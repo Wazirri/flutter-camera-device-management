@@ -16,10 +16,23 @@ class WebSocketService extends ChangeNotifier {
   String _password = '';
   List<String> _messageLog = [];
   SystemInfo? _systemInfo;
+  static const int maxLogMessages = 2000; // Maximum number of log messages to keep
 
   bool get isConnected => _isConnected;
   List<String> get messageLog => _messageLog;
   SystemInfo? get systemInfo => _systemInfo;
+  
+  // Add message to log with size limit enforcement
+  void _addToLog(String message) {
+    _messageLog.add(message);
+    
+    // If we exceed the maximum number of messages, remove oldest ones
+    if (_messageLog.length > maxLogMessages) {
+      _messageLog = _messageLog.sublist(_messageLog.length - maxLogMessages);
+    }
+    
+    notifyListeners();
+  }
   
   // Connect to WebSocket server
   Future<bool> connect(String address, String port, String username, String password) async {
@@ -62,8 +75,7 @@ class WebSocketService extends ChangeNotifier {
       
       // Add to message log
       final timestamp = DateTime.now().toString();
-      _messageLog.add('[$timestamp] Sent: $loginMessage');
-      notifyListeners();
+      _addToLog('[$timestamp] Sent: $loginMessage');
     }
   }
   
@@ -73,14 +85,14 @@ class WebSocketService extends ChangeNotifier {
       // Log the raw message first
       final timestamp = DateTime.now().toString();
       final rawLogMessage = '[$timestamp] Received: $message';
-      _messageLog.add(rawLogMessage);
+      _addToLog(rawLogMessage);
       debugPrint(rawLogMessage);
       
       // Try to parse as JSON if possible
       try {
         final jsonMessage = jsonDecode(message.toString());
         final jsonLogMessage = '[$timestamp] Parsed JSON: ${jsonEncode(jsonMessage)}';
-        _messageLog.add(jsonLogMessage);
+        _addToLog(jsonLogMessage);
         debugPrint(jsonLogMessage);
         
         // Check for login message
@@ -97,6 +109,7 @@ class WebSocketService extends ChangeNotifier {
             // Parse system info
             _systemInfo = SystemInfo.fromJson(jsonMessage);
             debugPrint('System info updated: ${jsonMessage['cpuTemp']}°C');
+            notifyListeners(); // Ensure UI updates with new system info
             
             // Send the monitor command after receiving system info
             sendMonitorCommand();
@@ -107,8 +120,6 @@ class WebSocketService extends ChangeNotifier {
         // Not valid JSON, that's okay, we already logged the raw message
         debugPrint('Error parsing JSON: $e');
       }
-      
-      notifyListeners();
     } catch (e) {
       debugPrint('Error handling message: $e');
     }
@@ -123,24 +134,21 @@ class WebSocketService extends ChangeNotifier {
       // Log the command
       final timestamp = DateTime.now().toString();
       final logMessage = '[$timestamp] Sent: $monitorCommand';
-      _messageLog.add(logMessage);
+      _addToLog(logMessage);
       debugPrint(logMessage);
-      
-      notifyListeners();
     }
   }
   
   // Handle WebSocket errors
   void _onError(dynamic error) {
     debugPrint('WebSocket error: $error');
-    _messageLog.add('[${DateTime.now()}] Error: $error');
-    notifyListeners();
+    _addToLog('[${DateTime.now()}] Error: $error');
   }
   
   // Handle WebSocket closure
   void _onDone() {
     debugPrint('WebSocket connection closed');
-    _messageLog.add('[${DateTime.now()}] Connection closed');
+    _addToLog('[${DateTime.now()}] Connection closed');
     _isConnected = false;
     notifyListeners();
     
@@ -160,6 +168,8 @@ class WebSocketService extends ChangeNotifier {
   void sendMessage(String message) {
     if (_channel != null && _isConnected) {
       _channel!.sink.add(message);
+      final timestamp = DateTime.now().toString();
+      _addToLog('[$timestamp] Sent: $message');
       debugPrint('Sent message: $message');
     } else {
       debugPrint('Cannot send message, WebSocket not connected');
