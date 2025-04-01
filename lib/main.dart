@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'screens/cameras_screen.dart';
@@ -12,19 +14,78 @@ import 'utils/responsive_helper.dart';
 import 'widgets/desktop_menu.dart';
 import 'widgets/mobile_menu.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
-  ]);
-  runApp(const MyApp());
+Future<void> main() async {
+  // This captures errors that happen during initialization
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    
+    // Set orientations
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    
+    // Set specific platform settings
+    if (Platform.isIOS || Platform.isMacOS) {
+      // iOS/macOS specific settings if needed
+    }
+    
+    // Run the app
+    runApp(const MyApp());
+  }, (error, stackTrace) {
+    // Log any errors that occur during initialization
+    debugPrint('Caught error: $error');
+    debugPrint('Stack trace: $stackTrace');
+  });
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    // Register observer for app lifecycle changes
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    // Remove observer when app is disposed
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Handle app lifecycle changes
+    debugPrint('App lifecycle state changed to: $state');
+    
+    // Handle specific state changes if needed
+    switch (state) {
+      case AppLifecycleState.resumed:
+        // App is visible and responding to user input
+        break;
+      case AppLifecycleState.inactive:
+        // App is inactive, happens when notifications or modal alerts appear
+        break;
+      case AppLifecycleState.paused:
+        // App is not visible
+        break;
+      case AppLifecycleState.detached:
+        // Application is in detached state (applicable for iOS and Android)
+        break;
+      default:
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +119,38 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   
+  @override
+  void initState() {
+    super.initState();
+    // Add observer for app lifecycle changes
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    // Clean up observer
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Handle app lifecycle state changes
+    debugPrint('AppShell lifecycle state: $state');
+    
+    if (state == AppLifecycleState.resumed) {
+      // When app is resumed from background, rebuild UI if needed
+      if (mounted) {
+        setState(() {
+          // Refresh the UI
+        });
+      }
+    }
+  }
+
   String get _currentRoute {
     final route = ModalRoute.of(context)?.settings.name ?? '/dashboard';
     return route;
@@ -68,6 +158,7 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Determine device type for responsive layout
     final isDesktop = ResponsiveHelper.isDesktop(context);
     final isTablet = ResponsiveHelper.isTablet(context);
     final isMobile = ResponsiveHelper.isMobile(context);
@@ -83,20 +174,22 @@ class _AppShellState extends State<AppShell> {
               ),
             )
           : null,
-      body: Row(
-        children: [
-          // Desktop side menu
-          if (isDesktop || isTablet)
-            DesktopSideMenu(
-              currentRoute: _currentRoute,
-              onDestinationSelected: _navigateToRoute,
+      body: SafeArea(
+        child: Row(
+          children: [
+            // Desktop side menu
+            if (isDesktop || isTablet)
+              DesktopSideMenu(
+                currentRoute: _currentRoute,
+                onDestinationSelected: _navigateToRoute,
+              ),
+            
+            // Main content
+            Expanded(
+              child: widget.child,
             ),
-          
-          // Main content
-          Expanded(
-            child: widget.child,
-          ),
-        ],
+          ],
+        ),
       ),
       // Mobile bottom navigation
       bottomNavigationBar: isMobile
@@ -109,13 +202,18 @@ class _AppShellState extends State<AppShell> {
   }
 
   void _navigateToRoute(String route) {
-    if (route != _currentRoute) {
-      Navigator.pushReplacementNamed(context, route);
-    }
-    
-    // Close drawer if open
-    if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
-      Navigator.of(context).pop();
+    try {
+      if (route != _currentRoute) {
+        Navigator.pushReplacementNamed(context, route);
+      }
+      
+      // Close drawer if open
+      if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      // Handle any navigation errors
+      debugPrint('Navigation error: $e');
     }
   }
 }

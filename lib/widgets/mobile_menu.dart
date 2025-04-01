@@ -14,20 +14,35 @@ class MobileBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final menuItems = MenuItems.getMenuItems(currentRoute: currentRoute);
-    
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: AppTheme.darkSurface,
-      selectedItemColor: AppTheme.primaryBlue,
-      unselectedItemColor: AppTheme.darkTextSecondary,
-      currentIndex: _getCurrentIndex(menuItems),
-      onTap: (index) => onDestinationSelected(menuItems[index].route),
-      items: menuItems.map((item) => BottomNavigationBarItem(
-        icon: Icon(item.icon),
-        label: item.title,
-      )).toList(),
-    );
+    try {
+      final menuItems = MenuItems.getMenuItems(currentRoute: currentRoute);
+      
+      return BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: AppTheme.darkSurface,
+        selectedItemColor: AppTheme.primaryBlue,
+        unselectedItemColor: AppTheme.darkTextSecondary,
+        currentIndex: _getCurrentIndex(menuItems),
+        onTap: (index) {
+          try {
+            // Handle onTap with error catching
+            if (index >= 0 && index < menuItems.length) {
+              onDestinationSelected(menuItems[index].route);
+            }
+          } catch (e) {
+            debugPrint('Error in bottom navigation tap: $e');
+          }
+        },
+        items: menuItems.map((item) => BottomNavigationBarItem(
+          icon: Icon(item.icon),
+          label: item.title,
+        )).toList(),
+      );
+    } catch (e) {
+      // Fallback in case of error
+      debugPrint('Error building mobile menu: $e');
+      return const SizedBox.shrink(); // Return empty widget instead of crashing
+    }
   }
   
   int _getCurrentIndex(List<CustomMenuItem> items) {
