@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/status.dart' as status;
+import '../models/system_info.dart';
 
 class WebSocketService extends ChangeNotifier {
   WebSocketChannel? _channel;
@@ -14,9 +15,11 @@ class WebSocketService extends ChangeNotifier {
   String _username = '';
   String _password = '';
   List<String> _messageLog = [];
+  SystemInfo? _systemInfo;
 
   bool get isConnected => _isConnected;
   List<String> get messageLog => _messageLog;
+  SystemInfo? get systemInfo => _systemInfo;
   
   // Connect to WebSocket server
   Future<bool> connect(String address, String port, String username, String password) async {
@@ -81,21 +84,49 @@ class WebSocketService extends ChangeNotifier {
         debugPrint(jsonLogMessage);
         
         // Check for login message
-        if (jsonMessage is Map && 
-            jsonMessage['c'] == 'login' && 
-            jsonMessage['msg'] == 'Oturum açılmamış! ') {
+        if (jsonMessage is Map) {
+          if (jsonMessage['c'] == 'login' && 
+              jsonMessage['msg'] == 'Oturum açılmamış! ') {
+            
+            // If we receive this specific login message, send login credentials
+            sendLoginMessage(_username, _password);
+          }
           
-          // If we receive this specific login message, send login credentials
-          sendLoginMessage(_username, _password);
+          // Check for system info message
+          else if (jsonMessage['c'] == 'sysinfo') {
+            // Parse system info
+            _systemInfo = SystemInfo.fromJson(jsonMessage);
+            debugPrint('System info updated: ${jsonMessage['cpuTemp']}°C');
+            
+            // Send the monitor command after receiving system info
+            sendMonitorCommand();
+          }
         }
         
       } catch (e) {
         // Not valid JSON, that's okay, we already logged the raw message
+        debugPrint('Error parsing JSON: $e');
       }
       
       notifyListeners();
     } catch (e) {
       debugPrint('Error handling message: $e');
+    }
+  }
+  
+  // Send the "DO MONITOR ecs" command
+  void sendMonitorCommand() {
+    if (_channel != null && _isConnected) {
+      final monitorCommand = 'DO MONITOR ecs';
+      _channel!.sink.add(monitorCommand);
+      
+      // Log the command
+      final timestamp = DateTime.now().toString();
+      final logMessage = '[$timestamp] Sent: $monitorCommand';
+      _messageLog.add(logMessage);
+      debugPrint(logMessage);
+      
+      notifyListeners();
     }
   }
   

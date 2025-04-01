@@ -9,6 +9,7 @@ class AppTheme {
   static const Color darkBackground = Color(0xFF121212);
   static const Color darkSurface = Color(0xFF1E1E1E);
   static const Color darkError = Color(0xFFCF6679);
+  static const Color darkBorder = Color(0xFF2A2A2A);
   
   // Text colors
   static const Color darkTextPrimary = Colors.white;
