@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:media_kit/media_kit.dart';                     // For Player
+import 'package:media_kit_video/media_kit_video.dart';         // For Video widget
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
@@ -15,6 +17,42 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
   int _selectedCameraIndex = 0;
   final List<String> _layoutOptions = ['Single', '2x2', '3x3', '4x4'];
   String _selectedLayout = 'Single';
+  
+  // Media Kit player instance
+  late final Player _player;
+  late final VideoController _videoController;
+  bool _isPlayerInitialized = false;
+  
+  // Demo video URL for Camera 1
+  final String _demoVideoUrl = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4';
+  
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the player
+    _player = Player();
+    _videoController = VideoController(_player);
+    
+    // Set up the player for Camera 1
+    _initializePlayer();
+  }
+  
+  Future<void> _initializePlayer() async {
+    try {
+      await _player.open(Media(_demoVideoUrl));
+      setState(() {
+        _isPlayerInitialized = true;
+      });
+    } catch (e) {
+      debugPrint('Error initializing player: $e');
+    }
+  }
+  
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -176,37 +214,50 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
         color: Colors.black,
         borderRadius: BorderRadius.circular(8),
       ),
+      clipBehavior: Clip.antiAlias, // Ensure video doesn't overflow rounded corners
       child: Stack(
         children: [
-          // Placeholder for the camera view
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.videocam_off,
-                  size: 64,
-                  color: AppTheme.darkTextSecondary,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Camera ${_selectedCameraIndex + 1}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: AppTheme.darkTextPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'No live feed available',
-                  style: TextStyle(
-                    fontSize: 14,
+          // Video player or placeholder based on camera selection
+          if (_selectedCameraIndex == 0 && _isPlayerInitialized)
+            // Camera 1 with video player for the demo video
+            SizedBox.expand(
+              child: Video(
+                controller: _videoController,
+                controls: NoVideoControls, // Use custom controls instead
+                wakelock: false, // We'll handle wakelock ourselves
+                fill: BoxFit.contain, // Contain the video in the available space
+              ),
+            )
+          else
+            // Placeholder for other cameras
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.videocam_off,
+                    size: 64,
                     color: AppTheme.darkTextSecondary,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  Text(
+                    'Camera ${_selectedCameraIndex + 1}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: AppTheme.darkTextPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'No live feed available',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppTheme.darkTextSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
           
           // Camera info overlay
           Positioned(
@@ -248,9 +299,9 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
                 color: Colors.black.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Text(
-                '2025-04-01 12:30:45',
-                style: TextStyle(
+              child: Text(
+                DateTime.now().toString().substring(0, 19), // Current time as timestamp
+                style: const TextStyle(
                   fontSize: 12,
                   color: Colors.white,
                 ),
@@ -279,6 +330,9 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
   }
 
   Widget _buildGridCameraItem(int index) {
+    final bool isCamera1 = index == 0;
+    final bool hasVideo = isCamera1 && _isPlayerInitialized;
+    
     return InkWell(
       onTap: () {
         setState(() {
@@ -294,16 +348,28 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
               ? Border.all(color: AppTheme.primaryBlue, width: 2)
               : null,
         ),
+        clipBehavior: Clip.antiAlias, // For video rendering
         child: Stack(
           children: [
-            // Placeholder for the camera view
-            Center(
-              child: Icon(
-                Icons.videocam_off,
-                size: 32,
-                color: AppTheme.darkTextSecondary,
+            // Video or placeholder for the camera
+            if (hasVideo)
+              // Show a preview for Camera 1
+              SizedBox.expand(
+                child: Video(
+                  controller: _videoController,
+                  controls: NoVideoControls,
+                  fill: BoxFit.cover,
+                ),
+              )
+            else
+              // Placeholder for other cameras
+              Center(
+                child: Icon(
+                  Icons.videocam_off,
+                  size: 32,
+                  color: AppTheme.darkTextSecondary,
+                ),
               ),
-            ),
             
             // Camera name overlay
             Positioned(
@@ -324,7 +390,7 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Camera ${index + 1}',
+                      'Camera ${index + 1}' + (hasVideo ? ' (Live)' : ''),
                       style: const TextStyle(
                         fontSize: 10,
                         color: Colors.white,
@@ -401,6 +467,11 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
   }
 
   Widget _buildControlBar() {
+    // Get playback state for Camera 1
+    final bool isPlayingVideo = _selectedCameraIndex == 0 && 
+                               _isPlayerInitialized && 
+                               _player.state.playing;
+    
     return Container(
       height: 60,
       color: AppTheme.darkSurface,
@@ -411,6 +482,20 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
           // Left controls
           Row(
             children: [
+              if (_selectedCameraIndex == 0 && _isPlayerInitialized)
+                // Play/Pause button for Camera 1
+                _buildControlButton(
+                  icon: isPlayingVideo ? Icons.pause : Icons.play_arrow,
+                  label: isPlayingVideo ? 'Pause' : 'Play',
+                  onPressed: () {
+                    if (isPlayingVideo) {
+                      _player.pause();
+                    } else {
+                      _player.play();
+                    }
+                    setState(() {}); // Refresh UI to update button state
+                  },
+                ),
               _buildControlButton(
                 icon: Icons.fullscreen,
                 label: 'Fullscreen',
@@ -440,10 +525,22 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
           Row(
             children: [
               _buildControlButton(
-                icon: Icons.volume_up,
-                label: 'Audio',
+                icon: (_selectedCameraIndex == 0 && _isPlayerInitialized && _player.state.volume <= 0) 
+                      ? Icons.volume_off 
+                      : Icons.volume_up,
+                label: (_selectedCameraIndex == 0 && _isPlayerInitialized && _player.state.volume <= 0)
+                      ? 'Unmute'
+                      : 'Mute',
                 onPressed: () {
-                  // UI only
+                  if (_selectedCameraIndex == 0 && _isPlayerInitialized) {
+                    // Toggle mute
+                    if (_player.state.volume > 0) {
+                      _player.setVolume(0);
+                    } else {
+                      _player.setVolume(100);
+                    }
+                    setState(() {}); // Refresh UI
+                  }
                 },
               ),
               _buildControlButton(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
+import 'package:media_kit/media_kit.dart'; // Import for MediaKit
 import 'screens/cameras_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/devices_screen.dart';
@@ -22,6 +23,9 @@ Future<void> main() async {
   // This captures errors that happen during initialization
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    
+    // Initialize MediaKit
+    MediaKit.ensureInitialized();
     
     // Set orientations (only for mobile platforms)
     if (!kIsWeb) {
