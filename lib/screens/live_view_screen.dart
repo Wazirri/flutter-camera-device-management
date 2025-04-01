@@ -225,7 +225,7 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
                 controller: _videoController,
                 controls: NoVideoControls, // Use custom controls instead
                 wakelock: false, // We'll handle wakelock ourselves
-                fill: BoxFit.contain, // Contain the video in the available space
+                fit: BoxFit.contain, // Contain the video in the available space
               ),
             )
           else
@@ -358,7 +358,7 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
                 child: Video(
                   controller: _videoController,
                   controls: NoVideoControls,
-                  fill: BoxFit.cover,
+                  fit: BoxFit.cover,
                 ),
               )
             else
