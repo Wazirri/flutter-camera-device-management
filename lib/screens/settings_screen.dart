@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
-import '../widgets/desktop_menu.dart';
-import '../widgets/mobile_menu.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -12,992 +10,462 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> with SingleTickerProviderStateMixin {
-  bool _isMenuExpanded = true;
-  late TabController _tabController;
-  
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-  }
-  
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-  
-  void _toggleMenu() {
-    setState(() {
-      _isMenuExpanded = !_isMenuExpanded;
-    });
-  }
-  
-  void _navigate(String route) {
-    Navigator.pushReplacementNamed(context, route);
-  }
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _notificationsEnabled = true;
+  bool _emailAlertsEnabled = false;
+  bool _autoUpdateEnabled = true;
+  double _storageLimit = 70;
+  String _videoQuality = 'High';
+  String _retentionPeriod = '30 Days';
   
   @override
   Widget build(BuildContext context) {
-    final isMobile = ResponsiveHelper.isMobile(context);
+    final isDesktop = ResponsiveHelper.isDesktop(context);
     
     return Scaffold(
+      backgroundColor: AppTheme.darkBackground,
       appBar: CustomAppBar(
         title: 'Settings',
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: () {},
-            tooltip: 'Save Settings',
-          ),
-          const SizedBox(width: 8.0),
-        ],
+        isDesktop: isDesktop,
       ),
-      drawer: isMobile
-          ? MobileDrawer(
-              currentRoute: '/settings',
-              onNavigate: _navigate,
-            )
-          : null,
-      bottomNavigationBar: isMobile
-          ? MobileMenu(
-              currentRoute: '/settings',
-              onNavigate: _navigate,
-            )
-          : null,
-      body: Row(
-        children: [
-          if (!isMobile)
-            DesktopMenu(
-              currentRoute: '/settings',
-              onNavigate: _navigate,
-              isExpanded: _isMenuExpanded,
-              onToggleExpand: _toggleMenu,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ResponsiveHelper.responsiveWidget(
+            context: context,
+            mobile: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: _buildSettingSections(context),
             ),
-          Expanded(
-            child: Column(
+            desktop: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildTabBar(),
                 Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
+                  child: Column(
                     children: [
-                      _buildGeneralSettings(),
-                      _buildUserManagement(),
-                      _buildCameraGroups(),
-                      _buildDeviceGroups(),
+                      _buildGeneralSettingsSection(context),
+                      const SizedBox(height: 16),
+                      _buildStorageSection(context),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    children: [
+                      _buildNotificationSection(context),
+                      const SizedBox(height: 16),
+                      _buildSecuritySection(context),
+                      const SizedBox(height: 16),
+                      _buildSystemSection(context),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildTabBar() {
-    return Container(
-      color: AppTheme.darkSurface,
-      child: TabBar(
-        controller: _tabController,
-        labelColor: AppTheme.blueAccent,
-        unselectedLabelColor: AppTheme.textSecondary,
-        indicatorColor: AppTheme.blueAccent,
-        indicatorWeight: 3.0,
-        tabs: const [
-          Tab(
-            icon: Icon(Icons.settings),
-            text: 'General',
-          ),
-          Tab(
-            icon: Icon(Icons.people),
-            text: 'Users',
-          ),
-          Tab(
-            icon: Icon(Icons.camera_alt),
-            text: 'Camera Groups',
-          ),
-          Tab(
-            icon: Icon(Icons.devices),
-            text: 'Device Groups',
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildGeneralSettings() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionHeader('System Settings'),
-          _buildSettingsCard([
-            _buildSwitchSetting(
-              'Dark Theme',
-              'Enable dark theme for the application',
-              true,
-              (value) {},
-            ),
-            const Divider(),
-            _buildSwitchSetting(
-              'Auto Refresh',
-              'Automatically refresh device status every 60 seconds',
-              true,
-              (value) {},
-            ),
-            const Divider(),
-            _buildDropdownSetting(
-              'Default View',
-              'Set the default view for cameras',
-              'Grid View',
-              ['Grid View', 'List View', 'Tile View'],
-              (value) {},
-            ),
-          ]),
-          
-          const SizedBox(height: 24.0),
-          _buildSectionHeader('Notification Settings'),
-          _buildSettingsCard([
-            _buildSwitchSetting(
-              'Email Notifications',
-              'Receive email notifications for alerts',
-              true,
-              (value) {},
-            ),
-            const Divider(),
-            _buildSwitchSetting(
-              'Push Notifications',
-              'Receive push notifications on mobile devices',
-              false,
-              (value) {},
-            ),
-            const Divider(),
-            _buildSwitchSetting(
-              'Sound Alerts',
-              'Play sound when alerts are triggered',
-              true,
-              (value) {},
-            ),
-          ]),
-          
-          const SizedBox(height: 24.0),
-          _buildSectionHeader('Storage Settings'),
-          _buildSettingsCard([
-            _buildSliderSetting(
-              'Retention Period',
-              'Number of days to keep recordings',
-              30,
-              (value) {},
-              min: 1,
-              max: 90,
-              divisions: 89,
-              suffix: 'days',
-            ),
-            const Divider(),
-            _buildDropdownSetting(
-              'Recording Quality',
-              'Default quality for recordings',
-              'High (1080p)',
-              ['Low (480p)', 'Medium (720p)', 'High (1080p)', 'Ultra (4K)'],
-              (value) {},
-            ),
-            const Divider(),
-            _buildSwitchSetting(
-              'Auto Delete',
-              'Automatically delete oldest recordings when storage is full',
-              true,
-              (value) {},
-            ),
-          ]),
-          
-          const SizedBox(height: 24.0),
-          _buildActionButtons(),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildUserManagement() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildSectionHeader('User Accounts'),
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.add),
-                label: const Text('Add User'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.blueAccent,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16.0),
-          _buildUsersList(),
-          
-          const SizedBox(height: 24.0),
-          _buildSectionHeader('User Roles'),
-          _buildRolesCard(),
-          
-          const SizedBox(height: 24.0),
-          _buildSectionHeader('Login Settings'),
-          _buildSettingsCard([
-            _buildSwitchSetting(
-              'Two-Factor Authentication',
-              'Require 2FA for all admin accounts',
-              true,
-              (value) {},
-            ),
-            const Divider(),
-            _buildDropdownSetting(
-              'Session Timeout',
-              'Automatically log out after inactivity',
-              '30 minutes',
-              ['15 minutes', '30 minutes', '1 hour', '4 hours', 'Never'],
-              (value) {},
-            ),
-            const Divider(),
-            _buildSwitchSetting(
-              'Failed Login Lockout',
-              'Lock account after 5 failed login attempts',
-              true,
-              (value) {},
-            ),
-          ]),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildCameraGroups() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildSectionHeader('Camera Groups'),
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.add),
-                label: const Text('Add Group'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.blueAccent,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16.0),
-          _buildGroupsList([
-            {
-              'name': 'Front Entrance',
-              'count': 4,
-              'status': 'All Online',
-              'color': AppTheme.blueAccent,
-            },
-            {
-              'name': 'Parking Lot',
-              'count': 6,
-              'status': '1 Offline',
-              'color': AppTheme.orangeAccent,
-            },
-            {
-              'name': 'Internal Offices',
-              'count': 8,
-              'status': 'All Online',
-              'color': AppTheme.blueAccent,
-            },
-            {
-              'name': 'Warehouse',
-              'count': 5,
-              'status': '2 Offline',
-              'color': AppTheme.orangeAccent,
-            },
-            {
-              'name': 'Back Entrance',
-              'count': 3,
-              'status': 'All Online',
-              'color': AppTheme.blueAccent,
-            },
-          ]),
-          
-          const SizedBox(height: 24.0),
-          _buildSectionHeader('Default Settings for New Groups'),
-          _buildSettingsCard([
-            _buildDropdownSetting(
-              'Recording Mode',
-              'Default recording mode for new camera groups',
-              'Motion Detection',
-              ['Always', 'Motion Detection', 'Scheduled', 'Manual'],
-              (value) {},
-            ),
-            const Divider(),
-            _buildSwitchSetting(
-              'Motion Alerts',
-              'Enable motion alerts for new camera groups',
-              true,
-              (value) {},
-            ),
-            const Divider(),
-            _buildSliderSetting(
-              'Motion Sensitivity',
-              'Default motion detection sensitivity',
-              70,
-              (value) {},
-              min: 0,
-              max: 100,
-              divisions: 100,
-              suffix: '%',
-            ),
-          ]),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildDeviceGroups() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildSectionHeader('Device Groups'),
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.add),
-                label: const Text('Add Group'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.blueAccent,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16.0),
-          _buildGroupsList([
-            {
-              'name': 'Network Infrastructure',
-              'count': 5,
-              'status': 'All Online',
-              'color': AppTheme.blueAccent,
-            },
-            {
-              'name': 'Storage Servers',
-              'count': 3,
-              'status': 'All Online',
-              'color': AppTheme.blueAccent,
-            },
-            {
-              'name': 'NVR Systems',
-              'count': 2,
-              'status': '1 Warning',
-              'color': AppTheme.orangeAccent,
-            },
-            {
-              'name': 'Remote Access',
-              'count': 4,
-              'status': '1 Offline',
-              'color': AppTheme.errorColor,
-            },
-          ]),
-          
-          const SizedBox(height: 24.0),
-          _buildSectionHeader('Maintenance Settings'),
-          _buildSettingsCard([
-            _buildSwitchSetting(
-              'Auto Updates',
-              'Automatically install firmware updates',
-              false,
-              (value) {},
-            ),
-            const Divider(),
-            _buildDropdownSetting(
-              'Maintenance Window',
-              'Schedule maintenance during low-usage hours',
-              '2:00 AM - 4:00 AM',
-              ['12:00 AM - 2:00 AM', '2:00 AM - 4:00 AM', '4:00 AM - 6:00 AM', 'Manually Schedule'],
-              (value) {},
-            ),
-            const Divider(),
-            _buildDropdownSetting(
-              'Backup Frequency',
-              'How often to back up device configurations',
-              'Weekly',
-              ['Daily', 'Weekly', 'Monthly', 'Never'],
-              (value) {},
-            ),
-          ]),
-          
-          const SizedBox(height: 24.0),
-          _buildSectionHeader('Network Settings'),
-          _buildSettingsCard([
-            _buildDropdownSetting(
-              'IP Assignment',
-              'How IP addresses are assigned to new devices',
-              'DHCP with Reservation',
-              ['DHCP', 'DHCP with Reservation', 'Static IP'],
-              (value) {},
-            ),
-            const Divider(),
-            _buildDropdownSetting(
-              'Default Subnet',
-              'Subnet for new devices',
-              '192.168.1.0/24',
-              ['192.168.1.0/24', '10.0.0.0/24', '172.16.0.0/24'],
-              (value) {},
-            ),
-            const Divider(),
-            _buildSwitchSetting(
-              'Remote Access',
-              'Allow devices to be accessed remotely',
-              true,
-              (value) {},
-            ),
-          ]),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildSectionHeader(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 20.0,
-          fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
-  
-  Widget _buildSettingsCard(List<Widget> children) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: children,
-        ),
-      ),
-    );
+
+  List<Widget> _buildSettingSections(BuildContext context) {
+    return [
+      _buildGeneralSettingsSection(context),
+      const SizedBox(height: 16),
+      _buildNotificationSection(context),
+      const SizedBox(height: 16),
+      _buildStorageSection(context),
+      const SizedBox(height: 16),
+      _buildSecuritySection(context),
+      const SizedBox(height: 16),
+      _buildSystemSection(context),
+    ];
   }
-  
-  Widget _buildSwitchSetting(
-    String title,
-    String subtitle,
-    bool value,
-    Function(bool) onChanged,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16.0,
-                  ),
-                ),
-                const SizedBox(height: 4.0),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 14.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: AppTheme.blueAccent,
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildDropdownSetting(
-    String title,
-    String subtitle,
-    String value,
-    List<String> options,
-    Function(String?) onChanged,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16.0,
-                  ),
-                ),
-                const SizedBox(height: 4.0),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 14.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-            decoration: BoxDecoration(
-              color: AppTheme.darkCard,
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: value,
-                dropdownColor: AppTheme.darkSurface,
-                icon: const Icon(Icons.arrow_drop_down),
-                items: options.map((String option) {
-                  return DropdownMenuItem<String>(
-                    value: option,
-                    child: Text(option),
-                  );
-                }).toList(),
-                onChanged: onChanged,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildSliderSetting(
-    String title,
-    String subtitle,
-    double value,
-    Function(double) onChanged, {
-    double min = 0.0,
-    double max = 100.0,
-    int divisions = 100,
-    String suffix = '',
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 16.0,
-            ),
-          ),
-          const SizedBox(height: 4.0),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              color: AppTheme.textSecondary,
-              fontSize: 14.0,
-            ),
-          ),
-          const SizedBox(height: 16.0),
-          Row(
-            children: [
-              Expanded(
-                child: SliderTheme(
-                  data: SliderThemeData(
-                    trackHeight: 4.0,
-                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8.0),
-                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 16.0),
-                    activeTrackColor: AppTheme.blueAccent,
-                    inactiveTrackColor: AppTheme.textSecondary.withOpacity(0.3),
-                    thumbColor: AppTheme.blueAccent,
-                    overlayColor: AppTheme.blueAccent.withOpacity(0.3),
-                  ),
-                  child: Slider(
-                    value: value,
-                    min: min,
-                    max: max,
-                    divisions: divisions,
-                    onChanged: onChanged,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16.0),
-              Container(
-                width: 60.0,
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                decoration: BoxDecoration(
-                  color: AppTheme.darkCard,
-                  borderRadius: BorderRadius.circular(4.0),
-                ),
-                child: Text(
-                  '${value.toInt()}$suffix',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildActionButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+
+  Widget _buildGeneralSettingsSection(BuildContext context) {
+    return _buildSettingCard(
+      title: 'General Settings',
+      icon: Icons.settings,
       children: [
-        OutlinedButton(
-          onPressed: () {},
-          style: OutlinedButton.styleFrom(
-            foregroundColor: AppTheme.textPrimary,
-            side: const BorderSide(color: AppTheme.textSecondary),
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-          ),
-          child: const Text('Reset to Defaults'),
+        _buildDropdownSetting(
+          title: 'Video Quality',
+          value: _videoQuality,
+          options: const ['Low', 'Medium', 'High', 'Ultra'],
+          onChanged: (newValue) {
+            if (newValue != null) {
+              setState(() {
+                _videoQuality = newValue;
+              });
+            }
+          },
         ),
-        const SizedBox(width: 16.0),
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.blueAccent,
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+        const Divider(),
+        _buildDropdownSetting(
+          title: 'Retention Period',
+          value: _retentionPeriod,
+          options: const ['7 Days', '14 Days', '30 Days', '60 Days', '90 Days'],
+          onChanged: (newValue) {
+            if (newValue != null) {
+              setState(() {
+                _retentionPeriod = newValue;
+              });
+            }
+          },
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text('Time Zone'),
+          subtitle: const Text('UTC+00:00 (Auto)'),
+          trailing: IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              // UI only
+            },
           ),
-          child: const Text('Save Changes'),
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text('Date Format'),
+          subtitle: const Text('YYYY-MM-DD'),
+          trailing: IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              // UI only
+            },
+          ),
         ),
       ],
     );
   }
-  
-  Widget _buildUsersList() {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+
+  Widget _buildNotificationSection(BuildContext context) {
+    return _buildSettingCard(
+      title: 'Notifications',
+      icon: Icons.notifications_outlined,
+      children: [
+        SwitchListTile(
+          title: const Text('Enable Notifications'),
+          subtitle: const Text('Receive alerts for important events'),
+          value: _notificationsEnabled,
+          activeColor: AppTheme.primaryBlue,
+          onChanged: (value) {
+            setState(() {
+              _notificationsEnabled = value;
+            });
+          },
+        ),
+        const Divider(),
+        SwitchListTile(
+          title: const Text('Email Alerts'),
+          subtitle: const Text('Receive alerts via email'),
+          value: _emailAlertsEnabled,
+          activeColor: AppTheme.primaryBlue,
+          onChanged: (value) {
+            setState(() {
+              _emailAlertsEnabled = value;
+            });
+          },
+        ),
+        const Divider(),
+        ExpansionTile(
+          title: const Text('Notification Types'),
           children: [
-            _buildUserListItem(
-              'John Smith',
-              'Administrator',
-              'Last login: Today, 10:45 AM',
-              Icons.admin_panel_settings,
-              AppTheme.blueAccent,
+            CheckboxListTile(
+              title: const Text('Motion Detection'),
+              value: true,
+              onChanged: (bool? value) {
+                // UI only
+              },
+              activeColor: AppTheme.primaryBlue,
             ),
-            const Divider(),
-            _buildUserListItem(
-              'Sarah Johnson',
-              'Manager',
-              'Last login: Yesterday, 3:22 PM',
-              Icons.manage_accounts,
-              AppTheme.blueAccent,
+            CheckboxListTile(
+              title: const Text('Device Status Changes'),
+              value: true,
+              onChanged: (bool? value) {
+                // UI only
+              },
+              activeColor: AppTheme.primaryBlue,
             ),
-            const Divider(),
-            _buildUserListItem(
-              'Michael Brown',
-              'Operator',
-              'Last login: 3 days ago',
-              Icons.person,
-              AppTheme.textSecondary,
-            ),
-            const Divider(),
-            _buildUserListItem(
-              'Jessica Williams',
-              'Viewer',
-              'Last login: 1 week ago',
-              Icons.remove_red_eye,
-              AppTheme.textSecondary,
+            CheckboxListTile(
+              title: const Text('System Updates'),
+              value: false,
+              onChanged: (bool? value) {
+                // UI only
+              },
+              activeColor: AppTheme.primaryBlue,
             ),
           ],
         ),
-      ),
+      ],
     );
   }
-  
-  Widget _buildUserListItem(
-    String name,
-    String role,
-    String lastLogin,
-    IconData icon,
-    Color iconColor,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Container(
-            width: 40.0,
-            height: 40.0,
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              color: iconColor,
-            ),
-          ),
-          const SizedBox(width: 16.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16.0,
-                  ),
-                ),
-                const SizedBox(height: 4.0),
-                Text(
-                  '$role • $lastLogin',
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 12.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.edit, size: 20.0),
-            onPressed: () {},
-            splashRadius: 24.0,
-            tooltip: 'Edit',
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete, size: 20.0),
-            onPressed: () {},
-            splashRadius: 24.0,
-            tooltip: 'Delete',
-            color: Colors.red.shade300,
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildRolesCard() {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildRoleItem(
-              'Administrator',
-              'Full system access and configuration rights',
-              AppTheme.blueAccent,
-            ),
-            const Divider(),
-            _buildRoleItem(
-              'Manager',
-              'Can manage cameras, devices, and view all content',
-              AppTheme.blueAccent,
-            ),
-            const Divider(),
-            _buildRoleItem(
-              'Operator',
-              'Can view live feeds and recordings, limited configuration',
-              AppTheme.orangeAccent,
-            ),
-            const Divider(),
-            _buildRoleItem(
-              'Viewer',
-              'Can only view live feeds, no configuration access',
-              AppTheme.textSecondary,
-            ),
-          ],
+
+  Widget _buildStorageSection(BuildContext context) {
+    return _buildSettingCard(
+      title: 'Storage',
+      icon: Icons.storage_outlined,
+      children: [
+        ListTile(
+          title: const Text('Storage Usage'),
+          subtitle: Text('${_storageLimit.toInt()}% of available space'),
         ),
-      ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: LinearProgressIndicator(
+            value: _storageLimit / 100,
+            backgroundColor: AppTheme.darkBackground,
+            valueColor: AlwaysStoppedAnimation<Color>(
+              _storageLimit > 90
+                  ? AppTheme.error
+                  : _storageLimit > 70
+                      ? AppTheme.warning
+                      : AppTheme.primaryBlue,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        const Divider(),
+        ListTile(
+          title: const Text('Storage Limit'),
+          subtitle: Text('${_storageLimit.toInt()}% of available space'),
+          trailing: SizedBox(
+            width: 120,
+            child: Slider(
+              value: _storageLimit,
+              min: 10,
+              max: 100,
+              divisions: 9,
+              label: '${_storageLimit.toInt()}%',
+              onChanged: (double value) {
+                setState(() {
+                  _storageLimit = value;
+                });
+              },
+              activeColor: AppTheme.primaryBlue,
+            ),
+          ),
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text('Cleanup Old Recordings'),
+          subtitle: const Text('Automatically delete recordings older than retention period'),
+          trailing: ElevatedButton(
+            onPressed: () {
+              // UI only
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryBlue,
+            ),
+            child: const Text('Clean Up'),
+          ),
+        ),
+      ],
     );
   }
-  
-  Widget _buildRoleItem(
-    String role,
-    String description,
-    Color color,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      child: Row(
+
+  Widget _buildSecuritySection(BuildContext context) {
+    return _buildSettingCard(
+      title: 'Security',
+      icon: Icons.security_outlined,
+      children: [
+        ListTile(
+          title: const Text('Change Password'),
+          leading: const Icon(Icons.lock_outline),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            // UI only
+          },
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text('Two-Factor Authentication'),
+          subtitle: const Text('Disabled'),
+          leading: const Icon(Icons.phonelink_lock),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            // UI only
+          },
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text('API Keys'),
+          subtitle: const Text('Manage API access'),
+          leading: const Icon(Icons.vpn_key_outlined),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            // UI only
+          },
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text('Session Management'),
+          subtitle: const Text('Manage active sessions'),
+          leading: const Icon(Icons.devices_outlined),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            // UI only
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSystemSection(BuildContext context) {
+    return _buildSettingCard(
+      title: 'System',
+      icon: Icons.system_update_outlined,
+      children: [
+        SwitchListTile(
+          title: const Text('Automatic Updates'),
+          subtitle: const Text('Keep system up to date automatically'),
+          value: _autoUpdateEnabled,
+          activeColor: AppTheme.primaryBlue,
+          onChanged: (value) {
+            setState(() {
+              _autoUpdateEnabled = value;
+            });
+          },
+        ),
+        const Divider(),
+        const ListTile(
+          title: Text('Current Version'),
+          subtitle: Text('v1.2.0'),
+          trailing: Text('Up to date', style: TextStyle(color: AppTheme.online)),
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text('System Logs'),
+          subtitle: const Text('View system logs and diagnostic information'),
+          trailing: IconButton(
+            icon: const Icon(Icons.download_outlined),
+            onPressed: () {
+              // UI only
+            },
+          ),
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text('Backup & Restore'),
+          subtitle: const Text('Backup system settings or restore from backup'),
+          trailing: IconButton(
+            icon: const Icon(Icons.backup_outlined),
+            onPressed: () {
+              // UI only
+            },
+          ),
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text('Factory Reset'),
+          subtitle: const Text('Reset all settings to default values'),
+          trailing: TextButton(
+            onPressed: () {
+              _showFactoryResetDialog();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: AppTheme.error,
+            ),
+            child: const Text('Reset'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSettingCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Card(
+      color: AppTheme.darkSurface,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 12.0,
-            height: 12.0,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 16.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  role,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16.0,
-                    color: color,
-                  ),
-                ),
-                const SizedBox(height: 4.0),
-                Text(
-                  description,
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 14.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.edit, size: 20.0),
-            onPressed: () {},
-            splashRadius: 24.0,
-            tooltip: 'Edit Permissions',
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildGroupsList(List<Map<String, dynamic>> groups) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: groups.length,
-      itemBuilder: (context, index) {
-        final group = groups[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
-          ),
-          child: Padding(
+          Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                Container(
-                  width: 48.0,
-                  height: 48.0,
-                  decoration: BoxDecoration(
-                    color: (group['color'] as Color).withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Icon(
-                    index % 2 == 0 ? Icons.camera_alt : Icons.devices,
-                    color: group['color'] as Color,
-                    size: 24.0,
-                  ),
+                Icon(
+                  icon,
+                  color: AppTheme.primaryBlue,
                 ),
-                const SizedBox(width: 16.0),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        group['name'] as String,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16.0,
-                        ),
-                      ),
-                      const SizedBox(height: 4.0),
-                      Row(
-                        children: [
-                          Text(
-                            '${group['count']} devices',
-                            style: const TextStyle(
-                              color: AppTheme.textSecondary,
-                              fontSize: 14.0,
-                            ),
-                          ),
-                          const SizedBox(width: 12.0),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-                            decoration: BoxDecoration(
-                              color: (group['color'] as Color).withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12.0),
-                            ),
-                            child: Text(
-                              group['status'] as String,
-                              style: TextStyle(
-                                color: group['color'] as Color,
-                                fontSize: 12.0,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                const SizedBox(width: 16),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit, size: 20.0),
-                      onPressed: () {},
-                      splashRadius: 24.0,
-                      tooltip: 'Edit',
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, size: 20.0),
-                      onPressed: () {},
-                      splashRadius: 24.0,
-                      tooltip: 'Delete',
-                      color: Colors.red.shade300,
-                    ),
-                  ],
                 ),
               ],
             ),
           ),
+          const Divider(height: 1),
+          ...children,
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDropdownSetting({
+    required String title,
+    required String value,
+    required List<String> options,
+    required Function(String?) onChanged,
+  }) {
+    return ListTile(
+      title: Text(title),
+      trailing: DropdownButton<String>(
+        value: value,
+        onChanged: onChanged,
+        items: options.map<DropdownMenuItem<String>>((String option) {
+          return DropdownMenuItem<String>(
+            value: option,
+            child: Text(option),
+          );
+        }).toList(),
+        dropdownColor: AppTheme.darkSurface,
+        underline: Container(),
+      ),
+    );
+  }
+
+  void _showFactoryResetDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.darkSurface,
+          title: const Text('Factory Reset'),
+          content: const Text(
+            'Are you sure you want to reset all settings to default values? This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                // UI only
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: AppTheme.error,
+              ),
+              child: const Text('Reset'),
+            ),
+          ],
         );
       },
     );

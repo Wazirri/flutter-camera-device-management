@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
-import '../widgets/camera_grid_item.dart';
 import '../widgets/custom_app_bar.dart';
-import '../widgets/desktop_menu.dart';
-import '../widgets/mobile_menu.dart';
 import '../widgets/status_indicator.dart';
 
 class LiveViewScreen extends StatefulWidget {
@@ -15,277 +12,467 @@ class LiveViewScreen extends StatefulWidget {
 }
 
 class _LiveViewScreenState extends State<LiveViewScreen> {
-  bool _isMenuExpanded = true;
-  String _selectedView = 'Grid View';
-  String _selectedGroup = 'All Cameras';
-  int _selectedLayoutIndex = 2; // 4 cameras by default
-  
-  final List<String> _layoutOptions = ['1 Camera', '2x2 Grid', '3x3 Grid', '4x4 Grid'];
-  final List<String> _viewOptions = ['Grid View', 'Single View', 'Custom View'];
-  final List<String> _groupOptions = ['All Cameras', 'Front Entrance', 'Parking', 'Internal', 'Back Entrance'];
-  
-  void _toggleMenu() {
-    setState(() {
-      _isMenuExpanded = !_isMenuExpanded;
-    });
-  }
-  
-  void _navigate(String route) {
-    Navigator.pushReplacementNamed(context, route);
-  }
-  
+  int _selectedCameraIndex = 0;
+  final List<String> _layoutOptions = ['Single', '2x2', '3x3', '4x4'];
+  String _selectedLayout = 'Single';
+
   @override
   Widget build(BuildContext context) {
-    final isMobile = ResponsiveHelper.isMobile(context);
+    final isDesktop = ResponsiveHelper.isDesktop(context);
     
     return Scaffold(
+      backgroundColor: AppTheme.darkBackground,
       appBar: CustomAppBar(
         title: 'Live View',
+        isDesktop: isDesktop,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.fullscreen),
-            onPressed: () {},
-            tooltip: 'Fullscreen',
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {},
-            tooltip: 'Refresh',
-          ),
-          const SizedBox(width: 8.0),
+          _buildLayoutSelector(),
+          const SizedBox(width: 8),
         ],
       ),
-      drawer: isMobile
-          ? MobileDrawer(
-              currentRoute: '/live_view',
-              onNavigate: _navigate,
-            )
-          : null,
-      bottomNavigationBar: isMobile
-          ? MobileMenu(
-              currentRoute: '/live_view',
-              onNavigate: _navigate,
-            )
-          : null,
       body: Row(
         children: [
-          if (!isMobile)
-            DesktopMenu(
-              currentRoute: '/live_view',
-              onNavigate: _navigate,
-              isExpanded: _isMenuExpanded,
-              onToggleExpand: _toggleMenu,
+          // Camera list sidebar - only visible on desktop/tablet
+          if (isDesktop || ResponsiveHelper.isTablet(context))
+            SizedBox(
+              width: 280,
+              child: Card(
+                margin: EdgeInsets.zero,
+                color: AppTheme.darkSurface,
+                elevation: 0,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Search cameras',
+                          prefixIcon: const Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: AppTheme.darkBackground,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: 10,
+                        itemBuilder: (context, index) {
+                          return _buildCameraListItem(
+                            index: index,
+                            isSelected: _selectedCameraIndex == index,
+                            onTap: () {
+                              setState(() {
+                                _selectedCameraIndex = index;
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
+          
+          // Main content area
           Expanded(
             child: Column(
               children: [
-                _buildControlBar(),
+                // Live video display area
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: _buildCameraGrid(),
+                  child: _buildSelectedLayout(context),
+                ),
+                
+                // Bottom control bar
+                _buildControlBar(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLayoutSelector() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: DropdownButton<String>(
+        value: _selectedLayout,
+        icon: const Icon(Icons.arrow_drop_down, color: AppTheme.darkTextPrimary),
+        iconSize: 24,
+        elevation: 16,
+        style: const TextStyle(color: AppTheme.darkTextPrimary),
+        underline: Container(height: 0),
+        dropdownColor: AppTheme.darkSurface,
+        onChanged: (String? newValue) {
+          if (newValue != null) {
+            setState(() {
+              _selectedLayout = newValue;
+            });
+          }
+        },
+        items: _layoutOptions.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Row(
+              children: [
+                Icon(
+                  _getLayoutIcon(value),
+                  color: AppTheme.darkTextPrimary,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Text(value),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  IconData _getLayoutIcon(String layout) {
+    switch (layout) {
+      case 'Single':
+        return Icons.fullscreen;
+      case '2x2':
+        return Icons.grid_view;
+      case '3x3':
+        return Icons.apps;
+      case '4x4':
+        return Icons.dashboard;
+      default:
+        return Icons.fullscreen;
+    }
+  }
+
+  Widget _buildSelectedLayout(BuildContext context) {
+    switch (_selectedLayout) {
+      case 'Single':
+        return _buildSingleCameraView();
+      case '2x2':
+        return _buildGridLayout(2);
+      case '3x3':
+        return _buildGridLayout(3);
+      case '4x4':
+        return _buildGridLayout(4);
+      default:
+        return _buildSingleCameraView();
+    }
+  }
+
+  Widget _buildSingleCameraView() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Stack(
+        children: [
+          // Placeholder for the camera view
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.videocam_off,
+                  size: 64,
+                  color: AppTheme.darkTextSecondary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Camera ${_selectedCameraIndex + 1}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: AppTheme.darkTextPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'No live feed available',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppTheme.darkTextSecondary,
                   ),
                 ),
               ],
             ),
           ),
+          
+          // Camera info overlay
+          Positioned(
+            top: 16,
+            left: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  StatusIndicator(
+                    status: DeviceStatus.online,
+                    size: 8,
+                    padding: EdgeInsets.zero,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Camera ${_selectedCameraIndex + 1}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          // Timestamp overlay
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Text(
+                '2025-04-01 12:30:45',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
-  
-  Widget _buildControlBar() {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: const BoxDecoration(
-        color: AppTheme.darkSurface,
-        border: Border(
-          bottom: BorderSide(
-            color: Color(0xFF333333),
-            width: 1.0,
-          ),
-        ),
-      ),
-      child: ResponsiveHelper.isMobile(context)
-          ? Column(
-              children: [
-                _buildDropdownRow(),
-                const SizedBox(height: 16.0),
-                _buildLayoutSelector(),
-              ],
-            )
-          : Row(
-              children: [
-                _buildDropdownRow(),
-                const Spacer(),
-                _buildLayoutSelector(),
-              ],
-            ),
-    );
-  }
-  
-  Widget _buildDropdownRow() {
-    return Wrap(
-      spacing: 16.0,
-      runSpacing: 16.0,
-      children: [
-        // View Type Dropdown
-        DropdownButtonHideUnderline(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-            decoration: BoxDecoration(
-              color: AppTheme.darkCard,
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: DropdownButton<String>(
-              value: _selectedView,
-              dropdownColor: AppTheme.darkSurface,
-              icon: const Icon(Icons.arrow_drop_down),
-              items: _viewOptions.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    _selectedView = newValue;
-                  });
-                }
-              },
-            ),
-          ),
-        ),
-        
-        // Camera Group Dropdown
-        DropdownButtonHideUnderline(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-            decoration: BoxDecoration(
-              color: AppTheme.darkCard,
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: DropdownButton<String>(
-              value: _selectedGroup,
-              dropdownColor: AppTheme.darkSurface,
-              icon: const Icon(Icons.arrow_drop_down),
-              items: _groupOptions.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    _selectedGroup = newValue;
-                  });
-                }
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-  
-  Widget _buildLayoutSelector() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Text(
-          'Layout:',
-          style: TextStyle(
-            color: AppTheme.textSecondary,
-          ),
-        ),
-        const SizedBox(width: 12.0),
-        ToggleButtons(
-          borderRadius: BorderRadius.circular(8.0),
-          selectedColor: Colors.white,
-          fillColor: AppTheme.blueAccent,
-          color: AppTheme.textSecondary,
-          constraints: const BoxConstraints(minWidth: 44.0, minHeight: 36.0),
-          isSelected: List.generate(
-            _layoutOptions.length,
-            (index) => index == _selectedLayoutIndex,
-          ),
-          onPressed: (index) {
-            setState(() {
-              _selectedLayoutIndex = index;
-            });
-          },
-          children: const [
-            Icon(Icons.fullscreen),
-            Icon(Icons.grid_view),
-            Icon(Icons.dashboard),
-            Icon(Icons.apps),
-          ],
-        ),
-      ],
-    );
-  }
-  
-  Widget _buildCameraGrid() {
-    final crossAxisCount = _getCrossAxisCount();
-    
+
+  Widget _buildGridLayout(int gridSize) {
     return GridView.builder(
+      padding: const EdgeInsets.all(8),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 16.0,
-        mainAxisSpacing: 16.0,
-        childAspectRatio: 16 / 10, // Approximate aspect ratio for cameras
+        crossAxisCount: gridSize,
+        childAspectRatio: 16 / 9,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
       ),
-      itemCount: _getCameraCount(),
+      itemCount: gridSize * gridSize,
       itemBuilder: (context, index) {
-        // Alternate between different statuses for demo purposes
-        final status = index % 3 == 0
-            ? DeviceStatus.online
-            : index % 3 == 1
-                ? DeviceStatus.warning
-                : DeviceStatus.offline;
-                
-        return CameraGridItem(
-          name: 'Camera ${index + 1}',
-          status: status,
-          resolution: '1080p',
-          isSelected: index == 0, // First camera is selected
-          onTap: () {
-            // Handle camera selection
-          },
-        );
+        return _buildGridCameraItem(index);
       },
     );
   }
-  
-  int _getCrossAxisCount() {
-    switch (_selectedLayoutIndex) {
-      case 0: // Single camera
-        return 1;
-      case 1: // 2x2 grid
-        return 2;
-      case 2: // 3x3 grid
-        return 3;
-      case 3: // 4x4 grid
-        return 4;
-      default:
-        return 2;
-    }
+
+  Widget _buildGridCameraItem(int index) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _selectedCameraIndex = index;
+          _selectedLayout = 'Single';
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(8),
+          border: index == _selectedCameraIndex && _selectedLayout != 'Single'
+              ? Border.all(color: AppTheme.primaryBlue, width: 2)
+              : null,
+        ),
+        child: Stack(
+          children: [
+            // Placeholder for the camera view
+            Center(
+              child: Icon(
+                Icons.videocam_off,
+                size: 32,
+                color: AppTheme.darkTextSecondary,
+              ),
+            ),
+            
+            // Camera name overlay
+            Positioned(
+              top: 8,
+              left: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    StatusIndicator(
+                      status: index % 5 == 0 ? DeviceStatus.offline : DeviceStatus.online,
+                      size: 6,
+                      padding: EdgeInsets.zero,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Camera ${index + 1}',
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
-  
-  int _getCameraCount() {
-    switch (_selectedLayoutIndex) {
-      case 0: // Single camera
-        return 1;
-      case 1: // 2x2 grid
-        return 4;
-      case 2: // 3x3 grid
-        return 9;
-      case 3: // 4x4 grid
-        return 16;
-      default:
-        return 4;
-    }
+
+  Widget _buildCameraListItem({
+    required int index,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    bool isOnline = index % 5 != 0;
+    
+    return ListTile(
+      selected: isSelected,
+      selectedTileColor: AppTheme.primaryBlue.withOpacity(0.15),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0),
+      ),
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.videocam,
+            color: isOnline ? AppTheme.primaryBlue : AppTheme.darkTextSecondary,
+            size: 20,
+          ),
+        ),
+      ),
+      title: Text(
+        'Camera ${index + 1}',
+        style: TextStyle(
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          color: isSelected ? AppTheme.primaryBlue : AppTheme.darkTextPrimary,
+        ),
+      ),
+      subtitle: Row(
+        children: [
+          StatusIndicator(
+            status: isOnline ? DeviceStatus.online : DeviceStatus.offline,
+            size: 8,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            isOnline ? 'Online' : 'Offline',
+            style: TextStyle(
+              fontSize: 12,
+              color: AppTheme.darkTextSecondary,
+            ),
+          ),
+        ],
+      ),
+      trailing: Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: isSelected ? AppTheme.primaryBlue : AppTheme.darkTextSecondary,
+      ),
+      onTap: onTap,
+    );
+  }
+
+  Widget _buildControlBar() {
+    return Container(
+      height: 60,
+      color: AppTheme.darkSurface,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Left controls
+          Row(
+            children: [
+              _buildControlButton(
+                icon: Icons.fullscreen,
+                label: 'Fullscreen',
+                onPressed: () {
+                  // UI only
+                },
+              ),
+              _buildControlButton(
+                icon: Icons.screenshot,
+                label: 'Screenshot',
+                onPressed: () {
+                  // UI only
+                },
+              ),
+              _buildControlButton(
+                icon: Icons.fiber_manual_record,
+                label: 'Record',
+                onPressed: () {
+                  // UI only
+                },
+                iconColor: AppTheme.error,
+              ),
+            ],
+          ),
+          
+          // Right controls
+          Row(
+            children: [
+              _buildControlButton(
+                icon: Icons.volume_up,
+                label: 'Audio',
+                onPressed: () {
+                  // UI only
+                },
+              ),
+              _buildControlButton(
+                icon: Icons.settings,
+                label: 'Settings',
+                onPressed: () {
+                  // UI only
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildControlButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+    Color? iconColor,
+  }) {
+    return Tooltip(
+      message: label,
+      child: IconButton(
+        icon: Icon(icon),
+        onPressed: onPressed,
+        color: iconColor ?? AppTheme.darkTextPrimary,
+      ),
+    );
   }
 }

@@ -5,75 +5,84 @@ enum DeviceStatus {
   online,
   offline,
   warning,
-  error
+  error,
 }
 
 class StatusIndicator extends StatelessWidget {
   final DeviceStatus status;
   final double size;
   final bool showLabel;
-  
+  final EdgeInsets padding;
+
   const StatusIndicator({
     Key? key,
     required this.status,
-    this.size = 12.0,
+    this.size = 10.0,
     this.showLabel = false,
+    this.padding = const EdgeInsets.symmetric(horizontal: 8.0),
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
-    Color color;
-    String label;
-    
-    switch (status) {
-      case DeviceStatus.online:
-        color = AppTheme.blueAccent;
-        label = 'Online';
-        break;
-      case DeviceStatus.offline:
-        color = AppTheme.textSecondary;
-        label = 'Offline';
-        break;
-      case DeviceStatus.warning:
-        color = AppTheme.orangeAccent;
-        label = 'Warning';
-        break;
-      case DeviceStatus.error:
-        color = AppTheme.errorColor;
-        label = 'Error';
-        break;
-    }
-    
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: color.withOpacity(0.5),
-                blurRadius: 4.0,
-                spreadRadius: 1.0,
-              ),
-            ],
-          ),
-        ),
-        if (showLabel) ...[
-          const SizedBox(width: 8.0),
-          Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 14.0,
-              fontWeight: FontWeight.w500,
+    return Padding(
+      padding: padding,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              color: _getColorForStatus(status),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: _getColorForStatus(status).withOpacity(0.5),
+                  blurRadius: 4,
+                  spreadRadius: 1,
+                ),
+              ],
             ),
           ),
+          if (showLabel) ...[
+            const SizedBox(width: 6),
+            Text(
+              _getLabelForStatus(status),
+              style: TextStyle(
+                fontSize: 12,
+                color: AppTheme.darkTextSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ],
-      ],
+      ),
     );
+  }
+
+  String _getLabelForStatus(DeviceStatus status) {
+    switch (status) {
+      case DeviceStatus.online:
+        return 'Online';
+      case DeviceStatus.offline:
+        return 'Offline';
+      case DeviceStatus.warning:
+        return 'Warning';
+      case DeviceStatus.error:
+        return 'Error';
+    }
+  }
+
+  Color _getColorForStatus(DeviceStatus status) {
+    switch (status) {
+      case DeviceStatus.online:
+        return AppTheme.online;
+      case DeviceStatus.offline:
+        return AppTheme.offline;
+      case DeviceStatus.warning:
+        return AppTheme.warning;
+      case DeviceStatus.error:
+        return AppTheme.error;
+    }
   }
 }

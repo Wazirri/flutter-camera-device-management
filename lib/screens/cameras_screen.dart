@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
+import '../widgets/camera_grid_item.dart';
 import '../widgets/custom_app_bar.dart';
-import '../widgets/desktop_menu.dart';
-import '../widgets/device_list_item.dart';
-import '../widgets/mobile_menu.dart';
 import '../widgets/status_indicator.dart';
 
 class CamerasScreen extends StatefulWidget {
@@ -15,255 +13,402 @@ class CamerasScreen extends StatefulWidget {
 }
 
 class _CamerasScreenState extends State<CamerasScreen> {
-  bool _isMenuExpanded = true;
-  String _selectedFilter = 'All';
-  String _searchQuery = '';
   final _searchController = TextEditingController();
-  final List<String> _filterOptions = ['All', 'Online', 'Offline', 'Warning'];
-  
-  void _toggleMenu() {
-    setState(() {
-      _isMenuExpanded = !_isMenuExpanded;
-    });
-  }
-  
-  void _navigate(String route) {
-    Navigator.pushReplacementNamed(context, route);
-  }
+  String _selectedFilter = 'All';
+  final List<String> _filterOptions = ['All', 'Online', 'Offline', 'Issues'];
+  final List<String> _sortOptions = ['Name', 'Status', 'Last Active', 'Location'];
+  String _selectedSort = 'Name';
   
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
-    final isMobile = ResponsiveHelper.isMobile(context);
+    final isDesktop = ResponsiveHelper.isDesktop(context);
     
     return Scaffold(
+      backgroundColor: AppTheme.darkBackground,
       appBar: CustomAppBar(
         title: 'Cameras',
+        isDesktop: isDesktop,
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {},
-            tooltip: 'Add Camera',
+            icon: const Icon(Icons.filter_list),
+            onPressed: _showFilterOptions,
           ),
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {},
-            tooltip: 'Refresh',
-          ),
-          const SizedBox(width: 8.0),
-        ],
-      ),
-      drawer: isMobile
-          ? MobileDrawer(
-              currentRoute: '/cameras',
-              onNavigate: _navigate,
-            )
-          : null,
-      bottomNavigationBar: isMobile
-          ? MobileMenu(
-              currentRoute: '/cameras',
-              onNavigate: _navigate,
-            )
-          : null,
-      body: Row(
-        children: [
-          if (!isMobile)
-            DesktopMenu(
-              currentRoute: '/cameras',
-              onNavigate: _navigate,
-              isExpanded: _isMenuExpanded,
-              onToggleExpand: _toggleMenu,
-            ),
-          Expanded(
-            child: Column(
-              children: [
-                _buildFilterBar(),
-                Expanded(
-                  child: _buildCameraList(),
-                ),
-              ],
-            ),
+            icon: const Icon(Icons.sort),
+            onPressed: _showSortOptions,
           ),
         ],
       ),
-      floatingActionButton: isMobile ? FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: AppTheme.blueAccent,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppTheme.primaryOrange,
+        foregroundColor: Colors.white,
+        onPressed: () {
+          // UI only
+        },
         child: const Icon(Icons.add),
-      ) : null,
-    );
-  }
-  
-  Widget _buildFilterBar() {
-    final isMobile = ResponsiveHelper.isMobile(context);
-    
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: const BoxDecoration(
-        color: AppTheme.darkSurface,
-        border: Border(
-          bottom: BorderSide(
-            color: Color(0xFF333333),
-            width: 1.0,
+      ),
+      body: Column(
+        children: [
+          _buildSearchBar(),
+          _buildFilterChips(),
+          Expanded(
+            child: _buildCameraGrid(context),
           ),
-        ),
+        ],
       ),
-      child: isMobile
-          ? Column(
-              children: [
-                _buildSearchField(),
-                const SizedBox(height: 16.0),
-                _buildFilterChips(),
-              ],
-            )
-          : Row(
-              children: [
-                Expanded(child: _buildSearchField()),
-                const SizedBox(width: 16.0),
-                _buildFilterChips(),
-              ],
-            ),
     );
   }
-  
-  Widget _buildSearchField() {
-    return TextField(
-      controller: _searchController,
-      decoration: InputDecoration(
-        hintText: 'Search cameras...',
-        prefixIcon: const Icon(Icons.search),
-        suffixIcon: _searchQuery.isNotEmpty
-            ? IconButton(
-                icon: const Icon(Icons.clear),
-                onPressed: () {
-                  setState(() {
-                    _searchQuery = '';
-                    _searchController.clear();
-                  });
-                },
-              )
-            : null,
-        filled: true,
-        fillColor: AppTheme.darkCard,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide.none,
-        ),
-      ),
-      onChanged: (value) {
-        setState(() {
-          _searchQuery = value;
-        });
-      },
-    );
-  }
-  
-  Widget _buildFilterChips() {
-    return Wrap(
-      spacing: 8.0,
-      children: _filterOptions.map((filter) {
-        final isSelected = _selectedFilter == filter;
-        return ChoiceChip(
-          label: Text(filter),
-          selected: isSelected,
-          onSelected: (selected) {
-            if (selected) {
-              setState(() {
-                _selectedFilter = filter;
-              });
-            }
-          },
-          selectedColor: AppTheme.blueAccent,
-          backgroundColor: AppTheme.darkCard,
-        );
-      }).toList(),
-    );
-  }
-  
-  Widget _buildCameraList() {
+
+  Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: ListView.builder(
-        itemCount: 12, // Sample data count
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Search cameras',
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              _searchController.clear();
+            },
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: AppTheme.darkSurface,
+          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterChips() {
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          _buildFilterChip('All', _selectedFilter == 'All'),
+          _buildFilterChip('Online', _selectedFilter == 'Online',
+              leadingIcon: StatusIndicator(
+                status: DeviceStatus.online,
+                size: 10,
+                padding: EdgeInsets.zero,
+              )),
+          _buildFilterChip('Offline', _selectedFilter == 'Offline',
+              leadingIcon: StatusIndicator(
+                status: DeviceStatus.offline,
+                size: 10,
+                padding: EdgeInsets.zero,
+              )),
+          _buildFilterChip('Issues', _selectedFilter == 'Issues',
+              leadingIcon: StatusIndicator(
+                status: DeviceStatus.warning,
+                size: 10,
+                padding: EdgeInsets.zero,
+              )),
+          _buildFilterChip('Favorites', _selectedFilter == 'Favorites',
+              leadingIcon: const Icon(
+                Icons.star,
+                size: 14,
+                color: AppTheme.primaryOrange,
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, bool isSelected, {Widget? leadingIcon}) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: FilterChip(
+        avatar: leadingIcon,
+        label: Text(label),
+        selected: isSelected,
+        showCheckmark: false,
+        selectedColor: AppTheme.primaryBlue.withOpacity(0.2),
+        backgroundColor: AppTheme.darkSurface,
+        labelStyle: TextStyle(
+          color: isSelected ? AppTheme.primaryBlue : AppTheme.darkTextPrimary,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+        onSelected: (selected) {
+          setState(() {
+            _selectedFilter = label;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildCameraGrid(BuildContext context) {
+    final crossAxisCount = ResponsiveHelper.getResponsiveGridCount(
+      context,
+      mobile: 1,
+      tablet: 2,
+      desktop: 3,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          childAspectRatio: 1,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+        ),
+        itemCount: 12,
         itemBuilder: (context, index) {
-          // Sample data with alternating statuses
-          DeviceStatus status;
-          if (index % 4 == 0) {
-            status = DeviceStatus.online;
-          } else if (index % 4 == 1) {
+          // Alternating statuses for demo
+          DeviceStatus status = DeviceStatus.online;
+          if (index % 5 == 0) {
             status = DeviceStatus.offline;
-          } else if (index % 4 == 2) {
+          } else if (index % 7 == 0) {
             status = DeviceStatus.warning;
-          } else {
-            status = DeviceStatus.error;
           }
           
-          // Filter based on selected filter
-          if (_selectedFilter != 'All') {
-            if (_selectedFilter == 'Online' && status != DeviceStatus.online) {
-              return const SizedBox.shrink();
-            }
-            if (_selectedFilter == 'Offline' && status != DeviceStatus.offline) {
-              return const SizedBox.shrink();
-            }
-            if (_selectedFilter == 'Warning' && status != DeviceStatus.warning) {
-              return const SizedBox.shrink();
-            }
-          }
-          
-          // Sample camera data
-          final cameraName = 'Camera ${index + 1}';
-          final ipAddress = '192.168.1.${100 + index}';
-          final resolution = index % 2 == 0 ? '1080p' : '4K';
-          final tags = _getSampleTags(index);
-          final group = _getSampleGroup(index);
-          
-          // Filter based on search query
-          if (_searchQuery.isNotEmpty &&
-              !cameraName.toLowerCase().contains(_searchQuery.toLowerCase()) &&
-              !ipAddress.contains(_searchQuery) &&
-              !group.toLowerCase().contains(_searchQuery.toLowerCase())) {
-            return const SizedBox.shrink();
-          }
-          
-          return DeviceListItem(
-            name: cameraName,
-            ip: ipAddress,
+          return CameraGridItem(
+            name: 'Camera ${index + 1}',
+            location: 'Location ${index + 1}',
             status: status,
-            resolution: resolution,
-            tags: tags,
-            group: group,
             onTap: () {
-              // Handle camera selection
+              // UI only
+            },
+            onSettingsTap: () {
+              _showCameraOptions(context, index);
             },
           );
         },
       ),
     );
   }
-  
-  List<String> _getSampleTags(int index) {
-    final List<String> allTags = [
-      'Indoor', 'Outdoor', 'PTZ', 'Dome', 'Bullet',
-      'Night Vision', 'Motion Sensor', 'HDR', 'Wide Angle'
-    ];
-    
-    // Return 2-3 tags based on index
-    final startIdx = index % (allTags.length - 2);
-    final count = 2 + (index % 2);
-    return allTags.sublist(startIdx, startIdx + count);
+
+  void _showFilterOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.darkSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              alignment: Alignment.centerLeft,
+              child: const Text(
+                'Filter Cameras',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: _filterOptions.length,
+              itemBuilder: (context, index) {
+                final option = _filterOptions[index];
+                return ListTile(
+                  leading: _getFilterIcon(option),
+                  title: Text(option),
+                  selected: _selectedFilter == option,
+                  selectedTileColor: AppTheme.primaryBlue.withOpacity(0.15),
+                  trailing: _selectedFilter == option
+                      ? const Icon(Icons.check, color: AppTheme.primaryBlue)
+                      : null,
+                  onTap: () {
+                    setState(() {
+                      _selectedFilter = option;
+                    });
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
-  
-  String _getSampleGroup(int index) {
-    final List<String> groups = [
-      'Front Entrance', 'Back Entrance', 'Parking Lot',
-      'Office Area', 'Warehouse', 'Hallway'
-    ];
-    return groups[index % groups.length];
+
+  Widget _getFilterIcon(String filter) {
+    switch (filter) {
+      case 'All':
+        return const Icon(Icons.all_inclusive);
+      case 'Online':
+        return StatusIndicator(
+          status: DeviceStatus.online,
+          size: 12,
+          padding: EdgeInsets.zero,
+        );
+      case 'Offline':
+        return StatusIndicator(
+          status: DeviceStatus.offline,
+          size: 12,
+          padding: EdgeInsets.zero,
+        );
+      case 'Issues':
+        return StatusIndicator(
+          status: DeviceStatus.warning,
+          size: 12,
+          padding: EdgeInsets.zero,
+        );
+      default:
+        return const Icon(Icons.filter_list);
+    }
+  }
+
+  void _showSortOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.darkSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              alignment: Alignment.centerLeft,
+              child: const Text(
+                'Sort Cameras',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: _sortOptions.length,
+              itemBuilder: (context, index) {
+                final option = _sortOptions[index];
+                return ListTile(
+                  title: Text(option),
+                  selected: _selectedSort == option,
+                  selectedTileColor: AppTheme.primaryBlue.withOpacity(0.15),
+                  trailing: _selectedSort == option
+                      ? const Icon(Icons.check, color: AppTheme.primaryBlue)
+                      : null,
+                  onTap: () {
+                    setState(() {
+                      _selectedSort = option;
+                    });
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCameraOptions(BuildContext context, int cameraIndex) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.darkSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    backgroundColor: Colors.black,
+                    radius: 20,
+                    child: Icon(
+                      Icons.videocam,
+                      color: AppTheme.primaryBlue,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Camera ${cameraIndex + 1}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Location ${cameraIndex + 1}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.darkTextSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.visibility),
+              title: const Text('View Live'),
+              onTap: () {
+                Navigator.pop(context);
+                // UI only
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () {
+                Navigator.pop(context);
+                // UI only
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.restart_alt),
+              title: const Text('Restart Camera'),
+              onTap: () {
+                Navigator.pop(context);
+                // UI only
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.star_border,
+                color: AppTheme.primaryOrange,
+              ),
+              title: const Text('Add to Favorites'),
+              onTap: () {
+                Navigator.pop(context);
+                // UI only
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        );
+      },
+    );
   }
 }

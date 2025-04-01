@@ -4,103 +4,127 @@ import 'status_indicator.dart';
 
 class CameraGridItem extends StatelessWidget {
   final String name;
+  final String location;
   final DeviceStatus status;
-  final String? resolution;
-  final bool isSelected;
-  final VoidCallback? onTap;
-  
+  final String? thumbnailUrl;
+  final VoidCallback onTap;
+  final VoidCallback onSettingsTap;
+
   const CameraGridItem({
     Key? key,
     required this.name,
+    required this.location,
     required this.status,
-    this.resolution,
-    this.isSelected = false,
-    this.onTap,
+    this.thumbnailUrl,
+    required this.onTap,
+    required this.onSettingsTap,
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        elevation: isSelected ? 4.0 : 2.0,
+        clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          side: isSelected
-              ? const BorderSide(color: AppTheme.blueAccent, width: 2.0)
-              : BorderSide.none,
+          borderRadius: BorderRadius.circular(12),
         ),
+        elevation: 2,
+        margin: const EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Camera preview area
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppTheme.darkBackground,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(8.0),
-                    topRight: Radius.circular(8.0),
+            Stack(
+              children: [
+                // Camera preview/thumbnail
+                Container(
+                  height: 150,
+                  width: double.infinity,
+                  color: Colors.black,
+                  child: thumbnailUrl != null
+                      ? Image.network(
+                          thumbnailUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              _buildPlaceholder(),
+                        )
+                      : _buildPlaceholder(),
+                ),
+                // Status indicator
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0,
+                      vertical: 4.0,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppTheme.darkSurface.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: StatusIndicator(
+                      status: status,
+                      showLabel: true,
+                      padding: EdgeInsets.zero,
+                    ),
                   ),
                 ),
-                alignment: Alignment.center,
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.videocam_off,
-                      color: AppTheme.textSecondary,
-                      size: 48.0,
-                    ),
-                    SizedBox(height: 8.0),
-                    Text(
-                      'No Live Feed',
-                      style: TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: 14.0,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              ],
             ),
-            
-            // Camera information
             Padding(
               padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
                           name,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16.0,
+                            fontSize: 16,
                           ),
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      StatusIndicator(status: status),
-                    ],
-                  ),
-                  if (resolution != null) ...[
-                    const SizedBox(height: 4.0),
-                    Text(
-                      resolution!,
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
-                        fontSize: 12.0,
-                      ),
+                        const SizedBox(height: 4),
+                        Text(
+                          location,
+                          style: TextStyle(
+                            color: AppTheme.darkTextSecondary,
+                            fontSize: 12,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.more_vert),
+                    color: AppTheme.darkTextSecondary,
+                    onPressed: onSettingsTap,
+                  ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      color: AppTheme.darkBackground,
+      child: Center(
+        child: Icon(
+          Icons.videocam_off,
+          size: 48,
+          color: AppTheme.darkTextSecondary,
         ),
       ),
     );

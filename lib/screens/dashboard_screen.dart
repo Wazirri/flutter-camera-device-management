@@ -2,190 +2,201 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
-import '../widgets/desktop_menu.dart';
-import '../widgets/mobile_menu.dart';
 import '../widgets/status_indicator.dart';
 
-class DashboardScreen extends StatefulWidget {
+class DashboardScreen extends StatelessWidget {
   const DashboardScreen({Key? key}) : super(key: key);
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
-}
-
-class _DashboardScreenState extends State<DashboardScreen> {
-  bool _isMenuExpanded = true;
-  
-  void _toggleMenu() {
-    setState(() {
-      _isMenuExpanded = !_isMenuExpanded;
-    });
-  }
-  
-  void _navigate(String route) {
-    Navigator.pushReplacementNamed(context, route);
-  }
-  
-  @override
   Widget build(BuildContext context) {
-    final isMobile = ResponsiveHelper.isMobile(context);
+    final isDesktop = ResponsiveHelper.isDesktop(context);
     
     return Scaffold(
+      backgroundColor: AppTheme.darkBackground,
       appBar: CustomAppBar(
         title: 'Dashboard',
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {},
-            tooltip: 'Notifications',
-          ),
-          IconButton(
-            icon: const Icon(Icons.account_circle_outlined),
-            onPressed: () {},
-            tooltip: 'Profile',
-          ),
-          const SizedBox(width: 8.0),
-        ],
+        isDesktop: isDesktop,
       ),
-      drawer: isMobile
-          ? MobileDrawer(
-              currentRoute: '/dashboard',
-              onNavigate: _navigate,
-            )
-          : null,
-      bottomNavigationBar: isMobile
-          ? MobileMenu(
-              currentRoute: '/dashboard',
-              onNavigate: _navigate,
-            )
-          : null,
-      body: Row(
-        children: [
-          if (!isMobile)
-            DesktopMenu(
-              currentRoute: '/dashboard',
-              onNavigate: _navigate,
-              isExpanded: _isMenuExpanded,
-              onToggleExpand: _toggleMenu,
-            ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
-              child: _buildDashboardContent(),
-            ),
-          ),
-        ],
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildWelcomeSection(context),
+            const SizedBox(height: 24),
+            _buildOverviewCards(context),
+            const SizedBox(height: 24),
+            _buildCameraSection(context),
+            const SizedBox(height: 24),
+            _buildDeviceSection(context),
+          ],
+        ),
       ),
     );
   }
-  
-  Widget _buildDashboardContent() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildStatusCards(),
-          const SizedBox(height: 24.0),
-          _buildDeviceOverview(),
-          const SizedBox(height: 24.0),
-          _buildRecentActivity(),
-        ],
+
+  Widget _buildWelcomeSection(BuildContext context) {
+    return Card(
+      color: AppTheme.darkSurface,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Welcome back, Admin',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.darkTextPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Here\'s what\'s happening with your cameras and devices',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppTheme.darkTextSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      // No implementation, UI only
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryBlue,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.add),
+                        SizedBox(width: 8),
+                        Text('Add New Device'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (ResponsiveHelper.isDesktop(context) || ResponsiveHelper.isTablet(context))
+              Container(
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryBlue.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.video_camera_back_rounded,
+                  size: 80,
+                  color: AppTheme.primaryBlue,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
-  
-  Widget _buildStatusCards() {
+
+  Widget _buildOverviewCards(BuildContext context) {
+    final isSmallScreen = ResponsiveHelper.isMobile(context);
+    
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: ResponsiveHelper.getCrossAxisCount(context),
-      crossAxisSpacing: 16.0,
-      mainAxisSpacing: 16.0,
+      crossAxisCount: isSmallScreen ? 2 : 4,
+      childAspectRatio: isSmallScreen ? 1.2 : 1.5,
+      crossAxisSpacing: 16,
+      mainAxisSpacing: 16,
       children: [
-        _buildStatusCard(
-          icon: Icons.videocam,
-          title: 'Cameras',
-          count: '24',
-          status: 'Active: 18',
-          color: AppTheme.blueAccent,
+        _buildStatCard(
+          context,
+          title: 'Total Cameras',
+          value: '12',
+          icon: Icons.camera_alt_rounded,
+          color: AppTheme.primaryBlue,
         ),
-        _buildStatusCard(
-          icon: Icons.devices,
-          title: 'Devices',
-          count: '32',
-          status: 'Active: 28',
-          color: AppTheme.orangeAccent,
+        _buildStatCard(
+          context,
+          title: 'Active Devices',
+          value: '8',
+          icon: Icons.devices_rounded,
+          color: AppTheme.online,
         ),
-        _buildStatusCard(
-          icon: Icons.error_outline,
+        _buildStatCard(
+          context,
           title: 'Alerts',
-          count: '5',
-          status: 'Critical: 2',
-          color: Colors.red,
+          value: '3',
+          icon: Icons.warning_amber_rounded,
+          color: AppTheme.warning,
         ),
-        _buildStatusCard(
-          icon: Icons.storage,
-          title: 'Storage',
-          count: '2.4TB',
-          status: '68% Used',
-          color: Colors.green,
+        _buildStatCard(
+          context,
+          title: 'Recordings',
+          value: '46',
+          icon: Icons.video_library_rounded,
+          color: AppTheme.primaryOrange,
         ),
       ],
     );
   }
-  
-  Widget _buildStatusCard({
-    required IconData icon,
+
+  Widget _buildStatCard(
+    BuildContext context, {
     required String title,
-    required String count,
-    required String status,
+    required String value,
+    required IconData icon,
     required Color color,
   }) {
     return Card(
-      elevation: 2.0,
+      color: AppTheme.darkSurface,
+      elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12.0),
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 icon,
                 color: color,
-                size: 28.0,
+                size: 24,
               ),
             ),
-            const Spacer(),
+            const SizedBox(height: 16),
             Text(
-              count,
+              value,
               style: const TextStyle(
-                fontSize: 32.0,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
+                color: AppTheme.darkTextPrimary,
               ),
             ),
-            const SizedBox(height: 4.0),
+            const SizedBox(height: 4),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 16.0,
-                color: AppTheme.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              status,
               style: TextStyle(
-                fontSize: 14.0,
-                color: color,
-                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: AppTheme.darkTextSecondary,
               ),
             ),
           ],
@@ -193,210 +204,338 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
-  
-  Widget _buildDeviceOverview() {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+
+  Widget _buildCameraSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'System Overview',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Icon(
-                  Icons.more_vert,
-                  color: AppTheme.textSecondary,
-                ),
-              ],
+            const Text(
+              'Recent Camera Activity',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.darkTextPrimary,
+              ),
             ),
-            const SizedBox(height: 16.0),
-            const Divider(),
-            const SizedBox(height: 16.0),
-            _buildSystemStatusItem(
-              'Network Status',
-              DeviceStatus.online,
-              'Connected - 1Gbps',
-            ),
-            const SizedBox(height: 12.0),
-            _buildSystemStatusItem(
-              'Storage Health',
-              DeviceStatus.warning,
-              '68% Used - 2.4TB of 4TB',
-            ),
-            const SizedBox(height: 12.0),
-            _buildSystemStatusItem(
-              'Server Status',
-              DeviceStatus.online,
-              'Running - Load: 35%',
-            ),
-            const SizedBox(height: 12.0),
-            _buildSystemStatusItem(
-              'Last Backup',
-              DeviceStatus.online,
-              'Today, 03:15 AM',
+            TextButton(
+              onPressed: () {
+                // No implementation, UI only
+              },
+              child: Row(
+                children: const [
+                  Text('View All'),
+                  SizedBox(width: 4),
+                  Icon(Icons.arrow_forward, size: 16),
+                ],
+              ),
             ),
           ],
         ),
-      ),
-    );
-  }
-  
-  Widget _buildSystemStatusItem(
-    String title,
-    DeviceStatus status,
-    String details,
-  ) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 2,
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        StatusIndicator(
-          status: status,
-          showLabel: true,
-        ),
-        const SizedBox(width: 16.0),
-        Expanded(
-          flex: 3,
-          child: Text(
-            details,
-            style: const TextStyle(
-              color: AppTheme.textSecondary,
-            ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: 5,
+            itemBuilder: (context, index) {
+              return _buildCameraActivityCard(
+                context,
+                name: 'Camera ${index + 1}',
+                location: 'Location ${index + 1}',
+                timestamp: '${index + 1}h ago',
+                status: index % 3 == 0 ? DeviceStatus.warning : DeviceStatus.online,
+              );
+            },
           ),
         ),
       ],
     );
   }
-  
-  Widget _buildRecentActivity() {
+
+  Widget _buildCameraActivityCard(
+    BuildContext context, {
+    required String name,
+    required String location,
+    required String timestamp,
+    required DeviceStatus status,
+  }) {
     return Card(
+      color: AppTheme.darkSurface,
+      elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
+      margin: const EdgeInsets.only(right: 16),
+      child: Container(
+        width: 280,
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Recent Activity',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryBlue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.videocam_rounded,
+                        color: AppTheme.primaryBlue,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: AppTheme.darkTextPrimary,
+                          ),
+                        ),
+                        Text(
+                          location,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.darkTextSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
+                StatusIndicator(status: status),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Motion detected',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppTheme.darkTextPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  Icons.access_time,
+                  size: 14,
+                  color: AppTheme.darkTextSecondary,
+                ),
+                const SizedBox(width: 4),
                 Text(
-                  'View All',
+                  timestamp,
                   style: TextStyle(
-                    color: AppTheme.blueAccent,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
+                    color: AppTheme.darkTextSecondary,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16.0),
-            const Divider(),
-            _buildActivityItem(
-              icon: Icons.videocam,
-              title: 'Camera 3 went offline',
-              time: '10 minutes ago',
-              color: Colors.red,
-            ),
-            const Divider(),
-            _buildActivityItem(
-              icon: Icons.warning_amber,
-              title: 'Motion detected on Camera 5',
-              time: '35 minutes ago',
-              color: AppTheme.orangeAccent,
-            ),
-            const Divider(),
-            _buildActivityItem(
-              icon: Icons.login,
-              title: 'Admin user logged in',
-              time: '1 hour ago',
-              color: AppTheme.blueAccent,
-            ),
-            const Divider(),
-            _buildActivityItem(
-              icon: Icons.backup,
-              title: 'System backup completed',
-              time: '3 hours ago',
-              color: Colors.green,
+            const Spacer(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    // No implementation, UI only
+                  },
+                  child: const Text('View Recording'),
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
-  
-  Widget _buildActivityItem({
-    required IconData icon,
-    required String title,
-    required String time,
-    required Color color,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8.0),
+
+  Widget _buildDeviceSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Device Status',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.darkTextPrimary,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: color,
-              size: 20.0,
+            TextButton(
+              onPressed: () {
+                // No implementation, UI only
+              },
+              child: Row(
+                children: const [
+                  Text('View All'),
+                  SizedBox(width: 4),
+                  Icon(Icons.arrow_forward, size: 16),
+                ],
+              ),
             ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Card(
+          color: AppTheme.darkSurface,
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
-          const SizedBox(width: 16.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: _buildDeviceStatusTable(context),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDeviceStatusTable(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              flex: 3,
+              child: Text(
+                'Device Name',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.darkTextSecondary,
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Text(
+                'Type',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.darkTextSecondary,
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Text(
+                'Status',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.darkTextSecondary,
+                ),
+              ),
+            ),
+            if (!ResponsiveHelper.isMobile(context))
+              Expanded(
+                flex: 2,
+                child: Text(
+                  'Last Active',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.darkTextSecondary,
                   ),
                 ),
-                const SizedBox(height: 4.0),
-                Text(
-                  time,
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
-                    fontSize: 12.0,
-                  ),
+              ),
+            Expanded(
+              flex: 1,
+              child: Container(),
+            ),
+          ],
+        ),
+        const Divider(height: 32),
+        ...List.generate(
+          4,
+          (index) => _buildDeviceStatusRow(
+            context,
+            name: 'Device ${index + 1}',
+            type: index % 2 == 0 ? 'Camera' : 'NVR',
+            status: index == 1 ? DeviceStatus.offline : DeviceStatus.online,
+            lastActive: '${index * 2}h ago',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDeviceStatusRow(
+    BuildContext context, {
+    required String name,
+    required String type,
+    required DeviceStatus status,
+    required String lastActive,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Text(
+              name,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: AppTheme.darkTextPrimary,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              type,
+              style: const TextStyle(
+                color: AppTheme.darkTextPrimary,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: StatusIndicator(
+              status: status,
+              showLabel: true,
+            ),
+          ),
+          if (!ResponsiveHelper.isMobile(context))
+            Expanded(
+              flex: 2,
+              child: Text(
+                lastActive,
+                style: const TextStyle(
+                  color: AppTheme.darkTextPrimary,
+                ),
+              ),
+            ),
+          Expanded(
+            flex: 1,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.more_vert),
+                  onPressed: () {
+                    // No implementation, UI only
+                  },
+                  color: AppTheme.darkTextSecondary,
+                  iconSize: 20,
                 ),
               ],
             ),
-          ),
-          const Icon(
-            Icons.chevron_right,
-            color: AppTheme.textSecondary,
           ),
         ],
       ),
