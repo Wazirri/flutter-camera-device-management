@@ -56,6 +56,11 @@ class WebSocketService extends ChangeNotifier {
       final loginMessage = 'LOGIN "$username" "$password"';
       _channel!.sink.add(loginMessage);
       debugPrint('Sent login message: $loginMessage');
+      
+      // Add to message log
+      final timestamp = DateTime.now().toString();
+      _messageLog.add('[$timestamp] Sent: $loginMessage');
+      notifyListeners();
     }
   }
   
@@ -74,6 +79,16 @@ class WebSocketService extends ChangeNotifier {
         final jsonLogMessage = '[$timestamp] Parsed JSON: ${jsonEncode(jsonMessage)}';
         _messageLog.add(jsonLogMessage);
         debugPrint(jsonLogMessage);
+        
+        // Check for login message
+        if (jsonMessage is Map && 
+            jsonMessage['c'] == 'login' && 
+            jsonMessage['msg'] == 'Oturum açılmamış! ') {
+          
+          // If we receive this specific login message, send login credentials
+          sendLoginMessage(_username, _password);
+        }
+        
       } catch (e) {
         // Not valid JSON, that's okay, we already logged the raw message
       }
