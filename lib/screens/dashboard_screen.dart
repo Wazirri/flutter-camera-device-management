@@ -549,7 +549,7 @@ class DashboardScreen extends StatelessWidget {
   }
   
   Widget _buildSystemInfoSection(BuildContext context, WebSocketProvider provider) {
-    final sysInfo = provider.service.systemInfo;
+    final sysInfo = provider.systemInfo;
     final isSmallScreen = ResponsiveHelper.isMobile(context);
     
     return Column(

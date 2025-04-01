@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../services/websocket_service.dart';
+import '../models/system_info.dart';
 
 class WebSocketProvider extends ChangeNotifier {
   final WebSocketService _webSocketService = WebSocketService();
   
+  WebSocketService get websocketService => _webSocketService;
   bool get isConnected => _webSocketService.isConnected;
   List<String> get messageLog => _webSocketService.messageLog;
+  SystemInfo? get systemInfo => _webSocketService.systemInfo;
   
   // Connect to WebSocket server
   Future<bool> connect(String address, String port, String username, String password) async {

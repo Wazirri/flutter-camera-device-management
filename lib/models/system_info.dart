@@ -25,19 +25,47 @@ class SystemInfo {
     required this.gps,
   });
 
-  factory SystemInfo.fromJson(Map<String, dynamic> json) {
+  factory SystemInfo.fromJson(Map<dynamic, dynamic> json) {
+    // Convert raw thermal list to properly typed List<Map<String, dynamic>>
+    List<Map<String, dynamic>> typedThermal = [];
+    if (json['thermal'] != null) {
+      for (var item in json['thermal']) {
+        if (item is Map) {
+          // Convert each thermal map to <String, dynamic>
+          final Map<String, dynamic> typedItem = {};
+          item.forEach((key, value) {
+            if (key is String) {
+              typedItem[key] = value;
+            }
+          });
+          typedThermal.add(typedItem);
+        }
+      }
+    }
+    
+    // Convert gps map to properly typed Map<String, dynamic>
+    Map<String, dynamic> typedGps = {'lat': '0', 'lon': '0', 'speed': '0'};
+    if (json['gps'] is Map) {
+      final rawGps = json['gps'] as Map;
+      rawGps.forEach((key, value) {
+        if (key is String) {
+          typedGps[key] = value.toString();
+        }
+      });
+    }
+    
     return SystemInfo(
-      cpuTemp: json['cpuTemp'] ?? '0',
-      upTime: json['upTime'] ?? '0',
-      srvTime: json['srvTime'] ?? '0',
-      totalRam: json['totalRam'] ?? '0',
-      freeRam: json['freeRam'] ?? '0',
-      totalConns: json['totalconns'] ?? '0',
-      sessions: json['sessions'] ?? '0',
-      eth0: json['eth0'] ?? 'Unknown',
-      ppp0: json['ppp0'] ?? 'Unknown',
-      thermal: List<Map<String, dynamic>>.from(json['thermal'] ?? []),
-      gps: json['gps'] ?? {'lat': '0', 'lon': '0', 'speed': '0'},
+      cpuTemp: json['cpuTemp']?.toString() ?? '0',
+      upTime: json['upTime']?.toString() ?? '0',
+      srvTime: json['srvTime']?.toString() ?? '0',
+      totalRam: json['totalRam']?.toString() ?? '0',
+      freeRam: json['freeRam']?.toString() ?? '0',
+      totalConns: json['totalconns']?.toString() ?? '0',
+      sessions: json['sessions']?.toString() ?? '0',
+      eth0: json['eth0']?.toString() ?? 'Unknown',
+      ppp0: json['ppp0']?.toString() ?? 'Unknown',
+      thermal: typedThermal,
+      gps: typedGps,
     );
   }
 
