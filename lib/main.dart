@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'screens/cameras_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/devices_screen.dart';
@@ -19,17 +20,24 @@ Future<void> main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     
-    // Set orientations
-    await SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
-    
-    // Set specific platform settings
-    if (Platform.isIOS || Platform.isMacOS) {
-      // iOS/macOS specific settings if needed
+    // Set orientations (only for mobile platforms)
+    if (!kIsWeb) {
+      try {
+        await SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+        ]);
+        
+        // Set specific platform settings
+        if (!kIsWeb && (Platform.isIOS || Platform.isMacOS)) {
+          // iOS/macOS specific settings if needed
+          debugPrint('Configuring iOS/macOS specific settings');
+        }
+      } catch (e) {
+        debugPrint('Error setting orientations: $e');
+      }
     }
     
     // Run the app
