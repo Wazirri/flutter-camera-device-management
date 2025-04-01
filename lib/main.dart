@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:provider/provider.dart';
 import 'screens/cameras_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/devices_screen.dart';
@@ -10,10 +11,12 @@ import 'screens/live_view_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/record_view_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/websocket_log_screen.dart';
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
 import 'widgets/desktop_menu.dart';
 import 'widgets/mobile_menu.dart';
+import 'providers/websocket_provider.dart';
 
 Future<void> main() async {
   // This captures errors that happen during initialization
@@ -97,20 +100,26 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Camera Device Manager',
-      theme: AppTheme.darkTheme,
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
-      routes: {
-        '/login': (context) => const LoginScreen(),
-        '/dashboard': (context) => const AppShell(child: DashboardScreen()),
-        '/live-view': (context) => const AppShell(child: LiveViewScreen()),
-        '/recordings': (context) => const AppShell(child: RecordViewScreen()),
-        '/cameras': (context) => const AppShell(child: CamerasScreen()),
-        '/devices': (context) => const AppShell(child: DevicesScreen()),
-        '/settings': (context) => const AppShell(child: SettingsScreen()),
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => WebSocketProvider()),
+      ],
+      child: MaterialApp(
+        title: 'Camera Device Manager',
+        theme: AppTheme.darkTheme,
+        debugShowCheckedModeBanner: false,
+        initialRoute: '/login',
+        routes: {
+          '/login': (context) => const LoginScreen(),
+          '/dashboard': (context) => const AppShell(child: DashboardScreen()),
+          '/live-view': (context) => const AppShell(child: LiveViewScreen()),
+          '/recordings': (context) => const AppShell(child: RecordViewScreen()),
+          '/cameras': (context) => const AppShell(child: CamerasScreen()),
+          '/devices': (context) => const AppShell(child: DevicesScreen()),
+          '/settings': (context) => const AppShell(child: SettingsScreen()),
+          '/websocket-logs': (context) => const WebSocketLogScreen(),
+        },
+      ),
     );
   }
 }

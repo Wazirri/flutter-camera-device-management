@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
+import '../providers/websocket_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -13,13 +15,27 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _serverAddressController = TextEditingController();
+  final _serverPortController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
+  bool _isConnecting = false;
+  String _connectionStatus = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // Set default values for testing
+    _serverAddressController.text = '127.0.0.1';
+    _serverPortController.text = '8080';
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _serverAddressController.dispose();
+    _serverPortController.dispose();
     super.dispose();
   }
 
@@ -178,8 +194,63 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Server address field
           const Text(
-            'Email',
+            'Server Address',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: AppTheme.darkTextPrimary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextFormField(
+            controller: _serverAddressController,
+            keyboardType: TextInputType.text,
+            decoration: const InputDecoration(
+              hintText: 'Enter server address',
+              prefixIcon: Icon(Icons.dns_outlined),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter server address';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 24),
+          
+          // Server port field
+          const Text(
+            'Server Port',
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: AppTheme.darkTextPrimary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextFormField(
+            controller: _serverPortController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              hintText: 'Enter server port',
+              prefixIcon: Icon(Icons.settings_ethernet_outlined),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter server port';
+              }
+              // Check if port is a valid number
+              if (int.tryParse(value) == null) {
+                return 'Port must be a number';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 24),
+          
+          // Username field (renamed from Email)
+          const Text(
+            'Username',
             style: TextStyle(
               fontWeight: FontWeight.w500,
               color: AppTheme.darkTextPrimary,
@@ -188,23 +259,21 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(height: 8),
           TextFormField(
             controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
+            keyboardType: TextInputType.text,
             decoration: const InputDecoration(
-              hintText: 'Enter your email',
-              prefixIcon: Icon(Icons.email_outlined),
+              hintText: 'Enter your username',
+              prefixIcon: Icon(Icons.person_outline),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter your email';
-              }
-              if (!RegExp(r'^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+')
-                  .hasMatch(value)) {
-                return 'Please enter a valid email';
+                return 'Please enter your username';
               }
               return null;
             },
           ),
           const SizedBox(height: 24),
+          
+          // Password field
           const Text(
             'Password',
             style: TextStyle(
@@ -236,12 +305,25 @@ class _LoginScreenState extends State<LoginScreen> {
               if (value == null || value.isEmpty) {
                 return 'Please enter your password';
               }
-              if (value.length < 6) {
-                return 'Password must be at least 6 characters';
-              }
               return null;
             },
           ),
+          
+          // Connection status message
+          if (_connectionStatus.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Text(
+                _connectionStatus,
+                style: TextStyle(
+                  color: _connectionStatus.contains('Error') || 
+                         _connectionStatus.contains('Failed')
+                      ? Colors.red
+                      : Colors.green,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -295,7 +377,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildLoginButton() {
     return ElevatedButton(
-      onPressed: _handleLogin,
+      onPressed: _isConnecting ? null : _handleLogin,
       style: ElevatedButton.styleFrom(
         backgroundColor: AppTheme.primaryBlue,
         foregroundColor: Colors.white,
@@ -304,20 +386,71 @@ class _LoginScreenState extends State<LoginScreen> {
           borderRadius: BorderRadius.circular(8),
         ),
       ),
-      child: const Text(
-        'Login',
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      child: _isConnecting
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Colors.white,
+              ),
+            )
+          : const Text(
+              'Login',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
     );
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
-      // This is just UI design, no implementation
-      Navigator.pushReplacementNamed(context, '/dashboard');
+      // Get form values
+      final serverAddress = _serverAddressController.text;
+      final serverPort = _serverPortController.text;
+      final username = _emailController.text;
+      final password = _passwordController.text;
+      
+      setState(() {
+        _isConnecting = true;
+        _connectionStatus = 'Connecting to WebSocket...';
+      });
+      
+      try {
+        // Get WebSocket provider
+        final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
+        
+        // Connect to WebSocket
+        final connected = await webSocketProvider.connect(
+          serverAddress,
+          serverPort,
+          username,
+          password,
+        );
+        
+        if (connected) {
+          setState(() {
+            _connectionStatus = 'Connected successfully!';
+            _isConnecting = false;
+          });
+          
+          // Navigate to dashboard after successful connection
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        } else {
+          setState(() {
+            _connectionStatus = 'Failed to connect to WebSocket server';
+            _isConnecting = false;
+          });
+        }
+      } catch (e) {
+        setState(() {
+          _connectionStatus = 'Error: ${e.toString()}';
+          _isConnecting = false;
+        });
+        debugPrint('WebSocket connection error: $e');
+      }
     }
   }
 }

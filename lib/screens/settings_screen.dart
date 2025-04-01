@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
+import '../providers/websocket_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -332,6 +334,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: Text('Current Version'),
           subtitle: Text('v1.2.0'),
           trailing: Text('Up to date', style: TextStyle(color: AppTheme.online)),
+        ),
+        const Divider(),
+        Consumer<WebSocketProvider>(
+          builder: (context, provider, child) {
+            final isConnected = provider.isConnected;
+            return ListTile(
+              title: const Text('WebSocket Logs'),
+              subtitle: Text(isConnected 
+                ? 'View WebSocket communication logs (Connected)'
+                : 'View WebSocket communication logs (Disconnected)'
+              ),
+              leading: Icon(
+                Icons.wifi_tethering,
+                color: isConnected ? AppTheme.online : AppTheme.offline,
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.pushNamed(context, '/websocket-logs');
+              },
+            );
+          },
         ),
         const Divider(),
         ListTile(

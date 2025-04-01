@@ -22,6 +22,10 @@ collection
 2.18
 file:///home/runner/.pub-cache/hosted/pub.dev/collection-1.18.0/
 file:///home/runner/.pub-cache/hosted/pub.dev/collection-1.18.0/lib/
+crypto
+3.4
+file:///home/runner/.pub-cache/hosted/pub.dev/crypto-3.0.6/
+file:///home/runner/.pub-cache/hosted/pub.dev/crypto-3.0.6/lib/
 cupertino_icons
 3.1
 file:///home/runner/.pub-cache/hosted/pub.dev/cupertino_icons-1.0.8/
@@ -206,6 +210,10 @@ web
 3.4
 file:///home/runner/.pub-cache/hosted/pub.dev/web-1.1.1/
 file:///home/runner/.pub-cache/hosted/pub.dev/web-1.1.1/lib/
+web_socket_channel
+2.15
+file:///home/runner/.pub-cache/hosted/pub.dev/web_socket_channel-2.4.0/
+file:///home/runner/.pub-cache/hosted/pub.dev/web_socket_channel-2.4.0/lib/
 xdg_directories
 3.3
 file:///home/runner/.pub-cache/hosted/pub.dev/xdg_directories-1.1.0/
