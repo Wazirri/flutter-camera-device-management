@@ -1,0 +1,50 @@
+name: camera_device_manager
+description: A cross-platform Flutter app for camera and device management
+
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none'
+
+# Version information
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.18.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI Components
+  cupertino_icons: ^1.0.5
+  flutter_svg: ^2.0.7
+  font_awesome_flutter: ^10.4.0
+  
+  # Utilities
+  intl: ^0.18.1
+  provider: ^6.0.5
+  shared_preferences: ^2.1.1
+
+  # Platform Detection
+  universal_platform: ^1.0.0+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.1
+
+flutter:
+  uses-material-design: true
+
+  # Add assets if you have any
+  # assets:
+  #   - assets/images/
+  #   - assets/icons/
+
+  # Define custom fonts if needed
+  # fonts:
+  #   - family: Roboto
+  #     fonts:
+  #       - asset: fonts/Roboto-Regular.ttf
+  #       - asset: fonts/Roboto-Bold.ttf
+  #         weight: 700
