@@ -85,8 +85,8 @@ class DesktopSideMenu extends StatelessWidget {
               leading: const Icon(Icons.logout, color: AppTheme.darkTextSecondary),
               title: const Text('Logout', style: TextStyle(color: AppTheme.darkTextPrimary)),
               onTap: () {
-                // This is just UI design, no implementation
-                // onDestinationSelected('/login');
+                // Navigate to login screen
+                Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
               },
             ),
             const SizedBox(height: 16),
