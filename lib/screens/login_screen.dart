@@ -25,9 +25,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    // Set default values for testing
-    _serverAddressController.text = '127.0.0.1';
-    _serverPortController.text = '8080';
+    // Set default values for production
+    _serverAddressController.text = '85.104.114.145';
+    _serverPortController.text = '1200';
   }
 
   @override

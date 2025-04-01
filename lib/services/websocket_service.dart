@@ -79,6 +79,9 @@ class WebSocketService extends ChangeNotifier {
     }
   }
   
+  // Track if a monitor command has been sent
+  bool _monitorCommandSent = false;
+  
   // Handle received message
   void _onMessage(dynamic message) {
     try {
@@ -98,10 +101,13 @@ class WebSocketService extends ChangeNotifier {
         // Check for login message
         if (jsonMessage is Map) {
           if (jsonMessage['c'] == 'login' && 
-              jsonMessage['msg'] == 'Oturum açılmamış! ') {
+              (jsonMessage['msg'] == 'Oturum açılmamış!' || 
+               jsonMessage['msg'].toString().contains('Oturum açılmamış'))) {
             
             // If we receive this specific login message, send login credentials
             sendLoginMessage(_username, _password);
+            // Reset monitor command flag on new login
+            _monitorCommandSent = false;
           }
           
           // Check for system info message
@@ -111,8 +117,11 @@ class WebSocketService extends ChangeNotifier {
             debugPrint('System info updated: ${jsonMessage['cpuTemp']}°C');
             notifyListeners(); // Ensure UI updates with new system info
             
-            // Send the monitor command after receiving system info
-            sendMonitorCommand();
+            // Send the monitor command only once after login
+            if (!_monitorCommandSent) {
+              sendMonitorCommand();
+              _monitorCommandSent = true;
+            }
           }
         }
         
@@ -160,6 +169,8 @@ class WebSocketService extends ChangeNotifier {
   Future<void> _reconnect() async {
     if (!_isConnected && _serverAddress.isNotEmpty && _serverPort.isNotEmpty) {
       debugPrint('Attempting to reconnect to WebSocket...');
+      // Reset the monitor command sent flag on reconnect
+      _monitorCommandSent = false;
       await connect(_serverAddress, _serverPort, _username, _password);
     }
   }
@@ -191,6 +202,7 @@ class WebSocketService extends ChangeNotifier {
     }
     
     _isConnected = false;
+    _monitorCommandSent = false; // Reset flag on disconnect
     notifyListeners();
     debugPrint('WebSocket disconnected');
   }
