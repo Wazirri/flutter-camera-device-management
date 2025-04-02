@@ -6,6 +6,7 @@ enum DeviceStatus {
   offline,
   warning,
   error,
+  unknown,
 }
 
 class StatusIndicator extends StatelessWidget {
@@ -70,6 +71,8 @@ class StatusIndicator extends StatelessWidget {
         return 'Warning';
       case DeviceStatus.error:
         return 'Error';
+      case DeviceStatus.unknown:
+        return 'Unknown';
     }
   }
 
@@ -83,6 +86,8 @@ class StatusIndicator extends StatelessWidget {
         return AppTheme.warning;
       case DeviceStatus.error:
         return AppTheme.error;
+      case DeviceStatus.unknown:
+        return AppTheme.darkTextSecondary; // Gray for unknown status
     }
   }
 }

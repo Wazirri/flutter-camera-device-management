@@ -1,0 +1,27 @@
+ - 'MobileBottomNavigationBar' is from 'package:camera_device_manager/widgets/mobile_bottom_navigation_bar.dart' ('lib/widgets/mobile_bottom_navigation_bar.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'context'.
+        Scaffold.of(context).openDrawer();
+                    ^^^^^^^
+lib/screens/live_view_screen.dart:51:45: Error: The getter 'allCameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'allCameras'.
+      final cameras = cameraDevicesProvider.allCameras;
+                                            ^^^^^^^^^^
+lib/screens/live_view_screen.dart:330:36: Error: Member not found: 'unknown'.
+                      DeviceStatus.unknown,
+                                   ^^^^^^^
+lib/screens/live_view_screen.dart:256:43: Error: The getter 'allCameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'allCameras'.
+    final cameras = cameraDevicesProvider.allCameras;
+                                          ^^^^^^^^^^
+lib/screens/live_view_screen.dart:434:43: Error: The getter 'allCameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'allCameras'.
+    final cameras = cameraDevicesProvider.allCameras;
+                                          ^^^^^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+warning: no rule to process file '/Users/smarteq/.pub-cache/hosted/pub.dev/volume_controller-3.3.3/macos/volume_controller/Sources/volume_controller/PrivacyInfo.xcprivacy' of type 'text.xml' for architecture 'arm64' (in target 'volume_controller' from project 'Pods')
+** BUILD FAILED **

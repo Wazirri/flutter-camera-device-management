@@ -13,6 +13,15 @@ class CameraDevicesProvider with ChangeNotifier {
   CameraDevice? get selectedDevice => _selectedDevice;
   int get selectedCameraIndex => _selectedCameraIndex;
   
+  // Get all cameras from all devices as a flat list
+  List<Camera> get allCameras {
+    List<Camera> cameras = [];
+    for (var device in _devices.values) {
+      cameras.addAll(device.cameras);
+    }
+    return cameras;
+  }
+  
   // Get the selected camera from the selected device
   Camera? get selectedCamera {
     if (_selectedDevice == null || _selectedDevice!.cameras.isEmpty) {

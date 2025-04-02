@@ -233,6 +233,27 @@ class Camera {
     };
   }
   
+  // Get the appropriate RTSP URI for streaming
+  String get rtspUri {
+    // First try to use mediaUri, if empty try other URIs in order of preference
+    if (mediaUri.isNotEmpty) {
+      return mediaUri;
+    } else if (subUri.isNotEmpty) {
+      return subUri;
+    } else if (remoteUri.isNotEmpty) {
+      return remoteUri;
+    } else if (recordUri.isNotEmpty) {
+      return recordUri;
+    }
+    return ""; // Return empty string if no URI is available
+  }
+  
+  // Added getter for compatibility
+  bool get isConnected => connected;
+  
+  // Added getter for compatibility
+  bool get isRecording => recording;
+  
   @override
   String toString() {
     return 'Camera{name: $name, ip: $ip, connected: $connected, recording: $recording}';

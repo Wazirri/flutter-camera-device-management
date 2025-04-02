@@ -327,7 +327,7 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
                   StatusIndicator(
                     status: hasCameraData ? 
                       (cameras[_selectedCameraIndex].isConnected ? DeviceStatus.online : DeviceStatus.offline) : 
-                      DeviceStatus.unknown,
+                      DeviceStatus.offline,
                     size: 8,
                     padding: EdgeInsets.zero,
                   ),
@@ -492,7 +492,7 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
                     StatusIndicator(
                       status: hasCameraData ? 
                         (cameras[index].isConnected ? DeviceStatus.online : DeviceStatus.offline) : 
-                        (index % 5 == 0 ? DeviceStatus.offline : DeviceStatus.online),
+                        DeviceStatus.offline,
                       size: 6,
                       padding: EdgeInsets.zero,
                     ),
