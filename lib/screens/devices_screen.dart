@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/device_list_item.dart';
 import '../widgets/status_indicator.dart';
 import '../models/camera_device.dart';
+import '../providers/camera_devices_provider.dart';
 
 class DevicesScreen extends StatefulWidget {
   const DevicesScreen({Key? key}) : super(key: key);
@@ -153,31 +155,109 @@ class _DevicesScreenState extends State<DevicesScreen> {
   }
 
   Widget _buildDevicesList() {
+    final devicesProvider = Provider.of<CameraDevicesProvider>(context);
+    final devicesByMac = devicesProvider.devicesByMacAddress;
+    final devicesList = devicesByMac.values.toList();
+    
+    if (devicesList.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.devices_other,
+              size: 64,
+              color: AppTheme.darkTextSecondary,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No devices found',
+              style: TextStyle(
+                fontSize: 18,
+                color: AppTheme.darkTextSecondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Connect to the server to discover devices',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppTheme.darkTextSecondary,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    // Filter the devices based on _selectedFilter
+    List<CameraDevice> filteredDevices = devicesList;
+    if (_selectedFilter != 'All') {
+      filteredDevices = devicesList.where((device) {
+        switch (_selectedFilter) {
+          case 'Online':
+            return device.connected;
+          case 'Offline':
+            return !device.connected;
+          // For 'Warning' and 'Error', we'd need more sophisticated logic based on device status
+          // For now, just showing all devices for these filters
+          default:
+            return true;
+        }
+      }).toList();
+    }
+    
+    // Sort the devices based on _selectedSort
+    filteredDevices.sort((a, b) {
+      switch (_selectedSort) {
+        case 'Name':
+          return a.macAddress.compareTo(b.macAddress);
+        case 'Status':
+          return a.connected == b.connected ? 0 : (a.connected ? -1 : 1);
+        case 'Last Active':
+          return a.lastSeenAt.compareTo(b.lastSeenAt);
+        case 'Type':
+          return a.deviceType.compareTo(b.deviceType);
+        default:
+          return 0;
+      }
+    });
+    
+    // Apply search filter if there's text in the search field
+    final searchQuery = _searchController.text.toLowerCase();
+    if (searchQuery.isNotEmpty) {
+      filteredDevices = filteredDevices.where((device) {
+        return device.macAddress.toLowerCase().contains(searchQuery) ||
+               device.ipv4.toLowerCase().contains(searchQuery) ||
+               device.deviceType.toLowerCase().contains(searchQuery);
+      }).toList();
+    }
+    
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: 12,
+      itemCount: filteredDevices.length,
       itemBuilder: (context, index) {
-        // Alternating statuses for demo
-        DeviceStatus status = DeviceStatus.online;
-        if (index % 5 == 0) {
-          status = DeviceStatus.offline;
-        } else if (index % 7 == 0) {
-          status = DeviceStatus.warning;
-        } else if (index % 11 == 0) {
-          status = DeviceStatus.error;
-        }
+        final device = filteredDevices[index];
+        
+        // Determine device status
+        DeviceStatus status = device.connected 
+          ? DeviceStatus.online 
+          : DeviceStatus.offline;
+        
+        // For more sophisticated status logic, we could look at other device properties
+        // such as warning conditions, errors, etc.
         
         return DeviceListItem(
-          name: 'Device ${index + 1}',
-          model: index % 3 == 0 ? 'IP Camera' : index % 3 == 1 ? 'NVR' : 'Gateway',
-          ipAddress: '192.168.1.${10 + index}',
+          name: 'Device ${device.macAddress}',
+          model: device.deviceType.isEmpty ? 'Unknown' : device.deviceType,
+          ipAddress: device.ipv4,
           status: status,
-          lastActive: '${index % 24}h ago',
+          lastActive: device.lastSeenAt,
           onTap: () {
-            _showDeviceDetails(index);
+            _showDeviceDetails(index, device);
           },
           onActionPressed: () {
-            _showDeviceOptions(context, index);
+            _showDeviceOptions(context, index, device);
           },
         );
       },
@@ -318,7 +398,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
     );
   }
 
-  void _showDeviceOptions(BuildContext context, int deviceIndex) {
+  void _showDeviceOptions(BuildContext context, int deviceIndex, CameraDevice device) {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.darkSurface,
@@ -346,25 +426,29 @@ class _DevicesScreenState extends State<DevicesScreen> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Device ${deviceIndex + 1}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          device.deviceType.isEmpty ? 'Device ${device.macAddress}' : device.deviceType,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        deviceIndex % 3 == 0 ? 'IP Camera' : deviceIndex % 3 == 1 ? 'NVR' : 'Gateway',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppTheme.darkTextSecondary,
+                        const SizedBox(height: 4),
+                        Text(
+                          'MAC: ${device.macAddress}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.darkTextSecondary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -375,7 +459,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
               title: const Text('Device Info'),
               onTap: () {
                 Navigator.pop(context);
-                _showDeviceDetails(deviceIndex);
+                _showDeviceDetails(deviceIndex, device);
               },
             ),
             ListTile(
@@ -386,6 +470,17 @@ class _DevicesScreenState extends State<DevicesScreen> {
                 // UI only
               },
             ),
+            if (device.cameras.isNotEmpty)
+              ListTile(
+                leading: const Icon(Icons.videocam),
+                title: Text('Cameras (${device.cameras.length})'),
+                onTap: () {
+                  final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                  devicesProvider.setSelectedDevice(device.macKey);
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/cameras');
+                },
+              ),
             ListTile(
               leading: const Icon(Icons.restart_alt),
               title: const Text('Restart Device'),
@@ -402,7 +497,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
               title: const Text('Remove Device'),
               onTap: () {
                 Navigator.pop(context);
-                _showRemoveDeviceDialog(deviceIndex);
+                _showRemoveDeviceDialog(deviceIndex, device);
               },
             ),
             const SizedBox(height: 8),
@@ -412,24 +507,31 @@ class _DevicesScreenState extends State<DevicesScreen> {
     );
   }
 
-  void _showDeviceDetails(int deviceIndex) {
+  void _showDeviceDetails(int deviceIndex, CameraDevice device) {
+    final statusText = device.connected ? 'Online' : 'Offline';
+    
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppTheme.darkSurface,
-          title: Text('Device ${deviceIndex + 1} Details'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildDetailRow('Device Type', deviceIndex % 3 == 0 ? 'IP Camera' : deviceIndex % 3 == 1 ? 'NVR' : 'Gateway'),
-              _buildDetailRow('IP Address', '192.168.1.${10 + deviceIndex}'),
-              _buildDetailRow('MAC Address', '00:1A:2B:3C:4D:${deviceIndex.toString().padLeft(2, '0')}'),
-              _buildDetailRow('Firmware', 'v2.${deviceIndex % 10}.0'),
-              _buildDetailRow('Last Active', '${deviceIndex % 24}h ago'),
-              _buildDetailRow('Status', 'Online'),
-              _buildDetailRow('Uptime', '${(deviceIndex + 1) * 24} hours'),
-            ],
+          title: Text(device.deviceType.isEmpty ? 'Device Details' : '${device.deviceType} Details'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildDetailRow('Device Type', device.deviceType.isEmpty ? 'Unknown' : device.deviceType),
+                _buildDetailRow('IP Address', device.ipv4.isEmpty ? 'Unknown' : device.ipv4),
+                _buildDetailRow('MAC Address', device.macAddress),
+                _buildDetailRow('Firmware', device.firmwareVersion.isEmpty ? 'Unknown' : device.firmwareVersion),
+                _buildDetailRow('Last Active', device.lastSeenAt.isEmpty ? 'Unknown' : device.lastSeenAt),
+                _buildDetailRow('Status', statusText),
+                _buildDetailRow('Uptime', device.uptime.isEmpty ? 'Unknown' : device.uptime),
+                _buildDetailRow('Cameras', '${device.cameras.length}'),
+                if (device.recordPath.isNotEmpty)
+                  _buildDetailRow('Recording Path', device.recordPath),
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -438,6 +540,19 @@ class _DevicesScreenState extends State<DevicesScreen> {
               },
               child: const Text('Close'),
             ),
+            if (device.cameras.isNotEmpty)
+              TextButton(
+                onPressed: () {
+                  final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                  devicesProvider.setSelectedDevice(device.macKey);
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/cameras');
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: AppTheme.primaryBlue,
+                ),
+                child: const Text('View Cameras'),
+              ),
           ],
         );
       },
@@ -552,7 +667,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
     );
   }
 
-  void _showRemoveDeviceDialog(int deviceIndex) {
+  void _showRemoveDeviceDialog(int deviceIndex, CameraDevice device) {
     showDialog(
       context: context,
       builder: (context) {
@@ -560,7 +675,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
           backgroundColor: AppTheme.darkSurface,
           title: const Text('Remove Device'),
           content: Text(
-            'Are you sure you want to remove Device ${deviceIndex + 1}? This action cannot be undone.',
+            'Are you sure you want to remove ${device.deviceType.isEmpty ? 'Device ' + device.macAddress : device.deviceType}? This action cannot be undone.',
           ),
           actions: [
             TextButton(
@@ -571,8 +686,18 @@ class _DevicesScreenState extends State<DevicesScreen> {
             ),
             TextButton(
               onPressed: () {
+                final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                // In a real app, we would remove from the backend first
+                // For now, just remove from the local state
+                // devicesProvider.removeDevice(device.macKey);
                 Navigator.pop(context);
-                // UI only
+                // UI only for now - show a snackbar to indicate action
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Device removal is disabled in this version'),
+                    backgroundColor: AppTheme.primaryBlue,
+                  ),
+                );
               },
               style: TextButton.styleFrom(
                 foregroundColor: AppTheme.error,

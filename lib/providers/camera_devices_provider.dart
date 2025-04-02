@@ -13,6 +13,9 @@ class CameraDevicesProvider with ChangeNotifier {
   CameraDevice? get selectedDevice => _selectedDevice;
   int get selectedCameraIndex => _selectedCameraIndex;
   
+  // Get devices grouped by MAC address
+  Map<String, CameraDevice> get devicesByMacAddress => _devices;
+  
   // Get all cameras from all devices as a flat list
   List<Camera> get allCameras {
     List<Camera> cameras = [];
