@@ -6,10 +6,10 @@ class DesktopSideMenu extends StatelessWidget {
   final Function(String) onDestinationSelected;
 
   const DesktopSideMenu({
-    Key? key,
+    super.key,
     required this.currentRoute,
     required this.onDestinationSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

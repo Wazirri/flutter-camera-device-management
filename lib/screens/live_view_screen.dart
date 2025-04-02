@@ -40,8 +40,10 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
       _playerInitialized[i] = false;
     }
     
-    // Initialize player for the currently selected camera
-    _initializePlayer(_selectedCameraIndex);
+    // Initialize player for the currently selected camera after the build is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializePlayer(_selectedCameraIndex);
+    });
   }
   
   Future<void> _initializePlayer(int cameraIndex) async {

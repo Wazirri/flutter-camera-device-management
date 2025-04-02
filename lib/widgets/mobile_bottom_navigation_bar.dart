@@ -6,10 +6,10 @@ class MobileBottomNavigationBar extends StatelessWidget {
   final Function(String) onDestinationSelected;
 
   const MobileBottomNavigationBar({
-    Key? key,
+    super.key,
     required this.currentRoute,
     required this.onDestinationSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
