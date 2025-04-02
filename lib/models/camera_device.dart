@@ -1,5 +1,14 @@
 import 'dart:convert';
 
+enum DeviceStatus {
+  online,
+  offline,
+  degraded,
+  warning,
+  error,
+  unknown,
+}
+
 class CameraDevice {
   final String macAddress; // The actual MAC address in standard format (e.g., 26:C1:7A:0B:1F:19)
   final String macKey;     // The key used in the WebSocket messages (e.g., m_26_C1_7A_0B_1F_19)

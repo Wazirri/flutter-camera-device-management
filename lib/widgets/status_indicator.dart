@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-
-enum DeviceStatus {
-  online,
-  offline,
-  warning,
-  error,
-  unknown,
-}
+import '../models/camera_device.dart';
 
 class StatusIndicator extends StatelessWidget {
   final DeviceStatus status;

@@ -78,8 +78,8 @@ class MobileBottomNavigationBar extends StatelessWidget {
         onDestinationSelected('/camera-devices');
         break;
       case 4:
-        // Open drawer for more options
-        Scaffold.of(context).openDrawer();
+        // For More menu, we'll just use a dedicated route instead of drawer
+        onDestinationSelected('/settings');
         break;
     }
   }
