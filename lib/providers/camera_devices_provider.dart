@@ -1,176 +1,285 @@
-import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/camera_device.dart';
+import 'websocket_provider.dart';
 
 class CameraDevicesProvider with ChangeNotifier {
-  final Map<String, DeviceInfo> _devices = {};
-  final Map<String, Map<String, dynamic>> _cameraProperties = {};
-  final Map<String, Map<String, dynamic>> _cameraReports = {};
-  bool _isInitialized = false;
+  final Map<String, CameraDevice> _devices = {};
+  CameraDevice? _selectedDevice;
+  int _selectedCameraIndex = 0;
 
-  // Getters
-  Map<String, DeviceInfo> get devices => _devices;
-  List<DeviceInfo> get devicesList => _devices.values.toList();
-  bool get isInitialized => _isInitialized;
+  Map<String, CameraDevice> get devices => _devices;
+  List<CameraDevice> get devicesList => _devices.values.toList();
+  CameraDevice? get selectedDevice => _selectedDevice;
+  int get selectedCameraIndex => _selectedCameraIndex;
+  
+  // Get the selected camera from the selected device
+  Camera? get selectedCamera {
+    if (_selectedDevice == null || _selectedDevice!.cameras.isEmpty) {
+      return null;
+    }
+    
+    // Make sure the selected index is valid
+    if (_selectedCameraIndex >= _selectedDevice!.cameras.length) {
+      _selectedCameraIndex = 0;
+    }
+    
+    return _selectedDevice!.cameras[_selectedCameraIndex];
+  }
 
-  void handleWebSocketMessage(String message) {
-    try {
-      // Parse the message
-      final Map<String, dynamic> data = json.decode(message);
-      
-      // Check if this is a "changed" message
-      if (data['c'] == 'changed' && data.containsKey('data') && data.containsKey('val')) {
-        final String dataPath = data['data'];
-        final dynamic value = data['val'];
-        
-        // Check if this is a device-related message (starts with ecs.slaves)
-        if (dataPath.startsWith('ecs.slaves.')) {
-          _processDeviceData(dataPath, value);
-          notifyListeners();
-        }
-      }
-    } catch (e) {
-      debugPrint('Error handling WebSocket message: $e');
+  void setSelectedDevice(String macAddress) {
+    if (_devices.containsKey(macAddress)) {
+      _selectedDevice = _devices[macAddress];
+      _selectedCameraIndex = 0; // Reset camera index when device changes
+      notifyListeners();
     }
   }
 
-  void _processDeviceData(String dataPath, dynamic value) {
-    // Extract MAC address from path (format: ecs.slaves.m_XX_XX_XX_XX_XX_XX.property)
-    final parts = dataPath.split('.');
-    if (parts.length < 3) return;
-    
-    final String macPart = parts[2]; // e.g., m_26_C1_7A_0B_1F_19
-    final String macAddress = macPart.replaceAll('m_', '').replaceAll('_', ':');
-    
-    // Initialize device if it doesn't exist
-    if (!_devices.containsKey(macAddress)) {
-      _devices[macAddress] = DeviceInfo.initial(macAddress);
-      _cameraProperties[macAddress] = {};
-      _cameraReports[macAddress] = {};
+  void setSelectedCameraIndex(int index) {
+    if (_selectedDevice != null && index >= 0 && index < _selectedDevice!.cameras.length) {
+      _selectedCameraIndex = index;
+      notifyListeners();
     }
-    
-    // Process based on the property path
-    if (parts.length >= 4) {
-      final String propertyType = parts[3];
-      
-      if (propertyType == 'firsttime') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(firstSeen: value.toString());
-      } else if (propertyType == 'connected') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(isConnected: value == 1);
-      } else if (propertyType == 'ipv4') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(ipv4: value.toString());
-      } else if (propertyType == 'ipv6') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(ipv6: value.toString());
-      } else if (propertyType == 'last_seen_at') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(lastSeen: value.toString());
-      } else if (propertyType == 'test' && parts.length >= 5 && parts[4] == 'uptime') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(uptime: value.toString());
-      } else if (propertyType == 'test' && parts.length >= 5 && parts[4] == 'is_error') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(hasError: value == 1);
-      } else if (propertyType == 'app' && parts.length >= 5 && parts[4] == 'firmware_version') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(firmwareVersion: value.toString());
-      } else if (propertyType == 'app' && parts.length >= 5 && parts[4] == 'deviceType') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(deviceType: value.toString());
-      } 
-      // Process camera properties
-      else if (propertyType == 'cam' && parts.length >= 5) {
-        final camIndex = parts[3]; // e.g., cam[0]
-        final property = parts[4]; // e.g., name, cameraIp
-        
-        if (!_cameraProperties[macAddress]!.containsKey(camIndex)) {
-          _cameraProperties[macAddress]![camIndex] = {};
-        }
-        
-        // Store the camera property
-        _cameraProperties[macAddress]![camIndex][property] = value;
-        
-        // Update the cameras list in the device
-        _updateDeviceCameras(macAddress);
-      }
-      // Process camera reports
-      else if (propertyType == 'camreports' && parts.length >= 6) {
-        final camName = parts[4]; // e.g., KAMERA1
-        final property = parts[5]; // e.g., connected, recording
-        
-        if (!_cameraReports[macAddress]!.containsKey(camName)) {
-          _cameraReports[macAddress]![camName] = {};
-        }
-        
-        // Store the camera report
-        _cameraReports[macAddress]![camName][property] = value;
-        
-        // Update the cameras list in the device
-        _updateDeviceCameras(macAddress);
-      }
-    }
-    
-    _isInitialized = true;
   }
 
-  void _updateDeviceCameras(String macAddress) {
-    final List<CameraDevice> cameras = [];
-    
-    // Create camera devices from camera properties
-    for (final entry in _cameraProperties[macAddress]!.entries) {
-      final String camIndex = entry.key;
-      final Map<String, dynamic> props = entry.value;
+  // Process "changed" messages from WebSocket
+  void processWebSocketMessage(Map<String, dynamic> message) {
+    if (message['c'] == 'changed' && message.containsKey('data') && message.containsKey('val')) {
+      final String dataPath = message['data'];
+      final dynamic value = message['val'];
       
-      if (props.containsKey('name')) {
-        final CameraDevice camera = CameraDevice.fromJson(props, macAddress);
-        
-        // Update camera with reports data if available
-        final String camName = props['name'];
-        if (_cameraReports[macAddress]!.containsKey(camName)) {
-          final Map<String, dynamic> reports = _cameraReports[macAddress]![camName];
+      // Check if this is a camera device-related message
+      if (dataPath.startsWith('ecs.slaves.m_')) {
+        // Extract the MAC address from the data path
+        // Format is like: ecs.slaves.m_26_C1_7A_0B_1F_19.property
+        final parts = dataPath.split('.');
+        if (parts.length >= 3) {
+          final macKey = parts[2]; // Get m_26_C1_7A_0B_1F_19
+          final macAddress = macKey.substring(2).replaceAll('_', ':'); // Convert to proper MAC format
           
-          // Update connected and recording status
-          final isConnected = reports['connected'] == 1;
-          final isRecording = reports['recording'] == true;
-          final lastSeenAt = reports['last_seen_at']?.toString() ?? '';
+          // Create the device if it doesn't exist yet
+          if (!_devices.containsKey(macKey)) {
+            _devices[macKey] = CameraDevice(
+              macAddress: macAddress,
+              macKey: macKey,
+              ipv4: '',
+              lastSeenAt: '',
+              connected: false,
+              uptime: '',
+              deviceType: '',
+              firmwareVersion: '',
+              recordPath: '',
+              cameras: [],
+            );
+          }
           
-          cameras.add(camera.copyWith(
-            isConnected: isConnected,
-            isRecording: isRecording,
-            lastSeenAt: lastSeenAt,
-          ));
-        } else {
-          cameras.add(camera);
+          _updateDeviceProperty(macKey, parts, value);
         }
       }
     }
-    
-    // Update the device with the updated cameras list
-    _devices[macAddress] = _devices[macAddress]!.copyWith(cameras: cameras);
   }
-
-  // Get a specific camera by MAC address and camera name
-  CameraDevice? getCamera(String macAddress, String cameraName) {
-    if (!_devices.containsKey(macAddress)) return null;
+  
+  // Update specific device property based on the data path
+  void _updateDeviceProperty(String macKey, List<String> parts, dynamic value) {
+    final device = _devices[macKey]!;
     
-    final cameras = _devices[macAddress]!.cameras;
-    return cameras.firstWhere(
-      (camera) => camera.name == cameraName,
-      orElse: () => throw Exception('Camera not found')
-    );
-  }
-
-  // Get all cameras from all devices
-  List<CameraDevice> get allCameras {
-    final List<CameraDevice> allCameras = [];
-    for (final device in _devices.values) {
-      allCameras.addAll(device.cameras);
+    // Skip ecs.slaves.macKey prefix to get the actual property path
+    final propertyPath = parts.sublist(3);
+    
+    if (propertyPath.isNotEmpty) {
+      switch (propertyPath[0]) {
+        case 'ipv4':
+          device.ipv4 = value.toString();
+          break;
+        case 'connected':
+          device.connected = value == 1;
+          break;
+        case 'last_seen_at':
+          device.lastSeenAt = value.toString();
+          break;
+        case 'test':
+          if (propertyPath.length > 1 && propertyPath[1] == 'uptime') {
+            device.uptime = value.toString();
+          }
+          break;
+        case 'app':
+          if (propertyPath.length > 1) {
+            switch (propertyPath[1]) {
+              case 'deviceType':
+                device.deviceType = value.toString();
+                break;
+              case 'firmware_version':
+                device.firmwareVersion = value.toString();
+                break;
+              case 'recordPath':
+                device.recordPath = value.toString();
+                break;
+            }
+          }
+          break;
+        case 'cam':
+          if (propertyPath.length > 0 && propertyPath[0].startsWith('cam[')) {
+            // Extract camera index
+            final indexStr = propertyPath[0].substring(4, propertyPath[0].length - 1);
+            final cameraIndex = int.tryParse(indexStr);
+            
+            if (cameraIndex != null) {
+              _updateCameraProperty(device, cameraIndex, propertyPath, value);
+            }
+          }
+          break;
+        case 'camreports':
+          if (propertyPath.length > 2) {
+            final cameraName = propertyPath[1];
+            final propertyName = propertyPath[2];
+            
+            // Find camera by name
+            final camera = device.cameras.firstWhere(
+              (cam) => cam.name == cameraName, 
+              orElse: () => Camera(
+                index: device.cameras.length,
+                name: cameraName,
+                ip: '',
+                username: '',
+                password: '',
+                brand: '',
+                model: '',
+                mediaUri: '',
+                recordUri: '',
+                subUri: '',
+                remoteUri: '',
+                mainSnapShot: '',
+                subSnapShot: '',
+                recordWidth: 0,
+                recordHeight: 0,
+                subWidth: 0,
+                subHeight: 0,
+                connected: false,
+                lastSeenAt: '',
+                recording: false,
+              ),
+            );
+            
+            // If camera isn't already in the list, add it
+            if (!device.cameras.contains(camera)) {
+              device.cameras.add(camera);
+            }
+            
+            // Update camera status properties
+            switch (propertyName) {
+              case 'connected':
+                camera.connected = value == 1;
+                break;
+              case 'last_seen_at':
+                camera.lastSeenAt = value.toString();
+                break;
+              case 'recording':
+                camera.recording = value == true || value == 1;
+                break;
+            }
+          }
+          break;
+      }
     }
-    return allCameras;
+    
+    // If we modified the selected device, notify listeners
+    if (_selectedDevice != null && _selectedDevice!.macKey == macKey) {
+      notifyListeners();
+    }
+  }
+  
+  // Update camera properties within a device
+  void _updateCameraProperty(CameraDevice device, int cameraIndex, List<String> propertyPath, dynamic value) {
+    // Find or create the camera
+    while (device.cameras.length <= cameraIndex) {
+      device.cameras.add(Camera(
+        index: device.cameras.length,
+        name: 'Camera ${device.cameras.length + 1}',
+        ip: '',
+        username: '',
+        password: '',
+        brand: '',
+        model: '',
+        mediaUri: '',
+        recordUri: '',
+        subUri: '',
+        remoteUri: '',
+        mainSnapShot: '',
+        subSnapShot: '',
+        recordWidth: 0,
+        recordHeight: 0,
+        subWidth: 0, 
+        subHeight: 0,
+        connected: false,
+        lastSeenAt: '',
+        recording: false,
+      ));
+    }
+    
+    final camera = device.cameras[cameraIndex];
+    
+    // Update the property if it has a sub-property
+    if (propertyPath.length > 1) {
+      final propertyName = propertyPath[1];
+      
+      switch (propertyName) {
+        case 'name':
+          camera.name = value.toString();
+          break;
+        case 'cameraIp':
+          camera.ip = value.toString();
+          break;
+        case 'username':
+          camera.username = value.toString();
+          break;
+        case 'password':
+          camera.password = value.toString();
+          break;
+        case 'brand':
+          camera.brand = value.toString();
+          break;
+        case 'hw':
+          camera.model = value.toString();
+          break;
+        case 'mediaUri':
+          camera.mediaUri = value.toString();
+          break;
+        case 'recordUri':
+          camera.recordUri = value.toString();
+          break;
+        case 'subUri':
+          camera.subUri = value.toString();
+          break;
+        case 'remoteUri':
+          camera.remoteUri = value.toString();
+          break;
+        case 'mainSnapShot':
+          camera.mainSnapShot = value.toString();
+          break;
+        case 'subSnapShot':
+          camera.subSnapShot = value.toString();
+          break;
+        case 'recordwidth':
+          camera.recordWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
+          break;
+        case 'recordheight':
+          camera.recordHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
+          break;
+        case 'subwidth':
+          camera.subWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
+          break;
+        case 'subheight':
+          camera.subHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
+          break;
+      }
+    }
   }
 
-  // Get online cameras only
-  List<CameraDevice> get onlineCameras {
-    return allCameras.where((camera) => camera.isConnected).toList();
-  }
-
-  // Get recording cameras only
-  List<CameraDevice> get recordingCameras {
-    return allCameras.where((camera) => camera.isRecording).toList();
+  // Clear all devices
+  void clearDevices() {
+    _devices.clear();
+    _selectedDevice = null;
+    _selectedCameraIndex = 0;
+    notifyListeners();
   }
 }

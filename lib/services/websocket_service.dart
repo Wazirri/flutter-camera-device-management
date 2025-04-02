@@ -5,7 +5,6 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import '../models/system_info.dart';
-import '../models/camera_device.dart';
 
 class WebSocketService extends ChangeNotifier {
   WebSocketChannel? _channel;
@@ -19,23 +18,16 @@ class WebSocketService extends ChangeNotifier {
   SystemInfo? _systemInfo;
   static const int maxLogMessages = 2000; // Maximum number of log messages to keep
   
-  // Camera devices state
-  final Map<String, DeviceInfo> _devices = {};
-  final Map<String, Map<int, Map<String, dynamic>>> _cameraProperties = {};
-  final Map<String, Map<String, Map<String, dynamic>>> _cameraReports = {};
+  // Function to handle parsed messages - set by WebSocketProvider
+  Function(Map<String, dynamic>)? _onParsedMessage;
   
-  bool get isInitialized => _devices.isNotEmpty;
   bool get isConnected => _isConnected;
   List<String> get messageLog => _messageLog;
   SystemInfo? get systemInfo => _systemInfo;
-  Map<String, DeviceInfo> get devices => _devices;
-  List<DeviceInfo> get devicesList => _devices.values.toList();
-  List<CameraDevice> get allCameras {
-    final List<CameraDevice> cameras = [];
-    for (final device in _devices.values) {
-      cameras.addAll(device.cameras);
-    }
-    return cameras;
+  
+  // Set message handler
+  void setMessageHandler(Function(Map<String, dynamic>) handler) {
+    _onParsedMessage = handler;
   }
   
   // Add message to log with size limit enforcement
@@ -140,18 +132,9 @@ class WebSocketService extends ChangeNotifier {
             notifyListeners();
           }
           
-          // Handle camera data changes
-          else if (jsonMessage['c'] == 'changed' && 
-                  jsonMessage.containsKey('data') && 
-                  jsonMessage.containsKey('val')) {
-            
-            final String dataPath = jsonMessage['data'];
-            final dynamic value = jsonMessage['val'];
-            
-            // Only process device related messages that we're interested in
-            if (dataPath.startsWith('ecs.slaves.')) {
-              _processDeviceData(dataPath, value);
-            }
+          // Pass the parsed message to the handler if provided
+          if (_onParsedMessage != null && jsonMessage is Map<String, dynamic>) {
+            _onParsedMessage!(jsonMessage);
           }
         }
         
@@ -162,162 +145,6 @@ class WebSocketService extends ChangeNotifier {
     } catch (e) {
       debugPrint('Error handling message: $e');
     }
-  }
-  
-  // Process device data received from WebSocket
-  void _processDeviceData(String dataPath, dynamic value) {
-    // Extract MAC address from path (format: ecs.slaves.m_XX_XX_XX_XX_XX_XX.property)
-    final parts = dataPath.split('.');
-    if (parts.length < 3) return;
-    
-    final String macPart = parts[2]; // e.g., m_26_C1_7A_0B_1F_19
-    final String macAddress = macPart.replaceAll('m_', '').replaceAll('_', ':');
-    
-    // Initialize device if it doesn't exist
-    if (!_devices.containsKey(macAddress)) {
-      _devices[macAddress] = DeviceInfo.initial(macAddress);
-      _cameraProperties[macAddress] = {};
-      _cameraReports[macAddress] = {};
-    }
-    
-    // Process based on the property path
-    if (parts.length >= 4) {
-      final String propertyType = parts[3];
-      
-      if (propertyType == 'firsttime') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(firstSeen: value.toString());
-      } else if (propertyType == 'connected') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(isConnected: value == 1);
-      } else if (propertyType == 'ipv4') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(ipv4: value.toString());
-      } else if (propertyType == 'ipv6') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(ipv6: value.toString());
-      } else if (propertyType == 'last_seen_at') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(lastSeen: value.toString());
-      } else if (propertyType == 'test' && parts.length >= 5 && parts[4] == 'uptime') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(uptime: value.toString());
-      } else if (propertyType == 'test' && parts.length >= 5 && parts[4] == 'is_error') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(hasError: value == 1);
-      } else if (propertyType == 'app' && parts.length >= 5 && parts[4] == 'firmware_version') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(firmwareVersion: value.toString());
-      } else if (propertyType == 'app' && parts.length >= 5 && parts[4] == 'deviceType') {
-        _devices[macAddress] = _devices[macAddress]!.copyWith(deviceType: value.toString());
-      } 
-      // Process camera properties
-      else if (propertyType.startsWith('cam[') && parts.length >= 5) {
-        final camIndex = _extractCameraIndex(propertyType); // Get index from cam[0]
-        final property = parts[4]; // e.g., name, cameraIp
-        
-        if (camIndex != null) {
-          if (!_cameraProperties[macAddress]!.containsKey(camIndex)) {
-            _cameraProperties[macAddress]![camIndex] = {};
-          }
-          
-          // Store the camera property
-          _cameraProperties[macAddress]![camIndex][property] = value;
-          
-          // Update the cameras list in the device
-          _updateDeviceCameras(macAddress);
-        }
-      }
-      // Process camera reports
-      else if (propertyType == 'camreports' && parts.length >= 6) {
-        final camName = parts[4]; // e.g., KAMERA1
-        final property = parts[5]; // e.g., connected, recording
-        
-        if (!_cameraReports[macAddress]!.containsKey(camName)) {
-          _cameraReports[macAddress]![camName] = {};
-        }
-        
-        // Store the camera report
-        _cameraReports[macAddress]![camName][property] = value;
-        
-        // Update the cameras list in the device
-        _updateDeviceCameras(macAddress);
-      }
-    }
-    
-    notifyListeners();
-  }
-  
-  // Extract camera index from cam[X] format
-  int? _extractCameraIndex(String camPath) {
-    final regex = RegExp(r'cam\[(\d+)\]');
-    final match = regex.firstMatch(camPath);
-    if (match != null && match.groupCount >= 1) {
-      return int.tryParse(match.group(1)!);
-    }
-    return null;
-  }
-  
-  // Update the device's cameras list from the stored properties
-  void _updateDeviceCameras(String macAddress) {
-    final List<CameraDevice> cameras = [];
-    
-    // Create camera devices from camera properties
-    for (final entry in _cameraProperties[macAddress]!.entries) {
-      final int camIndex = entry.key;
-      final Map<String, dynamic> props = entry.value;
-      
-      if (props.containsKey('name')) {
-        final camName = props['name'];
-        
-        // Create camera device from its properties
-        final CameraDevice camera = CameraDevice.fromJson(props, macAddress);
-        
-        // Update camera with reports data if available
-        if (_cameraReports[macAddress]!.containsKey(camName)) {
-          final Map<String, dynamic> reports = _cameraReports[macAddress]![camName]!;
-          
-          // Update connected and recording status
-          final isConnected = reports['connected'] == 1;
-          bool isRecording = false;
-          if (reports['recording'] is bool) {
-            isRecording = reports['recording'];
-          } else if (reports['recording'] is int) {
-            isRecording = reports['recording'] == 1;
-          } else if (reports['recording'] is String) {
-            isRecording = reports['recording'].toLowerCase() == 'true';
-          }
-          
-          final lastSeenAt = reports['last_seen_at']?.toString() ?? '';
-          
-          cameras.add(camera.copyWith(
-            isConnected: isConnected,
-            isRecording: isRecording,
-            lastSeenAt: lastSeenAt,
-          ));
-        } else {
-          cameras.add(camera);
-        }
-      }
-    }
-    
-    // Update the device with the updated cameras list
-    _devices[macAddress] = _devices[macAddress]!.copyWith(cameras: cameras);
-  }
-  
-  // Get a specific camera by MAC address and camera name
-  CameraDevice? getCamera(String macAddress, String cameraName) {
-    if (!_devices.containsKey(macAddress)) return null;
-    
-    final cameras = _devices[macAddress]!.cameras;
-    for (final camera in cameras) {
-      if (camera.name == cameraName) {
-        return camera;
-      }
-    }
-    return null;
-  }
-  
-  // Get online cameras only
-  List<CameraDevice> get onlineCameras {
-    return allCameras.where((camera) => camera.isConnected).toList();
-  }
-  
-  // Get recording cameras only
-  List<CameraDevice> get recordingCameras {
-    return allCameras.where((camera) => camera.isRecording).toList();
   }
   
   // Send the "DO MONITOR ecs" command

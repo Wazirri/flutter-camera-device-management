@@ -5,6 +5,10 @@ class AppTheme {
   static const Color primaryOrange = Color(0xFFF7941E);
   static const Color primaryBlue = Color(0xFF00ADEE);
   
+  // Convenience getters for brand colors
+  static Color get primaryColor => primaryOrange;
+  static Color get accentColor => primaryBlue;
+  
   // Dark theme colors
   static const Color darkBackground = Color(0xFF121212);
   static const Color darkSurface = Color(0xFF1E1E1E);

@@ -16,9 +16,10 @@ import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
-import 'widgets/desktop_menu.dart';
-import 'widgets/mobile_menu.dart';
+import 'widgets/desktop_side_menu.dart';
+import 'widgets/mobile_bottom_navigation_bar.dart';
 import 'providers/websocket_provider.dart';
+import 'providers/camera_devices_provider.dart';
 
 Future<void> main() async {
   // This captures errors that happen during initialization
@@ -70,6 +71,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     // Register observer for app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
+    
+    // Connect the providers
+    Future.microtask(() {
+      final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
+      final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+      
+      // Set camera devices provider in websocket provider
+      webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
+    });
   }
 
   @override
@@ -108,6 +118,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => WebSocketProvider()),
+        ChangeNotifierProvider(create: (_) => CameraDevicesProvider()),
       ],
       child: MaterialApp(
         title: 'Camera Device Manager',
