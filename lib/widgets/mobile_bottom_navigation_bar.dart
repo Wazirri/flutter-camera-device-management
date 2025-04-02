@@ -14,12 +14,13 @@ class MobileBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
+      currentIndex: _getCurrentIndex(),
+      onTap: (index) => _onItemTapped(index),
+      type: BottomNavigationBarType.fixed,
       backgroundColor: AppTheme.darkSurface,
       selectedItemColor: AppTheme.accentColor,
       unselectedItemColor: AppTheme.darkTextSecondary,
-      type: BottomNavigationBarType.fixed,
-      currentIndex: _getSelectedIndex(),
-      onTap: _onItemTapped,
+      showUnselectedLabels: true,
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.dashboard),
@@ -35,17 +36,17 @@ class MobileBottomNavigationBar extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.devices),
-          label: 'Camera Devices',
+          label: 'Devices',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: 'Settings',
+          icon: Icon(Icons.menu),
+          label: 'More',
         ),
       ],
     );
   }
 
-  int _getSelectedIndex() {
+  int _getCurrentIndex() {
     switch (currentRoute) {
       case '/dashboard':
         return 0;
@@ -54,11 +55,11 @@ class MobileBottomNavigationBar extends StatelessWidget {
       case '/recordings':
         return 2;
       case '/camera-devices':
+      case '/cameras':
+      case '/devices':
         return 3;
-      case '/settings':
-        return 4;
       default:
-        return 0;
+        return 4; // More menu
     }
   }
 
@@ -77,7 +78,8 @@ class MobileBottomNavigationBar extends StatelessWidget {
         onDestinationSelected('/camera-devices');
         break;
       case 4:
-        onDestinationSelected('/settings');
+        // Open drawer for more options
+        Scaffold.of(context).openDrawer();
         break;
     }
   }
