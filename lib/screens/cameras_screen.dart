@@ -4,6 +4,7 @@ import '../utils/responsive_helper.dart';
 import '../widgets/camera_grid_item.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/status_indicator.dart';
+import '../models/camera_device.dart';
 
 class CamerasScreen extends StatefulWidget {
   const CamerasScreen({Key? key}) : super(key: key);

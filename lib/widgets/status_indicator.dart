@@ -64,6 +64,8 @@ class StatusIndicator extends StatelessWidget {
         return 'Warning';
       case DeviceStatus.error:
         return 'Error';
+      case DeviceStatus.degraded:
+        return 'Degraded';
       case DeviceStatus.unknown:
         return 'Unknown';
     }
@@ -79,6 +81,8 @@ class StatusIndicator extends StatelessWidget {
         return AppTheme.warning;
       case DeviceStatus.error:
         return AppTheme.error;
+      case DeviceStatus.degraded:
+        return AppTheme.warning;
       case DeviceStatus.unknown:
         return AppTheme.darkTextSecondary; // Gray for unknown status
     }

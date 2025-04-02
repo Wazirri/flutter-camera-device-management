@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/websocket_provider.dart';
 import '../models/system_info.dart';
+import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';

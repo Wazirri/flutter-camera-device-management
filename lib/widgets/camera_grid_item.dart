@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../models/camera_device.dart';
 import 'status_indicator.dart';
 
 class CameraGridItem extends StatelessWidget {

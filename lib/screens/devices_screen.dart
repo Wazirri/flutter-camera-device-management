@@ -4,6 +4,7 @@ import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/device_list_item.dart';
 import '../widgets/status_indicator.dart';
+import '../models/camera_device.dart';
 
 class DevicesScreen extends StatefulWidget {
   const DevicesScreen({Key? key}) : super(key: key);
