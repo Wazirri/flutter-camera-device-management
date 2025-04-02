@@ -13,10 +13,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Flutter Build"
+args = "Flutter Web"
 
 [[workflows.workflow]]
-name = "Flutter Build"
+name = "Flutter Web"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -27,7 +27,8 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "flutter pub get && flutter build web --release"
+args = "flutter run -d web-server --web-hostname=0.0.0.0 --web-port=5000"
+waitForPort = 5000
 
 [deployment]
 run = ["sh", "-c", "flutter run -d web-server --web-port=5000 --web-hostname=0.0.0.0"]
