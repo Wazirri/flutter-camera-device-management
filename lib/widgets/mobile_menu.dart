@@ -15,25 +15,39 @@ class MobileBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     try {
-      final menuItems = MenuItems.getMenuItems(currentRoute: currentRoute);
+      // Create a subset of menu items for mobile navigation
+      // We need to limit items because BottomNavigationBar has limited space
+      final allMenuItems = MenuItems.getMenuItems(currentRoute: currentRoute);
+      final mobileMenuItems = [
+        // Dashboard
+        allMenuItems.firstWhere((item) => item.route == '/dashboard'),
+        // Live View
+        allMenuItems.firstWhere((item) => item.route == '/live-view'),
+        // Camera Devices (our new feature)
+        allMenuItems.firstWhere((item) => item.route == '/camera-devices'),
+        // Recordings
+        allMenuItems.firstWhere((item) => item.route == '/recordings'),
+        // Settings
+        allMenuItems.firstWhere((item) => item.route == '/settings'),
+      ];
       
       return BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: AppTheme.darkSurface,
         selectedItemColor: AppTheme.primaryBlue,
         unselectedItemColor: AppTheme.darkTextSecondary,
-        currentIndex: _getCurrentIndex(menuItems),
+        currentIndex: _getCurrentIndex(mobileMenuItems),
         onTap: (index) {
           try {
             // Handle onTap with error catching
-            if (index >= 0 && index < menuItems.length) {
-              onDestinationSelected(menuItems[index].route);
+            if (index >= 0 && index < mobileMenuItems.length) {
+              onDestinationSelected(mobileMenuItems[index].route);
             }
           } catch (e) {
             debugPrint('Error in bottom navigation tap: $e');
           }
         },
-        items: menuItems.map((item) => BottomNavigationBarItem(
+        items: mobileMenuItems.map((item) => BottomNavigationBarItem(
           icon: Icon(item.icon),
           label: item.title,
         )).toList(),

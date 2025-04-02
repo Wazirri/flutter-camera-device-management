@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:media_kit/media_kit.dart';                     // For Player
-import 'package:media_kit_video/media_kit_video.dart';         // For Video widget
+import 'package:media_kit/media_kit.dart';                    // For Player
+import 'package:media_kit_video/media_kit_video.dart';        // For Video widget
+import 'package:provider/provider.dart';                      // For Provider
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/status_indicator.dart';
+import '../providers/camera_devices_provider.dart';
+import '../models/camera_device.dart';
 
 class LiveViewScreen extends StatefulWidget {
   const LiveViewScreen({Key? key}) : super(key: key);
@@ -18,39 +21,76 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
   final List<String> _layoutOptions = ['Single', '2x2', '3x3', '4x4'];
   String _selectedLayout = 'Single';
   
-  // Media Kit player instance
-  late final Player _player;
-  late final VideoController _videoController;
-  bool _isPlayerInitialized = false;
+  // Map to store MediaKit players for each camera
+  final Map<int, Player> _players = {};
+  final Map<int, VideoController> _videoControllers = {};
+  final Map<int, bool> _playerInitialized = {};
   
-  // Demo video URL for Camera 1
+  // Demo video URL as fallback
   final String _demoVideoUrl = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4';
   
   @override
   void initState() {
     super.initState();
-    // Initialize the player
-    _player = Player();
-    _videoController = VideoController(_player);
     
-    // Set up the player for Camera 1
-    _initializePlayer();
+    // Initialize players for all cameras
+    for (int i = 0; i < 10; i++) {
+      _players[i] = Player();
+      _videoControllers[i] = VideoController(_players[i]!);
+      _playerInitialized[i] = false;
+    }
+    
+    // Initialize player for the currently selected camera
+    _initializePlayer(_selectedCameraIndex);
   }
   
-  Future<void> _initializePlayer() async {
+  Future<void> _initializePlayer(int cameraIndex) async {
     try {
-      await _player.open(Media(_demoVideoUrl));
-      setState(() {
-        _isPlayerInitialized = true;
-      });
+      // Get camera devices from provider
+      final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+      final cameras = cameraDevicesProvider.allCameras;
+      
+      String streamUrl;
+      
+      // If we have data for this camera index, use its RTSP stream
+      if (cameras.length > cameraIndex) {
+        final camera = cameras[cameraIndex];
+        streamUrl = camera.rtspUri;
+      } else {
+        // Otherwise use the demo video
+        streamUrl = _demoVideoUrl;
+      }
+      
+      // Open the media with the player
+      await _players[cameraIndex]!.open(Media(streamUrl));
+      
+      if (mounted) {
+        setState(() {
+          _playerInitialized[cameraIndex] = true;
+        });
+      }
     } catch (e) {
-      debugPrint('Error initializing player: $e');
+      debugPrint('Error initializing player for camera $cameraIndex: $e');
+      // Try with demo video as fallback
+      try {
+        await _players[cameraIndex]!.open(Media(_demoVideoUrl));
+        if (mounted) {
+          setState(() {
+            _playerInitialized[cameraIndex] = true;
+          });
+        }
+      } catch (e2) {
+        debugPrint('Error initializing player with demo video: $e2');
+      }
     }
   }
   
   @override
   void dispose() {
-    _player.dispose();
+    // Dispose all players
+    for (final player in _players.values) {
+      player.dispose();
+    }
     super.dispose();
   }
 
@@ -457,10 +497,24 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
           ),
         ],
       ),
-      trailing: Icon(
-        Icons.arrow_forward_ios,
-        size: 16,
-        color: isSelected ? AppTheme.primaryBlue : AppTheme.darkTextSecondary,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.camera_enhance_rounded),
+            iconSize: 18,
+            color: isSelected ? AppTheme.primaryBlue : AppTheme.darkTextSecondary,
+            onPressed: () {
+              Navigator.pushNamed(context, '/camera-devices');
+            },
+            tooltip: 'View Camera Details',
+          ),
+          Icon(
+            Icons.arrow_forward_ios,
+            size: 16,
+            color: isSelected ? AppTheme.primaryBlue : AppTheme.darkTextSecondary,
+          ),
+        ],
       ),
       onTap: onTap,
     );
@@ -548,6 +602,13 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
                 label: 'Settings',
                 onPressed: () {
                   // UI only
+                },
+              ),
+              _buildControlButton(
+                icon: Icons.camera_enhance_rounded,
+                label: 'Camera Details',
+                onPressed: () {
+                  Navigator.pushNamed(context, '/camera-devices');
                 },
               ),
             ],

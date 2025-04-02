@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart'; // Import for MediaKit
 import 'screens/cameras_screen.dart';
+import 'screens/camera_devices_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/devices_screen.dart';
 import 'screens/live_view_screen.dart';
@@ -120,6 +121,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           '/recordings': (context) => const AppShell(child: RecordViewScreen()),
           '/cameras': (context) => const AppShell(child: CamerasScreen()),
           '/devices': (context) => const AppShell(child: DevicesScreen()),
+          '/camera-devices': (context) => const AppShell(child: CameraDevicesScreen()),
           '/settings': (context) => const AppShell(child: SettingsScreen()),
           '/websocket-logs': (context) => const WebSocketLogScreen(),
         },

@@ -63,6 +63,12 @@ class MenuItems {
         isSelected: currentRoute == '/devices',
       ),
       CustomMenuItem(
+        title: 'Camera Devices',
+        icon: Icons.camera_enhance_rounded,
+        route: '/camera-devices',
+        isSelected: currentRoute == '/camera-devices',
+      ),
+      CustomMenuItem(
         title: 'Settings',
         icon: Icons.settings_rounded,
         route: '/settings',
