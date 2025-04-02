@@ -386,12 +386,21 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
                 color: Colors.black.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Text(
-                DateTime.now().toString().substring(0, 19), // Current time as timestamp
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.white,
-                ),
+              child: StreamBuilder(
+                stream: Stream.periodic(const Duration(seconds: 1)),
+                builder: (context, snapshot) {
+                  final now = DateTime.now();
+                  final formattedTime = 
+                      '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} '
+                      '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+                  return Text(
+                    formattedTime,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
+                    ),
+                  );
+                },
               ),
             ),
           ),
