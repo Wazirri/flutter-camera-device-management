@@ -134,7 +134,14 @@ class WebSocketService extends ChangeNotifier {
           
           // Pass the parsed message to the handler if provided
           if (_onParsedMessage != null && jsonMessage is Map<String, dynamic>) {
-            _onParsedMessage!(jsonMessage);
+            // Only forward the message if it contains useful data
+            if (jsonMessage['c'] == 'changed' && 
+                jsonMessage.containsKey('data') && 
+                jsonMessage.containsKey('val')) {
+              _onParsedMessage!(jsonMessage);
+            } else if (jsonMessage['c'] == 'loginok') {
+              debugPrint('👤 Successfully logged in: ${jsonMessage['username']}');
+            }
           }
         }
         
