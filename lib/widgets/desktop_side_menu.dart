@@ -20,11 +20,11 @@ class DesktopSideMenu extends StatelessWidget {
         children: [
           // App logo and title
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 24),
+            padding: const EdgeInsets.only(top: 24, bottom: 24),
             child: Column(
               children: [
                 Image.asset(
-                  'assets/app_logo.png',
+                  'assets/images/app_logo.png',
                   width: 60,
                   height: 60,
                   errorBuilder: (context, error, stackTrace) {
@@ -73,8 +73,8 @@ class DesktopSideMenu extends StatelessWidget {
                   '/recordings',
                 ),
                 const Divider(height: 1),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 8),
                   child: Text(
                     'DEVICES',
                     style: TextStyle(
