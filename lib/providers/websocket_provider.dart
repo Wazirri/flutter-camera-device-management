@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../services/websocket_service.dart';
 import '../models/system_info.dart';
@@ -23,7 +24,17 @@ class WebSocketProvider extends ChangeNotifier {
   // Message handler to forward messages to camera devices provider
   void _handleParsedMessage(Map<String, dynamic> message) {
     if (_cameraDevicesProvider != null) {
+      // Add more detailed debug info for changed messages
+      if (message['c'] == 'changed' && message.containsKey('data') && message.containsKey('val')) {
+        final String dataPath = message['data'].toString();
+        if (dataPath.startsWith('ecs.slaves.m_')) {
+          debugPrint('✅ Forwarding device message to CameraDevicesProvider: ${message['data']} = ${message['val']}');
+        }
+      }
+      
       _cameraDevicesProvider!.processWebSocketMessage(message);
+    } else {
+      debugPrint('❌ ERROR: CameraDevicesProvider is null, cannot process message: ${json.encode(message)}');
     }
   }
   

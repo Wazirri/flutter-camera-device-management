@@ -89,6 +89,12 @@ class CameraDevicesProvider with ChangeNotifier {
               recordPath: '',
               cameras: [],
             );
+            
+            // If this is the first device we're seeing, select it automatically
+            if (_selectedDevice == null) {
+              _selectedDevice = _devices[macKey];
+              debugPrint('Auto-selected first device: $macKey');
+            }
           }
           
           _updateDeviceProperty(macKey, parts, value);
