@@ -147,10 +147,10 @@ class WebSocketService extends ChangeNotifier {
     }
   }
   
-  // Send the "DO MONITOR ecs" command
+  // Send the "DO MONITORECS" command
   void sendMonitorCommand() {
     if (_channel != null && _isConnected) {
-      final monitorCommand = 'DO MONITOR ecs';
+      final monitorCommand = 'DO MONITORECS';
       _channel!.sink.add(monitorCommand);
       
       // Log the command
