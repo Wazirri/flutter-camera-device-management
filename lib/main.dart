@@ -49,8 +49,23 @@ Future<void> main() async {
       }
     }
     
-    // Run the app
-    runApp(const MyApp());
+    // Create providers first
+    final webSocketProvider = WebSocketProvider();
+    final cameraDevicesProvider = CameraDevicesProvider();
+    
+    // Connect the providers
+    webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
+    
+    // Run the app with providers
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<WebSocketProvider>.value(value: webSocketProvider),
+          ChangeNotifierProvider<CameraDevicesProvider>.value(value: cameraDevicesProvider),
+        ],
+        child: const MyApp(),
+      ),
+    );
   }, (error, stackTrace) {
     // Log any errors that occur during initialization
     debugPrint('Caught error: $error');
@@ -71,15 +86,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     // Register observer for app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
-    
-    // Connect the providers
-    Future.microtask(() {
-      final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
-      final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
-      
-      // Set camera devices provider in websocket provider
-      webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
-    });
   }
 
   @override
@@ -115,28 +121,22 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => WebSocketProvider()),
-        ChangeNotifierProvider(create: (_) => CameraDevicesProvider()),
-      ],
-      child: MaterialApp(
-        title: 'Camera Device Manager',
-        theme: AppTheme.darkTheme,
-        debugShowCheckedModeBanner: false,
-        initialRoute: '/login',
-        routes: {
-          '/login': (context) => const LoginScreen(),
-          '/dashboard': (context) => const AppShell(child: DashboardScreen()),
-          '/live-view': (context) => const AppShell(child: LiveViewScreen()),
-          '/recordings': (context) => const AppShell(child: RecordViewScreen()),
-          '/cameras': (context) => const AppShell(child: CamerasScreen()),
-          '/devices': (context) => const AppShell(child: DevicesScreen()),
-          '/camera-devices': (context) => const AppShell(child: CameraDevicesScreen()),
-          '/settings': (context) => const AppShell(child: SettingsScreen()),
-          '/websocket-logs': (context) => const WebSocketLogScreen(),
-        },
-      ),
+    return MaterialApp(
+      title: 'Camera Device Manager',
+      theme: AppTheme.darkTheme,
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/login',
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/dashboard': (context) => const AppShell(child: DashboardScreen()),
+        '/live-view': (context) => const AppShell(child: LiveViewScreen()),
+        '/recordings': (context) => const AppShell(child: RecordViewScreen()),
+        '/cameras': (context) => const AppShell(child: CamerasScreen()),
+        '/devices': (context) => const AppShell(child: DevicesScreen()),
+        '/camera-devices': (context) => const AppShell(child: CameraDevicesScreen()),
+        '/settings': (context) => const AppShell(child: SettingsScreen()),
+        '/websocket-logs': (context) => const WebSocketLogScreen(),
+      },
     );
   }
 }
