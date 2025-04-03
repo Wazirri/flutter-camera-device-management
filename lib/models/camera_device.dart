@@ -93,6 +93,31 @@ class CameraDevice {
     };
   }
   
+  // Get the device status
+  DeviceStatus get status {
+    if (!connected) {
+      return DeviceStatus.offline;
+    }
+    
+    // Check if any cameras have issues
+    bool hasWarning = false;
+    bool hasError = false;
+    
+    for (final camera in cameras) {
+      if (!camera.connected) {
+        hasWarning = true;
+      }
+    }
+    
+    if (hasError) {
+      return DeviceStatus.error;
+    } else if (hasWarning) {
+      return DeviceStatus.warning;
+    } else {
+      return DeviceStatus.online;
+    }
+  }
+
   @override
   String toString() {
     return 'CameraDevice{macAddress: $macAddress, ipv4: $ipv4, connected: $connected, cameras: ${cameras.length}}';
@@ -262,6 +287,14 @@ class Camera {
   
   // Added getter for compatibility
   bool get isRecording => recording;
+  
+  // Get the camera status
+  DeviceStatus get status {
+    if (!connected) {
+      return DeviceStatus.offline;
+    }
+    return DeviceStatus.online;
+  }
   
   @override
   String toString() {

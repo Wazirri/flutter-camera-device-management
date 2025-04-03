@@ -60,6 +60,9 @@ class CameraDevicesProvider with ChangeNotifier {
       final String dataPath = message['data'];
       final dynamic value = message['val'];
       
+      // Debugging log the message
+      debugPrint('Processing WebSocket message: ${json.encode(message)}');
+      
       // Check if this is a camera device-related message
       if (dataPath.startsWith('ecs.slaves.m_')) {
         // Extract the MAC address from the data path
@@ -69,8 +72,11 @@ class CameraDevicesProvider with ChangeNotifier {
           final macKey = parts[2]; // Get m_26_C1_7A_0B_1F_19
           final macAddress = macKey.substring(2).replaceAll('_', ':'); // Convert to proper MAC format
           
+          debugPrint('Extracted macKey: $macKey, macAddress: $macAddress');
+          
           // Create the device if it doesn't exist yet
           if (!_devices.containsKey(macKey)) {
+            debugPrint('Creating new device with macKey: $macKey');
             _devices[macKey] = CameraDevice(
               macAddress: macAddress,
               macKey: macKey,
@@ -86,6 +92,7 @@ class CameraDevicesProvider with ChangeNotifier {
           }
           
           _updateDeviceProperty(macKey, parts, value);
+          notifyListeners(); // Notify after any device update
         }
       }
     }
@@ -130,13 +137,19 @@ class CameraDevicesProvider with ChangeNotifier {
           }
           break;
         case 'cam':
-          if (propertyPath.length > 0 && propertyPath[0].startsWith('cam[')) {
-            // Extract camera index
-            final indexStr = propertyPath[0].substring(4, propertyPath[0].length - 1);
-            final cameraIndex = int.tryParse(indexStr);
+          // Check if this is a camera property pattern
+          final pattern = RegExp(r'^cam\[(\d+)\]');
+          final match = pattern.firstMatch(propertyPath[0]);
+          
+          if (match != null) {
+            // Extract camera index from the match
+            final cameraIndex = int.tryParse(match.group(1) ?? '-1');
             
-            if (cameraIndex != null) {
+            if (cameraIndex != null && cameraIndex >= 0) {
+              debugPrint('Updating camera $cameraIndex property: ${propertyPath.join('.')} = $value');
               _updateCameraProperty(device, cameraIndex, propertyPath, value);
+            } else {
+              debugPrint('Error parsing camera index from ${propertyPath[0]}');
             }
           }
           break;

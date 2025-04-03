@@ -125,6 +125,20 @@ class DesktopSideMenu extends StatelessWidget {
             child: Column(
               children: [
                 const Divider(height: 1),
+                // Logout button
+                ListTile(
+                  leading: Icon(
+                    Icons.logout,
+                    color: AppTheme.darkTextSecondary,
+                  ),
+                  title: Text(
+                    'Logout',
+                    style: TextStyle(
+                      color: AppTheme.darkTextPrimary,
+                    ),
+                  ),
+                  onTap: () => onDestinationSelected('/login'),
+                ),
                 const SizedBox(height: 16),
                 Text(
                   'v1.0.0',
