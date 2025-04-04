@@ -1,0 +1,624 @@
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % git pull            
+remote: Enumerating objects: 14, done.
+remote: Counting objects: 100% (14/14), done.
+remote: Compressing objects: 100% (4/4), done.
+remote: Total 8 (delta 4), reused 8 (delta 4), pack-reused 0 (from 0)
+Nesneler açılıyor: 100% (8/8), 3.52 KiB | 450.00 KiB/sn, bitti.
+Şu konumdan: https://github.com/Wazirri/flutter-camera-device-management
+   3e2cd8e..626c8a1  main       -> origin/main
+Güncelleniyor: 3e2cd8e..626c8a1
+Fast-forward
+ lib/providers/camera_devices_provider.dart | 315 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++---------------------------------------------------------
+ lib/providers/websocket_provider.dart      |  29 +++++++------
+ lib/services/websocket_service.dart        |  84 +++++++++++++++++++++-----------------
+ 3 files changed, 253 insertions(+), 175 deletions(-)
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % flutter run -d macos
+Launching lib/main.dart on macOS in debug mode...
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:00008112-001251360E08201E, name:My Mac }
+{ platform:macOS, arch:x86_64, id:00008112-001251360E08201E, name:My Mac }
+Building macOS application...                                           
+✓ Built build/macos/Build/Products/Debug/workspace.app
+2025-04-04 15:27:49.720 workspace[50943:513061] +[IMKClient subclass]: chose IMKClient_Modern
+2025-04-04 15:27:49.720 workspace[50943:513061] +[IMKInputSession subclass]: chose IMKInputSession_Modern
+flutter: Configuring iOS/macOS specific settings
+Error: unable to find directory entry in pubspec.yaml: /Users/smarteq/Desktop/Projects/Flutter/flutter-camera-device-management/assets/icons/
+Syncing files to device macOS...                                   109ms
+
+Flutter run key commands.
+r Hot reload. 🔥🔥🔥
+R Hot restart.
+h List all available interactive commands.
+d Detach (terminate "flutter run" but leave application running).
+c Clear the screen
+q Quit (terminate the application on the device).
+
+A Dart VM Service on macOS is available at: http://127.0.0.1:65123/VS0gOOAnZ0k=/
+flutter: Cannot send message: not connected
+flutter: Sent system monitor request
+The Flutter DevTools debugger and profiler on macOS is available at: http://127.0.0.1:9101?uri=http://127.0.0.1:65123/VS0gOOAnZ0k=/
+flutter: media_kit: NativeReferenceHolder: Allocated 5796884992
+flutter: Cannot send message: not connected
+flutter: Sent system monitor request
+flutter: Cannot send message: not connected
+flutter: Sent system monitor request
+flutter: Connecting to WebSocket: ws://85.104.114.145:1200
+flutter: Sent login request
+flutter: Sent login request
+flutter: Sent system monitor request
+
+══╡ EXCEPTION CAUGHT BY RENDERING LIBRARY ╞═════════════════════════════════════════════════════════
+The following assertion was thrown during layout:
+A RenderFlex overflowed by 48 pixels on the right.
+
+The relevant error-causing widget was:
+  Row
+  Row:file:///Users/smarteq/Desktop/Projects/Flutter/flutter-camera-device-management/lib/screens/dashboard_screen.dart:110:19
+
+To inspect this widget in Flutter DevTools, visit:
+http://127.0.0.1:9101/#/inspector?uri=http%3A%2F%2F127.0.0.1%3A65123%2FVS0gOOAnZ0k%3D%2F&inspectorRef=inspector-0
+
+The overflowing RenderFlex has an orientation of Axis.horizontal.
+The edge of the RenderFlex that is overflowing has been marked in the rendering with a yellow and
+black striped pattern. This is usually caused by the contents being too big for the RenderFlex.
+Consider applying a flex factor (e.g. using an Expanded widget) to force the children of the
+RenderFlex to fit within the available space instead of being sized to their natural size.
+This is considered an error condition because it indicates that there is content that cannot be
+seen. If the content is legitimately bigger than the available space, consider clipping it with a
+ClipRect widget before putting it in the flex, or using a scrollable container rather than a Flex,
+like a ListView.
+The specific RenderFlex in question is: RenderFlex#c2334 relayoutBoundary=up31 OVERFLOWING:
+  creator: Row ← Column ← Expanded ← Row ← Padding ← Semantics ← DefaultTextStyle ←
+    AnimatedDefaultTextStyle ← _InkFeatures-[GlobalKey#e78b7 ink renderer] ←
+    NotificationListener<LayoutChangedNotification> ← CustomPaint ← _ShapeBorderPaint ← ⋯
+  parentData: offset=Offset(0.0, 98.0); flex=null; fit=null (can use size)
+  constraints: BoxConstraints(0.0<=w<=322.0, 0.0<=h<=Infinity)
+  size: Size(322.0, 32.0)
+  direction: horizontal
+  mainAxisAlignment: start
+  mainAxisSize: max
+  crossAxisAlignment: center
+  textDirection: ltr
+  verticalDirection: down
+  spacing: 0.0
+◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤◢◤
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+Another exception was thrown: A RenderFlex overflowed by 94 pixels on the bottom.
+Another exception was thrown: A RenderFlex overflowed by 94 pixels on the bottom.
+Another exception was thrown: A RenderFlex overflowed by 74 pixels on the bottom.
+Another exception was thrown: A RenderFlex overflowed by 74 pixels on the bottom.
+flutter: WebSocket received message: login
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: App lifecycle state changed to: AppLifecycleState.inactive
+flutter: AppShell lifecycle state: AppLifecycleState.inactive
+flutter: AppShell lifecycle state: AppLifecycleState.inactive
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: App lifecycle state changed to: AppLifecycleState.hidden
+flutter: AppShell lifecycle state: AppLifecycleState.hidden
+flutter: AppShell lifecycle state: AppLifecycleState.hidden
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: Sent system monitor request
+flutter: App lifecycle state changed to: AppLifecycleState.inactive
+flutter: AppShell lifecycle state: AppLifecycleState.inactive
+flutter: AppShell lifecycle state: AppLifecycleState.inactive
+flutter: Sent system monitor request
+Application finished.
+the Dart compiler exited unexpectedly.
+^C%                                                                                                                                                                                              
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % 
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % 
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % 
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % git pull            
+remote: Enumerating objects: 23, done.
+remote: Counting objects: 100% (23/23), done.
+remote: Compressing objects: 100% (7/7), done.
+remote: Total 13 (delta 6), reused 13 (delta 6), pack-reused 0 (from 0)
+Nesneler açılıyor: 100% (13/13), 6.61 KiB | 676.00 KiB/sn, bitti.
+Şu konumdan: https://github.com/Wazirri/flutter-camera-device-management
+   626c8a1..4b66335  main       -> origin/main
+Güncelleniyor: 626c8a1..4b66335
+Fast-forward
+ lib/models/camera_device.dart              | 327 ++++++++++++++++++++-----------------------------------------------------------------------------
+ lib/providers/camera_devices_provider.dart | 478 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------------------------------------------------------------------------
+ lib/providers/websocket_provider.dart      |  31 +++++++++-
+ lib/screens/dashboard_screen.dart          | 165 ++++++++++++++++++++++++++-----------------------
+ lib/services/websocket_service.dart        |  12 +++-
+ 5 files changed, 414 insertions(+), 599 deletions(-)
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % flutter run -d macos
+Launching lib/main.dart on macOS in debug mode...
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:00008112-001251360E08201E, name:My Mac }
+{ platform:macOS, arch:x86_64, id:00008112-001251360E08201E, name:My Mac }
+lib/screens/cameras_screen.dart:18:3: Error: Type 'Camera' not found.
+  Camera? selectedCamera;
+  ^^^^^^
+lib/screens/cameras_screen.dart:30:22: Error: Type 'Camera' not found.
+  void _selectCamera(Camera camera) {
+                     ^^^^^^
+lib/screens/cameras_screen.dart:36:22: Error: Type 'Camera' not found.
+  void _openLiveView(Camera camera) {
+                     ^^^^^^
+lib/screens/cameras_screen.dart:45:24: Error: Type 'Camera' not found.
+  void _openRecordView(Camera camera) {
+                       ^^^^^^
+lib/screens/cameras_screen.dart:431:51: Error: Type 'Camera' not found.
+class CameraSearchDelegate extends SearchDelegate<Camera?> {
+                                                  ^^^^^^
+lib/screens/cameras_screen.dart:432:18: Error: Type 'Camera' not found.
+  final Function(Camera) onCameraSelected;
+                 ^^^^^^
+lib/screens/camera_devices_screen.dart:391:9: Error: Type 'Camera' not found.
+  final Camera camera;
+        ^^^^^^
+lib/screens/live_view_screen.dart:13:9: Error: Type 'Camera' not found.
+  final Camera? camera; // Make camera optional so the route can work without a parameter
+        ^^^^^^
+lib/screens/live_view_screen.dart:23:3: Error: Type 'Camera' not found.
+  Camera? _camera;
+  ^^^^^^
+lib/screens/live_view_screen.dart:31:8: Error: Type 'Camera' not found.
+  List<Camera> _availableCameras = [];
+       ^^^^^^
+lib/screens/record_view_screen.dart:15:9: Error: Type 'Camera' not found.
+  final Camera? camera; // Make camera optional so the route can work without a parameter
+        ^^^^^^
+lib/screens/record_view_screen.dart:25:3: Error: Type 'Camera' not found.
+  Camera? _camera;
+  ^^^^^^
+lib/screens/record_view_screen.dart:33:8: Error: Type 'Camera' not found.
+  List<Camera> _availableCameras = [];
+       ^^^^^^
+lib/widgets/camera_grid_item.dart:5:9: Error: Type 'Camera' not found.
+  final Camera camera;
+        ^^^^^^
+lib/screens/cameras_screen.dart:18:3: Error: 'Camera' isn't a type.
+  Camera? selectedCamera;
+  ^^^^^^
+lib/screens/cameras_screen.dart:30:22: Error: 'Camera' isn't a type.
+  void _selectCamera(Camera camera) {
+                     ^^^^^^
+lib/screens/cameras_screen.dart:36:22: Error: 'Camera' isn't a type.
+  void _openLiveView(Camera camera) {
+                     ^^^^^^
+lib/screens/cameras_screen.dart:45:24: Error: 'Camera' isn't a type.
+  void _openRecordView(Camera camera) {
+                       ^^^^^^
+lib/screens/cameras_screen.dart:221:16: Error: 'Camera' isn't a type.
+          List<Camera> displayCameras = [];
+               ^^^^^^
+lib/screens/cameras_screen.dart:134:24: Error: The getter 'isLoading' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'isLoading'.
+          if (provider.isLoading) {
+                       ^^^^^^^^^
+lib/screens/cameras_screen.dart:141:24: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+          if (provider.cameras.isEmpty) {
+                       ^^^^^^^
+lib/screens/cameras_screen.dart:171:32: Error: The method 'refreshCameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'refreshCameras'.
+                      provider.refreshCameras();
+                               ^^^^^^^^^^^^^^
+lib/screens/cameras_screen.dart:180:43: Error: The method 'getCamerasByMacAddress' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'getCamerasByMacAddress'.
+          final groupedCameras = provider.getCamerasByMacAddress();
+                                          ^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/cameras_screen.dart:228:39: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+            displayCameras = provider.cameras;
+                                      ^^^^^^^
+lib/screens/cameras_screen.dart:233:70: Error: The getter 'connected' isn't defined for the class 'Object?'.
+ - 'Object' is from 'dart:core'.
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+            displayCameras = displayCameras.where((camera) => camera.connected).toList();
+                                                                     ^^^^^^^^^
+lib/screens/cameras_screen.dart:432:18: Error: 'Camera' isn't a type.
+  final Function(Camera) onCameraSelected;
+                 ^^^^^^
+lib/screens/cameras_screen.dart:470:30: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+    final cameras = provider.cameras;
+                             ^^^^^^^
+lib/screens/camera_devices_screen.dart:24:36: Error: The getter 'devicesList' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'devicesList'.
+          final devices = provider.devicesList;
+                                   ^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:44:28: Error: The method 'setSelectedDevice' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'setSelectedDevice'.
+                  provider.setSelectedDevice(device.macKey);
+                           ^^^^^^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:99:25: Error: The getter 'connected' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+          color: device.connected 
+                        ^^^^^^^^^
+lib/screens/camera_devices_screen.dart:102:25: Error: The getter 'connected' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+          width: device.connected ? 2 : 1,
+                        ^^^^^^^^^
+lib/screens/camera_devices_screen.dart:117:28: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+                    device.deviceType.isEmpty 
+                           ^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:119:34: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+                        : device.deviceType,
+                                 ^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:131:37: Error: The getter 'connected' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+                      color: device.connected 
+                                    ^^^^^^^^^
+lib/screens/camera_devices_screen.dart:137:30: Error: The getter 'connected' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+                      device.connected ? 'Online' : 'Offline',
+                             ^^^^^^^^^
+lib/screens/camera_devices_screen.dart:165:36: Error: The getter 'cameras' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+                'Cameras: ${device.cameras.length}',
+                                   ^^^^^^^
+lib/screens/camera_devices_screen.dart:168:26: Error: The getter 'uptime' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'uptime'.
+              if (device.uptime.isNotEmpty) ...[
+                         ^^^^^^
+lib/screens/camera_devices_screen.dart:171:37: Error: The getter 'uptime' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'uptime'.
+                  'Uptime: ${device.uptime}',
+                                    ^^^^^^
+lib/screens/camera_devices_screen.dart:175:26: Error: The getter 'firmwareVersion' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'firmwareVersion'.
+              if (device.firmwareVersion.isNotEmpty) ...[
+                         ^^^^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:178:39: Error: The getter 'firmwareVersion' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'firmwareVersion'.
+                  'Firmware: ${device.firmwareVersion}',
+                                      ^^^^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:184:38: Error: The getter 'lastSeenAt' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'lastSeenAt'.
+                'Last seen: ${device.lastSeenAt}',
+                                     ^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:223:30: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+                      device.deviceType.isEmpty 
+                             ^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:225:36: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+                          : device.deviceType,
+                                   ^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:248:33: Error: The getter 'connected' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+                  color: device.connected 
+                                ^^^^^^^^^
+lib/screens/camera_devices_screen.dart:254:26: Error: The getter 'connected' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+                  device.connected ? 'Online' : 'Offline',
+                         ^^^^^^^^^
+lib/screens/camera_devices_screen.dart:280:57: Error: The getter 'lastSeenAt' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'lastSeenAt'.
+              InfoRow(label: 'Last Seen', value: device.lastSeenAt),
+                                                        ^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:281:54: Error: The getter 'uptime' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'uptime'.
+              InfoRow(label: 'Uptime', value: device.uptime),
+                                                     ^^^^^^
+lib/screens/camera_devices_screen.dart:282:56: Error: The getter 'firmwareVersion' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'firmwareVersion'.
+              InfoRow(label: 'Firmware', value: device.firmwareVersion),
+                                                       ^^^^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:298:36: Error: The getter 'cameras' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+                'Cameras (${device.cameras.length})',
+                                   ^^^^^^^
+lib/screens/camera_devices_screen.dart:304:26: Error: The getter 'cameras' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+              if (device.cameras.isNotEmpty && device.connected)
+                         ^^^^^^^
+lib/screens/camera_devices_screen.dart:304:55: Error: The getter 'connected' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+              if (device.cameras.isNotEmpty && device.connected)
+                                                      ^^^^^^^^^
+lib/screens/camera_devices_screen.dart:319:25: Error: The getter 'cameras' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+          child: device.cameras.isEmpty
+                        ^^^^^^^
+lib/screens/camera_devices_screen.dart:326:37: Error: The getter 'cameras' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+                  itemCount: device.cameras.length,
+                                    ^^^^^^^
+lib/screens/camera_devices_screen.dart:328:43: Error: The getter 'cameras' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+                    final camera = device.cameras[index];
+                                          ^^^^^^^
+lib/screens/camera_devices_screen.dart:334:30: Error: The method 'setSelectedCameraIndex' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'setSelectedCameraIndex'.
+                            .setSelectedCameraIndex(index);
+                             ^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:391:9: Error: 'Camera' isn't a type.
+  final Camera camera;
+        ^^^^^^
+lib/screens/devices_screen.dart:194:42: Error: A value of type 'List<List<CameraDevice>>' can't be assigned to a variable of type 'List<CameraDevice>'.
+ - 'List' is from 'dart:core'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+    List<CameraDevice> filteredDevices = devicesList;
+                                         ^
+lib/screens/devices_screen.dart:199:27: Error: The getter 'connected' isn't defined for the class 'List<CameraDevice>'.
+ - 'List' is from 'dart:core'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+            return device.connected;
+                          ^^^^^^^^^
+lib/screens/devices_screen.dart:201:28: Error: The getter 'connected' isn't defined for the class 'List<CameraDevice>'.
+ - 'List' is from 'dart:core'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+            return !device.connected;
+                           ^^^^^^^^^
+lib/screens/devices_screen.dart:207:10: Error: A value of type 'List<List<CameraDevice>>' can't be assigned to a variable of type 'List<CameraDevice>'.
+ - 'List' is from 'dart:core'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+      }).toList();
+         ^
+lib/screens/devices_screen.dart:216:20: Error: The getter 'connected' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+          return a.connected == b.connected ? 0 : (a.connected ? -1 : 1);
+                   ^^^^^^^^^
+lib/screens/devices_screen.dart:216:35: Error: The getter 'connected' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+          return a.connected == b.connected ? 0 : (a.connected ? -1 : 1);
+                                  ^^^^^^^^^
+lib/screens/devices_screen.dart:216:54: Error: The getter 'connected' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+          return a.connected == b.connected ? 0 : (a.connected ? -1 : 1);
+                                                     ^^^^^^^^^
+lib/screens/devices_screen.dart:218:20: Error: The getter 'lastSeenAt' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'lastSeenAt'.
+          return a.lastSeenAt.compareTo(b.lastSeenAt);
+                   ^^^^^^^^^^
+lib/screens/devices_screen.dart:218:43: Error: The getter 'lastSeenAt' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'lastSeenAt'.
+          return a.lastSeenAt.compareTo(b.lastSeenAt);
+                                          ^^^^^^^^^^
+lib/screens/devices_screen.dart:220:20: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+          return a.deviceType.compareTo(b.deviceType);
+                   ^^^^^^^^^^
+lib/screens/devices_screen.dart:220:43: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+          return a.deviceType.compareTo(b.deviceType);
+                                          ^^^^^^^^^^
+lib/screens/devices_screen.dart:232:23: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+               device.deviceType.toLowerCase().contains(searchQuery);
+                      ^^^^^^^^^^
+lib/screens/devices_screen.dart:243:38: Error: The getter 'connected' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+        DeviceStatus status = device.connected 
+                                     ^^^^^^^^^
+lib/screens/devices_screen.dart:252:25: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+          model: device.deviceType.isEmpty ? 'Unknown' : device.deviceType,
+                        ^^^^^^^^^^
+lib/screens/devices_screen.dart:252:65: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+          model: device.deviceType.isEmpty ? 'Unknown' : device.deviceType,
+                                                                ^^^^^^^^^^
+lib/screens/devices_screen.dart:255:30: Error: The getter 'lastSeenAt' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'lastSeenAt'.
+          lastActive: device.lastSeenAt,
+                             ^^^^^^^^^^
+lib/screens/devices_screen.dart:434:34: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+                          device.deviceType.isEmpty ? 'Device ${device.macAddress}' : device.deviceType,
+                                 ^^^^^^^^^^
+lib/screens/devices_screen.dart:434:94: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+                          device.deviceType.isEmpty ? 'Device ${device.macAddress}' : device.deviceType,
+                                                                                          ^^^^^^^^^^
+lib/screens/devices_screen.dart:473:24: Error: The getter 'cameras' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+            if (device.cameras.isNotEmpty)
+                       ^^^^^^^
+lib/screens/devices_screen.dart:476:48: Error: The getter 'cameras' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+                title: Text('Cameras (${device.cameras.length})'),
+                                               ^^^^^^^
+lib/screens/devices_screen.dart:479:35: Error: The method 'setSelectedDevice' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'setSelectedDevice'.
+                  devicesProvider.setSelectedDevice(device.macKey);
+                                  ^^^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:511:31: Error: The getter 'connected' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connected'.
+    final statusText = device.connected ? 'Online' : 'Offline';
+                              ^^^^^^^^^
+lib/screens/devices_screen.dart:518:30: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+          title: Text(device.deviceType.isEmpty ? 'Device Details' : '${device.deviceType} Details'),
+                             ^^^^^^^^^^
+lib/screens/devices_screen.dart:518:80: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+          title: Text(device.deviceType.isEmpty ? 'Device Details' : '${device.deviceType} Details'),
+                                                                               ^^^^^^^^^^
+lib/screens/devices_screen.dart:523:55: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+                _buildDetailRow('Device Type', device.deviceType.isEmpty ? 'Unknown' : device.deviceType),
+                                                      ^^^^^^^^^^
+lib/screens/devices_screen.dart:523:95: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+                _buildDetailRow('Device Type', device.deviceType.isEmpty ? 'Unknown' : device.deviceType),
+                                                                                          ^^^^^^^^^^
+lib/screens/devices_screen.dart:526:52: Error: The getter 'firmwareVersion' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'firmwareVersion'.
+                _buildDetailRow('Firmware', device.firmwareVersion.isEmpty ? 'Unknown' : device.firmwareVersion),
+                                                   ^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:526:97: Error: The getter 'firmwareVersion' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'firmwareVersion'.
+                _buildDetailRow('Firmware', device.firmwareVersion.isEmpty ? 'Unknown' : device.firmwareVersion),
+                                                                                          ^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:527:55: Error: The getter 'lastSeenAt' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'lastSeenAt'.
+                _buildDetailRow('Last Active', device.lastSeenAt.isEmpty ? 'Unknown' : device.lastSeenAt),
+                                                      ^^^^^^^^^^
+lib/screens/devices_screen.dart:527:95: Error: The getter 'lastSeenAt' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'lastSeenAt'.
+                _buildDetailRow('Last Active', device.lastSeenAt.isEmpty ? 'Unknown' : device.lastSeenAt),
+                                                                                          ^^^^^^^^^^
+lib/screens/devices_screen.dart:529:50: Error: The getter 'uptime' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'uptime'.
+                _buildDetailRow('Uptime', device.uptime.isEmpty ? 'Unknown' : device.uptime),
+                                                 ^^^^^^
+lib/screens/devices_screen.dart:529:86: Error: The getter 'uptime' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'uptime'.
+                _buildDetailRow('Uptime', device.uptime.isEmpty ? 'Unknown' : device.uptime),
+                                                                                     ^^^^^^
+lib/screens/devices_screen.dart:530:54: Error: The getter 'cameras' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+                _buildDetailRow('Cameras', '${device.cameras.length}'),
+                                                     ^^^^^^^
+lib/screens/devices_screen.dart:543:24: Error: The getter 'cameras' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+            if (device.cameras.isNotEmpty)
+                       ^^^^^^^
+lib/screens/devices_screen.dart:547:35: Error: The method 'setSelectedDevice' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'setSelectedDevice'.
+                  devicesProvider.setSelectedDevice(device.macKey);
+                                  ^^^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:678:55: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+            'Are you sure you want to remove ${device.deviceType.isEmpty ? 'Device ' + device.macAddress : device.deviceType}? This action cannot be undone.',
+                                                      ^^^^^^^^^^
+lib/screens/devices_screen.dart:678:115: Error: The getter 'deviceType' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'deviceType'.
+            'Are you sure you want to remove ${device.deviceType.isEmpty ? 'Device ' + device.macAddress : device.deviceType}? This action cannot be undone.',
+                                                                                          ^^^^^^^^^^
+lib/screens/live_view_screen.dart:13:9: Error: 'Camera' isn't a type.
+  final Camera? camera; // Make camera optional so the route can work without a parameter
+        ^^^^^^
+lib/screens/live_view_screen.dart:23:3: Error: 'Camera' isn't a type.
+  Camera? _camera;
+  ^^^^^^
+lib/screens/live_view_screen.dart:31:8: Error: 'Camera' isn't a type.
+  List<Camera> _availableCameras = [];
+       ^^^^^^
+lib/screens/live_view_screen.dart:118:42: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+      _availableCameras = cameraProvider.cameras;
+                                         ^^^^^^^
+lib/screens/record_view_screen.dart:15:9: Error: 'Camera' isn't a type.
+  final Camera? camera; // Make camera optional so the route can work without a parameter
+        ^^^^^^
+lib/screens/record_view_screen.dart:25:3: Error: 'Camera' isn't a type.
+  Camera? _camera;
+  ^^^^^^
+lib/screens/record_view_screen.dart:33:8: Error: 'Camera' isn't a type.
+  List<Camera> _availableCameras = [];
+       ^^^^^^
+lib/screens/record_view_screen.dart:165:42: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+      _availableCameras = cameraProvider.cameras;
+                                         ^^^^^^^
+lib/widgets/camera_grid_item.dart:5:9: Error: 'Camera' isn't a type.
+  final Camera camera;
+        ^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **
+
+Building macOS application...                                           
+Error: Build process failed
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % 

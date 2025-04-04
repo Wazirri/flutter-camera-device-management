@@ -251,7 +251,7 @@ class _CamerasScreenState extends State<CamerasScreen> {
                       return CameraGridItem(
                         camera: camera,
                         index: index,
-                        isSelected: selectedCamera?.id == camera.id,
+                        isSelected: selectedCamera == camera,
                         onTap: () => _selectCamera(camera),
                         onLiveView: () => _openLiveView(camera),
                         onPlayback: () => _openRecordView(camera),
@@ -415,6 +415,7 @@ class _CamerasScreenState extends State<CamerasScreen> {
                   ),
           );
           
+          // Combine MAC filters with the content
           return Column(
             children: [
               macAddressFilters,
@@ -423,11 +424,19 @@ class _CamerasScreenState extends State<CamerasScreen> {
           );
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Refresh camera data
+          final provider = Provider.of<CameraDevicesProvider>(context, listen: false);
+          provider.refreshCameras();
+        },
+        tooltip: 'Refresh Cameras',
+        child: const Icon(Icons.refresh),
+      ),
     );
   }
 }
 
-// Search delegate for cameras
 class CameraSearchDelegate extends SearchDelegate<Camera?> {
   final Function(Camera) onCameraSelected;
   
@@ -441,7 +450,7 @@ class CameraSearchDelegate extends SearchDelegate<Camera?> {
         onPressed: () {
           query = '';
         },
-      ),
+      )
     ];
   }
 
@@ -457,28 +466,28 @@ class CameraSearchDelegate extends SearchDelegate<Camera?> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return buildSearchResults(context);
+    return _buildSearchResults(context);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return buildSearchResults(context);
+    return _buildSearchResults(context);
   }
   
-  Widget buildSearchResults(BuildContext context) {
-    final provider = Provider.of<CameraDevicesProvider>(context, listen: false);
-    final cameras = provider.cameras;
+  Widget _buildSearchResults(BuildContext context) {
+    final provider = Provider.of<CameraDevicesProvider>(context);
+    final allCameras = provider.cameras;
     
     if (query.isEmpty) {
       return const Center(
-        child: Text('Enter camera name or IP to search'),
+        child: Text('Type to search for cameras'),
       );
     }
     
-    final filteredCameras = cameras.where((camera) {
+    final filteredCameras = allCameras.where((camera) {
       return camera.name.toLowerCase().contains(query.toLowerCase()) ||
              camera.ip.toLowerCase().contains(query.toLowerCase()) ||
-             camera.manufacturer.toLowerCase().contains(query.toLowerCase());
+             camera.brand.toLowerCase().contains(query.toLowerCase());
     }).toList();
     
     if (filteredCameras.isEmpty) {
@@ -492,11 +501,18 @@ class CameraSearchDelegate extends SearchDelegate<Camera?> {
               color: Colors.grey,
             ),
             const SizedBox(height: 16.0),
-            Text(
-              'No results found for "$query"',
-              style: const TextStyle(
-                fontSize: 16.0,
+            const Text(
+              'No cameras found',
+              style: TextStyle(
+                fontSize: 18.0,
                 fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              'Try a different search term',
+              style: TextStyle(
+                color: Colors.grey[600],
               ),
             ),
           ],
@@ -511,32 +527,16 @@ class CameraSearchDelegate extends SearchDelegate<Camera?> {
         
         return ListTile(
           leading: Container(
-            width: 48,
-            height: 48,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(4),
+              color: AppTheme.primaryBlue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: camera.mainSnapShot.isNotEmpty
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: Image.network(
-                    camera.mainSnapShot,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(
-                        Icons.broken_image_outlined,
-                        size: 24.0,
-                        color: Colors.white54,
-                      );
-                    },
-                  ),
-                )
-              : const Icon(
-                  Icons.videocam_off,
-                  size: 24.0,
-                  color: Colors.white54,
-                ),
+            child: const Icon(
+              Icons.videocam,
+              color: AppTheme.primaryBlue,
+            ),
           ),
           title: Text(camera.name),
           subtitle: Text(camera.ip),

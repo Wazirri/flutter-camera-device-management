@@ -176,6 +176,147 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  Widget _buildSystemInfoSection(BuildContext context) {
+    final webSocketProvider = Provider.of<WebSocketProvider>(context);
+    final systemInfo = webSocketProvider.systemInfo;
+    
+    return Card(
+      color: AppTheme.darkSurface,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'System Information',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.darkTextPrimary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 24,
+              runSpacing: 16,
+              children: [
+                _buildSystemInfoItem(
+                  title: 'Uptime',
+                  value: _formatUptime(systemInfo?.upTime ?? '0'),
+                  icon: Icons.timelapse,
+                ),
+                _buildSystemInfoItem(
+                  title: 'CPU Usage',
+                  value: '${systemInfo?.cpuUsage ?? "0"}%',
+                  icon: Icons.memory,
+                ),
+                _buildSystemInfoItem(
+                  title: 'CPU Temp',
+                  value: '${systemInfo?.cpuTemp ?? "0"}°C',
+                  icon: Icons.thermostat,
+                ),
+                _buildSystemInfoItem(
+                  title: 'RAM Usage',
+                  value: '${systemInfo?.ramUsage ?? "0"}%',
+                  icon: Icons.storage,
+                ),
+                _buildSystemInfoItem(
+                  title: 'Disk Space',
+                  value: '${systemInfo?.diskUsage ?? "0"}%',
+                  icon: Icons.sd_storage,
+                ),
+                _buildSystemInfoItem(
+                  title: 'Network',
+                  value: systemInfo?.connectionStatus ?? 'Unknown',
+                  icon: Icons.wifi,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSystemInfoItem({
+    required String title,
+    required String value,
+    required IconData icon,
+  }) {
+    // Fix overflow by giving it fixed width and using Expanded
+    return SizedBox(
+      width: 160, // Fixed width to prevent overflow
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryBlue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: AppTheme.primaryBlue,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Use Expanded for text to handle long values
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: AppTheme.darkTextPrimary,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    maxLines: 1,
+                  ),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.darkTextSecondary,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    maxLines: 1,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatUptime(String uptimeSeconds) {
+    try {
+      final seconds = int.parse(uptimeSeconds);
+      final hours = (seconds / 3600).floor();
+      final minutes = ((seconds % 3600) / 60).floor();
+      
+      if (hours > 0) {
+        return '$hours h ${minutes} m';
+      } else {
+        return '$minutes min';
+      }
+    } catch (e) {
+      return 'Unknown';
+    }
+  }
+
   Widget _buildOverviewCards(BuildContext context) {
     final isSmallScreen = ResponsiveHelper.isMobile(context);
     
@@ -293,6 +434,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Navigator.pushNamed(context, '/camera-devices');
               },
               child: Row(
+                mainAxisSize: MainAxisSize.min, // Make sure row only takes needed space
                 children: const [
                   Text('View All'),
                   SizedBox(width: 4),
@@ -346,42 +488,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryBlue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.videocam_rounded,
-                        color: AppTheme.primaryBlue,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: AppTheme.darkTextPrimary,
-                          ),
+                Expanded( // Added Expanded
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryBlue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        Text(
-                          location,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.darkTextSecondary,
-                          ),
+                        child: Icon(
+                          Icons.videocam_rounded,
+                          color: AppTheme.primaryBlue,
+                          size: 20,
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded( // Added Expanded
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: AppTheme.darkTextPrimary,
+                                overflow: TextOverflow.ellipsis, // Add ellipsis
+                              ),
+                              maxLines: 1, // Limit to one line
+                            ),
+                            Text(
+                              location,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppTheme.darkTextSecondary,
+                                overflow: TextOverflow.ellipsis, // Add ellipsis
+                              ),
+                              maxLines: 1, // Limit to one line
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 StatusIndicator(status: status),
               ],
@@ -392,7 +542,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: TextStyle(
                 fontSize: 14,
                 color: AppTheme.darkTextPrimary,
+                overflow: TextOverflow.ellipsis, // Add ellipsis
               ),
+              maxLines: 1, // Limit to one line
             ),
             const SizedBox(height: 8),
             Row(
@@ -403,11 +555,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   color: AppTheme.darkTextSecondary,
                 ),
                 const SizedBox(width: 4),
-                Text(
-                  timestamp,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppTheme.darkTextSecondary,
+                Expanded( // Added Expanded
+                  child: Text(
+                    timestamp,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.darkTextSecondary,
+                      overflow: TextOverflow.ellipsis, // Add ellipsis
+                    ),
+                    maxLines: 1, // Limit to one line
                   ),
                 ),
               ],
@@ -450,6 +606,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Navigator.pushNamed(context, '/camera-devices');
               },
               child: Row(
+                mainAxisSize: MainAxisSize.min, // Make sure row only takes needed space
                 children: const [
                   Text('View All'),
                   SizedBox(width: 4),
@@ -483,7 +640,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         Row(
           children: [
-            Container(
+            SizedBox(
               width: 150,
               child: Text(
                 'Device Name',
@@ -493,7 +650,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-            Container(
+            SizedBox(
               width: 100,
               child: Text(
                 'Type',
@@ -503,7 +660,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-            Container(
+            SizedBox(
               width: 120,
               child: Text(
                 'Status',
@@ -514,21 +671,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             if (!ResponsiveHelper.isMobile(context))
-              Container(
+              SizedBox(
                 width: 120,
                 child: Text(
-                  'Last Active',
+                  'Last Seen',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: AppTheme.darkTextSecondary,
                   ),
                 ),
               ),
-            Container(
-              width: 50,
-              alignment: Alignment.center,
+            SizedBox(
+              width: 120,
               child: Text(
-                '',
+                'Actions',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: AppTheme.darkTextSecondary,
@@ -537,15 +693,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ],
         ),
-        const Divider(height: 32),
-        ...List.generate(
-          4,
-          (index) => _buildDeviceStatusRow(
-            context,
-            name: 'Device ${index + 1}',
-            type: index % 2 == 0 ? 'Camera' : 'NVR',
-            status: index == 1 ? DeviceStatus.offline : DeviceStatus.online,
-            lastActive: '${index * 2}h ago',
+        const SizedBox(height: 16),
+        Column(
+          children: List.generate(
+            5,
+            (index) => _buildDeviceStatusRow(
+              context,
+              name: 'Device ${index + 1}',
+              type: index % 2 == 0 ? 'NVR' : 'DVR',
+              status: index % 3 == 0 ? DeviceStatus.warning : DeviceStatus.online,
+              lastSeen: '${index + 1} min ago',
+            ),
           ),
         ),
       ],
@@ -557,22 +715,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required String name,
     required String type,
     required DeviceStatus status,
-    required String lastActive,
+    required String lastSeen,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.only(bottom: 16.0),
       child: Row(
         children: [
-          Container(
+          SizedBox(
             width: 150,
-            child: Text(
-              name,
-              style: const TextStyle(
-                color: AppTheme.darkTextPrimary,
-              ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryBlue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.devices,
+                    color: AppTheme.primaryBlue,
+                    size: 16,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    name,
+                    style: const TextStyle(
+                      color: AppTheme.darkTextPrimary,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    maxLines: 1,
+                  ),
+                ),
+              ],
             ),
           ),
-          Container(
+          SizedBox(
             width: 100,
             child: Text(
               type,
@@ -581,350 +760,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-          Container(
+          SizedBox(
             width: 120,
             child: Row(
               children: [
                 StatusIndicator(status: status),
                 const SizedBox(width: 8),
                 Text(
-                  status.name,
-                  style: const TextStyle(
-                    color: AppTheme.darkTextPrimary,
+                  status == DeviceStatus.online
+                      ? 'Online'
+                      : status == DeviceStatus.warning
+                          ? 'Warning'
+                          : 'Offline',
+                  style: TextStyle(
+                    color: status == DeviceStatus.online
+                        ? AppTheme.online
+                        : status == DeviceStatus.warning
+                            ? AppTheme.warning
+                            : AppTheme.error,
                   ),
                 ),
               ],
             ),
           ),
           if (!ResponsiveHelper.isMobile(context))
-            Container(
+            SizedBox(
               width: 120,
               child: Text(
-                lastActive,
-                style: TextStyle(
-                  color: AppTheme.darkTextSecondary,
+                lastSeen,
+                style: const TextStyle(
+                  color: AppTheme.darkTextPrimary,
                 ),
               ),
             ),
-          Container(
-            width: 50,
-            alignment: Alignment.center,
-            child: IconButton(
-              icon: const Icon(Icons.more_vert),
-              onPressed: () {
-                // No implementation, UI only
-              },
+          SizedBox(
+            width: 120,
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    // No implementation, UI only
+                  },
+                  icon: const Icon(
+                    Icons.settings,
+                    size: 18,
+                    color: AppTheme.darkTextSecondary,
+                  ),
+                  tooltip: 'Settings',
+                ),
+                IconButton(
+                  onPressed: () {
+                    // No implementation, UI only
+                  },
+                  icon: const Icon(
+                    Icons.refresh,
+                    size: 18,
+                    color: AppTheme.darkTextSecondary,
+                  ),
+                  tooltip: 'Refresh',
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
-  }
-
-  Widget _buildSystemInfoSection(BuildContext context) {
-    // Use Consumer to listen for changes in the WebSocketProvider
-    return Consumer<WebSocketProvider>(
-      builder: (context, provider, _) {
-        final sysInfo = provider.systemInfo;
-        final isSmallScreen = ResponsiveHelper.isMobile(context);
-        
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'System Information',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.darkTextPrimary,
-                  ),
-                ),
-                // Add refresh button to manually refresh
-                IconButton(
-                  icon: const Icon(Icons.refresh, color: AppTheme.primaryBlue),
-                  tooltip: 'Refresh System Info',
-                  onPressed: _refreshSystemInfo,
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Card(
-              color: AppTheme.darkSurface,
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: sysInfo == null
-                      ? const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(24.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                CircularProgressIndicator(),
-                                SizedBox(height: 16),
-                                Text(
-                                  'Waiting for system information...',
-                                  style: TextStyle(color: AppTheme.darkTextPrimary),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      : Column(
-                          key: ValueKey<String>('sysInfo-${sysInfo.upTime}'), // Trigger rebuild when uptime changes
-                          children: [
-                            GridView.count(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              crossAxisCount: isSmallScreen ? 2 : 4,
-                              childAspectRatio: isSmallScreen ? 1.5 : 2.0,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                              children: [
-                                _buildSystemInfoCard(
-                                  title: 'CPU Temperature',
-                                  value: sysInfo.formattedCpuTemp,
-                                  icon: Icons.thermostat_outlined,
-                                  color: _getTemperatureColor(double.tryParse(sysInfo.cpuTemp) ?? 0),
-                                ),
-                                _buildSystemInfoCard(
-                                  title: 'Uptime',
-                                  value: sysInfo.formattedUpTime,
-                                  icon: Icons.timer_outlined,
-                                  color: AppTheme.primaryBlue,
-                                ),
-                                _buildSystemInfoCard(
-                                  title: 'Server Time',
-                                  value: sysInfo.formattedSrvTime,
-                                  icon: Icons.access_time,
-                                  color: AppTheme.online,
-                                ),
-                                _buildSystemInfoCard(
-                                  title: 'Network Connections',
-                                  value: sysInfo.connections,
-                                  icon: Icons.wifi,
-                                  color: AppTheme.primaryOrange,
-                                  subtitle: sysInfo.connections == '0' ? 'No active connections' : null,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            Card(
-                              color: AppTheme.darkBackground,
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                          'System Resource Usage',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: AppTheme.darkTextPrimary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-                                    if (!isSmallScreen)
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: _buildLinearProgressBar(
-                                              label: 'CPU',
-                                              value: double.parse(sysInfo.cpuUsage) / 100,
-                                              color: _getUsageColor(double.parse(sysInfo.cpuUsage)),
-                                              showPercentage: true,
-                                              percentage: '${sysInfo.cpuUsage}%',
-                                            ),
-                                          ),
-                                          const SizedBox(width: 16),
-                                          Expanded(
-                                            child: _buildLinearProgressBar(
-                                              label: 'RAM',
-                                              value: double.parse(sysInfo.ramUsage) / 100,
-                                              color: _getUsageColor(double.parse(sysInfo.ramUsage)),
-                                              showPercentage: true,
-                                              percentage: '${sysInfo.ramUsage}%',
-                                            ),
-                                          ),
-                                          const SizedBox(width: 16),
-                                          Expanded(
-                                            child: _buildLinearProgressBar(
-                                              label: 'Disk',
-                                              value: double.parse(sysInfo.diskUsage) / 100,
-                                              color: _getUsageColor(double.parse(sysInfo.diskUsage)),
-                                              showPercentage: true,
-                                              percentage: '${sysInfo.diskUsage}%',
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    else
-                                      Column(
-                                        children: [
-                                          _buildLinearProgressBar(
-                                            label: 'CPU',
-                                            value: double.parse(sysInfo.cpuUsage) / 100,
-                                            color: _getUsageColor(double.parse(sysInfo.cpuUsage)),
-                                            showPercentage: true,
-                                            percentage: '${sysInfo.cpuUsage}%',
-                                          ),
-                                          const SizedBox(height: 12),
-                                          _buildLinearProgressBar(
-                                            label: 'RAM',
-                                            value: double.parse(sysInfo.ramUsage) / 100,
-                                            color: _getUsageColor(double.parse(sysInfo.ramUsage)),
-                                            showPercentage: true,
-                                            percentage: '${sysInfo.ramUsage}%',
-                                          ),
-                                          const SizedBox(height: 12),
-                                          _buildLinearProgressBar(
-                                            label: 'Disk',
-                                            value: double.parse(sysInfo.diskUsage) / 100,
-                                            color: _getUsageColor(double.parse(sysInfo.diskUsage)),
-                                            showPercentage: true,
-                                            percentage: '${sysInfo.diskUsage}%',
-                                          ),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildSystemInfoCard({
-    required String title,
-    required String value,
-    required IconData icon,
-    required Color color,
-    String? subtitle,
-  }) {
-    return Card(
-      color: AppTheme.darkBackground,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: color, size: 16),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppTheme.darkTextSecondary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.darkTextPrimary,
-              ),
-            ),
-            if (subtitle != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: AppTheme.darkTextSecondary,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLinearProgressBar({
-    required String label,
-    required double value,
-    required Color color,
-    bool showPercentage = false,
-    String? percentage,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: AppTheme.darkTextSecondary,
-              ),
-            ),
-            if (showPercentage && percentage != null)
-              Text(
-                percentage,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppTheme.darkTextSecondary,
-                ),
-              ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        LinearProgressIndicator(
-          value: value.clamp(0.0, 1.0),
-          backgroundColor: AppTheme.darkSurface,
-          valueColor: AlwaysStoppedAnimation<Color>(color),
-          minHeight: 8,
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ],
-    );
-  }
-
-  Color _getTemperatureColor(double temp) {
-    if (temp >= 75) {
-      return AppTheme.error;
-    } else if (temp >= 65) {
-      return AppTheme.warning;
-    } else {
-      return AppTheme.online;
-    }
-  }
-
-  Color _getUsageColor(double percentage) {
-    if (percentage >= 90) {
-      return AppTheme.error;
-    } else if (percentage >= 70) {
-      return AppTheme.warning;
-    } else {
-      return AppTheme.online;
-    }
   }
 }
