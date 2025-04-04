@@ -1,0 +1,39 @@
+lib/providers/camera_devices_provider.dart:113:9: Error: No named parameter with the name 'id'.
+        id: macKey,
+        ^^
+lib/models/camera_device.dart:24:3: Context: Found this candidate, but the arguments don't match.
+  CameraDevice({
+  ^^^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:136:49: Error: No named parameter with the name 'brand'.
+          final updatedDevice = device.copyWith(brand: value.toString());
+                                                ^^^^^
+lib/providers/camera_devices_provider.dart:141:49: Error: No named parameter with the name 'model'.
+          final updatedDevice = device.copyWith(model: value.toString());
+                                                ^^^^^
+lib/providers/camera_devices_provider.dart:146:49: Error: No named parameter with the name 'ipAddress'.
+          final updatedDevice = device.copyWith(ipAddress: value.toString());
+                                                ^^^^^^^^^
+lib/providers/camera_devices_provider.dart:180:9: Error: No named parameter with the name 'id'.
+        id: cameras.length.toString(),
+        ^^
+lib/models/camera_device.dart:157:3: Context: Found this candidate, but the arguments don't match.
+  Camera({
+  ^^^^^^
+lib/providers/camera_devices_provider.dart:197:43: Error: No named parameter with the name 'streamUrl'.
+          updatedCamera = camera.copyWith(streamUrl: value.toString());
+                                          ^^^^^^^^^
+lib/providers/camera_devices_provider.dart:200:43: Error: No named parameter with the name 'snapshotUrl'.
+          updatedCamera = camera.copyWith(snapshotUrl: value.toString());
+                                          ^^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:209:43: Error: No named parameter with the name 'cameraAddress'.
+          updatedCamera = camera.copyWith(cameraAddress: value.toString());
+                                          ^^^^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:222:23: Error: The getter 'id' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'id'.
+      _devices[device.id] = device.copyWith(cameras: cameras);
+                      ^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **

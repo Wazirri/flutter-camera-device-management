@@ -55,9 +55,9 @@ class CameraDevicesProvider with ChangeNotifier {
     return _selectedDevice!.cameras[_selectedCameraIndex];
   }
 
-  void setSelectedDevice(String macAddress) {
-    if (_devices.containsKey(macAddress)) {
-      _selectedDevice = _devices[macAddress];
+  void setSelectedDevice(String macKey) {
+    if (_devices.containsKey(macKey)) {
+      _selectedDevice = _devices[macKey];
       _selectedCameraIndex = 0; // Reset camera index when device changes
       notifyListeners();
     }
@@ -107,17 +107,22 @@ class CameraDevicesProvider with ChangeNotifier {
   void _processDeviceMessage(List<String> parts, String dataPath, dynamic value) {
     final macKey = parts[2]; // Get m_26_C1_7A_0B_1F_19
     
+    // Format MAC address from macKey (m_26_C1_7A_0B_1F_19 -> 26:C1:7A:0B:1F:19)
+    final String formattedMac = macKey.substring(2).replaceAll('_', ':');
+    
     // Create device if it doesn't exist
     if (!_devices.containsKey(macKey)) {
       _devices[macKey] = CameraDevice(
-        id: macKey,
-        name: 'Device $macKey',
-        brand: 'Unknown',
-        model: 'Unknown',
+        macAddress: formattedMac,
+        macKey: macKey,
+        ipv4: 'Unknown',
+        lastSeenAt: DateTime.now().toIso8601String(),
+        connected: false,
+        uptime: '0',
+        deviceType: 'Unknown',
         firmwareVersion: 'Unknown',
-        ipAddress: 'Unknown',
+        recordPath: '',
         cameras: [],
-        status: DeviceStatus.unknown,
       );
     }
     
@@ -132,18 +137,18 @@ class CameraDevicesProvider with ChangeNotifier {
           _processCameraProperty(device, parts, dataPath, value);
           break;
         case 'brand':
-          // Update device brand
-          final updatedDevice = device.copyWith(brand: value.toString());
+          // Update device deviceType with brand
+          final updatedDevice = device.copyWith(deviceType: value.toString());
           _devices[macKey] = updatedDevice;
           break;
         case 'model':
-          // Update device model
-          final updatedDevice = device.copyWith(model: value.toString());
+          // No direct match, could be used to enhance deviceType
+          final updatedDevice = device.copyWith(deviceType: "${device.deviceType} ${value.toString()}");
           _devices[macKey] = updatedDevice;
           break;
         case 'ip':
           // Update device IP address
-          final updatedDevice = device.copyWith(ipAddress: value.toString());
+          final updatedDevice = device.copyWith(ipv4: value.toString());
           _devices[macKey] = updatedDevice;
           break;
         case 'version':
@@ -177,11 +182,25 @@ class CameraDevicesProvider with ChangeNotifier {
     final cameras = List<Camera>.from(device.cameras);
     while (cameras.length <= camIndex) {
       cameras.add(Camera(
-        id: cameras.length.toString(),
+        index: cameras.length,
         name: 'Camera ${cameras.length}',
-        streamUrl: '',
-        snapshotUrl: '',
-        status: DeviceStatus.unknown,
+        ip: '',
+        username: '',
+        password: '',
+        brand: '',
+        mediaUri: '',
+        recordUri: '',
+        subUri: '',
+        remoteUri: '',
+        mainSnapShot: '',
+        subSnapShot: '',
+        recordWidth: 0,
+        recordHeight: 0,
+        subWidth: 0,
+        subHeight: 0,
+        connected: false,
+        lastSeenAt: '',
+        recording: false,
       ));
     }
     
@@ -194,10 +213,10 @@ class CameraDevicesProvider with ChangeNotifier {
       
       switch (property) {
         case 'mediaUri':
-          updatedCamera = camera.copyWith(streamUrl: value.toString());
+          updatedCamera = camera.copyWith(mediaUri: value.toString());
           break;
         case 'mainSnapShot':
-          updatedCamera = camera.copyWith(snapshotUrl: value.toString());
+          updatedCamera = camera.copyWith(mainSnapShot: value.toString());
           break;
         case 'username':
           updatedCamera = camera.copyWith(username: value.toString());
@@ -206,7 +225,7 @@ class CameraDevicesProvider with ChangeNotifier {
           updatedCamera = camera.copyWith(password: value.toString());
           break;
         case 'xAddrs':
-          updatedCamera = camera.copyWith(cameraAddress: value.toString());
+          updatedCamera = camera.copyWith(xAddrs: value.toString());
           break;
         case 'name':
           updatedCamera = camera.copyWith(name: value.toString());
@@ -219,7 +238,7 @@ class CameraDevicesProvider with ChangeNotifier {
       cameras[camIndex] = updatedCamera;
       
       // Update the device with the new camera list
-      _devices[device.id] = device.copyWith(cameras: cameras);
+      _devices[macKey] = device.copyWith(cameras: cameras);
     }
   }
 }
