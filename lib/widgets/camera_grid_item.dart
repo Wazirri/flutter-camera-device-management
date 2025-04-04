@@ -9,11 +9,11 @@ class CameraGridItem extends StatelessWidget {
   final DeviceStatus status;
   final bool isRecording;
   final String? thumbnailUrl;
-  final VoidCallback onTap;
-  final VoidCallback onSettingsTap;
+  final void Function() onTap;  // Changed VoidCallback to void Function()
+  final void Function() onSettingsTap;  // Changed VoidCallback to void Function()
 
   const CameraGridItem({
-    Key? key,
+    super.key,  // Changed Key? key to super.key
     required this.name,
     required this.location,
     required this.status,
@@ -21,7 +21,7 @@ class CameraGridItem extends StatelessWidget {
     this.thumbnailUrl,
     required this.onTap,
     required this.onSettingsTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
