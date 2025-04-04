@@ -423,19 +423,12 @@ class _LoginScreenState extends State<LoginScreen> {
         final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
         
         // Connect to WebSocket
-        // Connect to WebSocket
         final connected = await webSocketProvider.connect(
           serverAddress,
-          int.parse(serverPort),
+          serverPort,
+          username,
+          password,
         );
-        
-        // Login after connection established
-        if (connected) {
-          webSocketProvider.login(username, password);
-        }
-        if (connected) {
-          webSocketProvider.login(username, password);
-        }
         
         if (connected) {
           setState(() {

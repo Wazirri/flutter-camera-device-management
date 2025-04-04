@@ -17,7 +17,7 @@ class WebSocketLogScreen extends StatelessWidget {
             icon: const Icon(Icons.delete_outline),
             onPressed: () {
               // Clear WebSocket logs
-              Provider.of<WebSocketProvider>(context, listen: false).clearLogs();
+              Provider.of<WebSocketProvider>(context, listen: false).clearLog();
             },
             tooltip: 'Clear logs',
           ),

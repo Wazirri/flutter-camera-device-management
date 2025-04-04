@@ -1,140 +1,288 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'package:provider/provider.dart';
-import '../models/camera_device.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 import '../providers/camera_devices_provider.dart';
+import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
+import '../utils/responsive_helper.dart';
+import '../utils/page_transitions.dart';
 
 class RecordViewScreen extends StatefulWidget {
   final Camera? camera; // Make camera optional so the route can work without a parameter
 
-  const RecordViewScreen({
-    Key? key,
-    this.camera,
-  }) : super(key: key);
+  const RecordViewScreen({Key? key, this.camera}) : super(key: key);
 
   @override
   State<RecordViewScreen> createState() => _RecordViewScreenState();
 }
 
-class _RecordViewScreenState extends State<RecordViewScreen> {
-  // Media Kit player
-  late final Player _player;
-  late final VideoController _controller;
+class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerProviderStateMixin {
+  int _selectedCameraIndex = 0;
   Camera? _camera;
   bool _isFullScreen = false;
-  bool _isLoading = true;
-  bool _isMuted = false;
+  late final Player _player;
+  late final VideoController _controller;
+  bool _isPlaying = false;
+  bool _isBuffering = false;
+  bool _hasError = false;
+  String _errorMessage = '';
   List<Camera> _availableCameras = [];
+  List<String> _availableRecordings = [];
+  String? _selectedRecording;
   
-  // Recording timeline
-  DateTime _selectedDate = DateTime.now();
+  // Calendar related variables
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+  final kFirstDay = DateTime(DateTime.now().year - 1, 1, 1);
+  final kLastDay = DateTime(DateTime.now().year + 1, 12, 31);
+  
+  // Map to store recordings by date for the calendar (sample data for demonstration)
+  final Map<DateTime, List<String>> _recordingsByDate = {};
+  
+  // Animation controllers
+  late AnimationController _animationController;
+  late Animation<double> _fadeInAnimation;
+  late Animation<Offset> _calendarSlideAnimation;
+  late Animation<Offset> _playerSlideAnimation;
   
   @override
   void initState() {
     super.initState();
-    // Initialize the player
+    _initializeAnimations();
+    _initializePlayer();
+    _initializeSampleData(); // This would be replaced with actual data from your backend
+  }
+  
+  void _initializeAnimations() {
+    // Setup animations
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    
+    _fadeInAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.3, 1.0, curve: Curves.easeIn),
+    ));
+    
+    _calendarSlideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, -0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.0, 0.7, curve: Curves.easeOutQuint),
+    ));
+    
+    _playerSlideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, 0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
+    ));
+    
+    // Start the entrance animation
+    _animationController.forward();
+  }
+  
+  void _initializePlayer() {
+    // Create a media kit player
     _player = Player();
     _controller = VideoController(_player);
-    _camera = widget.camera;
     
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadCamera();
+    // Set initial camera if provided
+    if (widget.camera != null) {
+      _camera = widget.camera;
+    }
+    
+    // Add event listeners
+    _player.stream.playing.listen((playing) {
+      if (mounted) {
+        setState(() {
+          _isPlaying = playing;
+        });
+      }
     });
+    
+    _player.stream.buffering.listen((buffering) {
+      if (mounted) {
+        setState(() {
+          _isBuffering = buffering;
+        });
+      }
+    });
+    
+    _player.stream.error.listen((error) {
+      print('Player error: $error');
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = 'Failed to play recording: $error';
+        });
+      }
+    });
+    
+    // Load the camera if available
+    _fetchRecordings();
+  }
+  
+  // Initialize sample recording data for demonstration
+  void _initializeSampleData() {
+    final now = DateTime.now();
+    
+    // Create recordings for the past week
+    for (int i = 0; i < 7; i++) {
+      final date = DateTime(now.year, now.month, now.day - i);
+      final day = DateFormat('yyyy-MM-dd').format(date);
+      
+      // Each day has 2-3 recordings
+      _recordingsByDate[date] = [
+        'Morning Recording - $day (8:00 AM)',
+        'Afternoon Recording - $day (2:30 PM)',
+        if (i % 2 == 0) 'Evening Recording - $day (7:15 PM)',
+      ];
+    }
+    
+    // Set selected day to today
+    _selectedDay = now;
+    _updateRecordingsForSelectedDay();
   }
   
   @override
-  void dispose() {
-    _player.dispose();
-    super.dispose();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Get the list of available cameras from provider
+    final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    setState(() {
+      _availableCameras = cameraProvider.cameras;
+      
+      // If no camera was provided and there are available cameras, use the first one
+      if (_camera == null && _availableCameras.isNotEmpty) {
+        _camera = _availableCameras[0];
+        _fetchRecordings();
+      }
+    });
   }
   
-  void _loadCamera() async {
-    final provider = Provider.of<CameraDevicesProvider>(context, listen: false);
-    
-    // Get all available cameras
-    setState(() {
-      _availableCameras = provider.cameras;
-      _isLoading = true;
-    });
-    
-    // If no camera was passed, try to use the first one
-    if (_camera == null && _availableCameras.isNotEmpty) {
+  // This would typically fetch recordings from a backend based on selected date
+  void _fetchRecordings() {
+    if (_camera == null) {
       setState(() {
-        _camera = _availableCameras.first;
+        _availableRecordings = [];
       });
+      return;
     }
     
-    // If we have a camera, play it
-    if (_camera != null) {
-      _playRecording(_camera!);
-    } else {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    _updateRecordingsForSelectedDay();
   }
   
-  void _playRecording(Camera camera) async {
+  // Update available recordings based on the selected day
+  void _updateRecordingsForSelectedDay() {
+    if (_selectedDay == null || _camera == null) {
+      setState(() {
+        _availableRecordings = [];
+        _selectedRecording = null;
+      });
+      return;
+    }
+    
+    // Reset animations for new data
+    _animationController.reset();
+    
+    // Find recordings for the selected day
+    final recordings = _recordingsByDate[DateTime(
+      _selectedDay!.year,
+      _selectedDay!.month,
+      _selectedDay!.day,
+    )] ?? [];
+    
     setState(() {
-      _isLoading = true;
-      _camera = camera;
+      _availableRecordings = recordings;
+      
+      // Auto-select first recording if available
+      if (_availableRecordings.isNotEmpty) {
+        _selectedRecording = _availableRecordings[0];
+        // In a real app, this URL would come from your backend based on the recording
+        _loadRecording(_camera!.recordUri);
+      } else {
+        _selectedRecording = null;
+      }
     });
     
+    // Start animations for updated data
+    _animationController.forward();
+  }
+  
+  void _loadRecording(String url) {
+    if (url.isEmpty) {
+      setState(() {
+        _hasError = true;
+        _errorMessage = 'No recording URL available';
+      });
+      return;
+    }
+    
+    // Reset error state
+    setState(() {
+      _hasError = false;
+      _errorMessage = '';
+    });
+    
+    // Try to play the recording
     try {
-      // Stop any current playback
-      await _player.stop();
-      
-      // Check if we have a valid record URI
-      if (camera.recordUri.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No recording URL available for ${camera.name}')),
-        );
-        setState(() {
-          _isLoading = false;
-        });
-        return;
-      }
-      
-      // Log the record URI we're trying to play
-      debugPrint('Playing record URI: ${camera.recordUri}');
-      
-      // Set up media options with authentication if needed
-      final Map<String, String> httpHeaders = {};
-      final List<String> playbackOptions = [];
-      
-      if (camera.username.isNotEmpty && camera.password.isNotEmpty) {
-        // For RTSP authentication
-        playbackOptions.add('rtsp-user=${camera.username}');
-        playbackOptions.add('rtsp-pass=${camera.password}');
-      }
-      
-      // Start playback
-      await _player.open(
-        Media(
-          camera.recordUri,
-          httpHeaders: httpHeaders,
-        ),
-        play: true,
-      );
-      
-      // Wait a bit to check if playback started successfully
-      await Future.delayed(const Duration(seconds: 3));
-      
-      setState(() {
-        _isLoading = false;
-      });
+      _player.open(Media(url));
     } catch (e) {
-      debugPrint('Error playing recording: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to play recording: ${e.toString()}')),
-      );
       setState(() {
-        _isLoading = false;
+        _hasError = true;
+        _errorMessage = 'Error opening recording: $e';
       });
     }
+  }
+  
+  void _selectCamera(int index) {
+    if (index >= 0 && index < _availableCameras.length && index != _selectedCameraIndex) {
+      // Reset animations for transition
+      _animationController.reset();
+      
+      setState(() {
+        _selectedCameraIndex = index;
+        _camera = _availableCameras[index];
+        _selectedRecording = null;
+      });
+      
+      // Fetch recordings for the newly selected camera
+      _fetchRecordings();
+      
+      // Start animations for the new data
+      _animationController.forward();
+    }
+  }
+  
+  void _selectRecording(String recording) {
+    if (recording == _selectedRecording) return;
+    
+    // Create a short animation effect for selection change
+    _animationController.reverse().then((_) {
+      setState(() {
+        _selectedRecording = recording;
+      });
+      
+      // In a real app, you'd fetch the recording URL from your backend
+      // For demo, we'll use the camera's record URI
+      if (_camera != null) {
+        _loadRecording(_camera!.recordUri);
+      }
+      
+      _animationController.forward();
+    });
   }
   
   void _toggleFullScreen() {
@@ -142,343 +290,416 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
       _isFullScreen = !_isFullScreen;
     });
   }
-
-  void _toggleMute() {
-    setState(() {
-      _isMuted = !_isMuted;
-      _player.setVolume(_isMuted ? 0 : 100);
-    });
+  
+  // Function to determine if a specific day has recordings
+  List<String> _getRecordingsForDay(DateTime day) {
+    return _recordingsByDate[DateTime(day.year, day.month, day.day)] ?? [];
+  }
+  
+  // Calculate the marker counts for the calendar
+  bool _hasRecordings(DateTime day) {
+    return _getRecordingsForDay(day).isNotEmpty;
+  }
+  
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _player.dispose();
+    super.dispose();
   }
 
-  void _onDateChanged(DateTime date) {
-    setState(() {
-      _selectedDate = date;
-    });
-    // In a real app, we would load the recording for this date
-    // For now, we just show a message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Loading recording for ${date.toString().split(' ')[0]}'),
-        duration: const Duration(seconds: 2),
+  @override
+  Widget build(BuildContext context) {
+    final isDesktop = ResponsiveHelper.isDesktop(context);
+    
+    if (_isFullScreen) {
+      return Scaffold(
+        body: _buildPlayer(),
+        floatingActionButton: FloatingActionButton(
+          mini: true,
+          child: const Icon(Icons.fullscreen_exit),
+          onPressed: _toggleFullScreen,
+        ),
+      );
+    }
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_camera != null 
+          ? 'Recordings: ${_camera!.name}' 
+          : 'Recordings'
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.fullscreen),
+            onPressed: _selectedRecording != null ? _toggleFullScreen : null,
+            tooltip: 'Fullscreen',
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Row(
+          children: [
+            // Left side panel with camera list
+            if (_availableCameras.length > 1)
+              Container(
+                width: isDesktop ? 250 : 180,
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Theme.of(context).dividerColor,
+                      width: 1,
+                    ),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Text(
+                        'Camera Devices',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    Expanded(
+                      child: AnimatedList(
+                        initialItemCount: _availableCameras.length,
+                        itemBuilder: (context, index, animation) {
+                          final camera = _availableCameras[index];
+                          final isSelected = index == _selectedCameraIndex;
+                          
+                          // Animated list item for each camera
+                          return SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(-1, 0),
+                              end: Offset.zero,
+                            ).animate(CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutQuad,
+                            )),
+                            child: FadeTransition(
+                              opacity: animation,
+                              child: ListTile(
+                                title: Text(
+                                  camera.name,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                selected: isSelected,
+                                leading: Icon(
+                                  Icons.videocam,
+                                  color: isSelected ? AppTheme.primaryOrange : null,
+                                ),
+                                selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                onTap: () => _selectCamera(index),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            
+            // Right side with calendar, recordings list, and player
+            Expanded(
+              child: Column(
+                children: [
+                  // Calendar section with slide-in animation
+                  SlideTransition(
+                    position: _calendarSlideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeInAnimation,
+                      child: Card(
+                        margin: const EdgeInsets.all(8.0),
+                        elevation: 4,
+                        shadowColor: Colors.black26,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TableCalendar(
+                            firstDay: kFirstDay,
+                            lastDay: kLastDay,
+                            focusedDay: _focusedDay,
+                            calendarFormat: CalendarFormat.month,
+                            selectedDayPredicate: (day) {
+                              return isSameDay(_selectedDay, day);
+                            },
+                            onDaySelected: (selectedDay, focusedDay) {
+                              setState(() {
+                                _selectedDay = selectedDay;
+                                _focusedDay = focusedDay; // update focused day
+                              });
+                              _updateRecordingsForSelectedDay();
+                            },
+                            onPageChanged: (focusedDay) {
+                              _focusedDay = focusedDay;
+                            },
+                            eventLoader: _getRecordingsForDay,
+                            calendarStyle: CalendarStyle(
+                              // Customize the appearance based on app theme
+                              todayDecoration: BoxDecoration(
+                                color: AppTheme.primaryBlue.withOpacity(0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              selectedDecoration: const BoxDecoration(
+                                color: AppTheme.primaryOrange,
+                                shape: BoxShape.circle,
+                              ),
+                              markerDecoration: const BoxDecoration(
+                                color: AppTheme.primaryOrange,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            calendarBuilders: CalendarBuilders(
+                              markerBuilder: (context, date, events) {
+                                if (events.isNotEmpty) {
+                                  return Positioned(
+                                    right: 1,
+                                    bottom: 1,
+                                    child: _buildMarker(events.length),
+                                  );
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // Recordings list for selected day
+                  if (_availableRecordings.isNotEmpty)
+                    FadeTransition(
+                      opacity: _fadeInAnimation,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Card(
+                          elevation: 4,
+                          shadowColor: Colors.black26,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(
+                                  'Recordings for ${DateFormat('MMMM d, yyyy').format(_selectedDay!)}',
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
+                              ),
+                              const Divider(height: 1),
+                              // Animated recordings list
+                              AnimatedSize(
+                                duration: const Duration(milliseconds: 300),
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: _availableRecordings.length,
+                                  itemBuilder: (context, index) {
+                                    final recording = _availableRecordings[index];
+                                    final isSelected = recording == _selectedRecording;
+                                    
+                                    // Create a staggered animation effect for list items
+                                    return TweenAnimationBuilder<double>(
+                                      tween: Tween<double>(begin: 0.0, end: 1.0),
+                                      duration: Duration(milliseconds: 200 + (index * 50)),
+                                      curve: Curves.easeOutQuad,
+                                      builder: (context, value, child) {
+                                        return Transform.translate(
+                                          offset: Offset(20 * (1 - value), 0),
+                                          child: Opacity(
+                                            opacity: value,
+                                            child: child,
+                                          ),
+                                        );
+                                      },
+                                      child: ListTile(
+                                        title: Text(recording),
+                                        leading: AnimatedSwitcher(
+                                          duration: const Duration(milliseconds: 300),
+                                          child: isSelected
+                                            ? const Icon(Icons.play_circle_filled, 
+                                                key: ValueKey('playing'),
+                                                color: AppTheme.primaryOrange)
+                                            : const Icon(Icons.video_library, 
+                                                key: ValueKey('not_playing')),
+                                          transitionBuilder: (child, animation) {
+                                            return ScaleTransition(
+                                              scale: animation,
+                                              child: child,
+                                            );
+                                          },
+                                        ),
+                                        selected: isSelected,
+                                        selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                        onTap: () => _selectRecording(recording),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  
+                  // Player section with slide-up animation
+                  Expanded(
+                    child: SlideTransition(
+                      position: _playerSlideAnimation,
+                      child: FadeTransition(
+                        opacity: _fadeInAnimation,
+                        child: _buildPlayer(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
   
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: _isFullScreen 
-          ? null 
-          : AppBar(
-              title: Text(_camera?.name ?? 'Recordings'),
-              backgroundColor: AppTheme.darkNavBar,
-              actions: [
-                // Date picker button
-                IconButton(
-                  icon: const Icon(Icons.calendar_today),
-                  tooltip: 'Select Date',
-                  onPressed: () async {
-                    final DateTime? picked = await showDatePicker(
-                      context: context,
-                      initialDate: _selectedDate,
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime.now(),
-                      builder: (context, child) {
-                        return Theme(
-                          data: Theme.of(context).copyWith(
-                            colorScheme: ColorScheme.dark(
-                              primary: AppTheme.primaryOrange,
-                              onPrimary: Colors.white,
-                              surface: AppTheme.darkSurface,
-                              onSurface: Colors.white,
-                            ),
-                            dialogBackgroundColor: AppTheme.darkBackground,
-                          ),
-                          child: child!,
-                        );
-                      },
-                    );
-                    if (picked != null) {
-                      _onDateChanged(picked);
-                    }
-                  },
-                ),
-                // Camera selector
-                PopupMenuButton<Camera>(
-                  icon: const Icon(Icons.switch_video),
-                  tooltip: 'Switch Camera',
-                  itemBuilder: (context) {
-                    return _availableCameras.map((camera) {
-                      return PopupMenuItem<Camera>(
-                        value: camera,
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.videocam,
-                              color: _camera == camera 
-                                  ? AppTheme.primaryOrange 
-                                  : null,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                camera.name.isEmpty 
-                                    ? 'Camera ${camera.index + 1}' 
-                                    : camera.name,
-                                style: TextStyle(
-                                  fontWeight: _camera == camera 
-                                      ? FontWeight.bold 
-                                      : FontWeight.normal,
-                                  color: _camera == camera 
-                                      ? AppTheme.primaryOrange 
-                                      : null,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList();
-                  },
-                  onSelected: (camera) {
-                    _playRecording(camera);
-                  },
-                ),
-              ],
-            ),
-      body: _camera == null
-          ? _buildEmptyState()
-          : Column(
-              children: [
-                // Video player
-                Expanded(
-                  child: Stack(
-                    children: [
-                      // Video player
-                      Center(
-                        child: _isLoading
-                            ? const CircularProgressIndicator()
-                            : Video(
-                                controller: _controller,
-                                controls: NoVideoControls,
-                                fit: BoxFit.contain,
-                              ),
-                      ),
-                      
-                      // Overlay controls
-                      if (!_isLoading)
-                        Positioned.fill(
-                          child: VideoControls(
-                            isFullScreen: _isFullScreen,
-                            isMuted: _isMuted,
-                            onToggleFullScreen: _toggleFullScreen,
-                            onToggleMute: _toggleMute,
-                            isRecording: true,
-                            onPlayPause: () {
-                              if (_player.state.playing) {
-                                _player.pause();
-                              } else {
-                                _player.play();
-                              }
-                              setState(() {});
-                            },
-                          ),
-                        ),
-                      
-                      // Recording date overlay
-                      if (!_isLoading && !_isFullScreen)
-                        Positioned(
-                          top: 16,
-                          left: 16,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.7),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.video_library,
-                                  color: AppTheme.primaryOrange,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                
-                // Playback timeline and controls (non-fullscreen only)
-                if (!_isFullScreen)
-                  Container(
-                    color: AppTheme.darkSurface,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
-                          children: [
-                            // Current timestamp
-                            Text(
-                              _formatDuration(_player.state.position),
-                              style: TextStyle(
-                                color: Colors.grey[400],
-                                fontSize: 12,
-                              ),
-                            ),
-                            
-                            // Seekbar
-                            Expanded(
-                              child: Slider(
-                                value: _player.state.position.inSeconds.toDouble(),
-                                max: _player.state.duration.inSeconds.toDouble() + 1.0,
-                                min: 0.0,
-                                activeColor: AppTheme.primaryOrange,
-                                inactiveColor: Colors.grey[800],
-                                onChanged: (value) {
-                                  _player.seek(Duration(seconds: value.toInt()));
-                                },
-                              ),
-                            ),
-                            
-                            // Total duration
-                            Text(
-                              _formatDuration(_player.state.duration),
-                              style: TextStyle(
-                                color: Colors.grey[400],
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                        
-                        // Playback controls
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Rewind 10s
-                            IconButton(
-                              icon: const Icon(Icons.replay_10),
-                              color: Colors.white,
-                              onPressed: () {
-                                final newPosition = _player.state.position - const Duration(seconds: 10);
-                                _player.seek(newPosition.isNegative ? Duration.zero : newPosition);
-                              },
-                            ),
-                            
-                            // Play/Pause
-                            IconButton(
-                              icon: Icon(
-                                _player.state.playing
-                                    ? Icons.pause_circle_filled
-                                    : Icons.play_circle_fill,
-                              ),
-                              iconSize: 48,
-                              color: AppTheme.primaryOrange,
-                              onPressed: () {
-                                if (_player.state.playing) {
-                                  _player.pause();
-                                } else {
-                                  _player.play();
-                                }
-                                setState(() {});
-                              },
-                            ),
-                            
-                            // Forward 10s
-                            IconButton(
-                              icon: const Icon(Icons.forward_10),
-                              color: Colors.white,
-                              onPressed: () {
-                                final newPosition = _player.state.position + const Duration(seconds: 10);
-                                if (newPosition < _player.state.duration) {
-                                  _player.seek(newPosition);
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
+  Widget _buildMarker(int count) {
+    return Container(
+      width: 16,
+      height: 16,
+      decoration: const BoxDecoration(
+        color: AppTheme.primaryOrange,
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Text(
+          count.toString(),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 10.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
     );
   }
-
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final hours = twoDigits(duration.inHours);
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
+  
+  Widget _buildPlayer() {
+    if (_camera == null) {
+      return const Center(
+        child: Text('No camera selected'),
+      );
+    }
     
-    return hours == '00'
-        ? '$minutes:$seconds'
-        : '$hours:$minutes:$seconds';
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.video_library_outlined,
-            size: 72,
-            color: Colors.white38,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'No Camera Selected',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+    if (_selectedRecording == null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.video_library,
+              size: 64,
+              color: Colors.grey,
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Select a camera to view recordings',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey[400],
+            const SizedBox(height: 16),
+            Text(
+              _availableRecordings.isEmpty
+                ? 'No recordings available for this date'
+                : 'Select a recording to play',
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.refresh),
-            label: const Text('Reload Cameras'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryOrange,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 12,
+          ],
+        ),
+      );
+    }
+    
+    if (_hasError) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Error playing recording',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Text(
+                _errorMessage,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
-            onPressed: _loadCamera,
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+              onPressed: () => _loadRecording(_camera!.recordUri),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Video player with Hero
+        Hero(
+          tag: 'player_${_camera!.id}_recording',
+          child: Material(
+            type: MaterialType.transparency,
+            child: Video(
+              controller: _controller,
+              controls: (_) => VideoControls(player: _player),
+            ),
           ),
-        ],
-      ),
+        ),
+        
+        // Buffering indicator (show when buffering and not playing yet)
+        if (_isBuffering && !_isPlaying)
+          const CircularProgressIndicator(),
+          
+        // Show overlay with recording info
+        if (!_isBuffering && _isPlaying && !_isFullScreen)
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.fiber_manual_record, color: Colors.red, size: 12),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Recording: $_selectedRecording',
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

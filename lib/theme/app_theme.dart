@@ -12,7 +12,6 @@ class AppTheme {
   // Dark theme colors
   static const Color darkBackground = Color(0xFF121212);
   static const Color darkSurface = Color(0xFF1E1E1E);
-  static const Color darkNavBar = Color(0xFF121212);
   static const Color darkError = Color(0xFFCF6679);
   static const Color darkBorder = Color(0xFF2A2A2A);
   
