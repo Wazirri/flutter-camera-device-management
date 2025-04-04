@@ -1,0 +1,38 @@
+lib/main.dart:167:42: Error: 'CamerasScreen' is imported from both 'package:camera_device_manager/screens/camera_devices_screen.dart' and 'package:camera_device_manager/screens/cameras_screen.dart'.
+            page = const AppShell(child: CamerasScreen());
+                                         ^^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:127:16: Error: Expected ']' before this.
+              );
+               ^
+lib/screens/camera_devices_screen.dart:123:37: Error: A value of type 'Future<dynamic>' can't be assigned to a variable of type 'Widget'.
+ - 'Future' is from 'dart:async'.
+ - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+              Navigator.of(context).push(
+                                    ^
+lib/screens/dashboard_screen.dart:234:38: Error: The getter 'connectionStatus' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connectionStatus'.
+                  value: systemInfo?.connectionStatus ?? 'Unknown',
+                                     ^^^^^^^^^^^^^^^^
+lib/screens/live_view_screen.dart:158:41: Error: Member not found: 'darkNavBar'.
+              backgroundColor: AppTheme.darkNavBar,
+                                        ^^^^^^^^^^
+lib/screens/live_view_screen.dart:223:23: Error: No named parameter with the name 'isFullScreen'.
+                      isFullScreen: _isFullScreen,
+                      ^^^^^^^^^^^^
+lib/widgets/video_controls.dart:11:9: Context: Found this candidate, but the arguments don't match.
+  const VideoControls({
+        ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:175:41: Error: Member not found: 'darkNavBar'.
+              backgroundColor: AppTheme.darkNavBar,
+                                        ^^^^^^^^^^
+lib/screens/record_view_screen.dart:275:29: Error: No named parameter with the name 'isFullScreen'.
+                            isFullScreen: _isFullScreen,
+                            ^^^^^^^^^^^^
+lib/widgets/video_controls.dart:11:9: Context: Found this candidate, but the arguments don't match.
+  const VideoControls({
+        ^^^^^^^^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **

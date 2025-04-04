@@ -4,6 +4,7 @@ import '../models/camera_device.dart';
 import '../providers/camera_devices_provider.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
+import 'cameras_screen.dart' as project_cameras; // Yeniden adlandırıldı çakışmayı önlemek için
 
 class CameraDevicesScreen extends StatefulWidget {
   const CameraDevicesScreen({Key? key}) : super(key: key);
@@ -50,6 +51,14 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> with SingleTi
     setState(() {
       showOnlyActive = !showOnlyActive;
     });
+  }
+
+  void _navigateToCamerasScreen() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const project_cameras.CamerasScreen(),
+      ),
+    );
   }
   
   @override
@@ -119,13 +128,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> with SingleTi
               // Devices tab
               _buildDevicesTab(displayDevices, provider),
               
-              // Cameras tab (redirects to CamerasScreen)
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const CamerasScreen(),
-                ),
-              );
-              // For now, just show a redirection message
+              // Cameras tab
               Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -150,9 +153,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> with SingleTi
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/cameras');
-                      },
+                      onPressed: _navigateToCamerasScreen,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryBlue,
                       ),
@@ -640,19 +641,6 @@ class DeviceSearchDelegate extends SearchDelegate<CameraDevice?> {
           },
         );
       },
-    );
-  }
-}
-
-// Stub of the CamerasScreen to prevent errors
-class CamerasScreen extends StatelessWidget {
-  const CamerasScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Cameras')),
-      body: const Center(child: Text('Cameras Screen')),
     );
   }
 }

@@ -16,6 +16,7 @@ class SystemInfo {
   final String ramUsage;
   final String diskUsage;
   final String connections;
+  final String connectionStatus;
 
   SystemInfo({
     required this.cpuTemp,
@@ -33,6 +34,7 @@ class SystemInfo {
     this.ramUsage = '0',
     this.diskUsage = '0',
     this.connections = '0',
+    this.connectionStatus = 'Unknown',
   });
 
   factory SystemInfo.fromJson(Map<dynamic, dynamic> json) {
@@ -64,6 +66,16 @@ class SystemInfo {
       });
     }
     
+    // Determine connection status based on eth0 and ppp0
+    String connectionStatus = 'Unknown';
+    if (json['eth0'] != null && json['eth0'].toString().isNotEmpty && json['eth0'] != "N/A") {
+      connectionStatus = 'Ethernet';
+    } else if (json['ppp0'] != null && json['ppp0'].toString().isNotEmpty && json['ppp0'] != "N/A") {
+      connectionStatus = 'Mobile Data';
+    } else {
+      connectionStatus = 'Offline';
+    }
+    
     return SystemInfo(
       cpuTemp: json['cpuTemp']?.toString() ?? '0',
       upTime: json['upTime']?.toString() ?? '0',
@@ -81,6 +93,7 @@ class SystemInfo {
       ramUsage: json['ramUsage']?.toString() ?? '40',  // Default or get from server
       diskUsage: json['diskUsage']?.toString() ?? '25', // Default or get from server
       connections: json['connections']?.toString() ?? json['totalconns']?.toString() ?? '0',
+      connectionStatus: json['connectionStatus']?.toString() ?? connectionStatus,
     );
   }
 
