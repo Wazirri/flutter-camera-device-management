@@ -5,7 +5,7 @@ import '../services/websocket_service.dart';
 import '../models/system_info.dart';
 import 'camera_devices_provider.dart';
 
-class WebSocketProvider with ChangeNotifier {
+class WebSocketProvider extends ChangeNotifier {
   final WebSocketService _webSocketService = WebSocketService();
   CameraDevicesProvider? _cameraDevicesProvider;
   

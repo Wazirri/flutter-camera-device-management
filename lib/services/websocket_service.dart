@@ -8,7 +8,7 @@ import '../models/system_info.dart';
 
 typedef MessageHandler = void Function(Map<String, dynamic> message);
 
-class WebSocketService with ChangeNotifier {
+class WebSocketService extends ChangeNotifier {
   WebSocketChannel? _channel;
   bool _isConnected = false;
   List<String> _messageLog = [];

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/camera_device.dart';
 import 'websocket_provider.dart';
 
-class CameraDevicesProvider with ChangeNotifier {
+class CameraDevicesProvider extends ChangeNotifier {
   final Map<String, CameraDevice> _devices = {};
   CameraDevice? _selectedDevice;
   int _selectedCameraIndex = 0;
