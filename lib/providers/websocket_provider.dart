@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../services/websocket_service.dart';
 import '../models/system_info.dart';
 import 'camera_devices_provider.dart';
 
-class WebSocketProvider extends ChangeNotifier {
+class WebSocketProvider with ChangeNotifier {
   final WebSocketService _webSocketService = WebSocketService();
   CameraDevicesProvider? _cameraDevicesProvider;
   
