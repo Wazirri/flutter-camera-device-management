@@ -195,8 +195,9 @@ class WebSocketService with ChangeNotifier {
         _handleSystemInfo(parsed);
       }
       
-      // Handle login message
+      // Handle login message - fixed the detection to match the actual login message format
       else if (parsed['c'] == 'login') {
+        print('🔐 [WebSocket] Detected login prompt: ${parsed['msg']}');
         _handleLoginMessage(parsed);
       }
       
@@ -255,13 +256,17 @@ class WebSocketService with ChangeNotifier {
   
   // Handle login-related messages
   void _handleLoginMessage(Map<String, dynamic> message) {
-    // Check for login prompt
-    if (message['msg'] == 'Oturum açılmamış!') {
-      print('[WebSocket] Login required, sending credentials');
+    // Check for login prompt - simplified detection to match the exact message we're seeing
+    if (message['c'] == 'login') {
+      print('[WebSocket] Login message received, sending credentials for ${_username}');
       _addToLog('Login required, sending credentials');
       
-      // Send login command
-      sendMessage('LOGIN $_username $_password');
+      // Send login command - add a small delay to ensure server is ready
+      Future.delayed(Duration(milliseconds: 500), () {
+        sendMessage('LOGIN $_username $_password');
+        print('[WebSocket] Sent LOGIN command');
+      });
+      
       _isAuthenticating = true;
     }
     // Check for successful login
