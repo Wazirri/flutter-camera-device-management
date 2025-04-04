@@ -1,0 +1,1023 @@
+lib/providers/camera_devices_provider.dart:158:15: Error: The method 'debugPrint' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+              debugPrint('Error parsing camera index from ${propertyPath[0]}');
+              ^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:167:13: Error: The method 'debugPrint' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+            debugPrint('Processing camera report for $cameraName: $propertyName = $value');
+            ^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:174:15: Error: The method 'debugPrint' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+              debugPrint('Camera $cameraName not found in device - creating placeholder');
+              ^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:205:15: Error: The method 'debugPrint' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+              debugPrint('Created placeholder camera at index $cameraIndex');
+              ^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:215:17: Error: The method 'debugPrint' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+                debugPrint('Updated camera $cameraName connected status: ${camera.connected}');
+                ^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:238:7: Error: The method 'debugPrint' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+      debugPrint('Creating camera at index $nextIndex because we need index $cameraIndex');
+      ^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:272:9: Error: The method 'debugPrint' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+        debugPrint('Set camera[$cameraIndex] name to: ${camera.name}');
+        ^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:348:5: Error: The method 'notifyListeners' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'notifyListeners'.
+    notifyListeners();
+    ^^^^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:12:9: Error: 'VoidCallback' isn't a type.
+  final VoidCallback onTap;
+        ^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:13:9: Error: 'VoidCallback' isn't a type.
+  final VoidCallback onSettingsTap;
+        ^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:16:5: Error: 'Key' isn't a type.
+    Key? key,
+    ^^^
+lib/widgets/camera_grid_item.dart:27:16: Error: 'BuildContext' isn't a type.
+  Widget build(BuildContext context) {
+               ^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:36:23: Error: Couldn't find constructor 'EdgeInsets.all'.
+        margin: const EdgeInsets.all(8.0),
+                      ^^^
+lib/widgets/camera_grid_item.dart:62:36: Error: Couldn't find constructor 'EdgeInsets.symmetric'.
+                    padding: const EdgeInsets.symmetric(
+                                   ^^^^^^^^^
+lib/widgets/camera_grid_item.dart:88:38: Error: Couldn't find constructor 'EdgeInsets.symmetric'.
+                      padding: const EdgeInsets.symmetric(
+                                     ^^^^^^^^^
+lib/widgets/camera_grid_item.dart:97:39: Error: Undefined name 'MainAxisSize'.
+                        mainAxisSize: MainAxisSize.min,
+                                      ^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:100:29: Error: Undefined name 'Icons'.
+                            Icons.fiber_manual_record,
+                            ^^^^^
+lib/widgets/camera_grid_item.dart:101:36: Error: Undefined name 'Colors'.
+                            color: Colors.white,
+                                   ^^^^^^
+lib/widgets/camera_grid_item.dart:99:27: Error: Method not found: 'Icon'.
+                          Icon(
+                          ^^^^
+lib/widgets/camera_grid_item.dart:104:27: Error: Method not found: 'SizedBox'.
+                          SizedBox(width: 4),
+                          ^^^^^^^^
+lib/widgets/camera_grid_item.dart:108:38: Error: Undefined name 'Colors'.
+                              color: Colors.white,
+                                     ^^^^^^
+lib/widgets/camera_grid_item.dart:110:43: Error: Undefined name 'FontWeight'.
+                              fontWeight: FontWeight.bold,
+                                          ^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:107:36: Error: Method not found: 'TextStyle'.
+                            style: TextStyle(
+                                   ^^^^^^^^^
+lib/widgets/camera_grid_item.dart:105:27: Error: Method not found: 'Text'.
+                          Text(
+                          ^^^^
+lib/widgets/camera_grid_item.dart:96:36: Error: Couldn't find constructor 'Row'.
+                      child: const Row(
+                                   ^^^
+lib/widgets/camera_grid_item.dart:120:30: Error: Couldn't find constructor 'EdgeInsets.all'.
+              padding: const EdgeInsets.all(12.0),
+                             ^^^
+lib/widgets/camera_grid_item.dart:131:41: Error: Undefined name 'FontWeight'.
+                            fontWeight: FontWeight.bold,
+                                        ^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:130:40: Error: Couldn't find constructor 'TextStyle'.
+                          style: const TextStyle(
+                                       ^^^^^^^^^
+lib/widgets/camera_grid_item.dart:137:31: Error: Couldn't find constructor 'SizedBox'.
+                        const SizedBox(height: 4),
+                              ^^^^^^^^
+lib/widgets/camera_grid_item.dart:151:38: Error: Undefined name 'Icons'.
+                    icon: const Icon(Icons.more_vert),
+                                     ^^^^^
+lib/widgets/camera_grid_item.dart:151:33: Error: Couldn't find constructor 'Icon'.
+                    icon: const Icon(Icons.more_vert),
+                                ^^^^
+lib/widgets/camera_grid_item.dart:28:12: Error: The method 'GestureDetector' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'GestureDetector'.
+    return GestureDetector(
+           ^^^^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:30:14: Error: The method 'Card' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Card'.
+      child: Card(
+             ^^^^
+lib/widgets/camera_grid_item.dart:31:23: Error: The getter 'Clip' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Clip'.
+        clipBehavior: Clip.antiAlias,
+                      ^^^^
+lib/widgets/camera_grid_item.dart:32:16: Error: The method 'RoundedRectangleBorder' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'RoundedRectangleBorder'.
+        shape: RoundedRectangleBorder(
+               ^^^^^^^^^^^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:33:25: Error: The getter 'BorderRadius' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'BorderRadius'.
+          borderRadius: BorderRadius.circular(12),
+                        ^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:37:16: Error: The method 'Column' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Column'.
+        child: Column(
+               ^^^^^^
+lib/widgets/camera_grid_item.dart:38:31: Error: The getter 'CrossAxisAlignment' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'CrossAxisAlignment'.
+          crossAxisAlignment: CrossAxisAlignment.start,
+                              ^^^^^^^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:40:13: Error: The method 'Stack' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Stack'.
+            Stack(
+            ^^^^^
+lib/widgets/camera_grid_item.dart:43:17: Error: The method 'Container' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Container'.
+                Container(
+                ^^^^^^^^^
+lib/widgets/camera_grid_item.dart:46:26: Error: The getter 'Colors' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Colors'.
+                  color: Colors.black,
+                         ^^^^^^
+lib/widgets/camera_grid_item.dart:48:25: Error: The getter 'Image' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Image'.
+                      ? Image.network(
+                        ^^^^^
+lib/widgets/camera_grid_item.dart:50:32: Error: The getter 'BoxFit' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'BoxFit'.
+                          fit: BoxFit.cover,
+                               ^^^^^^
+lib/widgets/camera_grid_item.dart:58:17: Error: The method 'Positioned' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Positioned'.
+                Positioned(
+                ^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:61:26: Error: The method 'Container' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Container'.
+                  child: Container(
+                         ^^^^^^^^^
+lib/widgets/camera_grid_item.dart:66:33: Error: The method 'BoxDecoration' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BoxDecoration'.
+                    decoration: BoxDecoration(
+                                ^^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:68:37: Error: The getter 'BorderRadius' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'BorderRadius'.
+                      borderRadius: BorderRadius.circular(12),
+                                    ^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:70:28: Error: The method 'Row' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Row'.
+                    child: Row(
+                           ^^^
+lib/widgets/camera_grid_item.dart:75:36: Error: The getter 'EdgeInsets' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'EdgeInsets'.
+                          padding: EdgeInsets.zero,
+                                   ^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:84:19: Error: The method 'Positioned' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Positioned'.
+                  Positioned(
+                  ^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:87:28: Error: The method 'Container' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Container'.
+                    child: Container(
+                           ^^^^^^^^^
+lib/widgets/camera_grid_item.dart:92:35: Error: The method 'BoxDecoration' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BoxDecoration'.
+                      decoration: BoxDecoration(
+                                  ^^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:93:32: Error: The getter 'Colors' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Colors'.
+                        color: Colors.red.withOpacity(0.8),
+                               ^^^^^^
+lib/widgets/camera_grid_item.dart:94:39: Error: The getter 'BorderRadius' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'BorderRadius'.
+                        borderRadius: BorderRadius.circular(12),
+                                      ^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:119:13: Error: The method 'Padding' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Padding'.
+            Padding(
+            ^^^^^^^
+lib/widgets/camera_grid_item.dart:121:22: Error: The method 'Row' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Row'.
+              child: Row(
+                     ^^^
+lib/widgets/camera_grid_item.dart:122:36: Error: The getter 'MainAxisAlignment' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'MainAxisAlignment'.
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                   ^^^^^^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:124:19: Error: The method 'Expanded' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Expanded'.
+                  Expanded(
+                  ^^^^^^^^
+lib/widgets/camera_grid_item.dart:125:28: Error: The method 'Column' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Column'.
+                    child: Column(
+                           ^^^^^^
+lib/widgets/camera_grid_item.dart:126:43: Error: The getter 'CrossAxisAlignment' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'CrossAxisAlignment'.
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                                          ^^^^^^^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:128:25: Error: The method 'Text' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Text'.
+                        Text(
+                        ^^^^
+lib/widgets/camera_grid_item.dart:135:37: Error: The getter 'TextOverflow' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'TextOverflow'.
+                          overflow: TextOverflow.ellipsis,
+                                    ^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:138:25: Error: The method 'Text' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Text'.
+                        Text(
+                        ^^^^
+lib/widgets/camera_grid_item.dart:140:34: Error: The method 'TextStyle' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'TextStyle'.
+                          style: TextStyle(
+                                 ^^^^^^^^^
+lib/widgets/camera_grid_item.dart:145:37: Error: The getter 'TextOverflow' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'TextOverflow'.
+                          overflow: TextOverflow.ellipsis,
+                                    ^^^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:150:19: Error: The method 'IconButton' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'IconButton'.
+                  IconButton(
+                  ^^^^^^^^^^
+lib/widgets/camera_grid_item.dart:165:12: Error: The method 'Container' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Container'.
+    return Container(
+           ^^^^^^^^^
+lib/widgets/camera_grid_item.dart:167:14: Error: The method 'Center' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Center'.
+      child: Center(
+             ^^^^^^
+lib/widgets/camera_grid_item.dart:168:16: Error: The method 'Icon' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Icon'.
+        child: Icon(
+               ^^^^
+lib/widgets/camera_grid_item.dart:169:11: Error: The getter 'Icons' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Icons'.
+          Icons.videocam_off,
+          ^^^^^
+lib/widgets/camera_grid_item.dart:172:17: Error: The getter 'Colors' isn't defined for the class 'CameraGridItem'.
+ - 'CameraGridItem' is from 'package:camera_device_manager/widgets/camera_grid_item.dart' ('lib/widgets/camera_grid_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Colors'.
+              ? Colors.red.withOpacity(0.5) 
+                ^^^^^^
+lib/widgets/custom_app_bar.dart:7:14: Error: 'Widget' isn't a type.
+  final List<Widget>? actions;
+             ^^^^^^
+lib/widgets/custom_app_bar.dart:9:9: Error: 'VoidCallback' isn't a type.
+  final VoidCallback? onBackPressed;
+        ^^^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:13:5: Error: 'Key' isn't a type.
+    Key? key,
+    ^^^
+lib/widgets/custom_app_bar.dart:22:16: Error: 'BuildContext' isn't a type.
+  Widget build(BuildContext context) {
+               ^^^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:30:32: Error: Undefined name 'Icons'.
+              icon: const Icon(Icons.arrow_back),
+                               ^^^^^
+lib/widgets/custom_app_bar.dart:30:27: Error: Couldn't find constructor 'Icon'.
+              icon: const Icon(Icons.arrow_back),
+                          ^^^^
+lib/widgets/custom_app_bar.dart:37:38: Error: Undefined name 'Icons'.
+                    icon: const Icon(Icons.menu),
+                                     ^^^^^
+lib/widgets/custom_app_bar.dart:37:33: Error: Couldn't find constructor 'Icon'.
+                    icon: const Icon(Icons.menu),
+                                ^^^^
+lib/widgets/custom_app_bar.dart:57:28: Error: Undefined name 'Icons'.
+          icon: const Icon(Icons.notifications_outlined),
+                           ^^^^^
+lib/widgets/custom_app_bar.dart:57:23: Error: Couldn't find constructor 'Icon'.
+          icon: const Icon(Icons.notifications_outlined),
+                      ^^^^
+lib/widgets/custom_app_bar.dart:62:15: Error: Couldn't find constructor 'SizedBox'.
+        const SizedBox(width: 8),
+              ^^^^^^^^
+lib/widgets/custom_app_bar.dart:64:26: Error: Couldn't find constructor 'EdgeInsets.only'.
+          padding: const EdgeInsets.only(right: 16.0),
+                         ^^^^
+lib/widgets/custom_app_bar.dart:71:24: Error: Undefined name 'Colors'.
+                color: Colors.white,
+                       ^^^^^^
+lib/widgets/custom_app_bar.dart:72:29: Error: Undefined name 'FontWeight'.
+                fontWeight: FontWeight.bold,
+                            ^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:70:22: Error: Method not found: 'TextStyle'.
+              style: TextStyle(
+                     ^^^^^^^^^
+lib/widgets/custom_app_bar.dart:68:26: Error: Couldn't find constructor 'Text'.
+            child: const Text(
+                         ^^^^
+lib/widgets/custom_app_bar.dart:23:12: Error: The method 'AppBar' isn't defined for the class 'CustomAppBar'.
+ - 'CustomAppBar' is from 'package:camera_device_manager/widgets/custom_app_bar.dart' ('lib/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'AppBar'.
+    return AppBar(
+           ^^^^^^
+lib/widgets/custom_app_bar.dart:29:13: Error: The method 'IconButton' isn't defined for the class 'CustomAppBar'.
+ - 'CustomAppBar' is from 'package:camera_device_manager/widgets/custom_app_bar.dart' ('lib/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'IconButton'.
+          ? IconButton(
+            ^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:31:49: Error: The getter 'Navigator' isn't defined for the class 'CustomAppBar'.
+ - 'CustomAppBar' is from 'package:camera_device_manager/widgets/custom_app_bar.dart' ('lib/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Navigator'.
+              onPressed: onBackPressed ?? () => Navigator.of(context).pop(),
+                                                ^^^^^^^^^
+lib/widgets/custom_app_bar.dart:35:17: Error: The method 'Builder' isn't defined for the class 'CustomAppBar'.
+ - 'CustomAppBar' is from 'package:camera_device_manager/widgets/custom_app_bar.dart' ('lib/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Builder'.
+              : Builder(
+                ^^^^^^^
+lib/widgets/custom_app_bar.dart:36:41: Error: The method 'IconButton' isn't defined for the class 'CustomAppBar'.
+ - 'CustomAppBar' is from 'package:camera_device_manager/widgets/custom_app_bar.dart' ('lib/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'IconButton'.
+                  builder: (context) => IconButton(
+                                        ^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:38:38: Error: The getter 'Scaffold' isn't defined for the class 'CustomAppBar'.
+ - 'CustomAppBar' is from 'package:camera_device_manager/widgets/custom_app_bar.dart' ('lib/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Scaffold'.
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                                     ^^^^^^^^
+lib/widgets/custom_app_bar.dart:41:14: Error: The method 'Text' isn't defined for the class 'CustomAppBar'.
+ - 'CustomAppBar' is from 'package:camera_device_manager/widgets/custom_app_bar.dart' ('lib/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Text'.
+      title: Text(
+             ^^^^
+lib/widgets/custom_app_bar.dart:43:16: Error: The method 'TextStyle' isn't defined for the class 'CustomAppBar'.
+ - 'CustomAppBar' is from 'package:camera_device_manager/widgets/custom_app_bar.dart' ('lib/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'TextStyle'.
+        style: TextStyle(
+               ^^^^^^^^^
+lib/widgets/custom_app_bar.dart:50:23: Error: The getter 'FontWeight' isn't defined for the class 'CustomAppBar'.
+ - 'CustomAppBar' is from 'package:camera_device_manager/widgets/custom_app_bar.dart' ('lib/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'FontWeight'.
+          fontWeight: FontWeight.w600,
+                      ^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:56:9: Error: The method 'IconButton' isn't defined for the class 'CustomAppBar'.
+ - 'CustomAppBar' is from 'package:camera_device_manager/widgets/custom_app_bar.dart' ('lib/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'IconButton'.
+        IconButton(
+        ^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:63:9: Error: The method 'Padding' isn't defined for the class 'CustomAppBar'.
+ - 'CustomAppBar' is from 'package:camera_device_manager/widgets/custom_app_bar.dart' ('lib/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Padding'.
+        Padding(
+        ^^^^^^^
+lib/widgets/custom_app_bar.dart:65:18: Error: The method 'CircleAvatar' isn't defined for the class 'CustomAppBar'.
+ - 'CustomAppBar' is from 'package:camera_device_manager/widgets/custom_app_bar.dart' ('lib/widgets/custom_app_bar.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'CircleAvatar'.
+          child: CircleAvatar(
+                 ^^^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:82:51: Error: Undefined name 'kToolbarHeight'.
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+                                                  ^^^^^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:82:35: Error: Couldn't find constructor 'Size.fromHeight'.
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+                                  ^^^^^^^^^^
+lib/widgets/status_indicator.dart:9:9: Error: 'EdgeInsets' isn't a type.
+  final EdgeInsets padding;
+        ^^^^^^^^^^
+lib/widgets/status_indicator.dart:12:5: Error: 'Key' isn't a type.
+    Key? key,
+    ^^^
+lib/widgets/status_indicator.dart:20:16: Error: 'BuildContext' isn't a type.
+  Widget build(BuildContext context) {
+               ^^^^^^^^^^^^
+lib/widgets/status_indicator.dart:42:19: Error: Couldn't find constructor 'SizedBox'.
+            const SizedBox(width: 6),
+                  ^^^^^^^^
+lib/widgets/status_indicator.dart:21:12: Error: The method 'Padding' isn't defined for the class 'StatusIndicator'.
+ - 'StatusIndicator' is from 'package:camera_device_manager/widgets/status_indicator.dart' ('lib/widgets/status_indicator.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Padding'.
+    return Padding(
+           ^^^^^^^
+lib/widgets/status_indicator.dart:23:14: Error: The method 'Row' isn't defined for the class 'StatusIndicator'.
+ - 'StatusIndicator' is from 'package:camera_device_manager/widgets/status_indicator.dart' ('lib/widgets/status_indicator.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Row'.
+      child: Row(
+             ^^^
+lib/widgets/status_indicator.dart:24:23: Error: The getter 'MainAxisSize' isn't defined for the class 'StatusIndicator'.
+ - 'StatusIndicator' is from 'package:camera_device_manager/widgets/status_indicator.dart' ('lib/widgets/status_indicator.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'MainAxisSize'.
+        mainAxisSize: MainAxisSize.min,
+                      ^^^^^^^^^^^^
+lib/widgets/status_indicator.dart:26:11: Error: The method 'Container' isn't defined for the class 'StatusIndicator'.
+ - 'StatusIndicator' is from 'package:camera_device_manager/widgets/status_indicator.dart' ('lib/widgets/status_indicator.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Container'.
+          Container(
+          ^^^^^^^^^
+lib/widgets/status_indicator.dart:29:25: Error: The method 'BoxDecoration' isn't defined for the class 'StatusIndicator'.
+ - 'StatusIndicator' is from 'package:camera_device_manager/widgets/status_indicator.dart' ('lib/widgets/status_indicator.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BoxDecoration'.
+            decoration: BoxDecoration(
+                        ^^^^^^^^^^^^^
+lib/widgets/status_indicator.dart:31:22: Error: The getter 'BoxShape' isn't defined for the class 'StatusIndicator'.
+ - 'StatusIndicator' is from 'package:camera_device_manager/widgets/status_indicator.dart' ('lib/widgets/status_indicator.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'BoxShape'.
+              shape: BoxShape.circle,
+                     ^^^^^^^^
+lib/widgets/status_indicator.dart:33:17: Error: The method 'BoxShadow' isn't defined for the class 'StatusIndicator'.
+ - 'StatusIndicator' is from 'package:camera_device_manager/widgets/status_indicator.dart' ('lib/widgets/status_indicator.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BoxShadow'.
+                BoxShadow(
+                ^^^^^^^^^
+lib/widgets/status_indicator.dart:43:13: Error: The method 'Text' isn't defined for the class 'StatusIndicator'.
+ - 'StatusIndicator' is from 'package:camera_device_manager/widgets/status_indicator.dart' ('lib/widgets/status_indicator.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Text'.
+            Text(
+            ^^^^
+lib/widgets/status_indicator.dart:45:22: Error: The method 'TextStyle' isn't defined for the class 'StatusIndicator'.
+ - 'StatusIndicator' is from 'package:camera_device_manager/widgets/status_indicator.dart' ('lib/widgets/status_indicator.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'TextStyle'.
+              style: TextStyle(
+                     ^^^^^^^^^
+lib/widgets/status_indicator.dart:48:29: Error: The getter 'FontWeight' isn't defined for the class 'StatusIndicator'.
+ - 'StatusIndicator' is from 'package:camera_device_manager/widgets/status_indicator.dart' ('lib/widgets/status_indicator.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'FontWeight'.
+                fontWeight: FontWeight.w500,
+                            ^^^^^^^^^^
+lib/widgets/device_list_item.dart:12:9: Error: 'VoidCallback' isn't a type.
+  final VoidCallback onTap;
+        ^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:13:9: Error: 'VoidCallback' isn't a type.
+  final VoidCallback onActionPressed;
+        ^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:16:5: Error: 'Key' isn't a type.
+    Key? key,
+    ^^^
+lib/widgets/device_list_item.dart:27:16: Error: 'BuildContext' isn't a type.
+  Widget build(BuildContext context) {
+               ^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:29:21: Error: Couldn't find constructor 'EdgeInsets.symmetric'.
+      margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
+                    ^^^^^^^^^
+lib/widgets/device_list_item.dart:38:26: Error: Couldn't find constructor 'EdgeInsets.all'.
+          padding: const EdgeInsets.all(16.0),
+                         ^^^
+lib/widgets/device_list_item.dart:60:31: Error: Couldn't find constructor 'SizedBox'.
+                        const SizedBox(width: 16),
+                              ^^^^^^^^
+lib/widgets/device_list_item.dart:68:47: Error: Undefined name 'FontWeight'.
+                                  fontWeight: FontWeight.bold,
+                                              ^^^^^^^^^^
+lib/widgets/device_list_item.dart:67:46: Error: Couldn't find constructor 'TextStyle'.
+                                style: const TextStyle(
+                                             ^^^^^^^^^
+lib/widgets/device_list_item.dart:74:37: Error: Couldn't find constructor 'SizedBox'.
+                              const SizedBox(height: 4),
+                                    ^^^^^^^^
+lib/widgets/device_list_item.dart:91:38: Error: Undefined name 'Icons'.
+                    icon: const Icon(Icons.more_vert),
+                                     ^^^^^
+lib/widgets/device_list_item.dart:91:33: Error: Couldn't find constructor 'Icon'.
+                    icon: const Icon(Icons.more_vert),
+                                ^^^^
+lib/widgets/device_list_item.dart:97:21: Error: Couldn't find constructor 'SizedBox'.
+              const SizedBox(height: 16),
+                    ^^^^^^^^
+lib/widgets/device_list_item.dart:114:29: Error: Couldn't find constructor 'SizedBox'.
+                      const SizedBox(width: 8),
+                            ^^^^^^^^
+lib/widgets/device_list_item.dart:28:12: Error: The method 'Card' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Card'.
+    return Card(
+           ^^^^
+lib/widgets/device_list_item.dart:30:14: Error: The method 'RoundedRectangleBorder' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'RoundedRectangleBorder'.
+      shape: RoundedRectangleBorder(
+             ^^^^^^^^^^^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:31:23: Error: The getter 'BorderRadius' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'BorderRadius'.
+        borderRadius: BorderRadius.circular(12),
+                      ^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:34:14: Error: The method 'InkWell' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'InkWell'.
+      child: InkWell(
+             ^^^^^^^
+lib/widgets/device_list_item.dart:36:23: Error: The getter 'BorderRadius' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'BorderRadius'.
+        borderRadius: BorderRadius.circular(12),
+                      ^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:37:16: Error: The method 'Padding' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Padding'.
+        child: Padding(
+               ^^^^^^^
+lib/widgets/device_list_item.dart:39:18: Error: The method 'Column' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Column'.
+          child: Column(
+                 ^^^^^^
+lib/widgets/device_list_item.dart:40:33: Error: The getter 'CrossAxisAlignment' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'CrossAxisAlignment'.
+            crossAxisAlignment: CrossAxisAlignment.start,
+                                ^^^^^^^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:42:15: Error: The method 'Row' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Row'.
+              Row(
+              ^^^
+lib/widgets/device_list_item.dart:43:36: Error: The getter 'MainAxisAlignment' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'MainAxisAlignment'.
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                   ^^^^^^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:45:19: Error: The method 'Expanded' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Expanded'.
+                  Expanded(
+                  ^^^^^^^^
+lib/widgets/device_list_item.dart:46:28: Error: The method 'Row' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Row'.
+                    child: Row(
+                           ^^^
+lib/widgets/device_list_item.dart:48:25: Error: The method 'Container' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Container'.
+                        Container(
+                        ^^^^^^^^^
+lib/widgets/device_list_item.dart:51:39: Error: The method 'BoxDecoration' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BoxDecoration'.
+                          decoration: BoxDecoration(
+                                      ^^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:53:43: Error: The getter 'BorderRadius' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'BorderRadius'.
+                            borderRadius: BorderRadius.circular(8),
+                                          ^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:55:34: Error: The method 'Icon' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Icon'.
+                          child: Icon(
+                                 ^^^^
+lib/widgets/device_list_item.dart:56:29: Error: The getter 'Icons' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Icons'.
+                            Icons.router_rounded,
+                            ^^^^^
+lib/widgets/device_list_item.dart:61:25: Error: The method 'Expanded' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Expanded'.
+                        Expanded(
+                        ^^^^^^^^
+lib/widgets/device_list_item.dart:62:34: Error: The method 'Column' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Column'.
+                          child: Column(
+                                 ^^^^^^
+lib/widgets/device_list_item.dart:63:49: Error: The getter 'CrossAxisAlignment' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'CrossAxisAlignment'.
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                ^^^^^^^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:65:31: Error: The method 'Text' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Text'.
+                              Text(
+                              ^^^^
+lib/widgets/device_list_item.dart:72:43: Error: The getter 'TextOverflow' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'TextOverflow'.
+                                overflow: TextOverflow.ellipsis,
+                                          ^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:75:31: Error: The method 'Text' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Text'.
+                              Text(
+                              ^^^^
+lib/widgets/device_list_item.dart:77:40: Error: The method 'TextStyle' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'TextStyle'.
+                                style: TextStyle(
+                                       ^^^^^^^^^
+lib/widgets/device_list_item.dart:82:43: Error: The getter 'TextOverflow' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'TextOverflow'.
+                                overflow: TextOverflow.ellipsis,
+                                          ^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:90:19: Error: The method 'IconButton' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'IconButton'.
+                  IconButton(
+                  ^^^^^^^^^^
+lib/widgets/device_list_item.dart:98:15: Error: The method 'Row' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Row'.
+              Row(
+              ^^^
+lib/widgets/device_list_item.dart:99:36: Error: The getter 'MainAxisAlignment' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'MainAxisAlignment'.
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                   ^^^^^^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:103:21: Error: The getter 'Icons' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Icons'.
+                    Icons.wifi,
+                    ^^^^^
+lib/widgets/device_list_item.dart:107:19: Error: The method 'Row' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Row'.
+                  Row(
+                  ^^^
+lib/widgets/device_list_item.dart:109:23: Error: The method 'Icon' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Icon'.
+                      Icon(
+                      ^^^^
+lib/widgets/device_list_item.dart:110:25: Error: The getter 'Icons' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Icons'.
+                        Icons.circle,
+                        ^^^^^
+lib/widgets/device_list_item.dart:123:21: Error: The getter 'Icons' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Icons'.
+                    Icons.access_time,
+                    ^^^^^
+lib/widgets/device_list_item.dart:135:25: Error: 'IconData' isn't a type.
+  Widget _buildInfoItem(IconData icon, String label) {
+                        ^^^^^^^^
+lib/widgets/device_list_item.dart:143:15: Error: Couldn't find constructor 'SizedBox'.
+        const SizedBox(width: 6),
+              ^^^^^^^^
+lib/widgets/device_list_item.dart:136:12: Error: The method 'Row' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Row'.
+    return Row(
+           ^^^
+lib/widgets/device_list_item.dart:138:9: Error: The method 'Icon' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Icon'.
+        Icon(
+        ^^^^
+lib/widgets/device_list_item.dart:144:9: Error: The method 'Text' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Text'.
+        Text(
+        ^^^^
+lib/widgets/device_list_item.dart:146:18: Error: The method 'TextStyle' isn't defined for the class 'DeviceListItem'.
+ - 'DeviceListItem' is from 'package:camera_device_manager/widgets/device_list_item.dart' ('lib/widgets/device_list_item.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'TextStyle'.
+          style: TextStyle(
+                 ^^^^^^^^^
+lib/widgets/video_controls.dart:7:9: Error: 'VideoState' isn't a type.
+  final VideoState state;
+        ^^^^^^^^^^
+lib/widgets/video_controls.dart:9:36: Error: 'Key' isn't a type.
+  const VideoControls(this.state, {Key? key}) : super(key: key);
+                                   ^^^
+lib/widgets/video_controls.dart:12:16: Error: 'BuildContext' isn't a type.
+  Widget build(BuildContext context) {
+               ^^^^^^^^^^^^
+lib/widgets/video_controls.dart:63:30: Error: Couldn't find constructor 'EdgeInsets.only'.
+              padding: const EdgeInsets.only(right: 8.0),
+                             ^^^^
+lib/widgets/video_controls.dart:66:47: Error: Undefined name 'Colors'.
+                style: const TextStyle(color: Colors.white),
+                                              ^^^^^^
+lib/widgets/video_controls.dart:66:30: Error: Couldn't find constructor 'TextStyle'.
+                style: const TextStyle(color: Colors.white),
+                             ^^^^^^^^^
+lib/widgets/video_controls.dart:84:17: Error: Undefined name 'Icons'.
+                Icons.fullscreen,
+                ^^^^^
+lib/widgets/video_controls.dart:85:24: Error: Undefined name 'Colors'.
+                color: Colors.white,
+                       ^^^^^^
+lib/widgets/video_controls.dart:83:27: Error: Couldn't find constructor 'Icon'.
+              icon: const Icon(
+                          ^^^^
+lib/widgets/video_controls.dart:13:12: Error: The method 'Align' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Align'.
+    return Align(
+           ^^^^^
+lib/widgets/video_controls.dart:14:18: Error: The getter 'Alignment' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Alignment'.
+      alignment: Alignment.bottomCenter,
+                 ^^^^^^^^^
+lib/widgets/video_controls.dart:15:14: Error: The method 'Container' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Container'.
+      child: Container(
+             ^^^^^^^^^
+lib/widgets/video_controls.dart:17:21: Error: The method 'BoxDecoration' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'BoxDecoration'.
+        decoration: BoxDecoration(
+                    ^^^^^^^^^^^^^
+lib/widgets/video_controls.dart:18:21: Error: The method 'LinearGradient' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'LinearGradient'.
+          gradient: LinearGradient(
+                    ^^^^^^^^^^^^^^
+lib/widgets/video_controls.dart:19:20: Error: The getter 'Alignment' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Alignment'.
+            begin: Alignment.topCenter,
+                   ^^^^^^^^^
+lib/widgets/video_controls.dart:20:18: Error: The getter 'Alignment' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Alignment'.
+            end: Alignment.bottomCenter,
+                 ^^^^^^^^^
+lib/widgets/video_controls.dart:22:15: Error: The getter 'Colors' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Colors'.
+              Colors.transparent,
+              ^^^^^^
+lib/widgets/video_controls.dart:23:15: Error: The getter 'Colors' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Colors'.
+              Colors.black.withOpacity(0.7),
+              ^^^^^^
+lib/widgets/video_controls.dart:27:16: Error: The method 'Row' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Row'.
+        child: Row(
+               ^^^
+lib/widgets/video_controls.dart:30:13: Error: The method 'IconButton' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'IconButton'.
+            IconButton(
+            ^^^^^^^^^^
+lib/widgets/video_controls.dart:31:21: Error: The method 'Icon' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Icon'.
+              icon: Icon(
+                    ^^^^
+lib/widgets/video_controls.dart:32:33: Error: The getter 'Icons' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Icons'.
+                state.playing ? Icons.pause : Icons.play_arrow,
+                                ^^^^^
+lib/widgets/video_controls.dart:32:47: Error: The getter 'Icons' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Icons'.
+                state.playing ? Icons.pause : Icons.play_arrow,
+                                              ^^^^^
+lib/widgets/video_controls.dart:33:24: Error: The getter 'Colors' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Colors'.
+                color: Colors.white,
+                       ^^^^^^
+lib/widgets/video_controls.dart:45:13: Error: The method 'Expanded' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Expanded'.
+            Expanded(
+            ^^^^^^^^
+lib/widgets/video_controls.dart:46:22: Error: The method 'Slider' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Slider'.
+              child: Slider(
+                     ^^^^^^
+lib/widgets/video_controls.dart:57:32: Error: The getter 'Colors' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Colors'.
+                inactiveColor: Colors.grey.shade600,
+                               ^^^^^^
+lib/widgets/video_controls.dart:62:13: Error: The method 'Padding' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Padding'.
+            Padding(
+            ^^^^^^^
+lib/widgets/video_controls.dart:64:22: Error: The method 'Text' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Text'.
+              child: Text(
+                     ^^^^
+lib/widgets/video_controls.dart:71:13: Error: The method 'IconButton' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'IconButton'.
+            IconButton(
+            ^^^^^^^^^^
+lib/widgets/video_controls.dart:72:21: Error: The method 'Icon' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Icon'.
+              icon: Icon(
+                    ^^^^
+lib/widgets/video_controls.dart:73:36: Error: The getter 'Icons' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Icons'.
+                state.volume > 0 ? Icons.volume_up : Icons.volume_off,
+                                   ^^^^^
+lib/widgets/video_controls.dart:73:54: Error: The getter 'Icons' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Icons'.
+                state.volume > 0 ? Icons.volume_up : Icons.volume_off,
+                                                     ^^^^^
+lib/widgets/video_controls.dart:74:24: Error: The getter 'Colors' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Colors'.
+                color: Colors.white,
+                       ^^^^^^
+lib/widgets/video_controls.dart:82:13: Error: The method 'IconButton' isn't defined for the class 'VideoControls'.
+ - 'VideoControls' is from 'package:camera_device_manager/widgets/video_controls.dart' ('lib/widgets/video_controls.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'IconButton'.
+            IconButton(
+            ^^^^^^^^^^
+lib/services/websocket_service.dart:11:3: Error: 'WebSocketChannel' isn't a type.
+  WebSocketChannel? _channel;
+  ^^^^^^^^^^^^^^^^
+lib/services/websocket_service.dart:48:7: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+      debugPrint('Already connected to WebSocket server');
+      ^^^^^^^^^^
+lib/services/websocket_service.dart:62:18: Error: The getter 'IOWebSocketChannel' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'IOWebSocketChannel'.
+      _channel = IOWebSocketChannel.connect(uri);
+                 ^^^^^^^^^^^^^^^^^^
+lib/services/websocket_service.dart:81:7: Error: The method 'notifyListeners' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'notifyListeners'.
+      notifyListeners();
+      ^^^^^^^^^^^^^^^
+lib/services/websocket_service.dart:83:7: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+      debugPrint('Connected to WebSocket server: ${uri.toString()}');
+      ^^^^^^^^^^
+lib/services/websocket_service.dart:86:7: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+      debugPrint('WebSocket connection failed: $e');
+      ^^^^^^^^^^
+lib/services/websocket_service.dart:88:7: Error: The method 'notifyListeners' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'notifyListeners'.
+      notifyListeners();
+      ^^^^^^^^^^^^^^^
+lib/services/websocket_service.dart:112:9: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+        debugPrint('No messages received in ${lastMessageDuration.inSeconds} seconds. Resetting connection.');
+        ^^^^^^^^^^
+lib/services/websocket_service.dart:120:9: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+        debugPrint('Heartbeat sent: PING');
+        ^^^^^^^^^^
+lib/services/websocket_service.dart:136:7: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+      debugPrint('Sent login message: $loginMessage');
+      ^^^^^^^^^^
+lib/services/websocket_service.dart:187:13: Error: The method 'notifyListeners' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'notifyListeners'.
+            notifyListeners();
+            ^^^^^^^^^^^^^^^
+lib/services/websocket_service.dart:201:17: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+                debugPrint('📦 Device message: ${jsonMessage['data']} = ${jsonMessage['val']}');
+                ^^^^^^^^^^
+lib/services/websocket_service.dart:207:15: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+              debugPrint('👤 Successfully logged in: ${jsonMessage['username']}');
+              ^^^^^^^^^^
+lib/services/websocket_service.dart:219:9: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+        debugPrint('Message is not valid JSON: $e');
+        ^^^^^^^^^^
+lib/services/websocket_service.dart:223:11: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+          debugPrint('Heartbeat response received: PONG');
+          ^^^^^^^^^^
+lib/services/websocket_service.dart:228:7: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+      debugPrint('Error handling message: $e');
+      ^^^^^^^^^^
+lib/services/websocket_service.dart:242:7: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+      debugPrint(logMessage);
+      ^^^^^^^^^^
+lib/services/websocket_service.dart:248:5: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+    debugPrint('WebSocket error: $error');
+    ^^^^^^^^^^
+lib/services/websocket_service.dart:255:5: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+    debugPrint('WebSocket connection closed');
+    ^^^^^^^^^^
+lib/services/websocket_service.dart:264:7: Error: The method 'notifyListeners' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'notifyListeners'.
+      notifyListeners();
+      ^^^^^^^^^^^^^^^
+lib/services/websocket_service.dart:286:5: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+    debugPrint('Scheduling reconnect attempt ${_reconnectAttempts}/$maxReconnectAttempts in $reconnectDelay seconds...');
+    ^^^^^^^^^^
+lib/services/websocket_service.dart:291:9: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+        debugPrint('Attempting to reconnect...');
+        ^^^^^^^^^^
+lib/services/websocket_service.dart:306:7: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+      debugPrint('Sent message: $message');
+      ^^^^^^^^^^
+lib/services/websocket_service.dart:308:7: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+      debugPrint('Cannot send message, not connected to WebSocket server');
+      ^^^^^^^^^^
+lib/services/websocket_service.dart:326:7: Error: The method 'notifyListeners' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'notifyListeners'.
+      notifyListeners();
+      ^^^^^^^^^^^^^^^
+lib/services/websocket_service.dart:330:5: Error: The method 'debugPrint' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'debugPrint'.
+    debugPrint('Disconnected from WebSocket server');
+    ^^^^^^^^^^
+lib/services/websocket_service.dart:346:5: Error: The method 'notifyListeners' isn't defined for the class 'WebSocketService'.
+ - 'WebSocketService' is from 'package:camera_device_manager/services/websocket_service.dart' ('lib/services/websocket_service.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'notifyListeners'.
+    notifyListeners();
+    ^^^^^^^^^^^^^^^
+lib/services/websocket_service.dart:352:11: Error: Superclass has no method named 'dispose'.
+    super.dispose();
+          ^^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **
+
+Building macOS application...                                           
+Error: Build process failed
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % 
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % 
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % 
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % 
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % 
