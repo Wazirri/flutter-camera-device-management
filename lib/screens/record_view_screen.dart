@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
 import '../providers/camera_devices_provider.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
@@ -31,10 +33,20 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
   List<String> _availableRecordings = [];
   String? _selectedRecording;
   
+  // Calendar related variables
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+  final kFirstDay = DateTime(DateTime.now().year - 1, 1, 1);
+  final kLastDay = DateTime(DateTime.now().year + 1, 12, 31);
+  
+  // Map to store recordings by date for the calendar (sample data for demonstration)
+  final Map<DateTime, List<String>> _recordingsByDate = {};
+  
   @override
   void initState() {
     super.initState();
     _initializePlayer();
+    _initializeSampleData(); // This would be replaced with actual data from your backend
   }
   
   void _initializePlayer() {
@@ -65,7 +77,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
     });
     
     _player.stream.error.listen((error) {
-      debugPrint('Player error: $error');
+      print('Player error: $error');
       if (mounted) {
         setState(() {
           _hasError = true;
@@ -76,6 +88,28 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
     
     // Load the camera if available
     _fetchRecordings();
+  }
+  
+  // Initialize sample recording data for demonstration
+  void _initializeSampleData() {
+    final now = DateTime.now();
+    
+    // Create recordings for the past week
+    for (int i = 0; i < 7; i++) {
+      final date = DateTime(now.year, now.month, now.day - i);
+      final day = DateFormat('yyyy-MM-dd').format(date);
+      
+      // Each day has 2-3 recordings
+      _recordingsByDate[date] = [
+        'Morning Recording - $day (8:00 AM)',
+        'Afternoon Recording - $day (2:30 PM)',
+        if (i % 2 == 0) 'Evening Recording - $day (7:15 PM)',
+      ];
+    }
+    
+    // Set selected day to today
+    _selectedDay = now;
+    _updateRecordingsForSelectedDay();
   }
   
   @override
@@ -95,8 +129,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
     });
   }
   
-  // This would typically fetch recordings from a backend
-  // For demo, we'll create some sample recordings
+  // This would typically fetch recordings from a backend based on selected date
   void _fetchRecordings() {
     if (_camera == null) {
       setState(() {
@@ -105,20 +138,36 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
       return;
     }
     
-    // In a real app, you'd fetch this from your backend
-    // For demo, we'll simulate recordings
+    _updateRecordingsForSelectedDay();
+  }
+  
+  // Update available recordings based on the selected day
+  void _updateRecordingsForSelectedDay() {
+    if (_selectedDay == null || _camera == null) {
+      setState(() {
+        _availableRecordings = [];
+        _selectedRecording = null;
+      });
+      return;
+    }
+    
+    // Find recordings for the selected day
+    final recordings = _recordingsByDate[DateTime(
+      _selectedDay!.year,
+      _selectedDay!.month,
+      _selectedDay!.day,
+    )] ?? [];
+    
     setState(() {
-      _availableRecordings = [
-        '${_camera!.name} - Yesterday (10:00 AM)',
-        '${_camera!.name} - Yesterday (2:30 PM)',
-        '${_camera!.name} - Today (8:15 AM)',
-      ];
+      _availableRecordings = recordings;
       
       // Auto-select first recording if available
-      if (_availableRecordings.isNotEmpty && _selectedRecording == null) {
+      if (_availableRecordings.isNotEmpty) {
         _selectedRecording = _availableRecordings[0];
-        // In a real app, this URL would come from your backend
+        // In a real app, this URL would come from your backend based on the recording
         _loadRecording(_camera!.recordUri);
+      } else {
+        _selectedRecording = null;
       }
     });
   }
@@ -180,6 +229,16 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
     });
   }
   
+  // Function to determine if a specific day has recordings
+  List<String> _getRecordingsForDay(DateTime day) {
+    return _recordingsByDate[DateTime(day.year, day.month, day.day)] ?? [];
+  }
+  
+  // Calculate the marker counts for the calendar
+  bool _hasRecordings(DateTime day) {
+    return _getRecordingsForDay(day).isNotEmpty;
+  }
+  
   @override
   void dispose() {
     _player.dispose();
@@ -188,99 +247,204 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = ResponsiveHelper.isDesktop(context);
+    
+    if (_isFullScreen) {
+      return Scaffold(
+        body: _buildPlayer(),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.fullscreen_exit),
+          onPressed: _toggleFullScreen,
+        ),
+      );
+    }
+    
     return Scaffold(
-      appBar: _isFullScreen 
-        ? null 
-        : AppBar(
-          title: Text(_camera != null 
-            ? 'Recordings: ${_camera!.name}' 
-            : 'Recordings'
+      appBar: AppBar(
+        title: Text(_camera != null 
+          ? 'Recordings: ${_camera!.name}' 
+          : 'Recordings'
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.fullscreen),
+            onPressed: _toggleFullScreen,
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.fullscreen),
-              onPressed: _toggleFullScreen,
+        ],
+      ),
+      body: SafeArea(
+        child: Row(
+          children: [
+            // Left side panel with camera list
+            if (_availableCameras.length > 1)
+              Container(
+                width: isDesktop ? 250 : 180,
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Theme.of(context).dividerColor,
+                      width: 1,
+                    ),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Text(
+                        'Camera Devices',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _availableCameras.length,
+                        itemBuilder: (context, index) {
+                          final camera = _availableCameras[index];
+                          final isSelected = index == _selectedCameraIndex;
+                          
+                          return ListTile(
+                            title: Text(
+                              camera.name,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            selected: isSelected,
+                            leading: Icon(
+                              Icons.videocam,
+                              color: isSelected ? AppTheme.primaryOrange : null,
+                            ),
+                            selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                            onTap: () => _selectCamera(index),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            
+            // Right side with calendar, recordings list, and player
+            Expanded(
+              child: Column(
+                children: [
+                  // Calendar section
+                  Card(
+                    margin: const EdgeInsets.all(8.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TableCalendar(
+                        firstDay: kFirstDay,
+                        lastDay: kLastDay,
+                        focusedDay: _focusedDay,
+                        calendarFormat: CalendarFormat.month,
+                        selectedDayPredicate: (day) {
+                          return isSameDay(_selectedDay, day);
+                        },
+                        onDaySelected: (selectedDay, focusedDay) {
+                          setState(() {
+                            _selectedDay = selectedDay;
+                            _focusedDay = focusedDay; // update focused day
+                          });
+                          _updateRecordingsForSelectedDay();
+                        },
+                        onPageChanged: (focusedDay) {
+                          _focusedDay = focusedDay;
+                        },
+                        eventLoader: _getRecordingsForDay,
+                        calendarStyle: CalendarStyle(
+                          // Customize the appearance based on app theme
+                          todayDecoration: BoxDecoration(
+                            color: AppTheme.primaryBlue.withOpacity(0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          selectedDecoration: const BoxDecoration(
+                            color: AppTheme.primaryOrange,
+                            shape: BoxShape.circle,
+                          ),
+                          markerDecoration: const BoxDecoration(
+                            color: AppTheme.primaryOrange,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        calendarBuilders: CalendarBuilders(
+                          markerBuilder: (context, date, events) {
+                            if (events.isNotEmpty) {
+                              return Positioned(
+                                right: 1,
+                                bottom: 1,
+                                child: Container(
+                                  padding: const EdgeInsets.all(2.0),
+                                  decoration: const BoxDecoration(
+                                    color: AppTheme.primaryOrange,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    events.length.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10.0,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  // Recordings list for selected day
+                  if (_availableRecordings.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Text(
+                                'Recordings for ${DateFormat('MMMM d, yyyy').format(_selectedDay!)}',
+                                style: Theme.of(context).textTheme.titleSmall,
+                              ),
+                            ),
+                            const Divider(height: 1),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: _availableRecordings.length,
+                              itemBuilder: (context, index) {
+                                final recording = _availableRecordings[index];
+                                final isSelected = recording == _selectedRecording;
+                                
+                                return ListTile(
+                                  title: Text(recording),
+                                  leading: const Icon(Icons.video_library),
+                                  selected: isSelected,
+                                  selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                  onTap: () => _selectRecording(recording),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  
+                  // Player section
+                  Expanded(
+                    child: _buildPlayer(),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-      body: SafeArea(
-        child: _isFullScreen
-          ? _buildPlayer()
-          : Column(
-            children: [
-              // Camera selector
-              if (_availableCameras.length > 1)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    height: 60,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _availableCameras.length,
-                      itemBuilder: (context, index) {
-                        final camera = _availableCameras[index];
-                        final isSelected = index == _selectedCameraIndex;
-                        
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          child: ChoiceChip(
-                            label: Text(camera.name),
-                            selected: isSelected,
-                            onSelected: (selected) {
-                              if (selected) {
-                                _selectCamera(index);
-                              }
-                            },
-                            backgroundColor: Theme.of(context).cardColor,
-                            selectedColor: AppTheme.primaryOrange.withOpacity(0.2),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-  
-              // Recording selector
-              if (_availableRecordings.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Select Recording',
-                      border: OutlineInputBorder(),
-                    ),
-                    value: _selectedRecording,
-                    items: _availableRecordings.map((recording) {
-                      return DropdownMenuItem<String>(
-                        value: recording,
-                        child: Text(recording),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        _selectRecording(value);
-                      }
-                    },
-                  ),
-                ),
-  
-              // Player section
-              Expanded(
-                child: _buildPlayer(),
-              ),
-              
-              // Camera details at the bottom
-              if (_camera != null)
-                _buildCameraDetails(),
-            ],
-          ),
       ),
-      floatingActionButton: _isFullScreen 
-        ? FloatingActionButton(
-            child: const Icon(Icons.fullscreen_exit),
-            onPressed: _toggleFullScreen,
-          )
-        : null,
     );
   }
   
@@ -304,7 +468,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
             const SizedBox(height: 16),
             Text(
               _availableRecordings.isEmpty
-                ? 'No recordings available'
+                ? 'No recordings available for this date'
                 : 'Select a recording to play',
               style: Theme.of(context).textTheme.titleLarge,
             ),
@@ -365,81 +529,6 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
         if (_isBuffering && !_isPlaying)
           const CircularProgressIndicator(),
       ],
-    );
-  }
-  
-  Widget _buildCameraDetails() {
-    if (_camera == null) return const SizedBox.shrink();
-    
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      color: Theme.of(context).cardColor,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Camera name and status
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _camera!.name,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        _camera!.recording ? Icons.fiber_manual_record : Icons.stop,
-                        size: 16,
-                        color: _camera!.recording ? Colors.red : Colors.grey,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _camera!.recording ? 'Recording' : 'Not Recording',
-                        style: TextStyle(
-                          color: _camera!.recording ? Colors.red : Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              
-              // Resolution info
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'Recording: ${_camera!.recordWidth}x${_camera!.recordHeight}',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  if (_camera!.recordPath.isNotEmpty)
-                    Text(
-                      'Path: ${_camera!.recordPath}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                ],
-              ),
-            ],
-          ),
-          
-          // Selected recording
-          if (_selectedRecording != null) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.video_file, size: 16),
-                const SizedBox(width: 4),
-                Text('Current: $_selectedRecording'),
-              ],
-            ),
-          ],
-        ],
-      ),
     );
   }
 }
