@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import "package:media_kit_video/media_kit_video_controls.dart";
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
@@ -509,7 +510,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
               borderRadius: BorderRadius.circular(8),
               child: Video(
                 controller: _videoController!,
-                controls: true,
+                controls: (state) => VideoControls(state),
               ),
             ),
           ),

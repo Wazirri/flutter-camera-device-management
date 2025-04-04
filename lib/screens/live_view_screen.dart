@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import "package:media_kit_video/media_kit_video_controls.dart";
 import '../providers/camera_devices_provider.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
@@ -380,7 +381,7 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
           child: Center(
             child: Video(
               controller: _videoControllers[camera.name]!,
-              controls: true,
+              controls: (state) => VideoControls(state),
             ),
           ),
         ),
