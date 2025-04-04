@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
+import '../providers/camera_devices_provider.dart';
+import '../models/camera_device.dart';
 
 class RecordViewScreen extends StatefulWidget {
   const RecordViewScreen({Key? key}) : super(key: key);
@@ -12,11 +17,66 @@ class RecordViewScreen extends StatefulWidget {
 
 class _RecordViewScreenState extends State<RecordViewScreen> {
   final _dateController = TextEditingController(text: '2025-04-01');
-  int _selectedRecordingIndex = 0;
+  String _selectedCameraName = '';
+  
+  // Map to store MediaKit players for recordings
+  Player? _recordingPlayer;
+  VideoController? _videoController;
+  bool _playerInitialized = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    
+    // Initialize player for the selected camera
+    _recordingPlayer = Player();
+    _videoController = VideoController(_recordingPlayer!);
+    
+    // Set up the player after the build is complete
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeSelectedCamera();
+    });
+  }
+  
+  void _initializeSelectedCamera() {
+    final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    final selectedCamera = cameraDevicesProvider.selectedCamera;
+    
+    if (selectedCamera != null) {
+      _selectedCameraName = selectedCamera.name;
+      
+      // Try to load a recording if available (using the record URI which would normally
+      // be a past recording, but for demo purposes we're using it as-is)
+      if (selectedCamera.recordUri.isNotEmpty) {
+        _initializePlayer(selectedCamera.recordUri);
+      }
+    }
+  }
+  
+  Future<void> _initializePlayer(String streamUrl) async {
+    if (streamUrl.isEmpty) {
+      debugPrint('No record stream URL available for this camera');
+      return;
+    }
+    
+    try {
+      debugPrint('Initializing recording player with URL: $streamUrl');
+      await _recordingPlayer!.open(Media(streamUrl));
+      
+      if (mounted) {
+        setState(() {
+          _playerInitialized = true;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error initializing recording player: $e');
+    }
+  }
   
   @override
   void dispose() {
     _dateController.dispose();
+    _recordingPlayer?.dispose();
     super.dispose();
   }
 
@@ -51,7 +111,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
                   children: [
                     _buildCalendar(),
                     Expanded(
-                      child: _buildRecordingsList(),
+                      child: _buildCamerasList(),
                     ),
                   ],
                 ),
@@ -242,60 +302,82 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
     );
   }
 
-  Widget _buildRecordingsList() {
-    return ListView.builder(
-      itemCount: 8,
-      itemBuilder: (context, index) {
-        final hour = 8 + index;
-        final formattedHour = hour.toString().padLeft(2, '0');
-        final hasRecording = [8, 10, 14].contains(hour);
+  Widget _buildCamerasList() {
+    return Consumer<CameraDevicesProvider>(
+      builder: (context, provider, child) {
+        // Get all cameras from all devices
+        final allCameras = provider.allCameras;
         
-        if (hasRecording) {
-          return _buildRecordingItem(
-            index: index,
-            time: '$formattedHour:00 - $formattedHour:30',
-            cameraName: 'Camera ${index + 1}',
-            eventType: index % 2 == 0 ? 'Motion Detected' : 'Scheduled',
-            isSelected: _selectedRecordingIndex == index,
-          );
-        } else {
-          return ListTile(
-            title: Text(
-              '$formattedHour:00',
-              style: TextStyle(
-                color: AppTheme.darkTextSecondary,
-                fontSize: 14,
-              ),
-            ),
-            subtitle: const Text(
-              'No recordings',
-              style: TextStyle(
-                color: AppTheme.darkTextSecondary,
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
-              ),
+        if (allCameras.isEmpty) {
+          return const Center(
+            child: Text(
+              'No cameras available.\nMake sure you are connected to the server.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
             ),
           );
         }
+        
+        // Filter for cameras that have recording capabilities (have recordUri)
+        final recordingCameras = allCameras
+            .where((camera) => camera.recordUri.isNotEmpty || camera.recording)
+            .toList();
+        
+        if (recordingCameras.isEmpty) {
+          return const Center(
+            child: Text(
+              'No cameras with recordings found.\nCheck that cameras are properly configured.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
+            ),
+          );
+        }
+        
+        return ListView.builder(
+          itemCount: recordingCameras.length,
+          itemBuilder: (context, index) {
+            final camera = recordingCameras[index];
+            final isSelected = camera.name == _selectedCameraName;
+            
+            return _buildCameraRecordingItem(
+              camera: camera,
+              isSelected: isSelected,
+              onTap: () {
+                setState(() {
+                  _selectedCameraName = camera.name;
+                });
+                
+                // Find the device this camera belongs to
+                for (var device in provider.devicesList) {
+                  final cameraIndex = device.cameras.indexWhere((c) => c.name == camera.name);
+                  if (cameraIndex >= 0) {
+                    provider.setSelectedDevice(device.macKey);
+                    provider.setSelectedCameraIndex(cameraIndex);
+                    
+                    // Initialize player with this camera's recording
+                    if (camera.recordUri.isNotEmpty) {
+                      _initializePlayer(camera.recordUri);
+                    }
+                    break;
+                  }
+                }
+              },
+            );
+          },
+        );
       },
     );
   }
 
-  Widget _buildRecordingItem({
-    required int index,
-    required String time,
-    required String cameraName,
-    required String eventType,
+  Widget _buildCameraRecordingItem({
+    required Camera camera,
     required bool isSelected,
+    required VoidCallback onTap,
   }) {
     return ListTile(
       selected: isSelected,
       selectedTileColor: AppTheme.primaryBlue.withOpacity(0.15),
-      onTap: () {
-        setState(() {
-          _selectedRecordingIndex = index;
-        });
-      },
+      onTap: onTap,
       leading: Container(
         width: 40,
         height: 40,
@@ -306,13 +388,13 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
         child: Center(
           child: Icon(
             Icons.videocam,
-            color: AppTheme.primaryBlue,
+            color: isSelected ? AppTheme.primaryBlue : AppTheme.primaryOrange,
             size: 20,
           ),
         ),
       ),
       title: Text(
-        cameraName,
+        camera.name,
         style: TextStyle(
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           color: isSelected ? AppTheme.primaryBlue : AppTheme.darkTextPrimary,
@@ -321,20 +403,20 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            time,
-            style: TextStyle(
-              fontSize: 12,
-              color: AppTheme.darkTextSecondary,
+          if (camera.manufacturer.isNotEmpty || camera.hw.isNotEmpty)
+            Text(
+              '${camera.manufacturer} ${camera.hw}',
+              style: TextStyle(
+                fontSize: 12,
+                color: AppTheme.darkTextSecondary,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
           Text(
-            eventType,
+            camera.recording ? 'Currently Recording' : 'Has Recordings',
             style: TextStyle(
               fontSize: 12,
-              color: eventType == 'Motion Detected'
-                  ? AppTheme.warning
-                  : AppTheme.darkTextSecondary,
+              color: camera.recording ? Colors.red : AppTheme.darkTextSecondary,
             ),
           ),
         ],
@@ -348,6 +430,71 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
   }
 
   Widget _buildRecordingView() {
+    // Check if we have a selected camera
+    final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    final selectedCamera = cameraProvider.selectedCamera;
+    
+    if (selectedCamera == null) {
+      return const Center(
+        child: Text(
+          'No camera selected',
+          style: TextStyle(fontSize: 16),
+        ),
+      );
+    }
+    
+    // Check if player is initialized
+    if (!_playerInitialized || selectedCamera.recordUri.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.videocam,
+                size: 64,
+                color: AppTheme.primaryOrange,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No Recording Available',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: AppTheme.darkTextPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                selectedCamera.name,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppTheme.darkTextSecondary,
+                ),
+              ),
+              if (selectedCamera.recordUri.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'This camera does not have a recording URI configured',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.red[300],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      );
+    }
+    
+    // Show the video player
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -356,37 +503,18 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
       ),
       child: Stack(
         children: [
-          // Placeholder for the recording view
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.videocam,
-                  size: 64,
-                  color: AppTheme.primaryOrange,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Recording Playback',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppTheme.darkTextPrimary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Camera ${_selectedRecordingIndex + 1} - April 1, 2025',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppTheme.darkTextSecondary,
-                  ),
-                ),
-              ],
+          // Video
+          Positioned.fill(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Video(
+                controller: _videoController!,
+                controls: true,
+              ),
             ),
           ),
           
-          // Recording info overlay
+          // Camera info overlay
           Positioned(
             top: 16,
             left: 16,
@@ -404,9 +532,9 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
                     color: AppTheme.error,
                   ),
                   const SizedBox(width: 8),
-                  const Text(
-                    'Recording',
-                    style: TextStyle(
+                  Text(
+                    selectedCamera.name,
+                    style: const TextStyle(
                       fontSize: 12,
                       color: Colors.white,
                     ),
@@ -416,7 +544,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
             ),
           ),
           
-          // Timestamp overlay
+          // Recording details overlay
           Positioned(
             bottom: 16,
             right: 16,
@@ -426,9 +554,9 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
                 color: Colors.black.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Text(
-                '2025-04-01 08:15:22',
-                style: TextStyle(
+              child: Text(
+                '${_dateController.text} (${selectedCamera.recordWidth}x${selectedCamera.recordHeight})',
+                style: const TextStyle(
                   fontSize: 12,
                   color: Colors.white,
                 ),
@@ -489,7 +617,10 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
                     backgroundColor: AppTheme.primaryBlue,
                     foregroundColor: Colors.white,
                     onPressed: () {
-                      // UI only
+                      // Pause/play the recording player
+                      if (_recordingPlayer != null && _playerInitialized) {
+                        _recordingPlayer!.playOrPause();
+                      }
                     },
                     child: const Icon(Icons.pause),
                   ),

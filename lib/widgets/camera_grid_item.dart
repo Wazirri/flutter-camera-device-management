@@ -7,6 +7,7 @@ class CameraGridItem extends StatelessWidget {
   final String name;
   final String location;
   final DeviceStatus status;
+  final bool isRecording;
   final String? thumbnailUrl;
   final VoidCallback onTap;
   final VoidCallback onSettingsTap;
@@ -16,6 +17,7 @@ class CameraGridItem extends StatelessWidget {
     required this.name,
     required this.location,
     required this.status,
+    this.isRecording = false,
     this.thumbnailUrl,
     required this.onTap,
     required this.onSettingsTap,
@@ -51,6 +53,7 @@ class CameraGridItem extends StatelessWidget {
                         )
                       : _buildPlaceholder(),
                 ),
+                
                 // Status indicator
                 Positioned(
                   top: 8,
@@ -64,13 +67,53 @@ class CameraGridItem extends StatelessWidget {
                       color: AppTheme.darkSurface.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: StatusIndicator(
-                      status: status,
-                      showLabel: true,
-                      padding: EdgeInsets.zero,
+                    child: Row(
+                      children: [
+                        StatusIndicator(
+                          status: status,
+                          showLabel: true,
+                          padding: EdgeInsets.zero,
+                        ),
+                      ],
                     ),
                   ),
                 ),
+                
+                // Recording indicator
+                if (isRecording)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 4.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.fiber_manual_record,
+                            color: Colors.white,
+                            size: 12,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            'REC',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
             Padding(
@@ -124,8 +167,10 @@ class CameraGridItem extends StatelessWidget {
       child: Center(
         child: Icon(
           Icons.videocam_off,
-          size: 48,
-          color: AppTheme.darkTextSecondary,
+          size: 36,
+          color: status == DeviceStatus.offline 
+              ? Colors.red.withOpacity(0.5) 
+              : AppTheme.primaryBlue.withOpacity(0.5),
         ),
       ),
     );
