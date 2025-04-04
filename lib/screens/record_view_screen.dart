@@ -358,7 +358,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
         // Video player
         Video(
           controller: _controller,
-          controls: (player) => VideoControls(player: player),
+          controls: (_) => VideoControls(player: _player),
         ),
         
         // Buffering indicator (show when buffering and not playing yet)
