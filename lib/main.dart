@@ -138,7 +138,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             return AppPageTransitions.fade(page);
             
           case '/dashboard':
-            page = const AppShell(child: DashboardScreen());
+            page = AppShell(
+              currentRoute: settings.name ?? '/dashboard',
+              child: const DashboardScreen(),
+            );
             // Shared axis transition for dashboard (feels connected to login)
             return AppPageTransitions.sharedAxisHorizontal(page);
             
@@ -146,9 +149,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             // Check if there's a camera parameter passed
             final args = settings.arguments;
             if (args is Map && args.containsKey('camera')) {
-              page = AppShell(child: LiveViewScreen(camera: args['camera']));
+              page = AppShell(
+                currentRoute: settings.name ?? '/live-view',
+                child: LiveViewScreen(camera: args['camera']),
+              );
             } else {
-              page = const AppShell(child: LiveViewScreen());
+              page = AppShell(
+                currentRoute: settings.name ?? '/live-view',
+                child: const LiveViewScreen(),
+              );
             }
             // Zoom transition for camera views to emphasize content
             return AppPageTransitions.zoomIn(page);
@@ -156,30 +165,48 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           case '/recordings':
             final args = settings.arguments;
             if (args is Map && args.containsKey('camera')) {
-              page = AppShell(child: RecordViewScreen(camera: args['camera']));
+              page = AppShell(
+                currentRoute: settings.name ?? '/recordings',
+                child: RecordViewScreen(camera: args['camera']),
+              );
             } else {
-              page = const AppShell(child: RecordViewScreen());
+              page = AppShell(
+                currentRoute: settings.name ?? '/recordings',
+                child: const RecordViewScreen(),
+              );
             }
             // Slide up transition for recordings
             return AppPageTransitions.slideUp(page);
             
           case '/cameras':
-            page = const AppShell(child: CamerasScreen());
+            page = AppShell(
+              currentRoute: settings.name ?? '/cameras',
+              child: const CamerasScreen(),
+            );
             // Horizontal slide for navigation
             return AppPageTransitions.slideHorizontal(page);
             
           case '/devices':
-            page = const AppShell(child: DevicesScreen());
+            page = AppShell(
+              currentRoute: settings.name ?? '/devices',
+              child: const DevicesScreen(),
+            );
             // Horizontal slide for navigation
             return AppPageTransitions.slideHorizontal(page);
             
           case '/camera-devices':
-            page = const AppShell(child: CameraDevicesScreen());
+            page = AppShell(
+              currentRoute: settings.name ?? '/camera-devices',
+              child: const CameraDevicesScreen(),
+            );
             // Horizontal slide for navigation
             return AppPageTransitions.slideHorizontal(page);
             
           case '/settings':
-            page = const AppShell(child: SettingsScreen());
+            page = AppShell(
+              currentRoute: settings.name ?? '/settings',
+              child: const SettingsScreen(),
+            );
             // Scale and fade for settings to stand out
             return AppPageTransitions.scaleAndFade(page);
             
@@ -189,7 +216,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             return AppPageTransitions.slideUp(page);
             
           default:
-            page = const AppShell(child: DashboardScreen());
+            page = AppShell(
+              currentRoute: '/dashboard',
+              child: const DashboardScreen(),
+            );
             // Default transition
             return AppPageTransitions.fade(page);
         }
@@ -200,10 +230,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
 class AppShell extends StatefulWidget {
   final Widget child;
+  final String currentRoute;
 
   const AppShell({
     Key? key,
     required this.child,
+    required this.currentRoute,
   }) : super(key: key);
 
   @override
@@ -242,11 +274,6 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
     }
   }
 
-  String get _currentRoute {
-    final route = ModalRoute.of(context)?.settings.name ?? '/dashboard';
-    return route;
-  }
-
   @override
   Widget build(BuildContext context) {
     // Determine device type for responsive layout
@@ -260,7 +287,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
           ? SizedBox(
               width: 250,
               child: DesktopSideMenu(
-                currentRoute: _currentRoute,
+                currentRoute: widget.currentRoute,
                 onDestinationSelected: _navigateToRoute,
               ),
             )
@@ -271,7 +298,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
             // Desktop side menu
             if (isDesktop || isTablet)
               DesktopSideMenu(
-                currentRoute: _currentRoute,
+                currentRoute: widget.currentRoute,
                 onDestinationSelected: _navigateToRoute,
               ),
             
@@ -285,7 +312,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
       // Mobile bottom navigation
       bottomNavigationBar: isMobile
           ? MobileBottomNavigationBar(
-              currentRoute: _currentRoute,
+              currentRoute: widget.currentRoute,
               onDestinationSelected: _navigateToRoute,
             )
           : null,
@@ -294,9 +321,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
 
   void _navigateToRoute(String route) {
     try {
-      if (route != _currentRoute) {
-        // Sadece standart navigasyonu kullan, özel animasyonlar
-        // onGenerateRoute tarafından zaten uygulanıyor
+      if (route != widget.currentRoute) {
         Navigator.pushReplacementNamed(context, route);
       }
       
