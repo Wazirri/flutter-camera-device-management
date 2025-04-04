@@ -151,6 +151,8 @@ class Camera {
   int subHeight;              // Height of sub-stream resolution
   bool connected;             // Whether the camera is connected
   String disconnected;        // Disconnection info
+  String? group;              // Camera group/category
+  bool? soundRec;             // Whether sound recording is enabled
   String lastSeenAt;          // When the camera was last seen
   bool recording;             // Whether the camera is currently recording
   
@@ -181,6 +183,8 @@ class Camera {
     required this.subHeight,
     required this.connected,
     this.disconnected = '-',
+    this.group,
+    this.soundRec,
     required this.lastSeenAt,
     required this.recording,
   });
@@ -284,6 +288,8 @@ class Camera {
       subHeight: json['subHeight'] ?? 0,
       connected: json['connected'] ?? false,
       disconnected: json['disconnected'] ?? '-',
+      group: json['group'],
+      soundRec: json['soundRec'],
       lastSeenAt: json['lastSeenAt'] ?? '',
       recording: json['recording'] ?? false,
     );
