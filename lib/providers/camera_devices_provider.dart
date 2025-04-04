@@ -263,17 +263,37 @@ class CameraDevicesProvider with ChangeNotifier {
   // Helper method to update a single property on a camera
   Camera _updateCameraWithProperty(Camera camera, String propertyName, dynamic value) {
     // Handle each known property - add more as needed
+    print('🔍 Updating camera property: $propertyName = $value');
+    
     switch (propertyName) {
       case 'name':
         return camera.copyWith(name: value.toString());
+      
+      // IP address properties
       case 'ip':
+      case 'cameraIp': // Handle both property naming formats
         return camera.copyWith(ip: value.toString());
+      
+      // Raw IP address properties
       case 'rawIp':
+      case 'cameraRawIp': // Handle both property naming formats
         return camera.copyWith(rawIp: value is int ? value : int.tryParse(value.toString()) ?? 0);
+      
+      // Connection status properties
       case 'connected':
-        return camera.copyWith(connected: value is bool ? value : value.toString().toLowerCase() == 'true');
+        return camera.copyWith(connected: value is bool ? value : (value.toString().toLowerCase() == 'true' || value.toString() == '1'));
+      
+      // Authentication properties
+      case 'username':
+        return camera.copyWith(username: value.toString());
+      case 'password':
+        return camera.copyWith(password: value.toString());
+      
+      // ONVIF properties
       case 'xAddrs':
         return camera.copyWith(xAddrs: value.toString());
+      
+      // Stream URI properties
       case 'mediaUri':
         return camera.copyWith(mediaUri: value.toString());
       case 'recordUri':
@@ -282,18 +302,52 @@ class CameraDevicesProvider with ChangeNotifier {
         return camera.copyWith(subUri: value.toString());
       case 'remoteUri':
         return camera.copyWith(remoteUri: value.toString());
+      
+      // Snapshot properties
       case 'mainSnapShot':
         return camera.copyWith(mainSnapShot: value.toString());
       case 'subSnapShot':
         return camera.copyWith(subSnapShot: value.toString());
+      
+      // Camera identification properties
       case 'brand':
+      case 'model':
         return camera.copyWith(brand: value.toString());
+      case 'hw':
+        return camera.copyWith(hw: value.toString());
       case 'manufacturer':
         return camera.copyWith(manufacturer: value.toString());
+      case 'country':
+        return camera.copyWith(country: value.toString());
+      
+      // Camera status properties
       case 'recording':
-        return camera.copyWith(recording: value is bool ? value : value.toString().toLowerCase() == 'true');
+        return camera.copyWith(recording: value is bool ? value : (value.toString().toLowerCase() == 'true' || value.toString() == '1'));
+      case 'disconnected':
+        return camera.copyWith(disconnected: value.toString());
+      case 'last_seen_at':
+        return camera.copyWith(lastSeenAt: value.toString());
+      
+      // Recording properties
+      case 'recordPath':
+        return camera.copyWith(recordPath: value.toString());
+      case 'recordcodec':
+        return camera.copyWith(recordCodec: value.toString());
+      case 'recordwidth':
+        return camera.copyWith(recordWidth: value is int ? value : int.tryParse(value.toString()) ?? 0);
+      case 'recordheight':
+        return camera.copyWith(recordHeight: value is int ? value : int.tryParse(value.toString()) ?? 0);
+      
+      // Sub-stream properties
+      case 'subcodec':
+        return camera.copyWith(subCodec: value.toString());
+      case 'subwidth':
+        return camera.copyWith(subWidth: value is int ? value : int.tryParse(value.toString()) ?? 0);
+      case 'subheight':
+        return camera.copyWith(subHeight: value is int ? value : int.tryParse(value.toString()) ?? 0);
+        
       default:
-        print('⚠️ Unknown camera property: $propertyName');
+        print('⚠️ Unknown camera property: $propertyName with value: $value');
         return camera; // No change for unknown properties
     }
   }
