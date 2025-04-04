@@ -1,77 +1,131 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/status.dart' as status;
 import '../models/system_info.dart';
 
-class WebSocketService extends ChangeNotifier {
+typedef MessageHandler = void Function(Map<String, dynamic> message);
+
+class WebSocketService with ChangeNotifier {
   WebSocketChannel? _channel;
-  StreamSubscription? _subscription;
   bool _isConnected = false;
-  String _serverAddress = '';
-  String _serverPort = '';
-  String _username = '';
-  String _password = '';
   List<String> _messageLog = [];
   SystemInfo? _systemInfo;
-  static const int maxLogMessages = 2000; // Maximum number of log messages to keep
+  bool _monitorCommandSent = false;
+  MessageHandler? _onParsedMessage;
   
-  // Function to handle parsed messages - set by WebSocketProvider
-  Function(Map<String, dynamic>)? _onParsedMessage;
+  String _username = '';
+  String _password = '';
+  String _address = '';
+  String _port = '';
   
+  // Auto-reconnect properties
+  Timer? _reconnectTimer;
+  bool _shouldReconnect = false;
+  int _reconnectAttempts = 0;
+  static const int maxReconnectAttempts = 10;
+  static const int reconnectDelay = 3; // seconds
+  
+  // Heartbeat properties
+  Timer? _heartbeatTimer;
+  static const int heartbeatInterval = 30; // seconds
+  DateTime? _lastMessageTime;
+  
+  // Getters
   bool get isConnected => _isConnected;
-  List<String> get messageLog => _messageLog;
+  List<String> get messageLog => List.unmodifiable(_messageLog);
   SystemInfo? get systemInfo => _systemInfo;
   
   // Set message handler
-  void setMessageHandler(Function(Map<String, dynamic>) handler) {
+  void setMessageHandler(MessageHandler handler) {
     _onParsedMessage = handler;
-  }
-  
-  // Add message to log with size limit enforcement
-  void _addToLog(String message) {
-    _messageLog.add(message);
-    
-    // If we exceed the maximum number of messages, remove oldest ones
-    if (_messageLog.length > maxLogMessages) {
-      _messageLog = _messageLog.sublist(_messageLog.length - maxLogMessages);
-    }
-    
-    notifyListeners();
   }
   
   // Connect to WebSocket server
   Future<bool> connect(String address, String port, String username, String password) async {
-    _serverAddress = address;
-    _serverPort = port;
-    _username = username;
-    _password = password;
+    if (_isConnected) {
+      debugPrint('Already connected to WebSocket server');
+      return true;
+    }
     
     try {
+      // Store connection parameters for possible reconnection
+      _address = address;
+      _port = port;
+      _username = username;
+      _password = password;
+      _shouldReconnect = true;
+      
+      // Attempt to connect
       final uri = Uri.parse('ws://$address:$port');
       _channel = IOWebSocketChannel.connect(uri);
       
-      _subscription = _channel!.stream.listen(
+      // Add to message log
+      final timestamp = DateTime.now().toString();
+      _addToLog('[$timestamp] Connecting to WebSocket server: ${uri.toString()}');
+      
+      // Listen for messages
+      _channel!.stream.listen(
         _onMessage,
         onError: _onError,
         onDone: _onDone,
+        cancelOnError: false
       );
       
-      // Send the login message
-      sendLoginMessage(username, password);
-      
+      // Set connection status and notify listeners
       _isConnected = true;
+      _lastMessageTime = DateTime.now();
+      _reconnectAttempts = 0;
+      _startHeartbeat();
       notifyListeners();
-      debugPrint('WebSocket connected to $uri');
+      
+      debugPrint('Connected to WebSocket server: ${uri.toString()}');
       return true;
     } catch (e) {
       debugPrint('WebSocket connection failed: $e');
       _isConnected = false;
       notifyListeners();
+      _scheduleReconnect();
       return false;
     }
+  }
+  
+  // Start heartbeat to monitor connection health
+  void _startHeartbeat() {
+    _stopHeartbeat(); // Stop existing timer if any
+    
+    _heartbeatTimer = Timer.periodic(Duration(seconds: heartbeatInterval), (timer) {
+      if (!_isConnected) {
+        _stopHeartbeat();
+        return;
+      }
+      
+      // Check when we last received a message
+      final now = DateTime.now();
+      final lastMessageDuration = _lastMessageTime != null 
+        ? now.difference(_lastMessageTime!) 
+        : Duration(seconds: heartbeatInterval * 2);
+      
+      // If it's been too long since a message was received, consider the connection dead
+      if (lastMessageDuration.inSeconds > heartbeatInterval * 2) {
+        debugPrint('No messages received in ${lastMessageDuration.inSeconds} seconds. Resetting connection.');
+        _resetConnection();
+        return;
+      }
+      
+      // Send a heartbeat message if connected
+      if (_channel != null && _isConnected) {
+        _channel!.sink.add('PING');
+        debugPrint('Heartbeat sent: PING');
+      }
+    });
+  }
+  
+  // Stop heartbeat timer
+  void _stopHeartbeat() {
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
   }
   
   // Send login message
@@ -87,17 +141,19 @@ class WebSocketService extends ChangeNotifier {
     }
   }
   
-  // Track if a monitor command has been sent
-  bool _monitorCommandSent = false;
-  
   // Handle received message
   void _onMessage(dynamic message) {
     try {
+      // Update last message time
+      _lastMessageTime = DateTime.now();
+      
       // Log the raw message first
       final timestamp = DateTime.now().toString();
       final rawLogMessage = '[$timestamp] Received: $message';
       _addToLog(rawLogMessage);
-      debugPrint(rawLogMessage);
+      
+      // Reset reconnect attempts as we're receiving messages
+      _reconnectAttempts = 0;
       
       // Try to parse as JSON if possible
       try {
@@ -121,7 +177,6 @@ class WebSocketService extends ChangeNotifier {
           else if (jsonMessage['c'] == 'sysinfo') {
             // Parse system info
             _systemInfo = SystemInfo.fromJson(jsonMessage);
-            debugPrint('System info updated: ${jsonMessage['cpuTemp']}°C');
             
             // Send the monitor command only once after login
             if (!_monitorCommandSent) {
@@ -134,20 +189,40 @@ class WebSocketService extends ChangeNotifier {
           
           // Pass the parsed message to the handler if provided
           if (_onParsedMessage != null && jsonMessage is Map<String, dynamic>) {
-            // Only forward the message if it contains useful data
+            // For changed messages, add extra debug info
             if (jsonMessage['c'] == 'changed' && 
                 jsonMessage.containsKey('data') && 
                 jsonMessage.containsKey('val')) {
-              _onParsedMessage!(jsonMessage);
-            } else if (jsonMessage['c'] == 'loginok') {
+              
+              final String dataPath = jsonMessage['data'].toString();
+              
+              // Add detailed debug info for camera device messages
+              if (dataPath.startsWith('ecs.slaves.m_')) {
+                debugPrint('📦 Device message: ${jsonMessage['data']} = ${jsonMessage['val']}');
+                _onParsedMessage!(jsonMessage);
+              }
+            } 
+            // Handle login success
+            else if (jsonMessage['c'] == 'loginok') {
               debugPrint('👤 Successfully logged in: ${jsonMessage['username']}');
+              _onParsedMessage!(jsonMessage);
+            }
+            // Handle any other message type
+            else {
+              _onParsedMessage!(jsonMessage);
             }
           }
         }
         
       } catch (e) {
         // Not valid JSON, that's okay, we already logged the raw message
-        debugPrint('Error parsing JSON: $e');
+        debugPrint('Message is not valid JSON: $e');
+        
+        // Check for PONG response to our PING
+        if (message.toString() == 'PONG') {
+          debugPrint('Heartbeat response received: PONG');
+          return;
+        }
       }
     } catch (e) {
       debugPrint('Error handling message: $e');
@@ -172,71 +247,108 @@ class WebSocketService extends ChangeNotifier {
   void _onError(dynamic error) {
     debugPrint('WebSocket error: $error');
     _addToLog('[${DateTime.now()}] Error: $error');
+    _resetConnection();
   }
   
   // Handle WebSocket closure
   void _onDone() {
     debugPrint('WebSocket connection closed');
     _addToLog('[${DateTime.now()}] Connection closed');
-    _isConnected = false;
-    notifyListeners();
-    
-    // Attempt reconnection after a delay
-    Future.delayed(const Duration(seconds: 5), _reconnect);
+    _resetConnection();
   }
   
-  // Attempt to reconnect
-  Future<void> _reconnect() async {
-    if (!_isConnected && _serverAddress.isNotEmpty && _serverPort.isNotEmpty) {
-      debugPrint('Attempting to reconnect to WebSocket...');
-      // Reset the monitor command sent flag on reconnect
-      _monitorCommandSent = false;
-      await connect(_serverAddress, _serverPort, _username, _password);
+  // Reset connection status and attempt reconnect if needed
+  void _resetConnection() {
+    if (_isConnected) {
+      _isConnected = false;
+      notifyListeners();
+    }
+    
+    // Clean up
+    _channel?.sink.close();
+    _channel = null;
+    _stopHeartbeat();
+    
+    // Schedule reconnect if needed
+    if (_shouldReconnect) {
+      _scheduleReconnect();
     }
   }
   
-  // Send a message through the WebSocket
+  // Schedule a reconnection attempt
+  void _scheduleReconnect() {
+    if (_reconnectTimer != null || _reconnectAttempts >= maxReconnectAttempts) {
+      return;
+    }
+    
+    _reconnectAttempts++;
+    
+    debugPrint('Scheduling reconnect attempt ${_reconnectAttempts}/$maxReconnectAttempts in $reconnectDelay seconds...');
+    
+    _reconnectTimer = Timer(Duration(seconds: reconnectDelay), () {
+      _reconnectTimer = null;
+      if (_shouldReconnect && !_isConnected) {
+        debugPrint('Attempting to reconnect...');
+        connect(_address, _port, _username, _password);
+      }
+    });
+  }
+  
+  // Send a message
   void sendMessage(String message) {
     if (_channel != null && _isConnected) {
       _channel!.sink.add(message);
+      
+      // Log the message
       final timestamp = DateTime.now().toString();
       _addToLog('[$timestamp] Sent: $message');
+      
       debugPrint('Sent message: $message');
     } else {
-      debugPrint('Cannot send message, WebSocket not connected');
-      // Try to reconnect
-      _reconnect();
+      debugPrint('Cannot send message, not connected to WebSocket server');
     }
   }
   
   // Disconnect WebSocket
   void disconnect() {
-    if (_subscription != null) {
-      _subscription!.cancel();
-      _subscription = null;
-    }
+    _shouldReconnect = false;
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
+    _stopHeartbeat();
     
     if (_channel != null) {
-      _channel!.sink.close(status.goingAway);
+      _channel!.sink.close();
       _channel = null;
     }
     
-    _isConnected = false;
-    _monitorCommandSent = false; // Reset flag on disconnect
-    notifyListeners();
-    debugPrint('WebSocket disconnected');
+    if (_isConnected) {
+      _isConnected = false;
+      notifyListeners();
+    }
+    
+    _addToLog('[${DateTime.now()}] Disconnected from WebSocket server');
+    debugPrint('Disconnected from WebSocket server');
   }
   
-  // Clean up resources
-  @override
-  void dispose() {
-    disconnect();
-    super.dispose();
+  // Add message to log with timestamp
+  void _addToLog(String message) {
+    _messageLog.add(message);
+    
+    // Limit log size to prevent memory issues
+    if (_messageLog.length > 1000) {
+      _messageLog.removeAt(0);
+    }
   }
   
   // Clear message log
   void clearLog() {
     _messageLog.clear();
     notifyListeners();
+  }
+  
+  @override
+  void dispose() {
+    disconnect();
+    super.dispose();
   }
 }
