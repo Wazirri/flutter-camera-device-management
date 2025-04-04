@@ -28,43 +28,47 @@ class WebSocketProvider with ChangeNotifier {
       // Add more detailed debug info for changed messages
       if (message['c'] == 'changed' && message.containsKey('data') && message.containsKey('val')) {
         final String dataPath = message['data'].toString();
+        
+        // Check if this is a camera device message
         if (dataPath.startsWith('ecs.slaves.m_')) {
-          print('✅ Forwarding device message to CameraDevicesProvider: ${message['data']} = ${message['val']}');
-          _cameraDevicesProvider!.processWebSocketMessage(message);
+          debugPrint('Received camera device update: $dataPath');
+          _cameraDevicesProvider!.updateDeviceFromChangedMessage(message);
         }
-      } 
-      // Process all other messages as well
-      else {
-        _cameraDevicesProvider!.processWebSocketMessage(message);
       }
-    } else {
-      print('❌ ERROR: CameraDevicesProvider is null, cannot process message: ${json.encode(message)}');
     }
   }
   
   // Connect to WebSocket server
-  Future<bool> connect(String address, String port, String username, String password) async {
-    return await _webSocketService.connect(address, port, username, password);
+  Future<void> connect(String host, int port) async {
+    try {
+      await _webSocketService.connect(host, port);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error connecting to WebSocket: $e');
+      rethrow;
+    }
   }
   
-  // Send a message
+  // Disconnect from WebSocket server
+  void disconnect() {
+    _webSocketService.disconnect();
+    notifyListeners();
+  }
+  
+  // Send message to WebSocket server
   void sendMessage(String message) {
     _webSocketService.sendMessage(message);
   }
   
-  // Disconnect WebSocket
-  void disconnect() {
-    _webSocketService.disconnect();
+  // Method to specifically request system monitoring data
+  void sendSystemMonitorRequest() {
+    sendMessage("DO MONITORECS");
+    debugPrint('Sent system monitor request');
   }
   
-  // Clear message log
-  void clearLog() {
-    _webSocketService.clearLog();
-  }
-  
-  @override
-  void dispose() {
-    _webSocketService.dispose();
-    super.dispose();
+  // Login to the server
+  void login(String username, String password) {
+    sendMessage('LOGIN $username $password');
+    debugPrint('Sent login request');
   }
 }
