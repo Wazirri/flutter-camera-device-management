@@ -238,6 +238,16 @@ class WebSocketService with ChangeNotifier {
       if (message.toString() == 'PONG') {
         print('[WebSocket] Received heartbeat response');
       }
+      // Check if it's a login success message
+      else if (message.toString().contains('Oturum açıldı')) {
+        print('✅ [WebSocket] Login successful, sending DO MONITORECS');
+        _isAuthenticating = false;
+        
+        // Send monitoring request after successful login
+        Future.delayed(Duration(milliseconds: 500), () {
+          sendMessage('DO MONITORECS');
+        });
+      }
       // Any other non-JSON message
       else {
         print('[WebSocket] Non-JSON message: $message');
@@ -261,22 +271,30 @@ class WebSocketService with ChangeNotifier {
       print('[WebSocket] Login message received, sending credentials for ${_username}');
       _addToLog('Login required, sending credentials');
       
+      // Format the login command with quotes around username and password
+      String loginCommand = 'LOGIN "${_username}" "${_password}"';
+      print('[WebSocket] Preparing login command: $loginCommand');
+      
       // Send login command - add a small delay to ensure server is ready
       Future.delayed(Duration(milliseconds: 500), () {
-        sendMessage('LOGIN $_username $_password');
-        print('[WebSocket] Sent LOGIN command');
+        sendMessage(loginCommand);
+        print('[WebSocket] Sent LOGIN command with properly formatted credentials');
       });
       
       _isAuthenticating = true;
     }
-    // Check for successful login
+    // Check for successful login (although this might also be handled in the non-JSON block)
     else if (message['msg'] == 'Oturum açıldı!') {
-      print('[WebSocket] Login successful');
+      print('[WebSocket] Login successful from JSON response');
       _addToLog('Login successful');
       
-      // Request system monitoring after login
-      sendMessage('DO MONITORECS');
       _isAuthenticating = false;
+      
+      // Send system monitoring after successful login
+      Future.delayed(Duration(milliseconds: 500), () {
+        sendMessage('DO MONITORECS');
+        print('[WebSocket] Sent monitoring request after successful login');
+      });
     }
     // Check for login failure
     else if (message['msg'].toString().contains('hatalı')) {
