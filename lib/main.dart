@@ -83,9 +83,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  @override
-  void initState() {
     super.initState();
     // Register observer for app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
@@ -98,8 +95,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void dispose() {
     // Remove observer when app is disposed
     WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
     super.dispose();
   }
 
