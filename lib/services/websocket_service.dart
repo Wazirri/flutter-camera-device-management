@@ -99,6 +99,19 @@ class WebSocketService with ChangeNotifier {
     }
   }
   
+  // Request camera information explicitly - use this to refresh cameras
+  void requestCameraInfo() {
+    if (_isConnected && _channel != null && !_isAuthenticating) {
+      print('[WebSocket] Explicitly requesting camera information');
+      // The DO LISTDEVS command requests all device information from the server
+      sendMessage('DO LISTDEVS');
+      // Also request camera properties
+      sendMessage('DO GETCAMS');
+    } else {
+      print('[WebSocket] Not ready to request camera information');
+    }
+  }
+  
   // Disconnect from the server
   void disconnect() {
     if (_channel != null) {
@@ -267,7 +280,14 @@ class WebSocketService with ChangeNotifier {
         
         // Send monitoring request after successful login
         Future.delayed(Duration(milliseconds: 500), () {
+          // Send DO MONITORECS to start system monitoring
           sendMessage('DO MONITORECS');
+          
+          // Also request camera information proactively
+          Future.delayed(Duration(milliseconds: 1000), () {
+            print('📷 [WebSocket] Proactively requesting camera information after login');
+            requestCameraInfo();
+          });
         });
       }
       // Any other non-JSON message
@@ -314,8 +334,15 @@ class WebSocketService with ChangeNotifier {
       
       // Send system monitoring after successful login
       Future.delayed(Duration(milliseconds: 500), () {
+        // Send DO MONITORECS to start system monitoring
         sendMessage('DO MONITORECS');
         print('[WebSocket] Sent monitoring request after successful login');
+        
+        // Also request camera information proactively
+        Future.delayed(Duration(milliseconds: 1000), () {
+          print('📷 [WebSocket] Proactively requesting camera information after login');
+          requestCameraInfo();
+        });
       });
     }
     // Check for login failure
