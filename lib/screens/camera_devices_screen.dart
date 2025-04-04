@@ -501,7 +501,7 @@ class CameraCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Model: ${camera.brand} ${camera.model}',
+                'Model: ${camera.brand} ${camera.hw}',
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
