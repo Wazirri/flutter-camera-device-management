@@ -295,32 +295,8 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   void _navigateToRoute(String route) {
     try {
       if (route != _currentRoute) {
-        // Determine appropriate transition type based on route
-        PageTransitionType transitionType;
-        
-        // Select transition type based on the destination
-        if (route == '/login') {
-          transitionType = PageTransitionType.fadeIn;
-        } else if (route == '/live-view') {
-          transitionType = PageTransitionType.zoomIn;
-        } else if (route == '/recordings') {
-          transitionType = PageTransitionType.slideUp;
-        } else if (route == '/settings') {
-          transitionType = PageTransitionType.scaleAndFade;
-        } else if (route == '/websocket-logs') {
-          transitionType = PageTransitionType.slideUp;
-        } else {
-          // Default transition for other routes
-          transitionType = PageTransitionType.rightToLeft;
-        }
-        
-        // Use the context extension to navigate with the custom transition
-        context.pushReplacementWithTransition(
-          Container(), // Placeholder - will be replaced by actual route
-          type: transitionType,
-        );
-        
-        // Use standard navigation which will trigger onGenerateRoute
+        // Sadece standart navigasyonu kullan, özel animasyonlar
+        // onGenerateRoute tarafından zaten uygulanıyor
         Navigator.pushReplacementNamed(context, route);
       }
       
