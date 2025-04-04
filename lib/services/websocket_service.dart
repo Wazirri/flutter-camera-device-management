@@ -181,14 +181,24 @@ class WebSocketService with ChangeNotifier {
       return;
     }
     
-    // Check for camera messages and always print them in a special format
-    if (message.toString().contains('cam')) {
-      print('🎥 [WebSocket] CAMERA MESSAGE: $message');
+    // Check for various camera message patterns and always print them in a special format
+    String msgString = message.toString();
+    if (msgString.contains('cam[') || // camera index pattern
+        msgString.contains('camreports') || // camera reports pattern
+        msgString.contains('.cam.') || // alternative camera path
+        msgString.contains('cameras.')) { // cameras array pattern
+      print('🎥 [WebSocket] CAMERA MESSAGE DETECTED: $message');
     }
     
     try {
       // Try to parse as JSON
       final Map<String, dynamic> parsed = json.decode(message);
+      
+      // Enhanced detailed logging for ALL camera-related messages
+      if (parsed.containsKey('data') && parsed['data'].toString().contains('cam')) {
+        print('📸 [WebSocket] CAMERA MSG DATA PATH: ${parsed['data']}');
+        print('📸 [WebSocket] CAMERA MSG VALUE: ${parsed['val']}');
+      }
       
       // Handle system information
       if (parsed['c'] == 'sysinfo') {
@@ -201,27 +211,39 @@ class WebSocketService with ChangeNotifier {
         _handleLoginMessage(parsed);
       }
       
-      // Special logging for camera-related properties
-      else if (parsed['c'] == 'changed' && 
-               parsed.containsKey('data') && 
-               parsed['data'].toString().contains('cam')) {
-        print('📦 Camera message: ${parsed['data']} = ${parsed['val']}');
-        
-        // Also forward to handler
-        if (_messageHandler != null) {
-          _messageHandler!(parsed);
-        }
-      }
-      
-      // Handle device property change
+      // SPECIAL HANDLING FOR CAMERA DATA - detect all camera-related patterns
       else if (parsed['c'] == 'changed' && parsed.containsKey('data')) {
-        // Check if it's a device message
-        if (parsed['data'].toString().startsWith('ecs.slaves.')) {
-          print('📦 Device message: ${parsed['data']} = ${parsed['val']}');
-        }
+        String dataPath = parsed['data'].toString();
         
-        // Forward to handler
-        if (_messageHandler != null) {
+        // Check for different camera data patterns
+        bool isCameraMessage = 
+            dataPath.contains('cam[') || // Pattern: cam[0], cam[1], etc.
+            dataPath.contains('camreports.') || // Pattern: camreports.CAMERA1
+            dataPath.contains('cameras.') || // Pattern: cameras.0
+            dataPath.contains('.cam.'); // Alternative pattern
+            
+        if (isCameraMessage) {
+          print('📦 CAMERA DATA: $dataPath = ${parsed['val']}');
+          
+          // Forward to handler
+          if (_messageHandler != null) {
+            print('⏩ Forwarding camera message to handler');
+            _messageHandler!(parsed);
+          } else {
+            print('❌ No message handler set to process camera message');
+          }
+        }
+        // General device messages
+        else if (dataPath.startsWith('ecs.slaves.')) {
+          print('📦 Device message: $dataPath = ${parsed['val']}');
+          
+          // Forward to handler
+          if (_messageHandler != null) {
+            _messageHandler!(parsed);
+          }
+        }
+        // Other messages
+        else if (_messageHandler != null) {
           _messageHandler!(parsed);
         }
       }
