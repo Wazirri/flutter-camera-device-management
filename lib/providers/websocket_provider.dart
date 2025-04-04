@@ -40,16 +40,38 @@ class WebSocketProvider with ChangeNotifier {
       if (message['c'] == 'changed' && message.containsKey('data') && message.containsKey('val')) {
         final String dataPath = message['data'].toString();
         if (dataPath.startsWith('ecs.slaves.m_')) {
-          print('✅ Forwarding device message to CameraDevicesProvider: ${message['data']} = ${message['val']}');
+          // Enhanced debug output for camera-related messages
+          print('✅ [WebSocket] Forwarding device message: ${message['data']} = ${message['val']}');
+          
+          // Add additional debug info
+          if (dataPath.contains('cam')) {
+            print('📷 [WebSocket] Camera message detected - Type: ${message['c']}, Path: ${message['data']}');
+            // Check the message value
+            if (message['val'] != null) {
+              if (message['val'] is Map) {
+                print('📦 [WebSocket] Value is a map with ${(message['val'] as Map).length} items');
+              } else if (message['val'] is List) {
+                print('📚 [WebSocket] Value is a list with ${(message['val'] as List).length} items');
+              } else {
+                print('📝 [WebSocket] Value type: ${message['val'].runtimeType}');
+              }
+            }
+          }
+          
+          // Forward message to camera devices provider
           _cameraDevicesProvider!.processWebSocketMessage(message);
         }
       } 
       // Process all other messages as well
       else {
+        // Debug other message types
+        if (message['c'] != null) {
+          print('🔄 [WebSocket] Message type: ${message['c']}');
+        }
         _cameraDevicesProvider!.processWebSocketMessage(message);
       }
     } else {
-      print('❌ ERROR: CameraDevicesProvider is null, cannot process message: ${json.encode(message)}');
+      print('❌ [WebSocket] ERROR: CameraDevicesProvider is null, cannot process message: ${json.encode(message)}');
     }
   }
   
