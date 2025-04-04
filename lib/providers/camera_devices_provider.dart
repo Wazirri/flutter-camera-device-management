@@ -143,15 +143,15 @@ class CameraDevicesProvider with ChangeNotifier {
           }
           break;
         case 'cam':
-          // Check if this is a camera property pattern
-          final pattern = RegExp(r'^cam\[(\d+)\]');
-          final match = pattern.firstMatch(propertyPath[0]);
+          // Check if this is a camera property pattern with cam[X]
+          final camPattern = RegExp(r'cam\[(\d+)\]');
+          final match = camPattern.firstMatch(propertyPath[0]);
           
           if (match != null) {
             // Extract camera index from the match
-            final cameraIndex = int.tryParse(match.group(1) ?? '-1');
+            final cameraIndex = int.tryParse(match.group(1) ?? '-1') ?? -1;
             
-            if (cameraIndex != null && cameraIndex >= 0) {
+            if (cameraIndex >= 0) {
               debugPrint('Updating camera $cameraIndex property: ${propertyPath.join('.')} = $value');
               _updateCameraProperty(device, cameraIndex, propertyPath, value);
             } else {
@@ -165,57 +165,33 @@ class CameraDevicesProvider with ChangeNotifier {
             final propertyName = propertyPath[2];
             
             // Find camera by name
-            final camera = device.cameras.firstWhere(
-              (cam) => cam.name == cameraName, 
-              orElse: () => Camera(
-                index: device.cameras.length,
-                name: cameraName,
-                ip: '',
-                username: '',
-                password: '',
-                brand: '',
-                model: '',
-                mediaUri: '',
-                recordUri: '',
-                subUri: '',
-                remoteUri: '',
-                mainSnapShot: '',
-                subSnapShot: '',
-                recordWidth: 0,
-                recordHeight: 0,
-                subWidth: 0,
-                subHeight: 0,
-                connected: false,
-                lastSeenAt: '',
-                recording: false,
-              ),
-            );
+            final cameraIndex = device.cameras.indexWhere((cam) => cam.name == cameraName);
             
-            // If camera isn't already in the list, add it
-            if (!device.cameras.contains(camera)) {
-              device.cameras.add(camera);
-            }
-            
-            // Update camera status properties
-            switch (propertyName) {
-              case 'connected':
-                camera.connected = value == 1;
-                break;
-              case 'last_seen_at':
-                camera.lastSeenAt = value.toString();
-                break;
-              case 'recording':
-                camera.recording = value == true || value == 1;
-                break;
+            if (cameraIndex >= 0) {
+              debugPrint('Found camera with name $cameraName at index $cameraIndex');
+              final camera = device.cameras[cameraIndex];
+              
+              // Update camera status properties
+              switch (propertyName) {
+                case 'connected':
+                  camera.connected = value == 1;
+                  break;
+                case 'disconnected':
+                  camera.disconnected = value.toString();
+                  break;
+                case 'last_seen_at':
+                  camera.lastSeenAt = value.toString();
+                  break;
+                case 'recording':
+                  camera.recording = value == true || value == 1;
+                  break;
+              }
+            } else {
+              debugPrint('Warning: Camera report for $cameraName but no camera with that name found');
             }
           }
           break;
       }
-    }
-    
-    // If we modified the selected device, notify listeners
-    if (_selectedDevice != null && _selectedDevice!.macKey == macKey) {
-      notifyListeners();
     }
   }
   
@@ -230,7 +206,6 @@ class CameraDevicesProvider with ChangeNotifier {
         username: '',
         password: '',
         brand: '',
-        model: '',
         mediaUri: '',
         recordUri: '',
         subUri: '',
@@ -249,60 +224,80 @@ class CameraDevicesProvider with ChangeNotifier {
     
     final camera = device.cameras[cameraIndex];
     
-    // Update the property if it has a sub-property
-    if (propertyPath.length > 1) {
-      final propertyName = propertyPath[1];
-      
-      switch (propertyName) {
-        case 'name':
-          camera.name = value.toString();
-          break;
-        case 'cameraIp':
-          camera.ip = value.toString();
-          break;
-        case 'username':
-          camera.username = value.toString();
-          break;
-        case 'password':
-          camera.password = value.toString();
-          break;
-        case 'brand':
-          camera.brand = value.toString();
-          break;
-        case 'hw':
-          camera.model = value.toString();
-          break;
-        case 'mediaUri':
-          camera.mediaUri = value.toString();
-          break;
-        case 'recordUri':
-          camera.recordUri = value.toString();
-          break;
-        case 'subUri':
-          camera.subUri = value.toString();
-          break;
-        case 'remoteUri':
-          camera.remoteUri = value.toString();
-          break;
-        case 'mainSnapShot':
-          camera.mainSnapShot = value.toString();
-          break;
-        case 'subSnapShot':
-          camera.subSnapShot = value.toString();
-          break;
-        case 'recordwidth':
-          camera.recordWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
-          break;
-        case 'recordheight':
-          camera.recordHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
-          break;
-        case 'subwidth':
-          camera.subWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
-          break;
-        case 'subheight':
-          camera.subHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
-          break;
-      }
+    // Extract the property name after cam[X]
+    final propertyName = propertyPath.length > 1 ? propertyPath[1] : '';
+    
+    // Update the camera property based on name
+    switch (propertyName) {
+      case 'name':
+        camera.name = value.toString();
+        break;
+      case 'cameraIp':
+        camera.ip = value.toString();
+        break;
+      case 'cameraRawIp':
+        camera.rawIp = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'username':
+        camera.username = value.toString();
+        break;
+      case 'password':
+        camera.password = value.toString();
+        break;
+      case 'brand':
+        camera.brand = value.toString();
+        break;
+      case 'hw':
+        camera.hw = value.toString();
+        break;
+      case 'manufacturer':
+        camera.manufacturer = value.toString();
+        break;
+      case 'country':
+        camera.country = value.toString();
+        break;
+      case 'xAddrs':
+        camera.xAddrs = value.toString();
+        break;
+      case 'mediaUri':
+        camera.mediaUri = value.toString();
+        break;
+      case 'recordUri':
+        camera.recordUri = value.toString();
+        break;
+      case 'subUri':
+        camera.subUri = value.toString();
+        break;
+      case 'remoteUri':
+        camera.remoteUri = value.toString();
+        break;
+      case 'mainSnapShot':
+        camera.mainSnapShot = value.toString();
+        break;
+      case 'subSnapShot':
+        camera.subSnapShot = value.toString();
+        break;
+      case 'recordPath':
+        camera.recordPath = value.toString();
+        break;
+      case 'recordcodec':
+        camera.recordCodec = value.toString();
+        break;
+      case 'recordwidth':
+        camera.recordWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'recordheight':
+        camera.recordHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'subcodec':
+        camera.subCodec = value.toString();
+        break;
+      case 'subwidth':
+        camera.subWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'subheight':
+        camera.subHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        break;
     }
   }
 

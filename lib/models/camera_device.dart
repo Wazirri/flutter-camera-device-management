@@ -125,46 +125,62 @@ class CameraDevice {
 }
 
 class Camera {
-  final int index;        // Index of the camera in the device's cameras array
-  String name;            // User-friendly name (e.g., KAMERA1)
-  String ip;              // IP address of the camera
-  String username;        // Username for authentication
-  String password;        // Password for authentication
-  String brand;           // Camera brand
-  String model;           // Camera hardware model
-  String mediaUri;        // Main RTSP URI for live view
-  String recordUri;       // RTSP URI for recording stream
-  String subUri;          // RTSP URI for sub-stream (lower resolution)
-  String remoteUri;       // RTSP URI for remote viewing
-  String mainSnapShot;    // URL for main snapshot
-  String subSnapShot;     // URL for sub-stream snapshot
-  int recordWidth;        // Width of recording resolution
-  int recordHeight;       // Height of recording resolution
-  int subWidth;           // Width of sub-stream resolution
-  int subHeight;          // Height of sub-stream resolution
-  bool connected;         // Whether the camera is connected
-  String lastSeenAt;      // When the camera was last seen
-  bool recording;         // Whether the camera is currently recording
+  final int index;            // Index of the camera in the device's cameras array
+  String name;                // User-friendly name (e.g., KAMERA1)
+  String ip;                  // IP address of the camera (cameraIp)
+  int rawIp;                  // Raw IP address integer (cameraRawIp)
+  String username;            // Username for authentication
+  String password;            // Password for authentication
+  String brand;               // Camera brand
+  String hw;                  // Hardware identifier
+  String manufacturer;        // Camera manufacturer
+  String country;             // Camera country
+  String xAddrs;              // ONVIF device service address
+  String mediaUri;            // Main RTSP URI for live view
+  String recordUri;           // RTSP URI for recording stream
+  String subUri;              // RTSP URI for sub-stream (lower resolution)
+  String remoteUri;           // RTSP URI for remote viewing
+  String mainSnapShot;        // URL for main snapshot
+  String subSnapShot;         // URL for sub-stream snapshot
+  String recordPath;          // Recording path
+  String recordCodec;         // Recording codec (e.g., H264)
+  int recordWidth;            // Width of recording resolution
+  int recordHeight;           // Height of recording resolution
+  String subCodec;            // Sub-stream codec (e.g., H264)
+  int subWidth;               // Width of sub-stream resolution
+  int subHeight;              // Height of sub-stream resolution
+  bool connected;             // Whether the camera is connected
+  String disconnected;        // Disconnection info
+  String lastSeenAt;          // When the camera was last seen
+  bool recording;             // Whether the camera is currently recording
   
   Camera({
     required this.index,
     required this.name,
     required this.ip,
+    this.rawIp = 0,
     required this.username,
     required this.password,
     required this.brand,
-    required this.model,
+    this.hw = '',
+    this.manufacturer = '',
+    this.country = '',
+    this.xAddrs = '',
     required this.mediaUri,
     required this.recordUri,
     required this.subUri,
     required this.remoteUri,
     required this.mainSnapShot,
     required this.subSnapShot,
+    this.recordPath = '',
+    this.recordCodec = '',
     required this.recordWidth,
     required this.recordHeight,
+    this.subCodec = '',
     required this.subWidth,
     required this.subHeight,
     required this.connected,
+    this.disconnected = '-',
     required this.lastSeenAt,
     required this.recording,
   });
@@ -173,21 +189,29 @@ class Camera {
   Camera copyWith({
     String? name,
     String? ip,
+    int? rawIp,
     String? username,
     String? password,
     String? brand,
-    String? model,
+    String? hw,
+    String? manufacturer,
+    String? country,
+    String? xAddrs,
     String? mediaUri,
     String? recordUri,
     String? subUri,
     String? remoteUri,
     String? mainSnapShot,
     String? subSnapShot,
+    String? recordPath,
+    String? recordCodec,
     int? recordWidth,
     int? recordHeight,
+    String? subCodec,
     int? subWidth,
     int? subHeight,
     bool? connected,
+    String? disconnected,
     String? lastSeenAt,
     bool? recording,
   }) {
@@ -195,21 +219,29 @@ class Camera {
       index: this.index,
       name: name ?? this.name,
       ip: ip ?? this.ip,
+      rawIp: rawIp ?? this.rawIp,
       username: username ?? this.username,
       password: password ?? this.password,
       brand: brand ?? this.brand,
-      model: model ?? this.model,
+      hw: hw ?? this.hw,
+      manufacturer: manufacturer ?? this.manufacturer,
+      country: country ?? this.country,
+      xAddrs: xAddrs ?? this.xAddrs,
       mediaUri: mediaUri ?? this.mediaUri,
       recordUri: recordUri ?? this.recordUri,
       subUri: subUri ?? this.subUri,
       remoteUri: remoteUri ?? this.remoteUri,
       mainSnapShot: mainSnapShot ?? this.mainSnapShot,
       subSnapShot: subSnapShot ?? this.subSnapShot,
+      recordPath: recordPath ?? this.recordPath,
+      recordCodec: recordCodec ?? this.recordCodec,
       recordWidth: recordWidth ?? this.recordWidth,
       recordHeight: recordHeight ?? this.recordHeight,
+      subCodec: subCodec ?? this.subCodec,
       subWidth: subWidth ?? this.subWidth,
       subHeight: subHeight ?? this.subHeight,
       connected: connected ?? this.connected,
+      disconnected: disconnected ?? this.disconnected,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
       recording: recording ?? this.recording,
     );
@@ -221,21 +253,29 @@ class Camera {
       index: json['index'] ?? 0,
       name: json['name'] ?? '',
       ip: json['ip'] ?? '',
+      rawIp: json['rawIp'] ?? 0,
       username: json['username'] ?? '',
       password: json['password'] ?? '',
       brand: json['brand'] ?? '',
-      model: json['model'] ?? '',
+      hw: json['hw'] ?? '',
+      manufacturer: json['manufacturer'] ?? '',
+      country: json['country'] ?? '',
+      xAddrs: json['xAddrs'] ?? '',
       mediaUri: json['mediaUri'] ?? '',
       recordUri: json['recordUri'] ?? '',
       subUri: json['subUri'] ?? '',
       remoteUri: json['remoteUri'] ?? '',
       mainSnapShot: json['mainSnapShot'] ?? '',
       subSnapShot: json['subSnapShot'] ?? '',
+      recordPath: json['recordPath'] ?? '',
+      recordCodec: json['recordCodec'] ?? '',
       recordWidth: json['recordWidth'] ?? 0,
       recordHeight: json['recordHeight'] ?? 0,
+      subCodec: json['subCodec'] ?? '',
       subWidth: json['subWidth'] ?? 0,
       subHeight: json['subHeight'] ?? 0,
       connected: json['connected'] ?? false,
+      disconnected: json['disconnected'] ?? '-',
       lastSeenAt: json['lastSeenAt'] ?? '',
       recording: json['recording'] ?? false,
     );
@@ -247,21 +287,29 @@ class Camera {
       'index': index,
       'name': name,
       'ip': ip,
+      'rawIp': rawIp,
       'username': username,
       'password': password,
       'brand': brand,
-      'model': model,
+      'hw': hw,
+      'manufacturer': manufacturer,
+      'country': country,
+      'xAddrs': xAddrs,
       'mediaUri': mediaUri,
       'recordUri': recordUri,
       'subUri': subUri,
       'remoteUri': remoteUri,
       'mainSnapShot': mainSnapShot,
       'subSnapShot': subSnapShot,
+      'recordPath': recordPath,
+      'recordCodec': recordCodec,
       'recordWidth': recordWidth,
       'recordHeight': recordHeight,
+      'subCodec': subCodec,
       'subWidth': subWidth,
       'subHeight': subHeight,
       'connected': connected,
+      'disconnected': disconnected,
       'lastSeenAt': lastSeenAt,
       'recording': recording,
     };
