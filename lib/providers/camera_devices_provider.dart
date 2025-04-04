@@ -227,16 +227,50 @@ class CameraDevicesProvider with ChangeNotifier {
   
   // Update a specific camera property
   void _updateCameraProperty(CameraDevice device, String propertyPath, dynamic value) {
-    // Camera properties often come in with a path like: cameras.0.property
+    // Camera properties can come in different formats
     List<String> parts = propertyPath.split('.');
     
+    // Format 1: cam[0].property - Extract camera index from brackets
+    if (parts.length >= 1 && parts[0].startsWith('cam[') && parts[0].contains(']')) {
+      String indexPart = parts[0].substring(4, parts[0].indexOf(']'));
+      int? cameraIndex;
+      
+      try {
+        cameraIndex = int.parse(indexPart);
+      } catch (e) {
+        print('❌ Invalid camera index from format cam[idx]: $indexPart');
+        return;
+      }
+      
+      // Check if we have this camera
+      if (device.cameras.length > cameraIndex) {
+        List<Camera> updatedCameras = List.from(device.cameras);
+        Camera camera = updatedCameras[cameraIndex];
+        
+        // Extract the actual property name (after "cam[INDEX].")
+        String propertyName = parts.length > 1 ? parts.sublist(1).join('.') : '';
+        
+        // Update the specific property
+        Camera updatedCamera = _updateCameraWithProperty(camera, propertyName, value);
+        updatedCameras[cameraIndex] = updatedCamera;
+        
+        // Update the device with the new cameras list
+        _devices[device.macKey] = device.copyWith(cameras: updatedCameras);
+      } else {
+        print('❌ Camera index out of range for cam[idx]: $cameraIndex, available: ${device.cameras.length}');
+      }
+      
+      return;
+    }
+    
+    // Format 2: cameras.0.property - Extract camera index as an integer
     if (parts.length >= 2 && parts[0] == 'cameras') {
       // Try to parse the camera index
       int? cameraIndex;
       try {
         cameraIndex = int.parse(parts[1]);
       } catch (e) {
-        print('❌ Invalid camera index: ${parts[1]}');
+        print('❌ Invalid camera index from format cameras.idx: ${parts[1]}');
         return;
       }
       
@@ -246,7 +280,7 @@ class CameraDevicesProvider with ChangeNotifier {
         Camera camera = updatedCameras[cameraIndex];
         
         // Extract the actual property name (after "cameras.INDEX.")
-        String propertyName = parts.sublist(2).join('.');
+        String propertyName = parts.length > 2 ? parts.sublist(2).join('.') : '';
         
         // Update the specific property
         Camera updatedCamera = _updateCameraWithProperty(camera, propertyName, value);
@@ -255,7 +289,76 @@ class CameraDevicesProvider with ChangeNotifier {
         // Update the device with the new cameras list
         _devices[device.macKey] = device.copyWith(cameras: updatedCameras);
       } else {
-        print('❌ Camera index out of range: $cameraIndex, available: ${device.cameras.length}');
+        print('❌ Camera index out of range for cameras.idx: $cameraIndex, available: ${device.cameras.length}');
+      }
+      
+      return;
+    }
+    
+    // Format 3: camreports.NAME.property - Find camera by name
+    if (parts.length >= 2 && parts[0] == 'camreports') {
+      String cameraName = parts[1];
+      
+      // Find the camera with matching name
+      List<Camera> updatedCameras = List.from(device.cameras);
+      int cameraIndex = updatedCameras.indexWhere((cam) => cam.name == cameraName);
+      
+      if (cameraIndex >= 0) {
+        Camera camera = updatedCameras[cameraIndex];
+        
+        // Extract the actual property name (after "camreports.NAME.")
+        String propertyName = parts.length > 2 ? parts.sublist(2).join('.') : '';
+        
+        // Update the specific property
+        Camera updatedCamera = _updateCameraWithProperty(camera, propertyName, value);
+        updatedCameras[cameraIndex] = updatedCamera;
+        
+        // Update the device with the new cameras list
+        _devices[device.macKey] = device.copyWith(cameras: updatedCameras);
+      } else {
+        print('❌ Camera not found by name: $cameraName in device: ${device.macKey}');
+        
+        // If we can't find a camera but have a name, maybe we need to create it?
+        if (device.cameras.isEmpty && parts.length > 2) {
+          String propertyName = parts[2];
+          
+          // Only create a new camera for certain properties
+          if (['connected', 'last_seen_at', 'recording'].contains(propertyName)) {
+            print('✏️ Creating new camera with name: $cameraName');
+            
+            // Create a new camera with default values plus this name
+            Camera newCamera = Camera(
+              index: 0, // First camera
+              name: cameraName,
+              ip: '',
+              rawIp: 0,
+              username: '',
+              password: '',
+              brand: '',
+              mediaUri: '',
+              recordUri: '',
+              subUri: '',
+              remoteUri: '',
+              mainSnapShot: '',
+              subSnapShot: '',
+              recordWidth: 0,
+              recordHeight: 0,
+              subWidth: 0,
+              subHeight: 0,
+              connected: false,
+              lastSeenAt: DateTime.now().toIso8601String(),
+              recording: false,
+            );
+            
+            // Update with the property
+            newCamera = _updateCameraWithProperty(newCamera, propertyName, value);
+            
+            // Add to the device
+            _devices[device.macKey] = device.copyWith(
+              cameras: [...device.cameras, newCamera]
+            );
+          }
+        }
       }
     }
   }
