@@ -1,7 +1,9 @@
 #!/bin/bash
 
-echo "Building Flutter web application..."
-flutter build web --web-renderer html --release
+echo "Building Flutter application..."
+flutter build apk --release
+flutter build macos --release
+flutter build linux --release
+flutter build windows --release
 
-echo "Build completed. Starting server..."
-node server.js
+echo "Build completed."
