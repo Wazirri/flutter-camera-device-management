@@ -250,7 +250,7 @@ class WebSocketService with ChangeNotifier {
   void _handleSystemInfo(Map<String, dynamic> message) {
     // Parse system info
     _systemInfo = SystemInfo.fromJson(message);
-    print('[WebSocket] Received system info: CPU Temp: ${_systemInfo?.cpuTemp}, Memory: ${_systemInfo?.memoryUsed}/${_systemInfo?.memoryTotal}');
+    print('[WebSocket] Received system info: CPU Temp: ${_systemInfo?.cpuTemp}, Memory: ${_systemInfo?.totalRam}/${_systemInfo?.freeRam}');
   }
   
   // Handle login-related messages
