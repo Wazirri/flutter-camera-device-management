@@ -238,7 +238,7 @@ class CameraDevicesProvider with ChangeNotifier {
       cameras[camIndex] = updatedCamera;
       
       // Update the device with the new camera list
-      _devices[macKey] = device.copyWith(cameras: cameras);
+      _devices[device.macKey] = device.copyWith(cameras: cameras);
     }
   }
 }
