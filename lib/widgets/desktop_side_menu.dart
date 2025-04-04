@@ -89,7 +89,7 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
         color: AppTheme.darkSurface,
         border: Border(
           right: BorderSide(
-            color: AppTheme.darkPrimary.withOpacity(0.1),
+            color: AppTheme.primaryColor.withOpacity(0.1),
             width: 1,
           ),
         ),
@@ -108,7 +108,7 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
                 children: [
                   Icon(
                     Icons.camera_enhance,
-                    color: AppTheme.darkAccent,
+                    color: AppTheme.accentColor,
                     size: 32,
                   ),
                   const SizedBox(width: 10),
@@ -156,14 +156,14 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
                       leading: Icon(
                         item['icon'],
                         color: isSelected 
-                            ? AppTheme.darkAccent 
+                            ? AppTheme.accentColor 
                             : AppTheme.darkTextSecondary,
                       ),
                       title: Text(
                         item['title'],
                         style: TextStyle(
                           color: isSelected 
-                              ? AppTheme.darkAccent 
+                              ? AppTheme.accentColor 
                               : AppTheme.darkTextPrimary,
                           fontWeight: isSelected 
                               ? FontWeight.bold 
@@ -171,7 +171,7 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
                         ),
                       ),
                       selected: isSelected,
-                      selectedTileColor: AppTheme.darkAccent.withOpacity(0.1),
+                      selectedTileColor: AppTheme.accentColor.withOpacity(0.1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
