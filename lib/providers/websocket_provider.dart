@@ -24,25 +24,30 @@ class WebSocketProvider with ChangeNotifier {
   
   // Message handler to forward messages to camera devices provider
   void _handleParsedMessage(Map<String, dynamic> message) {
-    if (_cameraDevicesProvider != null) {
-      // Add more detailed debug info for changed messages
-      if (message['c'] == 'changed' && message.containsKey('data') && message.containsKey('val')) {
-        final String dataPath = message['data'].toString();
-        
-        // Check if this is a camera device message
-        if (dataPath.startsWith('ecs.slaves.m_')) {
-          debugPrint('Received camera device update: $dataPath');
-          _cameraDevicesProvider!.updateDeviceFromChangedMessage(message);
+    try {
+      if (_cameraDevicesProvider != null) {
+        // Add more detailed debug info for changed messages
+        if (message['c'] == 'changed' && message.containsKey('data') && message.containsKey('val')) {
+          final String dataPath = message['data'].toString();
+          
+          // Check if this is a camera device message
+          if (dataPath.startsWith('ecs.slaves.m_')) {
+            print('Forwarding camera device update: $dataPath');
+            _cameraDevicesProvider!.updateDeviceFromChangedMessage(message);
+          }
         }
       }
+    } catch (e) {
+      print('Error in WebSocketProvider._handleParsedMessage: $e');
+      print('Message: $message');
     }
   }
   
   // Connect to WebSocket server
-  Future<bool> connect(String address, int port) async {
+  Future<bool> connect(String address, int port, {String username = '', String password = ''}) async {
     try {
-      // Adapting to the WebSocketService connect method signature
-      final connected = await _webSocketService.connect(address, port.toString(), '', '');
+      // Connect to WebSocket server
+      final connected = await _webSocketService.connect(address, port.toString(), username, password);
       notifyListeners();
       return connected;
     } catch (e) {

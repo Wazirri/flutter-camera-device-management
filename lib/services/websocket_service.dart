@@ -107,6 +107,9 @@ class WebSocketService with ChangeNotifier {
       // Parse the message as JSON
       final Map<String, dynamic> message = jsonDecode(rawMessage);
       
+      // Add detailed logging for debugging
+      print('WebSocket received message: ${message["c"]}');
+      
       // Handle system info messages
       if (message['c'] == 'sysinfo') {
         _systemInfo = SystemInfo.fromJson(message);
@@ -114,28 +117,39 @@ class WebSocketService with ChangeNotifier {
       
       // Handle login messages
       if (message['c'] == 'login' && message['msg'] == 'Oturum açılmamış!') {
-        // Not logged in, send login credentials
-        sendMessage('LOGIN $_username $_password');
+        // Not logged in, send login credentials if we have them
+        if (_username.isNotEmpty && _password.isNotEmpty) {
+          print('Sending login credentials');
+          sendMessage('LOGIN $_username $_password');
+        } else {
+          print('Login required but no credentials available');
+        }
       }
       
       // If we're logged in and haven't sent the monitor command yet, do so
       if (message['c'] == 'login' && message['msg'] == 'success' && !_monitorCommandSent) {
+        print('Login successful, sending monitor command');
         sendMessage('DO MONITORECS');
         _monitorCommandSent = true;
       }
       
       // Call the message handler if one is registered
       if (_onParsedMessage != null) {
-        _onParsedMessage!(message);
+        try {
+          _onParsedMessage!(message);
+        } catch (handlerError) {
+          print('Error in message handler: $handlerError');
+        }
       }
     } catch (e) {
       // Not a valid JSON message, just keep it in the log
       print('Error parsing WebSocket message: $e');
+      print('Raw message: $rawMessage');
     }
     
     notifyListeners();
   }
-  
+    
   // Handle WebSocket errors
   void _onError(dynamic error) {
     print('WebSocket error: $error');
@@ -161,58 +175,56 @@ class WebSocketService with ChangeNotifier {
     notifyListeners();
   }
   
-  // Schedule WebSocket reconnection
+  // Schedule a reconnect attempt
   void _scheduleReconnect() {
-    if (_reconnectTimer != null && _reconnectTimer!.isActive) {
-      return;
-    }
-    
-    if (_reconnectAttempts >= maxReconnectAttempts) {
-      print('Max reconnect attempts reached');
-      _shouldReconnect = false;
-      return;
+    if (_reconnectTimer != null) {
+      _reconnectTimer!.cancel();
     }
     
     _reconnectAttempts++;
-    final delay = reconnectDelay * _reconnectAttempts;
+    if (_reconnectAttempts <= maxReconnectAttempts) {
+      print('Scheduling reconnect attempt $_reconnectAttempts in $reconnectDelay seconds');
+      _reconnectTimer = Timer(Duration(seconds: reconnectDelay), () {
+        connect(_address, _port, _username, _password);
+      });
+    } else {
+      print('Maximum reconnect attempts reached');
+    }
+  }
+  
+  // Start heartbeat timer
+  void _startHeartbeat() {
+    _stopHeartbeat();
+    _lastMessageTime = DateTime.now();
     
-    print('Scheduling reconnect in $delay seconds (attempt $_reconnectAttempts)');
-    _reconnectTimer = Timer(Duration(seconds: delay), () {
-      print('Attempting to reconnect...');
-      connect(_address, _port, _username, _password);
+    _heartbeatTimer = Timer.periodic(Duration(seconds: heartbeatInterval), (_) {
+      _checkHeartbeat();
     });
   }
   
-  // Start heartbeat mechanism
-  void _startHeartbeat() {
-    _stopHeartbeat();
-    
-    _lastMessageTime = DateTime.now();
-    _heartbeatTimer = Timer.periodic(
-      const Duration(seconds: heartbeatInterval), 
-      (_) => _checkHeartbeat()
-    );
-  }
-  
-  // Stop heartbeat mechanism
+  // Stop heartbeat timer
   void _stopHeartbeat() {
-    _heartbeatTimer?.cancel();
-    _heartbeatTimer = null;
+    if (_heartbeatTimer != null) {
+      _heartbeatTimer!.cancel();
+      _heartbeatTimer = null;
+    }
   }
   
-  // Check if we need to send a heartbeat
+  // Check for connection liveness
   void _checkHeartbeat() {
-    if (!_isConnected) {
+    if (!_isConnected || _lastMessageTime == null) {
       return;
     }
     
     final now = DateTime.now();
-    final lastMessage = _lastMessageTime ?? now;
-    final elapsed = now.difference(lastMessage).inSeconds;
+    final diff = now.difference(_lastMessageTime!).inSeconds;
     
-    if (elapsed >= heartbeatInterval) {
-      // Send a ping message
-      sendMessage('PING');
+    if (diff > heartbeatInterval * 2) {
+      print('No heartbeat received for $diff seconds, reconnecting...');
+      if (_channel != null) {
+        _channel!.sink.close();
+      }
+      connect(_address, _port, _username, _password);
     }
   }
   
