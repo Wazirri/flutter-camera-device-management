@@ -108,69 +108,92 @@ class _VideoControlsState extends State<VideoControls> {
             ],
           ),
         ),
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Play/Pause button
-            IconButton(
-              icon: Icon(
-                _playing ? Icons.pause : Icons.play_arrow,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                if (_playing) {
-                  widget.player.pause();
-                } else {
-                  widget.player.play();
-                }
-              },
-            ),
-            
-            // Position slider
-            Expanded(
-              child: Slider(
-                value: _position.inMilliseconds.toDouble().clamp(
-                      0,
-                      _duration.inMilliseconds.toDouble().max(0),
-                    ),
-                min: 0,
-                max: _duration.inMilliseconds.toDouble().max(1),
-                onChanged: (value) {
-                  widget.player.seek(Duration(milliseconds: value.toInt()));
-                },
-                activeColor: AppTheme.primaryOrange,
-                inactiveColor: Colors.grey.shade600,
-              ),
-            ),
-            
-            // Position/duration text
+            // Position slider at the bottom
             Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Text(
-                "${_formatDuration(_position)} / ${_formatDuration(_duration)}",
-                style: const TextStyle(color: Colors.white),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                children: [
+                  // Current position text
+                  Text(
+                    _formatDuration(_position),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                  
+                  // Position slider
+                  Expanded(
+                    child: Slider(
+                      value: _position.inMilliseconds.toDouble().clamp(
+                            0,
+                            _duration.inMilliseconds.toDouble().max(0),
+                          ),
+                      min: 0,
+                      max: _duration.inMilliseconds.toDouble().max(1),
+                      onChanged: (value) {
+                        widget.player.seek(Duration(milliseconds: value.toInt()));
+                      },
+                      activeColor: AppTheme.primaryOrange,
+                      inactiveColor: Colors.grey.shade600,
+                    ),
+                  ),
+                  
+                  // Duration text
+                  Text(
+                    _formatDuration(_duration),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
               ),
             ),
             
-            // Volume button
-            IconButton(
-              icon: Icon(
-                _volume > 0 ? Icons.volume_up : Icons.volume_off,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                widget.player.setVolume(_volume > 0 ? 0 : 100);
-              },
-            ),
-            
-            // Fullscreen button
-            if (widget.showFullScreenButton)
-              IconButton(
-                icon: const Icon(
-                  Icons.fullscreen,
-                  color: Colors.white,
+            // Control buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Play/Pause button
+                IconButton(
+                  icon: Icon(
+                    _playing ? Icons.pause : Icons.play_arrow,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    if (_playing) {
+                      widget.player.pause();
+                    } else {
+                      widget.player.play();
+                    }
+                  },
                 ),
-                onPressed: widget.onFullScreenToggle,
-              ),
+                
+                // Control buttons on the right
+                Row(
+                  children: [
+                    // Volume button
+                    IconButton(
+                      icon: Icon(
+                        _volume > 0 ? Icons.volume_up : Icons.volume_off,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        widget.player.setVolume(_volume > 0 ? 0 : 100);
+                      },
+                    ),
+                    
+                    // Fullscreen button
+                    if (widget.showFullScreenButton)
+                      IconButton(
+                        icon: const Icon(
+                          Icons.fullscreen,
+                          color: Colors.white,
+                        ),
+                        onPressed: widget.onFullScreenToggle,
+                      ),
+                  ],
+                ),
+              ],
+            ),
           ],
         ),
       ),
