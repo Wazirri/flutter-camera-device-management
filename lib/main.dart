@@ -16,6 +16,7 @@ import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
+import 'utils/page_transitions.dart';
 import 'widgets/desktop_side_menu.dart';
 import 'widgets/mobile_bottom_navigation_bar.dart';
 import 'providers/websocket_provider.dart';
@@ -86,9 +87,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     // Register observer for app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
-    
-    // Don't try to access providers here, as they're not yet accessible
-    // in the context of this widget
   }
 
   @override
@@ -129,16 +127,72 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
-      routes: {
-        '/login': (context) => const LoginScreen(),
-        '/dashboard': (context) => const AppShell(child: DashboardScreen()),
-        '/live-view': (context) => const AppShell(child: LiveViewScreen()),
-        '/recordings': (context) => const AppShell(child: RecordViewScreen()),
-        '/cameras': (context) => const AppShell(child: CamerasScreen()),
-        '/devices': (context) => const AppShell(child: DevicesScreen()),
-        '/camera-devices': (context) => const AppShell(child: CameraDevicesScreen()),
-        '/settings': (context) => const AppShell(child: SettingsScreen()),
-        '/websocket-logs': (context) => const WebSocketLogScreen(),
+      onGenerateRoute: (settings) {
+        // Define custom page transitions for different routes
+        Widget page;
+        
+        switch(settings.name) {
+          case '/login':
+            page = const LoginScreen();
+            // Fade in transition for login
+            return AppPageTransitions.fade(page);
+            
+          case '/dashboard':
+            page = const AppShell(child: DashboardScreen());
+            // Shared axis transition for dashboard (feels connected to login)
+            return AppPageTransitions.sharedAxisHorizontal(page);
+            
+          case '/live-view':
+            // Check if there's a camera parameter passed
+            final args = settings.arguments;
+            if (args is Map && args.containsKey('camera')) {
+              page = AppShell(child: LiveViewScreen(camera: args['camera']));
+            } else {
+              page = const AppShell(child: LiveViewScreen());
+            }
+            // Zoom transition for camera views to emphasize content
+            return AppPageTransitions.zoomIn(page);
+            
+          case '/recordings':
+            final args = settings.arguments;
+            if (args is Map && args.containsKey('camera')) {
+              page = AppShell(child: RecordViewScreen(camera: args['camera']));
+            } else {
+              page = const AppShell(child: RecordViewScreen());
+            }
+            // Slide up transition for recordings
+            return AppPageTransitions.slideUp(page);
+            
+          case '/cameras':
+            page = const AppShell(child: CamerasScreen());
+            // Horizontal slide for navigation
+            return AppPageTransitions.slideHorizontal(page);
+            
+          case '/devices':
+            page = const AppShell(child: DevicesScreen());
+            // Horizontal slide for navigation
+            return AppPageTransitions.slideHorizontal(page);
+            
+          case '/camera-devices':
+            page = const AppShell(child: CameraDevicesScreen());
+            // Horizontal slide for navigation
+            return AppPageTransitions.slideHorizontal(page);
+            
+          case '/settings':
+            page = const AppShell(child: SettingsScreen());
+            // Scale and fade for settings to stand out
+            return AppPageTransitions.scaleAndFade(page);
+            
+          case '/websocket-logs':
+            page = const WebSocketLogScreen();
+            // Slide up for overlay-like screen
+            return AppPageTransitions.slideUp(page);
+            
+          default:
+            page = const AppShell(child: DashboardScreen());
+            // Default transition
+            return AppPageTransitions.fade(page);
+        }
       },
     );
   }
@@ -241,6 +295,32 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   void _navigateToRoute(String route) {
     try {
       if (route != _currentRoute) {
+        // Determine appropriate transition type based on route
+        PageTransitionType transitionType;
+        
+        // Select transition type based on the destination
+        if (route == '/login') {
+          transitionType = PageTransitionType.fadeIn;
+        } else if (route == '/live-view') {
+          transitionType = PageTransitionType.zoomIn;
+        } else if (route == '/recordings') {
+          transitionType = PageTransitionType.slideUp;
+        } else if (route == '/settings') {
+          transitionType = PageTransitionType.scaleAndFade;
+        } else if (route == '/websocket-logs') {
+          transitionType = PageTransitionType.slideUp;
+        } else {
+          // Default transition for other routes
+          transitionType = PageTransitionType.rightToLeft;
+        }
+        
+        // Use the context extension to navigate with the custom transition
+        context.pushReplacementWithTransition(
+          Container(), // Placeholder - will be replaced by actual route
+          type: transitionType,
+        );
+        
+        // Use standard navigation which will trigger onGenerateRoute
         Navigator.pushReplacementNamed(context, route);
       }
       

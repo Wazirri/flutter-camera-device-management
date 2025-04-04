@@ -7,6 +7,7 @@ import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
 import '../utils/responsive_helper.dart';
+import '../utils/page_transitions.dart';
 
 class LiveViewScreen extends StatefulWidget {
   final Camera? camera; // Make camera optional so the route can work without a parameter
@@ -17,7 +18,7 @@ class LiveViewScreen extends StatefulWidget {
   State<LiveViewScreen> createState() => _LiveViewScreenState();
 }
 
-class _LiveViewScreenState extends State<LiveViewScreen> {
+class _LiveViewScreenState extends State<LiveViewScreen> with SingleTickerProviderStateMixin {
   int _selectedCameraIndex = 0;
   Camera? _camera;
   bool _isFullScreen = false;
@@ -29,10 +30,43 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
   String _errorMessage = '';
   List<Camera> _availableCameras = [];
   
+  // Animation controllers
+  late AnimationController _pageAnimationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  
   @override
   void initState() {
     super.initState();
+    _initializeAnimations();
     _initializePlayer();
+  }
+  
+  void _initializeAnimations() {
+    // Setup animations
+    _pageAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _pageAnimationController,
+      curve: Curves.easeIn,
+    ));
+    
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, 0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _pageAnimationController,
+      curve: Curves.easeOutQuint,
+    ));
+    
+    // Start the entrance animation
+    _pageAnimationController.forward();
   }
   
   void _initializePlayer() {
@@ -121,7 +155,10 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
   }
   
   void _selectCamera(int index) {
-    if (index >= 0 && index < _availableCameras.length) {
+    if (index >= 0 && index < _availableCameras.length && index != _selectedCameraIndex) {
+      // Start a transition animation when changing cameras
+      _pageAnimationController.reset();
+      
       setState(() {
         _selectedCameraIndex = index;
         _camera = _availableCameras[index];
@@ -129,6 +166,9 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
       
       // Load the newly selected camera
       _loadCameraStream();
+      
+      // Start the animation for the new camera
+      _pageAnimationController.forward();
     }
   }
   
@@ -138,8 +178,24 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
     });
   }
   
+  Future<void> _showCameraDetails() async {
+    // Show a smooth animated modal sheet
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _buildFullCameraDetails(),
+      // Use animation settings
+      transitionAnimationController: AnimationController(
+        duration: const Duration(milliseconds: 400),
+        vsync: Navigator.of(context).overlay!,
+      ),
+    );
+  }
+  
   @override
   void dispose() {
+    _pageAnimationController.dispose();
     _player.dispose();
     super.dispose();
   }
@@ -153,6 +209,7 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
         body: _buildPlayer(),
         floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.fullscreen_exit),
+          mini: true,
           onPressed: _toggleFullScreen,
         ),
       );
@@ -168,6 +225,7 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
           IconButton(
             icon: const Icon(Icons.fullscreen),
             onPressed: _toggleFullScreen,
+            tooltip: 'Fullscreen',
           ),
         ],
       ),
@@ -198,24 +256,37 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
                     ),
                     const Divider(height: 1),
                     Expanded(
-                      child: ListView.builder(
-                        itemCount: _availableCameras.length,
-                        itemBuilder: (context, index) {
+                      child: AnimatedList(
+                        initialItemCount: _availableCameras.length,
+                        itemBuilder: (context, index, animation) {
                           final camera = _availableCameras[index];
                           final isSelected = index == _selectedCameraIndex;
                           
-                          return ListTile(
-                            title: Text(
-                              camera.name,
-                              overflow: TextOverflow.ellipsis,
+                          // Animated list item for each camera
+                          return SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(-1, 0),
+                              end: Offset.zero,
+                            ).animate(CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutQuad,
+                            )),
+                            child: FadeTransition(
+                              opacity: animation,
+                              child: ListTile(
+                                title: Text(
+                                  camera.name,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                selected: isSelected,
+                                leading: Icon(
+                                  Icons.videocam,
+                                  color: isSelected ? AppTheme.primaryOrange : null,
+                                ),
+                                selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                onTap: () => _selectCamera(index),
+                              ),
                             ),
-                            selected: isSelected,
-                            leading: Icon(
-                              Icons.videocam,
-                              color: isSelected ? AppTheme.primaryOrange : null,
-                            ),
-                            selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
-                            onTap: () => _selectCamera(index),
                           );
                         },
                       ),
@@ -226,17 +297,23 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
             
             // Right side with player and details
             Expanded(
-              child: Column(
-                children: [
-                  // Player section
-                  Expanded(
-                    child: _buildPlayer(),
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Column(
+                    children: [
+                      // Player section
+                      Expanded(
+                        child: _buildPlayer(),
+                      ),
+                      
+                      // Camera details at the bottom
+                      if (_camera != null)
+                        _buildCameraDetails(),
+                    ],
                   ),
-                  
-                  // Camera details at the bottom
-                  if (_camera != null)
-                    _buildCameraDetails(),
-                ],
+                ),
               ),
             ),
           ],
@@ -290,10 +367,16 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Video player
-        Video(
-          controller: _controller,
-          controls: (_) => VideoControls(player: _player),
+        // Video player with HeroMode activated for smooth transitions
+        Hero(
+          tag: 'player_${_camera!.id}',
+          child: Material(
+            type: MaterialType.transparency,
+            child: Video(
+              controller: _controller,
+              controls: (_) => VideoControls(player: _player),
+            ),
+          ),
         ),
         
         // Buffering indicator (show when buffering and not playing yet)
@@ -334,29 +417,40 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.info_outline),
-                onPressed: () {
-                  // Show more detailed camera info
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) => _buildFullCameraDetails(),
-                    isScrollControlled: true,
-                  );
-                },
+                onPressed: _showCameraDetails,
+                tooltip: 'More Info',
               ),
             ],
           ),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 16,
-            runSpacing: 8,
-            children: [
-              _buildInfoChip(Icons.camera_alt, 'Name: ${_camera!.name}'),
-              _buildInfoChip(Icons.language, 'IP: ${_camera!.ip}'),
-              if (_camera!.manufacturer.isNotEmpty)
-                _buildInfoChip(Icons.business, 'Manufacturer: ${_camera!.manufacturer}'),
-              if (_camera!.brand.isNotEmpty)
-                _buildInfoChip(Icons.category, 'Brand: ${_camera!.brand}'),
-            ],
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, animation) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.2),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: FadeTransition(
+                  opacity: animation,
+                  child: child,
+                ),
+              );
+            },
+            // Wrap with ValueKey to trigger animation when camera changes
+            child: Wrap(
+              key: ValueKey<String>(_camera!.id),
+              spacing: 16,
+              runSpacing: 8,
+              children: [
+                _buildInfoChip(Icons.camera_alt, 'Name: ${_camera!.name}'),
+                _buildInfoChip(Icons.language, 'IP: ${_camera!.ip}'),
+                if (_camera!.manufacturer.isNotEmpty)
+                  _buildInfoChip(Icons.business, 'Manufacturer: ${_camera!.manufacturer}'),
+                if (_camera!.brand.isNotEmpty)
+                  _buildInfoChip(Icons.category, 'Brand: ${_camera!.brand}'),
+              ],
+            ),
           ),
         ],
       ),
@@ -368,6 +462,8 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
       avatar: Icon(icon, size: 16),
       label: Text(label),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      elevation: 2,
+      shadowColor: Colors.black45,
     );
   }
   
@@ -378,27 +474,69 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
       minChildSize: 0.4,
       builder: (_, controller) {
         return Container(
-          padding: const EdgeInsets.all(16),
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: ListView(
-            controller: controller,
-            children: [
-              Text(
-                'Camera Details',
-                style: Theme.of(context).textTheme.headlineSmall,
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, -2),
               ),
-              const Divider(),
-              _buildDetailItem('Name', _camera!.name),
-              _buildDetailItem('IP Address', _camera!.ip),
-              _buildDetailItem('ID', _camera!.id), // Using ID instead of MAC address
-              _buildDetailItem('Manufacturer', _camera!.manufacturer),
-              _buildDetailItem('Brand', _camera!.brand), // Using Brand instead of Model
-              _buildDetailItem('RTSP URI', _camera!.rtspUri),
-              _buildDetailItem('Country', _camera!.country),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                child: const Text('Close'),
-                onPressed: () => Navigator.pop(context),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Draggable handle indicator
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                height: 4,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              // Content
+              Expanded(
+                child: ListView(
+                  controller: controller,
+                  padding: const EdgeInsets.all(24),
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.info, size: 28, color: AppTheme.primaryOrange),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Camera Details',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 32),
+                    _buildDetailItem('Name', _camera!.name),
+                    _buildDetailItem('IP Address', _camera!.ip),
+                    _buildDetailItem('ID', _camera!.id), // Using ID instead of MAC address
+                    _buildDetailItem('Manufacturer', _camera!.manufacturer),
+                    _buildDetailItem('Brand', _camera!.brand), // Using Brand instead of Model
+                    _buildDetailItem('RTSP URI', _camera!.rtspUri),
+                    _buildDetailItem('Country', _camera!.country),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Close'),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -408,27 +546,41 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
   }
   
   Widget _buildDetailItem(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              '$title:',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutQuint,
+      builder: (context, opacity, child) {
+        return Opacity(
+          opacity: opacity,
+          child: Transform.translate(
+            offset: Offset(0, 20 * (1 - opacity)),
+            child: child,
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 120,
+              child: Text(
+                '$title:',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Text(
-              value.isEmpty ? 'Not available' : value,
-              style: Theme.of(context).textTheme.bodyMedium,
+            Expanded(
+              child: Text(
+                value.isEmpty ? 'Not available' : value,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -9,6 +9,7 @@ import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
 import '../utils/responsive_helper.dart';
+import '../utils/page_transitions.dart';
 
 class RecordViewScreen extends StatefulWidget {
   final Camera? camera; // Make camera optional so the route can work without a parameter
@@ -19,7 +20,7 @@ class RecordViewScreen extends StatefulWidget {
   State<RecordViewScreen> createState() => _RecordViewScreenState();
 }
 
-class _RecordViewScreenState extends State<RecordViewScreen> {
+class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerProviderStateMixin {
   int _selectedCameraIndex = 0;
   Camera? _camera;
   bool _isFullScreen = false;
@@ -42,11 +43,53 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
   // Map to store recordings by date for the calendar (sample data for demonstration)
   final Map<DateTime, List<String>> _recordingsByDate = {};
   
+  // Animation controllers
+  late AnimationController _animationController;
+  late Animation<double> _fadeInAnimation;
+  late Animation<Offset> _calendarSlideAnimation;
+  late Animation<Offset> _playerSlideAnimation;
+  
   @override
   void initState() {
     super.initState();
+    _initializeAnimations();
     _initializePlayer();
     _initializeSampleData(); // This would be replaced with actual data from your backend
+  }
+  
+  void _initializeAnimations() {
+    // Setup animations
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    
+    _fadeInAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.3, 1.0, curve: Curves.easeIn),
+    ));
+    
+    _calendarSlideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, -0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.0, 0.7, curve: Curves.easeOutQuint),
+    ));
+    
+    _playerSlideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, 0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
+    ));
+    
+    // Start the entrance animation
+    _animationController.forward();
   }
   
   void _initializePlayer() {
@@ -151,6 +194,9 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
       return;
     }
     
+    // Reset animations for new data
+    _animationController.reset();
+    
     // Find recordings for the selected day
     final recordings = _recordingsByDate[DateTime(
       _selectedDay!.year,
@@ -170,6 +216,9 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
         _selectedRecording = null;
       }
     });
+    
+    // Start animations for updated data
+    _animationController.forward();
   }
   
   void _loadRecording(String url) {
@@ -199,7 +248,10 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
   }
   
   void _selectCamera(int index) {
-    if (index >= 0 && index < _availableCameras.length) {
+    if (index >= 0 && index < _availableCameras.length && index != _selectedCameraIndex) {
+      // Reset animations for transition
+      _animationController.reset();
+      
       setState(() {
         _selectedCameraIndex = index;
         _camera = _availableCameras[index];
@@ -208,19 +260,29 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
       
       // Fetch recordings for the newly selected camera
       _fetchRecordings();
+      
+      // Start animations for the new data
+      _animationController.forward();
     }
   }
   
   void _selectRecording(String recording) {
-    setState(() {
-      _selectedRecording = recording;
-    });
+    if (recording == _selectedRecording) return;
     
-    // In a real app, you'd fetch the recording URL from your backend
-    // For demo, we'll use the camera's record URI
-    if (_camera != null) {
-      _loadRecording(_camera!.recordUri);
-    }
+    // Create a short animation effect for selection change
+    _animationController.reverse().then((_) {
+      setState(() {
+        _selectedRecording = recording;
+      });
+      
+      // In a real app, you'd fetch the recording URL from your backend
+      // For demo, we'll use the camera's record URI
+      if (_camera != null) {
+        _loadRecording(_camera!.recordUri);
+      }
+      
+      _animationController.forward();
+    });
   }
   
   void _toggleFullScreen() {
@@ -241,6 +303,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
   
   @override
   void dispose() {
+    _animationController.dispose();
     _player.dispose();
     super.dispose();
   }
@@ -253,6 +316,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
       return Scaffold(
         body: _buildPlayer(),
         floatingActionButton: FloatingActionButton(
+          mini: true,
           child: const Icon(Icons.fullscreen_exit),
           onPressed: _toggleFullScreen,
         ),
@@ -268,7 +332,8 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.fullscreen),
-            onPressed: _toggleFullScreen,
+            onPressed: _selectedRecording != null ? _toggleFullScreen : null,
+            tooltip: 'Fullscreen',
           ),
         ],
       ),
@@ -299,24 +364,37 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
                     ),
                     const Divider(height: 1),
                     Expanded(
-                      child: ListView.builder(
-                        itemCount: _availableCameras.length,
-                        itemBuilder: (context, index) {
+                      child: AnimatedList(
+                        initialItemCount: _availableCameras.length,
+                        itemBuilder: (context, index, animation) {
                           final camera = _availableCameras[index];
                           final isSelected = index == _selectedCameraIndex;
                           
-                          return ListTile(
-                            title: Text(
-                              camera.name,
-                              overflow: TextOverflow.ellipsis,
+                          // Animated list item for each camera
+                          return SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(-1, 0),
+                              end: Offset.zero,
+                            ).animate(CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutQuad,
+                            )),
+                            child: FadeTransition(
+                              opacity: animation,
+                              child: ListTile(
+                                title: Text(
+                                  camera.name,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                selected: isSelected,
+                                leading: Icon(
+                                  Icons.videocam,
+                                  color: isSelected ? AppTheme.primaryOrange : null,
+                                ),
+                                selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                onTap: () => _selectCamera(index),
+                              ),
                             ),
-                            selected: isSelected,
-                            leading: Icon(
-                              Icons.videocam,
-                              color: isSelected ? AppTheme.primaryOrange : null,
-                            ),
-                            selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
-                            onTap: () => _selectCamera(index),
                           );
                         },
                       ),
@@ -329,69 +407,67 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
             Expanded(
               child: Column(
                 children: [
-                  // Calendar section
-                  Card(
-                    margin: const EdgeInsets.all(8.0),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TableCalendar(
-                        firstDay: kFirstDay,
-                        lastDay: kLastDay,
-                        focusedDay: _focusedDay,
-                        calendarFormat: CalendarFormat.month,
-                        selectedDayPredicate: (day) {
-                          return isSameDay(_selectedDay, day);
-                        },
-                        onDaySelected: (selectedDay, focusedDay) {
-                          setState(() {
-                            _selectedDay = selectedDay;
-                            _focusedDay = focusedDay; // update focused day
-                          });
-                          _updateRecordingsForSelectedDay();
-                        },
-                        onPageChanged: (focusedDay) {
-                          _focusedDay = focusedDay;
-                        },
-                        eventLoader: _getRecordingsForDay,
-                        calendarStyle: CalendarStyle(
-                          // Customize the appearance based on app theme
-                          todayDecoration: BoxDecoration(
-                            color: AppTheme.primaryBlue.withOpacity(0.5),
-                            shape: BoxShape.circle,
-                          ),
-                          selectedDecoration: const BoxDecoration(
-                            color: AppTheme.primaryOrange,
-                            shape: BoxShape.circle,
-                          ),
-                          markerDecoration: const BoxDecoration(
-                            color: AppTheme.primaryOrange,
-                            shape: BoxShape.circle,
-                          ),
+                  // Calendar section with slide-in animation
+                  SlideTransition(
+                    position: _calendarSlideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeInAnimation,
+                      child: Card(
+                        margin: const EdgeInsets.all(8.0),
+                        elevation: 4,
+                        shadowColor: Colors.black26,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        calendarBuilders: CalendarBuilders(
-                          markerBuilder: (context, date, events) {
-                            if (events.isNotEmpty) {
-                              return Positioned(
-                                right: 1,
-                                bottom: 1,
-                                child: Container(
-                                  padding: const EdgeInsets.all(2.0),
-                                  decoration: const BoxDecoration(
-                                    color: AppTheme.primaryOrange,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Text(
-                                    events.length.toString(),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10.0,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-                            return null;
-                          },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TableCalendar(
+                            firstDay: kFirstDay,
+                            lastDay: kLastDay,
+                            focusedDay: _focusedDay,
+                            calendarFormat: CalendarFormat.month,
+                            selectedDayPredicate: (day) {
+                              return isSameDay(_selectedDay, day);
+                            },
+                            onDaySelected: (selectedDay, focusedDay) {
+                              setState(() {
+                                _selectedDay = selectedDay;
+                                _focusedDay = focusedDay; // update focused day
+                              });
+                              _updateRecordingsForSelectedDay();
+                            },
+                            onPageChanged: (focusedDay) {
+                              _focusedDay = focusedDay;
+                            },
+                            eventLoader: _getRecordingsForDay,
+                            calendarStyle: CalendarStyle(
+                              // Customize the appearance based on app theme
+                              todayDecoration: BoxDecoration(
+                                color: AppTheme.primaryBlue.withOpacity(0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              selectedDecoration: const BoxDecoration(
+                                color: AppTheme.primaryOrange,
+                                shape: BoxShape.circle,
+                              ),
+                              markerDecoration: const BoxDecoration(
+                                color: AppTheme.primaryOrange,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            calendarBuilders: CalendarBuilders(
+                              markerBuilder: (context, date, events) {
+                                if (events.isNotEmpty) {
+                                  return Positioned(
+                                    right: 1,
+                                    bottom: 1,
+                                    child: _buildMarker(events.length),
+                                  );
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -399,50 +475,118 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
                   
                   // Recordings list for selected day
                   if (_availableRecordings.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Card(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Text(
-                                'Recordings for ${DateFormat('MMMM d, yyyy').format(_selectedDay!)}',
-                                style: Theme.of(context).textTheme.titleSmall,
+                    FadeTransition(
+                      opacity: _fadeInAnimation,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Card(
+                          elevation: 4,
+                          shadowColor: Colors.black26,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(
+                                  'Recordings for ${DateFormat('MMMM d, yyyy').format(_selectedDay!)}',
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
                               ),
-                            ),
-                            const Divider(height: 1),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: _availableRecordings.length,
-                              itemBuilder: (context, index) {
-                                final recording = _availableRecordings[index];
-                                final isSelected = recording == _selectedRecording;
-                                
-                                return ListTile(
-                                  title: Text(recording),
-                                  leading: const Icon(Icons.video_library),
-                                  selected: isSelected,
-                                  selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
-                                  onTap: () => _selectRecording(recording),
-                                );
-                              },
-                            ),
-                          ],
+                              const Divider(height: 1),
+                              // Animated recordings list
+                              AnimatedSize(
+                                duration: const Duration(milliseconds: 300),
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: _availableRecordings.length,
+                                  itemBuilder: (context, index) {
+                                    final recording = _availableRecordings[index];
+                                    final isSelected = recording == _selectedRecording;
+                                    
+                                    // Create a staggered animation effect for list items
+                                    return TweenAnimationBuilder<double>(
+                                      tween: Tween<double>(begin: 0.0, end: 1.0),
+                                      duration: Duration(milliseconds: 200 + (index * 50)),
+                                      curve: Curves.easeOutQuad,
+                                      builder: (context, value, child) {
+                                        return Transform.translate(
+                                          offset: Offset(20 * (1 - value), 0),
+                                          child: Opacity(
+                                            opacity: value,
+                                            child: child,
+                                          ),
+                                        );
+                                      },
+                                      child: ListTile(
+                                        title: Text(recording),
+                                        leading: AnimatedSwitcher(
+                                          duration: const Duration(milliseconds: 300),
+                                          child: isSelected
+                                            ? const Icon(Icons.play_circle_filled, 
+                                                key: ValueKey('playing'),
+                                                color: AppTheme.primaryOrange)
+                                            : const Icon(Icons.video_library, 
+                                                key: ValueKey('not_playing')),
+                                          transitionBuilder: (child, animation) {
+                                            return ScaleTransition(
+                                              scale: animation,
+                                              child: child,
+                                            );
+                                          },
+                                        ),
+                                        selected: isSelected,
+                                        selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                        onTap: () => _selectRecording(recording),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   
-                  // Player section
+                  // Player section with slide-up animation
                   Expanded(
-                    child: _buildPlayer(),
+                    child: SlideTransition(
+                      position: _playerSlideAnimation,
+                      child: FadeTransition(
+                        opacity: _fadeInAnimation,
+                        child: _buildPlayer(),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildMarker(int count) {
+    return Container(
+      width: 16,
+      height: 16,
+      decoration: const BoxDecoration(
+        color: AppTheme.primaryOrange,
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Text(
+          count.toString(),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 10.0,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
@@ -505,11 +649,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
             ElevatedButton.icon(
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
-              onPressed: () {
-                if (_camera != null) {
-                  _loadRecording(_camera!.recordUri);
-                }
-              },
+              onPressed: () => _loadRecording(_camera!.recordUri),
             ),
           ],
         ),
@@ -519,15 +659,46 @@ class _RecordViewScreenState extends State<RecordViewScreen> {
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Video player
-        Video(
-          controller: _controller,
-          controls: (_) => VideoControls(player: _player),
+        // Video player with Hero
+        Hero(
+          tag: 'player_${_camera!.id}_recording',
+          child: Material(
+            type: MaterialType.transparency,
+            child: Video(
+              controller: _controller,
+              controls: (_) => VideoControls(player: _player),
+            ),
+          ),
         ),
         
         // Buffering indicator (show when buffering and not playing yet)
         if (_isBuffering && !_isPlaying)
           const CircularProgressIndicator(),
+          
+        // Show overlay with recording info
+        if (!_isBuffering && _isPlaying && !_isFullScreen)
+          Positioned(
+            top: 8,
+            right: 8,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.fiber_manual_record, color: Colors.red, size: 12),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Recording: $_selectedRecording',
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
       ],
     );
   }
