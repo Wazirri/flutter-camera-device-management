@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import "package:media_kit_video/media_kit_video_controls.dart";
+// Removed the import for media_kit_video_controls
 import '../providers/camera_devices_provider.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
+import "../widgets/video_controls.dart";
 import '../utils/responsive_helper.dart';
 
 class LiveViewScreen extends StatefulWidget {

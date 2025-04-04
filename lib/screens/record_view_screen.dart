@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import "package:media_kit_video/media_kit_video_controls.dart";
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
 import '../providers/camera_devices_provider.dart';
 import '../models/camera_device.dart';
+import "../widgets/video_controls.dart";
 
 class RecordViewScreen extends StatefulWidget {
   const RecordViewScreen({Key? key}) : super(key: key);
