@@ -8,8 +8,7 @@ import '../models/system_info.dart';
 
 typedef MessageHandler = void Function(Map<String, dynamic> message);
 
-// Changed to 'extends ChangeNotifier' for proper inheritance
-class WebSocketService extends ChangeNotifier {
+class WebSocketService with ChangeNotifier {
   WebSocketChannel? _channel;
   bool _isConnected = false;
   List<String> _messageLog = [];
@@ -47,7 +46,7 @@ class WebSocketService extends ChangeNotifier {
   // Connect to WebSocket server
   Future<bool> connect(String address, String port, String username, String password) async {
     if (_isConnected) {
-      debugPrint('Already connected to WebSocket server');
+      print('Already connected to WebSocket server');
       return true;
     }
     
@@ -82,10 +81,10 @@ class WebSocketService extends ChangeNotifier {
       _startHeartbeat();
       notifyListeners();
       
-      debugPrint('Connected to WebSocket server: ${uri.toString()}');
+      print('Connected to WebSocket server: ${uri.toString()}');
       return true;
     } catch (e) {
-      debugPrint('WebSocket connection failed: $e');
+      print('WebSocket connection failed: $e');
       _isConnected = false;
       notifyListeners();
       _scheduleReconnect();
@@ -111,7 +110,7 @@ class WebSocketService extends ChangeNotifier {
       
       // If it's been too long since a message was received, consider the connection dead
       if (lastMessageDuration.inSeconds > heartbeatInterval * 2) {
-        debugPrint('No messages received in ${lastMessageDuration.inSeconds} seconds. Resetting connection.');
+        print('No messages received in ${lastMessageDuration.inSeconds} seconds. Resetting connection.');
         _resetConnection();
         return;
       }
@@ -119,7 +118,7 @@ class WebSocketService extends ChangeNotifier {
       // Send a heartbeat message if connected
       if (_channel != null && _isConnected) {
         _channel!.sink.add('PING');
-        debugPrint('Heartbeat sent: PING');
+        print('Heartbeat sent: PING');
       }
     });
   }
@@ -135,7 +134,7 @@ class WebSocketService extends ChangeNotifier {
     if (_channel != null && _isConnected) {
       final loginMessage = 'LOGIN "$username" "$password"';
       _channel!.sink.add(loginMessage);
-      debugPrint('Sent login message: $loginMessage');
+      print('Sent login message: $loginMessage');
       
       // Add to message log
       final timestamp = DateTime.now().toString();
@@ -200,13 +199,13 @@ class WebSocketService extends ChangeNotifier {
               
               // Add detailed debug info for camera device messages
               if (dataPath.startsWith('ecs.slaves.m_')) {
-                debugPrint('📦 Device message: ${jsonMessage['data']} = ${jsonMessage['val']}');
+                print('📦 Device message: ${jsonMessage['data']} = ${jsonMessage['val']}');
                 _onParsedMessage!(jsonMessage);
               }
             } 
             // Handle login success
             else if (jsonMessage['c'] == 'loginok') {
-              debugPrint('👤 Successfully logged in: ${jsonMessage['username']}');
+              print('👤 Successfully logged in: ${jsonMessage['username']}');
               _onParsedMessage!(jsonMessage);
             }
             // Handle any other message type
@@ -218,16 +217,16 @@ class WebSocketService extends ChangeNotifier {
         
       } catch (e) {
         // Not valid JSON, that's okay, we already logged the raw message
-        debugPrint('Message is not valid JSON: $e');
+        print('Message is not valid JSON: $e');
         
         // Check for PONG response to our PING
         if (message.toString() == 'PONG') {
-          debugPrint('Heartbeat response received: PONG');
+          print('Heartbeat response received: PONG');
           return;
         }
       }
     } catch (e) {
-      debugPrint('Error handling message: $e');
+      print('Error handling message: $e');
     }
   }
   
@@ -241,20 +240,20 @@ class WebSocketService extends ChangeNotifier {
       final timestamp = DateTime.now().toString();
       final logMessage = '[$timestamp] Sent: $monitorCommand';
       _addToLog(logMessage);
-      debugPrint(logMessage);
+      print(logMessage);
     }
   }
   
   // Handle WebSocket errors
   void _onError(dynamic error) {
-    debugPrint('WebSocket error: $error');
+    print('WebSocket error: $error');
     _addToLog('[${DateTime.now()}] Error: $error');
     _resetConnection();
   }
   
   // Handle WebSocket closure
   void _onDone() {
-    debugPrint('WebSocket connection closed');
+    print('WebSocket connection closed');
     _addToLog('[${DateTime.now()}] Connection closed');
     _resetConnection();
   }
@@ -285,12 +284,12 @@ class WebSocketService extends ChangeNotifier {
     
     _reconnectAttempts++;
     
-    debugPrint('Scheduling reconnect attempt ${_reconnectAttempts}/$maxReconnectAttempts in $reconnectDelay seconds...');
+    print('Scheduling reconnect attempt ${_reconnectAttempts}/$maxReconnectAttempts in $reconnectDelay seconds...');
     
     _reconnectTimer = Timer(Duration(seconds: reconnectDelay), () {
       _reconnectTimer = null;
       if (_shouldReconnect && !_isConnected) {
-        debugPrint('Attempting to reconnect...');
+        print('Attempting to reconnect...');
         connect(_address, _port, _username, _password);
       }
     });
@@ -305,9 +304,9 @@ class WebSocketService extends ChangeNotifier {
       final timestamp = DateTime.now().toString();
       _addToLog('[$timestamp] Sent: $message');
       
-      debugPrint('Sent message: $message');
+      print('Sent message: $message');
     } else {
-      debugPrint('Cannot send message, not connected to WebSocket server');
+      print('Cannot send message, not connected to WebSocket server');
     }
   }
   
@@ -329,7 +328,7 @@ class WebSocketService extends ChangeNotifier {
     }
     
     _addToLog('[${DateTime.now()}] Disconnected from WebSocket server');
-    debugPrint('Disconnected from WebSocket server');
+    print('Disconnected from WebSocket server');
   }
   
   // Add message to log with timestamp

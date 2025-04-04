@@ -13,10 +13,10 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Flutter App"
+args = "Flutter App - Mobile"
 
 [[workflows.workflow]]
-name = "Flutter App"
+name = "Flutter App - Mobile"
 author = "agent"
 
 [workflows.workflow.metadata]
@@ -27,8 +27,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "flutter run -d web-server --web-port 5000 --web-hostname 0.0.0.0"
-waitForPort = 5000
+args = "flutter run -d macos"
 
 [deployment]
 run = ["sh", "-c", "flutter run -d web-server --web-port=5000 --web-hostname=0.0.0.0"]

@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/camera_device.dart';
 import 'websocket_provider.dart';
 
-// Changed to `extends ChangeNotifier` for proper inheritance
-class CameraDevicesProvider extends ChangeNotifier {
+class CameraDevicesProvider with ChangeNotifier {
   final Map<String, CameraDevice> _devices = {};
   CameraDevice? _selectedDevice;
   int _selectedCameraIndex = 0;
@@ -90,7 +89,7 @@ class CameraDevicesProvider extends ChangeNotifier {
       final dynamic value = message['val'];
       
       // Debugging log the message
-      debugPrint('Processing WebSocket message: ${json.encode(message)}');
+      print('Processing WebSocket message: ${json.encode(message)}');
       
       // Check if this is a camera device-related message
       if (dataPath.startsWith('ecs.slaves.m_')) {
@@ -101,11 +100,11 @@ class CameraDevicesProvider extends ChangeNotifier {
           final macKey = parts[2]; // Get m_26_C1_7A_0B_1F_19
           final macAddress = macKey.substring(2).replaceAll('_', ':'); // Convert to proper MAC format
           
-          debugPrint('Extracted macKey: $macKey, macAddress: $macAddress');
+          print('Extracted macKey: $macKey, macAddress: $macAddress');
           
           // Create the device if it doesn't exist yet
           if (!_devices.containsKey(macKey)) {
-            debugPrint('Creating new device with macKey: $macKey');
+            print('Creating new device with macKey: $macKey');
             _devices[macKey] = CameraDevice(
               macAddress: macAddress,
               macKey: macKey,
@@ -122,7 +121,7 @@ class CameraDevicesProvider extends ChangeNotifier {
             // If this is the first device we're seeing, select it automatically
             if (_selectedDevice == null) {
               _selectedDevice = _devices[macKey];
-              debugPrint('Auto-selected first device: $macKey');
+              print('Auto-selected first device: $macKey');
             }
           }
           
@@ -181,10 +180,10 @@ class CameraDevicesProvider extends ChangeNotifier {
             final cameraIndex = int.tryParse(match.group(1) ?? '-1') ?? -1;
             
             if (cameraIndex >= 0) {
-              debugPrint('Updating camera $cameraIndex property: ${propertyPath.join('.')} = $value');
+              print('Updating camera $cameraIndex property: ${propertyPath.join('.')} = $value');
               _updateCameraProperty(device, cameraIndex, propertyPath, value);
             } else {
-              debugPrint('Error parsing camera index from ${propertyPath[0]}');
+              print('Error parsing camera index from ${propertyPath[0]}');
             }
           }
           
@@ -193,14 +192,14 @@ class CameraDevicesProvider extends ChangeNotifier {
             final cameraName = propertyPath[1];
             final propertyName = propertyPath[2];
             
-            debugPrint('Processing camera report for $cameraName: $propertyName = $value');
+            print('Processing camera report for $cameraName: $propertyName = $value');
             
             // Find camera by name first
             int cameraIndex = device.cameras.indexWhere((cam) => cam.name == cameraName);
             
             // If camera doesn't exist yet, we need to create a placeholder
             if (cameraIndex < 0) {
-              debugPrint('Camera $cameraName not found in device - creating placeholder');
+              print('Camera $cameraName not found in device - creating placeholder');
               
               // Find the next available index
               int nextIndex = device.cameras.length;
@@ -231,7 +230,7 @@ class CameraDevicesProvider extends ChangeNotifier {
               // Add the new camera to the device
               device.cameras.add(newCamera);
               cameraIndex = nextIndex;
-              debugPrint('Created placeholder camera at index $cameraIndex');
+              print('Created placeholder camera at index $cameraIndex');
             }
             
             // Now we have a valid camera index, update the property
@@ -241,7 +240,7 @@ class CameraDevicesProvider extends ChangeNotifier {
             switch (propertyName) {
               case 'connected':
                 camera.connected = value == 1;
-                debugPrint('Updated camera $cameraName connected status: ${camera.connected}');
+                print('Updated camera $cameraName connected status: ${camera.connected}');
                 break;
               case 'disconnected':
                 camera.disconnected = value.toString();
@@ -264,7 +263,7 @@ class CameraDevicesProvider extends ChangeNotifier {
     // Ensure we have enough cameras in the array
     while (device.cameras.length <= cameraIndex) {
       int nextIndex = device.cameras.length;
-      debugPrint('Creating camera at index $nextIndex because we need index $cameraIndex');
+      print('Creating camera at index $nextIndex because we need index $cameraIndex');
       
       device.cameras.add(Camera(
         index: nextIndex,
@@ -298,7 +297,7 @@ class CameraDevicesProvider extends ChangeNotifier {
     switch (propertyName) {
       case 'name':
         camera.name = value.toString();
-        debugPrint('Set camera[$cameraIndex] name to: ${camera.name}');
+        print('Set camera[$cameraIndex] name to: ${camera.name}');
         break;
       case 'cameraIp':
         camera.ip = value.toString();

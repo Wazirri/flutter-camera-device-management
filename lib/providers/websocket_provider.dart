@@ -5,8 +5,7 @@ import '../services/websocket_service.dart';
 import '../models/system_info.dart';
 import 'camera_devices_provider.dart';
 
-// Changed to `extends ChangeNotifier` for proper inheritance
-class WebSocketProvider extends ChangeNotifier {
+class WebSocketProvider with ChangeNotifier {
   final WebSocketService _webSocketService = WebSocketService();
   CameraDevicesProvider? _cameraDevicesProvider;
   
@@ -30,7 +29,7 @@ class WebSocketProvider extends ChangeNotifier {
       if (message['c'] == 'changed' && message.containsKey('data') && message.containsKey('val')) {
         final String dataPath = message['data'].toString();
         if (dataPath.startsWith('ecs.slaves.m_')) {
-          debugPrint('✅ Forwarding device message to CameraDevicesProvider: ${message['data']} = ${message['val']}');
+          print('✅ Forwarding device message to CameraDevicesProvider: ${message['data']} = ${message['val']}');
           _cameraDevicesProvider!.processWebSocketMessage(message);
         }
       } 
@@ -39,7 +38,7 @@ class WebSocketProvider extends ChangeNotifier {
         _cameraDevicesProvider!.processWebSocketMessage(message);
       }
     } else {
-      debugPrint('❌ ERROR: CameraDevicesProvider is null, cannot process message: ${json.encode(message)}');
+      print('❌ ERROR: CameraDevicesProvider is null, cannot process message: ${json.encode(message)}');
     }
   }
   
