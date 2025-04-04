@@ -5,301 +5,261 @@ import '../models/camera_device.dart';
 import 'websocket_provider.dart';
 
 class CameraDevicesProvider with ChangeNotifier {
-  final Map<String, CameraDevice> _devices = {};
-  CameraDevice? _selectedDevice;
-  int _selectedCameraIndex = 0;
-  bool _isLoading = false;
-
-  Map<String, CameraDevice> get devices => _devices;
-  List<CameraDevice> get devicesList => _devices.values.toList();
-  CameraDevice? get selectedDevice => _selectedDevice;
-  int get selectedCameraIndex => _selectedCameraIndex;
-  bool get isLoading => _isLoading;
+  final Map<String, List<CameraDevice>> _devicesByMacAddress = {};
   
-  // Get all cameras from all devices as a flat list
-  List<Camera> get cameras {
-    List<Camera> camerasList = [];
-    for (var device in _devices.values) {
-      camerasList.addAll(device.cameras);
-    }
-    return camerasList;
-  }
+  // Getter for all cameras grouped by MAC address
+  Map<String, List<CameraDevice>> get devicesByMacAddress => _devicesByMacAddress;
   
-  // Get devices grouped by MAC address (for UI display and filtering)
-  Map<String, List<Camera>> getCamerasByMacAddress() {
-    Map<String, List<Camera>> result = {};
-    
-    for (var deviceEntry in _devices.entries) {
-      String macAddress = deviceEntry.key;
-      CameraDevice device = deviceEntry.value;
-      result[macAddress] = device.cameras;
-    }
-    
-    return result;
-  }
-  
-  // Get devices grouped by MAC address as a map of key to device
-  Map<String, CameraDevice> get devicesByMacAddress => _devices;
-  
-  // Get the selected camera from the selected device
-  Camera? get selectedCamera {
-    if (_selectedDevice == null || _selectedDevice!.cameras.isEmpty) {
-      return null;
-    }
-    
-    // Make sure the selected index is valid
-    if (_selectedCameraIndex >= _selectedDevice!.cameras.length) {
-      _selectedCameraIndex = 0;
-    }
-    
-    return _selectedDevice!.cameras[_selectedCameraIndex];
-  }
-
-  void setSelectedDevice(String macKey) {
-    if (_devices.containsKey(macKey)) {
-      _selectedDevice = _devices[macKey];
-      _selectedCameraIndex = 0; // Reset camera index when device changes
-      notifyListeners();
-    }
-  }
-
-  void setSelectedCameraIndex(int index) {
-    if (_selectedDevice != null && index >= 0 && index < _selectedDevice!.cameras.length) {
-      _selectedCameraIndex = index;
-      notifyListeners();
-    }
-  }
-  
-  // Refresh cameras - simulates a refresh by triggering UI update
-  void refreshCameras() {
-    _isLoading = true;
-    notifyListeners();
-    
-    // Simulate a delay for refresh
-    Future.delayed(const Duration(seconds: 1), () {
-      _isLoading = false;
-      notifyListeners();
+  // Getter for all cameras as a flat list
+  List<CameraDevice> get allDevices {
+    final allDevices = <CameraDevice>[];
+    _devicesByMacAddress.forEach((_, devices) {
+      allDevices.addAll(devices);
     });
+    return allDevices;
   }
-
-  // Method to handle update messages from WebSocketProvider
+  
+  // Update or add a device from a WebSocket changed message
   void updateDeviceFromChangedMessage(Map<String, dynamic> message) {
-    if (message['c'] == 'changed' && message.containsKey('data') && message.containsKey('val')) {
+    try {
+      print('CameraDevicesProvider.updateDeviceFromChangedMessage received message: ${json.encode(message)}');
+      
+      // Make sure we have the expected fields
+      if (!message.containsKey('data') || !message.containsKey('val')) {
+        print('Error: Message missing required fields (data or val)');
+        return;
+      }
+      
+      // Get data path and value
       final String dataPath = message['data'].toString();
       final dynamic value = message['val'];
       
-      // Ayrıntılı debugging bilgileri ekle
-      debugPrint('Processing WebSocket message: ${json.encode(message)}');
+      // Make sure this is a camera device message
+      if (!dataPath.startsWith('ecs.slaves.m_')) {
+        print('Warning: Not a camera device message: $dataPath');
+        return;
+      }
+      
+      print('Processing camera device message: $dataPath = $value');
       
       try {
-        // Check if this is a camera device-related message
-        if (dataPath.startsWith('ecs.slaves.m_')) {
-          // Extract the MAC address from the data path
-          // Format is like: ecs.slaves.m_26_C1_7A_0B_1F_19.property
-          final parts = dataPath.split('.');
-          if (parts.length >= 3) {
-            _processDeviceMessage(parts, dataPath, value);
-          } else {
-            debugPrint('Invalid data path format: $dataPath');
-          }
-        }
+        _processDeviceMessage(dataPath, value);
+        notifyListeners();
       } catch (e) {
-        debugPrint('Error processing device message: $e');
-        debugPrint('Message: ${json.encode(message)}');
+        print('Error processing device message: $e');
       }
-    }
-  }
-
-  // Helper method to process device messages
-  void _processDeviceMessage(List<String> parts, String dataPath, dynamic value) {
-    try {
-      final macKey = parts[2]; // Get m_26_C1_7A_0B_1F_19
-      
-      // Format MAC address from macKey (m_26_C1_7A_0B_1F_19 -> 26:C1:7A:0B:1F:19)
-      final String formattedMac = macKey.substring(2).replaceAll('_', ':');
-      
-      debugPrint('Processing device with MAC: $formattedMac (key: $macKey)');
-      
-      // Create device if it doesn't exist
-      if (!_devices.containsKey(macKey)) {
-        debugPrint('Creating new device for $macKey');
-        _devices[macKey] = CameraDevice(
-          macAddress: formattedMac,
-          macKey: macKey,
-          ipv4: 'Unknown',
-          lastSeenAt: DateTime.now().toIso8601String(),
-          connected: false,
-          uptime: '0',
-          deviceType: 'Unknown',
-          firmwareVersion: 'Unknown',
-          recordPath: '',
-          cameras: [],
-        );
-      }
-      
-      final device = _devices[macKey]!;
-      
-      // Update device properties based on the data path
-      if (parts.length > 3) {
-        final property = parts[3];
-        
-        switch (property) {
-          case 'cam':
-            _processCameraProperty(device, parts, dataPath, value);
-            break;
-          case 'brand':
-            // Update device deviceType with brand
-            debugPrint('Updating brand for $macKey: $value');
-            final updatedDevice = device.copyWith(deviceType: value.toString());
-            _devices[macKey] = updatedDevice;
-            break;
-          case 'model':
-            // No direct match, could be used to enhance deviceType
-            debugPrint('Updating model for $macKey: $value');
-            final updatedDevice = device.copyWith(deviceType: "${device.deviceType} ${value.toString()}");
-            _devices[macKey] = updatedDevice;
-            break;
-          case 'ip':
-            // Update device IP address
-            debugPrint('Updating IP for $macKey: $value');
-            final updatedDevice = device.copyWith(ipv4: value.toString());
-            _devices[macKey] = updatedDevice;
-            break;
-          case 'version':
-            // Update firmware version
-            debugPrint('Updating firmware version for $macKey: $value');
-            final updatedDevice = device.copyWith(firmwareVersion: value.toString());
-            _devices[macKey] = updatedDevice;
-            break;
-          default:
-            // Handle other device properties
-            debugPrint('Unhandled property for $macKey: $property = $value');
-            break;
-        }
-      }
-      
-      // Notify listeners of the change
-      notifyListeners();
     } catch (e) {
-      debugPrint('Error in _processDeviceMessage: $e');
-      debugPrint('Parts: $parts, DataPath: $dataPath, Value: $value');
+      print('Error in updateDeviceFromChangedMessage: $e');
     }
   }
   
-  // Helper method to process camera-specific properties
-  void _processCameraProperty(
-    CameraDevice device, 
-    List<String> parts, 
-    String dataPath, 
-    dynamic value
-  ) {
+  // Process device message by splitting the data path and extracting MAC and property
+  void _processDeviceMessage(String dataPath, dynamic value) {
+    // Split the data path to extract MAC address and property
+    final parts = dataPath.split('.');
+    print('Data path parts: $parts');
+    
+    if (parts.length < 3) {
+      print('Invalid data path format: $dataPath');
+      return;
+    }
+    
+    // Extract MAC address with proper formatting
+    String macKey = parts[2]; // This will be like 'm_XX_XX_XX_XX_XX_XX' or similar
+    print('Extracted MAC key: $macKey');
+    
+    // Extract the rest of the path as the property
+    final propertyPath = parts.sublist(3).join('.');
+    print('Property path: $propertyPath');
+    
+    // If this is a camera entry, it will have a path like 'cam.0.property'
+    if (propertyPath.startsWith('cam.')) {
+      // Extract camera index and property name
+      final propertyParts = propertyPath.split('.');
+      print('Property parts: $propertyParts');
+      
+      if (propertyParts.length < 3) {
+        print('Invalid camera property format: $propertyPath');
+        return;
+      }
+      
+      final cameraIndex = int.tryParse(propertyParts[1]);
+      if (cameraIndex == null) {
+        print('Invalid camera index: ${propertyParts[1]}');
+        return;
+      }
+      
+      final String cameraProperty = propertyParts.sublist(2).join('.');
+      print('Camera index: $cameraIndex, Camera property: $cameraProperty');
+      
+      // Process this camera property
+      _processCameraProperty(macKey, cameraIndex, cameraProperty, value);
+    } else {
+      // This is a device property, not a camera property
+      print('Device property (not camera): $propertyPath');
+    }
+  }
+  
+  // Process a specific camera property
+  void _processCameraProperty(String macKey, int cameraIndex, String property, dynamic value) {
+    print('Processing camera property: MAC=$macKey, Index=$cameraIndex, Property=$property, Value=$value');
+    
     try {
-      if (parts.length < 5) {
-        debugPrint('Invalid camera property path: $dataPath (not enough parts)');
-        return;
+      // Get or create the list of devices for this MAC
+      if (!_devicesByMacAddress.containsKey(macKey)) {
+        _devicesByMacAddress[macKey] = [];
+        print('Created new device list for MAC: $macKey');
       }
       
-      final camIndex = int.tryParse(parts[4]);
-      if (camIndex == null) {
-        debugPrint('Invalid camera index: ${parts[4]}');
-        return;
+      // Ensure we have enough devices in the list
+      while (_devicesByMacAddress[macKey]!.length <= cameraIndex) {
+        final newDevice = CameraDevice(
+          macKey: macKey,
+          macAddress: _convertMacKeyToAddress(macKey),
+          index: _devicesByMacAddress[macKey]!.length,
+        );
+        _devicesByMacAddress[macKey]!.add(newDevice);
+        print('Added new camera device for MAC: $macKey, Index: ${newDevice.index}');
       }
       
-      debugPrint('Processing camera property: Device ${device.macKey}, Camera #$camIndex, Path: $dataPath');
+      // Update the specific property
+      final device = _devicesByMacAddress[macKey]![cameraIndex];
+      print('Updating device: $device with property: $property');
       
-      // Create a camera list with enough capacity
-      final cameras = List<Camera>.from(device.cameras);
-      while (cameras.length <= camIndex) {
-        cameras.add(Camera(
-          index: cameras.length,
-          name: 'Camera ${cameras.length}',
-          ip: '',
-          username: '',
-          password: '',
-          brand: '',
-          mediaUri: '',
-          recordUri: '',
-          subUri: '',
-          remoteUri: '',
-          mainSnapShot: '',
-          subSnapShot: '',
-          recordWidth: 0,
-          recordHeight: 0,
-          subWidth: 0,
-          subHeight: 0,
-          connected: false,
-          lastSeenAt: '',
-          recording: false,
-        ));
-      }
-      
-      // Update the camera property
-      if (parts.length > 5) {
-        final camera = cameras[camIndex];
-        final property = parts[5];
-        
-        Camera updatedCamera;
-        debugPrint('Updating camera property: $property = $value');
-        
-        switch (property) {
-          case 'mediaUri':
-            updatedCamera = camera.copyWith(mediaUri: value.toString());
-            break;
-          case 'mainSnapShot':
-            updatedCamera = camera.copyWith(mainSnapShot: value.toString());
-            break;
-          case 'username':
-            updatedCamera = camera.copyWith(username: value.toString());
-            break;
-          case 'password':
-            updatedCamera = camera.copyWith(password: value.toString());
-            break;
-          case 'xAddrs':
-            updatedCamera = camera.copyWith(xAddrs: value.toString());
-            break;
-          case 'name':
-            updatedCamera = camera.copyWith(name: value.toString());
-            break;
-          case 'ip':
-            updatedCamera = camera.copyWith(ip: value.toString());
-            break;
-          case 'brand':
-            updatedCamera = camera.copyWith(brand: value.toString());
-            break;
-          case 'manufacturer':
-            updatedCamera = camera.copyWith(manufacturer: value.toString());
-            break;
-          case 'country':
-            updatedCamera = camera.copyWith(country: value.toString());
-            break;
-          case 'subUri':
-            updatedCamera = camera.copyWith(subUri: value.toString());
-            break;
-          case 'remoteUri':
-            updatedCamera = camera.copyWith(remoteUri: value.toString());
-            break;
-          case 'recordUri':
-            updatedCamera = camera.copyWith(recordUri: value.toString());
-            break;
-          case 'subSnapShot':
-            updatedCamera = camera.copyWith(subSnapShot: value.toString());
-            break;
-          default:
-            debugPrint('Unhandled camera property: $property');
-            updatedCamera = camera;
-            break;
-        }
-        
-        cameras[camIndex] = updatedCamera;
-        
-        // Update the device with the new camera list
-        _devices[device.macKey] = device.copyWith(cameras: cameras);
-      } else {
-        debugPrint('Not enough parts to update camera property: $dataPath');
+      // Handle different properties
+      switch (property) {
+        case 'xAddrs':
+          device.xAddrs = value.toString();
+          print('Updated xAddrs to: ${device.xAddrs}');
+          break;
+        case 'username':
+          device.username = value.toString();
+          print('Updated username to: ${device.username}');
+          break;
+        case 'password':
+          device.password = value.toString();
+          print('Updated password to: ${device.password}');
+          break;
+        case 'manufacturer':
+          device.manufacturer = value.toString();
+          print('Updated manufacturer to: ${device.manufacturer}');
+          break;
+        case 'ipv4':
+          device.ipv4 = value.toString();
+          print('Updated IPv4 to: ${device.ipv4}');
+          break;
+        case 'model':
+          device.brand = value.toString(); // Using brand field for model value
+          print('Updated brand/model to: ${device.brand}');
+          break;
+        case 'mediaUri':
+          device.mediaUri = value.toString();
+          print('Updated mediaUri to: ${device.mediaUri}');
+          break;
+        case 'recordUri':
+          device.recordUri = value.toString();
+          print('Updated recordUri to: ${device.recordUri}');
+          break;
+        case 'subUri':
+          device.subUri = value.toString();
+          print('Updated subUri to: ${device.subUri}');
+          break;
+        case 'remoteUri':
+          device.remoteUri = value.toString();
+          print('Updated remoteUri to: ${device.remoteUri}');
+          break;
+        case 'subSnapShot':
+          device.subSnapShot = value.toString();
+          print('Updated subSnapShot to: ${device.subSnapShot}');
+          break;
+        case 'mainSnapShot':
+          device.mainSnapShot = value.toString();
+          print('Updated mainSnapShot to: ${device.mainSnapShot}');
+          break;
+        case 'cameraRawIp':
+          device.cameraRawIp = value.toString();
+          print('Updated cameraRawIp to: ${device.cameraRawIp}');
+          break;
+        case 'recordPath':
+          device.recordPath = value.toString();
+          print('Updated recordPath to: ${device.recordPath}');
+          break;
+        case 'country':
+          device.country = value.toString();
+          print('Updated country to: ${device.country}');
+          break;
+        default:
+          print('Unhandled camera property: $property');
+          break;
       }
     } catch (e) {
-      debugPrint('Error in _processCameraProperty: $e');
-      debugPrint('Device: ${device.macKey}, Path: $dataPath, Value: $value');
+      print('Error processing camera property: $e');
     }
+  }
+  
+  // Convert MAC key to MAC address
+  String _convertMacKeyToAddress(String macKey) {
+    try {
+      print('Converting MAC key to address: $macKey');
+      
+      // Remove 'm_' prefix and replace underscores with colons
+      if (macKey.startsWith('m_')) {
+        final macWithoutPrefix = macKey.substring(2);
+        final macWithColons = macWithoutPrefix.replaceAll('_', ':');
+        print('Converted MAC: $macWithColons');
+        return macWithColons;
+      } else {
+        print('MAC key doesn\'t start with "m_", returning as is');
+        return macKey;
+      }
+    } catch (e) {
+      print('Error converting MAC key to address: $e');
+      return macKey;
+    }
+  }
+  
+  // Update connection status for a specific device
+  void updateDeviceConnectionStatus(String macAddress, bool isConnected) {
+    try {
+      print('Updating connection status for MAC: $macAddress to: $isConnected');
+      
+      // Find the device by MAC address
+      final macKey = _convertAddressToMacKey(macAddress);
+      
+      if (_devicesByMacAddress.containsKey(macKey)) {
+        for (final device in _devicesByMacAddress[macKey]!) {
+          device.isConnected = isConnected;
+          print('Updated connection status for device: $device');
+        }
+        notifyListeners();
+      } else {
+        print('Device with MAC $macAddress not found');
+      }
+    } catch (e) {
+      print('Error updating connection status: $e');
+    }
+  }
+  
+  // Convert MAC address to MAC key
+  String _convertAddressToMacKey(String macAddress) {
+    try {
+      print('Converting MAC address to key: $macAddress');
+      
+      // Replace colons with underscores and add 'm_' prefix
+      final macWithUnderscores = macAddress.replaceAll(':', '_');
+      final macKey = 'm_$macWithUnderscores';
+      print('Converted MAC key: $macKey');
+      return macKey;
+    } catch (e) {
+      print('Error converting MAC address to key: $e');
+      return macAddress;
+    }
+  }
+  
+  // Clear all devices
+  void clearDevices() {
+    print('Clearing all devices');
+    _devicesByMacAddress.clear();
+    notifyListeners();
   }
 }

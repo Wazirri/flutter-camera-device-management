@@ -105,19 +105,24 @@ class WebSocketService with ChangeNotifier {
     
     try {
       // Parse the message as JSON
+      print('Attempting to parse raw message: $rawMessage');
       final Map<String, dynamic> message = jsonDecode(rawMessage);
       
       // Add detailed logging for debugging
-      print('WebSocket received message: ${message["c"]}');
+      print('WebSocket received message type: ${message["c"]}');
+      print('WebSocket message data: ${json.encode(message)}');
       
       // Handle system info messages
       if (message['c'] == 'sysinfo') {
+        print('Processing system info message');
         _systemInfo = SystemInfo.fromJson(message);
+        print('SystemInfo parsed successfully: CPU Temp ${_systemInfo?.cpuTemp}, RAM Usage ${_systemInfo?.ramUsage}');
       }
       
       // Handle login messages
       if (message['c'] == 'login' && message['msg'] == 'Oturum açılmamış!') {
         // Not logged in, send login credentials if we have them
+        print('Received login required message');
         if (_username.isNotEmpty && _password.isNotEmpty) {
           print('Sending login credentials');
           sendMessage('LOGIN $_username $_password');
@@ -136,15 +141,17 @@ class WebSocketService with ChangeNotifier {
       // Call the message handler if one is registered
       if (_onParsedMessage != null) {
         try {
+          print('Calling message handler for message type: ${message["c"]}');
           _onParsedMessage!(message);
         } catch (handlerError) {
           print('Error in message handler: $handlerError');
+          print('Message that caused error: ${json.encode(message)}');
         }
       }
     } catch (e) {
       // Not a valid JSON message, just keep it in the log
       print('Error parsing WebSocket message: $e');
-      print('Raw message: $rawMessage');
+      print('Raw message that caused error: $rawMessage');
     }
     
     notifyListeners();
@@ -252,6 +259,7 @@ class WebSocketService with ChangeNotifier {
     try {
       _channel!.sink.add(message);
       _messageLog.add('← $message');
+      print('Sent message: $message');
       
       // Limit log size
       if (_messageLog.length > 100) {

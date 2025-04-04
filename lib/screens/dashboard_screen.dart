@@ -55,21 +55,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
         title: 'Dashboard',
         isDesktop: isDesktop,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildWelcomeSection(context),
-            const SizedBox(height: 24),
-            _buildSystemInfoSection(context),
-            const SizedBox(height: 24),
-            _buildOverviewCards(context),
-            const SizedBox(height: 24),
-            _buildCameraSection(context),
-            const SizedBox(height: 24),
-            _buildDeviceSection(context),
-          ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildWelcomeSection(context),
+              const SizedBox(height: 24),
+              _buildSystemInfoSection(context),
+              const SizedBox(height: 24),
+              _buildOverviewCards(context),
+              const SizedBox(height: 24),
+              _buildCameraSection(context),
+              const SizedBox(height: 24),
+              _buildDeviceSection(context),
+              // Add extra space at the bottom to avoid overflow
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
@@ -107,7 +111,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Row(
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 12,
                     children: [
                       ElevatedButton(
                         onPressed: () {
@@ -127,7 +133,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 16),
                       OutlinedButton(
                         onPressed: () {
                           Navigator.pushNamed(context, '/camera-devices');
@@ -461,9 +466,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: _buildDeviceStatusTable(context),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: _buildDeviceStatusTable(context),
+            ),
           ),
         ),
       ],
@@ -475,8 +483,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         Row(
           children: [
-            Expanded(
-              flex: 3,
+            Container(
+              width: 150,
               child: Text(
                 'Device Name',
                 style: TextStyle(
@@ -485,8 +493,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-            Expanded(
-              flex: 2,
+            Container(
+              width: 100,
               child: Text(
                 'Type',
                 style: TextStyle(
@@ -495,8 +503,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-            Expanded(
-              flex: 2,
+            Container(
+              width: 120,
               child: Text(
                 'Status',
                 style: TextStyle(
@@ -506,8 +514,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             if (!ResponsiveHelper.isMobile(context))
-              Expanded(
-                flex: 2,
+              Container(
+                width: 120,
                 child: Text(
                   'Last Active',
                   style: TextStyle(
@@ -516,9 +524,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-            Expanded(
-              flex: 1,
-              child: Container(),
+            Container(
+              width: 50,
+              alignment: Alignment.center,
+              child: Text(
+                '',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.darkTextSecondary,
+                ),
+              ),
             ),
           ],
         ),
@@ -548,8 +563,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          Expanded(
-            flex: 3,
+          Container(
+            width: 150,
             child: Text(
               name,
               style: const TextStyle(
@@ -557,8 +572,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-          Expanded(
-            flex: 2,
+          Container(
+            width: 100,
             child: Text(
               type,
               style: const TextStyle(
@@ -566,8 +581,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-          Expanded(
-            flex: 2,
+          Container(
+            width: 120,
             child: Row(
               children: [
                 StatusIndicator(status: status),
@@ -582,8 +597,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           if (!ResponsiveHelper.isMobile(context))
-            Expanded(
-              flex: 2,
+            Container(
+              width: 120,
               child: Text(
                 lastActive,
                 style: TextStyle(
@@ -591,8 +606,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-          Expanded(
-            flex: 1,
+          Container(
+            width: 50,
+            alignment: Alignment.center,
             child: IconButton(
               icon: const Icon(Icons.more_vert),
               onPressed: () {
@@ -696,6 +712,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   value: sysInfo.connections,
                                   icon: Icons.wifi,
                                   color: AppTheme.primaryOrange,
+                                  subtitle: sysInfo.connections == '0' ? 'No active connections' : null,
                                 ),
                               ],
                             ),
@@ -708,13 +725,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Icon(
-                                          Icons.memory,
-                                          color: AppTheme.primaryBlue,
-                                          size: 18,
-                                        ),
-                                        const SizedBox(width: 8),
                                         const Text(
                                           'System Resource Usage',
                                           style: TextStyle(
@@ -807,30 +819,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required String value,
     required IconData icon,
     required Color color,
+    String? subtitle,
   }) {
     return Card(
       color: AppTheme.darkBackground,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(
-                  icon,
-                  color: color,
-                  size: 16,
-                ),
-                const SizedBox(width: 6),
+                Icon(icon, color: color, size: 16),
+                const SizedBox(width: 8),
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     color: AppTheme.darkTextSecondary,
                   ),
                 ),
@@ -839,12 +844,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 8),
             Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: color,
+                color: AppTheme.darkTextPrimary,
               ),
             ),
+            if (subtitle != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: AppTheme.darkTextSecondary,
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -856,7 +871,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required double value,
     required Color color,
     bool showPercentage = false,
-    String percentage = '',
+    String? percentage,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -871,7 +886,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 color: AppTheme.darkTextSecondary,
               ),
             ),
-            if (showPercentage)
+            if (showPercentage && percentage != null)
               Text(
                 percentage,
                 style: TextStyle(
@@ -882,33 +897,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         const SizedBox(height: 4),
-        ClipRRect(
+        LinearProgressIndicator(
+          value: value.clamp(0.0, 1.0),
+          backgroundColor: AppTheme.darkSurface,
+          valueColor: AlwaysStoppedAnimation<Color>(color),
+          minHeight: 8,
           borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: value,
-            backgroundColor: Colors.grey[800],
-            valueColor: AlwaysStoppedAnimation<Color>(color),
-            minHeight: 8,
-          ),
         ),
       ],
     );
   }
 
-  Color _getTemperatureColor(double temperature) {
-    if (temperature > 70) {
+  Color _getTemperatureColor(double temp) {
+    if (temp >= 75) {
       return AppTheme.error;
-    } else if (temperature > 60) {
+    } else if (temp >= 65) {
       return AppTheme.warning;
     } else {
       return AppTheme.online;
     }
   }
 
-  Color _getUsageColor(double usage) {
-    if (usage > 90) {
+  Color _getUsageColor(double percentage) {
+    if (percentage >= 90) {
       return AppTheme.error;
-    } else if (usage > 70) {
+    } else if (percentage >= 70) {
       return AppTheme.warning;
     } else {
       return AppTheme.online;
