@@ -1,0 +1,2 @@
+// Suppress macro redefinition warnings from CocoaPods
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) POD_CONFIGURATION_DEBUG=1

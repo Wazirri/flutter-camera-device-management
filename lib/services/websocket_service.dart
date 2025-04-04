@@ -8,6 +8,7 @@ import '../models/system_info.dart';
 
 typedef MessageHandler = void Function(Map<String, dynamic> message);
 
+// Changed to 'extends ChangeNotifier' for proper inheritance
 class WebSocketService extends ChangeNotifier {
   WebSocketChannel? _channel;
   bool _isConnected = false;

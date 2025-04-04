@@ -10,7 +10,9 @@ import "../widgets/video_controls.dart";
 import '../utils/responsive_helper.dart';
 
 class LiveViewScreen extends StatefulWidget {
-  const LiveViewScreen({Key? key}) : super(key: key);
+  final Camera? camera; // Make camera optional so the route can work without a parameter
+
+  const LiveViewScreen({Key? key, this.camera}) : super(key: key);
 
   @override
   State<LiveViewScreen> createState() => _LiveViewScreenState();
@@ -18,447 +20,331 @@ class LiveViewScreen extends StatefulWidget {
 
 class _LiveViewScreenState extends State<LiveViewScreen> {
   int _selectedCameraIndex = 0;
-  final List<String> _layoutOptions = ['Single', '2x2', '3x3', '4x4'];
-  String _selectedLayout = 'Single';
-  
-  // Map to store MediaKit players for each camera
-  final Map<String, Player> _players = {};
-  final Map<String, VideoController> _videoControllers = {};
-  final Map<String, bool> _playerInitialized = {};
+  Camera? _camera;
+  bool _isFullScreen = false;
+  late final Player _player;
+  late final VideoController _controller;
+  bool _isPlaying = false;
+  bool _isBuffering = false;
+  bool _hasError = false;
+  String _errorMessage = '';
+  List<Camera> _availableCameras = [];
   
   @override
   void initState() {
     super.initState();
+    _initializePlayer();
+  }
+  
+  void _initializePlayer() {
+    // Create a media kit player
+    _player = Player();
+    _controller = VideoController(_player);
     
-    // Initialize player for the currently selected camera after the build is complete
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeSelectedCamera();
+    // Set initial camera if provided
+    if (widget.camera != null) {
+      _camera = widget.camera;
+    }
+    
+    // Add event listeners
+    _player.stream.playing.listen((playing) {
+      if (mounted) {
+        setState(() {
+          _isPlaying = playing;
+        });
+      }
+    });
+    
+    _player.stream.buffering.listen((buffering) {
+      if (mounted) {
+        setState(() {
+          _isBuffering = buffering;
+        });
+      }
+    });
+    
+    _player.stream.error.listen((error) {
+      debugPrint('Player error: $error');
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = 'Failed to play stream: $error';
+        });
+      }
+    });
+    
+    // Load the camera if available
+    _loadCameraStream();
+  }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Get the list of available cameras from provider
+    final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    setState(() {
+      _availableCameras = cameraProvider.cameras;
+      
+      // If no camera was provided and there are available cameras, use the first one
+      if (_camera == null && _availableCameras.isNotEmpty) {
+        _camera = _availableCameras[0];
+        _loadCameraStream();
+      }
     });
   }
   
-  void _initializeSelectedCamera() {
-    final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
-    final selectedCamera = cameraDevicesProvider.selectedCamera;
+  void _loadCameraStream() {
+    if (_camera == null || _camera!.rtspUri.isEmpty) {
+      setState(() {
+        _hasError = true;
+        _errorMessage = 'No valid RTSP stream URL available for this camera';
+      });
+      return;
+    }
     
-    if (selectedCamera != null) {
-      _initializePlayer(selectedCamera);
-    }
-  }
-
-  Future<void> _initializePlayer(Camera camera) async {
+    // Reset error state
+    setState(() {
+      _hasError = false;
+      _errorMessage = '';
+    });
+    
+    // Format RTSP URL if needed (sometimes RTSP URLs need adjustments)
+    final url = _camera!.rtspUri;
+    
+    // Try to play the stream
     try {
-      // Create player if it doesn't exist yet for this camera
-      if (!_players.containsKey(camera.name)) {
-        debugPrint('Creating new player for camera: ${camera.name}');
-        _players[camera.name] = Player();
-        _videoControllers[camera.name] = VideoController(_players[camera.name]!);
-        _playerInitialized[camera.name] = false;
-      }
-      
-      // Skip if already initialized
-      if (_playerInitialized[camera.name] == true) {
-        debugPrint('Player already initialized for camera: ${camera.name}');
-        return;
-      }
-      
-      String streamUrl = camera.rtspUri;
-      
-      if (streamUrl.isEmpty) {
-        debugPrint('No stream URL available for camera: ${camera.name}');
-        return;
-      }
-      
-      debugPrint('Initializing player with stream URL: $streamUrl');
-      
-      // Open the media with the player
-      await _players[camera.name]!.open(Media(streamUrl));
-      
-      if (mounted) {
-        setState(() {
-          _playerInitialized[camera.name] = true;
-        });
-      }
-      
+      _player.open(Media(url));
     } catch (e) {
-      debugPrint('Error initializing player for ${camera.name}: $e');
+      setState(() {
+        _hasError = true;
+        _errorMessage = 'Error opening stream: $e';
+      });
     }
   }
-
+  
+  void _selectCamera(int index) {
+    if (index >= 0 && index < _availableCameras.length) {
+      setState(() {
+        _selectedCameraIndex = index;
+        _camera = _availableCameras[index];
+      });
+      
+      // Load the newly selected camera
+      _loadCameraStream();
+    }
+  }
+  
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullScreen = !_isFullScreen;
+    });
+  }
+  
   @override
   void dispose() {
-    // Dispose all players
-    for (final player in _players.values) {
-      player.dispose();
-    }
+    _player.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = ResponsiveHelper.isDesktop(context);
-    
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Live View'),
-        backgroundColor: AppTheme.darkBackground,
-        actions: [
-          // Layout selector
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.grid_view),
-            onSelected: (String layout) {
-              setState(() {
-                _selectedLayout = layout;
-              });
-            },
-            itemBuilder: (context) {
-              return _layoutOptions.map((String layout) {
-                return PopupMenuItem<String>(
-                  value: layout,
-                  child: Text(layout),
-                );
-              }).toList();
-            },
+      appBar: _isFullScreen 
+        ? null 
+        : AppBar(
+          title: Text(_camera != null 
+            ? 'Live View: ${_camera!.name}' 
+            : 'Live View'
           ),
-          
-          // More options
-          PopupMenuButton<String>(
-            onSelected: (String option) {
-              // Handle option selection
-            },
-            itemBuilder: (context) {
-              return [
-                const PopupMenuItem<String>(
-                  value: 'fullscreen',
-                  child: Text('Fullscreen'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'snapshot',
-                  child: Text('Take Snapshot'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'record',
-                  child: Text('Start Recording'),
-                ),
-              ];
-            },
-          ),
-        ],
-      ),
-      body: Consumer<CameraDevicesProvider>(
-        builder: (context, provider, child) {
-          final allCameras = provider.allCameras;
-          
-          if (allCameras.isEmpty) {
-            return const Center(
-              child: Text(
-                'No cameras available.\nMake sure you are connected to the server.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
-              ),
-            );
-          }
-          
-          // Filter for only connected cameras
-          final connectedCameras = allCameras.where((camera) => camera.connected).toList();
-          
-          if (connectedCameras.isEmpty) {
-            return const Center(
-              child: Text(
-                'No connected cameras found.\nAll cameras are currently offline.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
-              ),
-            );
-          }
-          
-          // Get the selected camera or use the first one
-          final selectedCamera = provider.selectedCamera ?? connectedCameras.first;
-          
-          // Initialize the player for the selected camera if needed
-          if (!_players.containsKey(selectedCamera.name)) {
-            _initializePlayer(selectedCamera);
-          }
-          
-          return Row(
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.fullscreen),
+              onPressed: _toggleFullScreen,
+            ),
+          ],
+        ),
+      body: SafeArea(
+        child: _isFullScreen
+          ? _buildPlayer()
+          : Column(
             children: [
-              // Camera list sidebar (only on desktop)
-              if (isDesktop)
-                SizedBox(
-                  width: 250,
-                  child: _buildCameraList(connectedCameras, selectedCamera),
-                ),
-                
-              // Main content area
-              Expanded(
-                child: Column(
-                  children: [
-                    // Camera view
-                    Expanded(
-                      child: _buildCameraView(selectedCamera),
-                    ),
-                    
-                    // Bottom camera selector (only on mobile)
-                    if (!isDesktop)
-                      SizedBox(
-                        height: 100,
-                        child: _buildCameraSelector(connectedCameras, selectedCamera),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-  
-  Widget _buildCameraList(List<Camera> cameras, Camera selectedCamera) {
-    return Container(
-      color: AppTheme.darkSurface,
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            alignment: Alignment.centerLeft,
-            child: const Text(
-              'Cameras',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const Divider(height: 1),
-          Expanded(
-            child: ListView.builder(
-              itemCount: cameras.length,
-              itemBuilder: (context, index) {
-                final camera = cameras[index];
-                final isSelected = camera.name == selectedCamera.name;
-                
-                return ListTile(
-                  leading: const Icon(Icons.videocam),
-                  title: Text(
-                    camera.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(
-                    camera.manufacturer.isNotEmpty || camera.hw.isNotEmpty
-                        ? '${camera.manufacturer} ${camera.hw}'
-                        : 'Camera ${index + 1}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[400],
-                    ),
-                  ),
-                  selected: isSelected,
-                  selectedTileColor: AppTheme.primaryColor.withOpacity(0.1),
-                  trailing: camera.recording
-                      ? const Icon(Icons.fiber_manual_record, color: Colors.red, size: 12)
-                      : null,
-                  onTap: () {
-                    // Find the device this camera belongs to
-                    final provider = Provider.of<CameraDevicesProvider>(context, listen: false);
-                    for (var device in provider.devicesList) {
-                      int cameraIndex = device.cameras.indexWhere((c) => c.name == camera.name);
-                      if (cameraIndex >= 0) {
-                        provider.setSelectedDevice(device.macKey);
-                        provider.setSelectedCameraIndex(cameraIndex);
+              // Camera selector
+              if (_availableCameras.length > 1)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    height: 60,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _availableCameras.length,
+                      itemBuilder: (context, index) {
+                        final camera = _availableCameras[index];
+                        final isSelected = index == _selectedCameraIndex;
                         
-                        // Initialize the player for this camera if needed
-                        _initializePlayer(camera);
-                        break;
-                      }
-                    }
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildCameraSelector(List<Camera> cameras, Camera selectedCamera) {
-    return Container(
-      color: AppTheme.darkSurface,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: cameras.length,
-        itemBuilder: (context, index) {
-          final camera = cameras[index];
-          final isSelected = camera.name == selectedCamera.name;
-          
-          return Container(
-            width: 120,
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: isSelected ? AppTheme.primaryColor : Colors.transparent,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: InkWell(
-              onTap: () {
-                // Find the device this camera belongs to
-                final provider = Provider.of<CameraDevicesProvider>(context, listen: false);
-                for (var device in provider.devicesList) {
-                  int cameraIndex = device.cameras.indexWhere((c) => c.name == camera.name);
-                  if (cameraIndex >= 0) {
-                    provider.setSelectedDevice(device.macKey);
-                    provider.setSelectedCameraIndex(cameraIndex);
-                    
-                    // Initialize the player for this camera if needed
-                    _initializePlayer(camera);
-                    break;
-                  }
-                }
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.videocam,
-                    color: isSelected ? AppTheme.primaryColor : Colors.grey,
-                    size: 32,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    camera.name,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: ChoiceChip(
+                            label: Text(camera.name),
+                            selected: isSelected,
+                            onSelected: (selected) {
+                              if (selected) {
+                                _selectCamera(index);
+                              }
+                            },
+                            backgroundColor: Theme.of(context).cardColor,
+                            selectedColor: AppTheme.primaryOrange.withOpacity(0.2),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                ],
+                ),
+  
+              // Player section
+              Expanded(
+                child: _buildPlayer(),
               ),
-            ),
-          );
-        },
+              
+              // Camera details at the bottom
+              if (_camera != null)
+                _buildCameraDetails(),
+            ],
+          ),
       ),
+      floatingActionButton: _isFullScreen 
+        ? FloatingActionButton(
+            child: const Icon(Icons.fullscreen_exit),
+            onPressed: _toggleFullScreen,
+          )
+        : null,
     );
   }
   
-  Widget _buildCameraView(Camera camera) {
-    // Check if player exists and is initialized
-    final hasPlayer = _players.containsKey(camera.name);
-    final isInitialized = _playerInitialized[camera.name] ?? false;
+  Widget _buildPlayer() {
+    if (_camera == null) {
+      return const Center(
+        child: Text('No camera selected'),
+      );
+    }
     
-    if (!hasPlayer || !isInitialized) {
+    if (_hasError) {
       return Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const CircularProgressIndicator(),
+            const Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red,
+            ),
             const SizedBox(height: 16),
             Text(
-              'Loading camera: ${camera.name}',
-              style: const TextStyle(fontSize: 16),
+              'Error playing stream',
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-            if (camera.rtspUri.isEmpty)
-              Text(
-                'No stream URL available for this camera',
-                style: TextStyle(fontSize: 14, color: Colors.red[300]),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Text(
+                _errorMessage,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+              onPressed: _loadCameraStream,
+            ),
           ],
         ),
       );
     }
     
-    // Show the video view
     return Stack(
+      alignment: Alignment.center,
       children: [
-        // Video
-        Positioned.fill(
-          child: Center(
-            child: Video(
-              controller: _videoControllers[camera.name]!,
-              controls: (state) => VideoControls(state),
-            ),
-          ),
+        // Video player
+        Video(
+          controller: _controller,
+          controls: (player) => VideoControls(player: player),
         ),
         
-        // Camera info overlay
-        Positioned(
-          top: 16,
-          left: 16,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  camera.name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if (camera.manufacturer.isNotEmpty || camera.hw.isNotEmpty)
-                  Text(
-                    '${camera.manufacturer} ${camera.hw}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[400],
-                    ),
-                  ),
-                if (camera.recordWidth > 0 && camera.recordHeight > 0)
-                  Text(
-                    '${camera.recordWidth}x${camera.recordHeight}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[400],
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-        
-        // Recording indicator
-        if (camera.recording)
-          Positioned(
-            top: 16,
-            right: 16,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Row(
+        // Buffering indicator (show when buffering and not playing yet)
+        if (_isBuffering && !_isPlaying)
+          const CircularProgressIndicator(),
+      ],
+    );
+  }
+  
+  Widget _buildCameraDetails() {
+    if (_camera == null) return const SizedBox.shrink();
+    
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      color: Theme.of(context).cardColor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Camera name and status
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.fiber_manual_record,
-                    size: 12,
-                    color: Colors.white,
-                  ),
-                  SizedBox(width: 4),
                   Text(
-                    'REC',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    _camera!.name,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        _camera!.connected ? Icons.link : Icons.link_off,
+                        size: 16,
+                        color: _camera!.connected ? Colors.green : Colors.red,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _camera!.connected ? 'Connected' : 'Disconnected',
+                        style: TextStyle(
+                          color: _camera!.connected ? Colors.green : Colors.red,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ),
+              
+              // Resolution info
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'Main: ${_camera!.recordWidth}x${_camera!.recordHeight}',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  Text(
+                    'Sub: ${_camera!.subWidth}x${_camera!.subHeight}',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ],
           ),
-      ],
+          
+          // Additional details
+          const SizedBox(height: 8),
+          if (_camera!.brand.isNotEmpty)
+            Text('Brand: ${_camera!.brand}'),
+          if (_camera!.ip.isNotEmpty)
+            Text('IP: ${_camera!.ip}'),
+        ],
+      ),
     );
   }
 }

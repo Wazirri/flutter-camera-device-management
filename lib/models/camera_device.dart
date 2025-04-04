@@ -185,6 +185,10 @@ class Camera {
     required this.recording,
   });
   
+  // Added id getter to uniquely identify cameras
+  // Using a combination of name and index as id
+  String get id => "${name}_$index";
+  
   // Copy with method for immutable updates
   Camera copyWith({
     String? name,

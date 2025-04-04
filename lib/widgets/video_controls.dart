@@ -1,12 +1,96 @@
 import 'package:flutter/material.dart';
-import 'package:media_kit_video/media_kit_video.dart';
+import 'package:media_kit/media_kit.dart';
 import '../theme/app_theme.dart';
 
 // Custom video controls for our Media Kit player
-class VideoControls extends StatelessWidget {
-  final VideoState state;
+class VideoControls extends StatefulWidget {
+  final Player player;
+  final bool showFullScreenButton;
+  final VoidCallback? onFullScreenToggle;
 
-  const VideoControls(this.state, {Key? key}) : super(key: key);
+  const VideoControls({
+    Key? key,
+    required this.player,
+    this.showFullScreenButton = true,
+    this.onFullScreenToggle,
+  }) : super(key: key);
+
+  @override
+  State<VideoControls> createState() => _VideoControlsState();
+}
+
+class _VideoControlsState extends State<VideoControls> {
+  bool _playing = false;
+  Duration _position = Duration.zero;
+  Duration _duration = Duration.zero;
+  double _volume = 100;
+  late final _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // Initial values
+    _updatePlaybackState();
+    
+    // Set up listener for changes
+    _subscription = widget.player.stream.playing.listen((playing) {
+      if (mounted) {
+        setState(() {
+          _playing = playing;
+        });
+      }
+    });
+    
+    // Listen to position changes
+    widget.player.stream.position.listen((position) {
+      if (mounted) {
+        setState(() {
+          _position = position;
+        });
+      }
+    });
+    
+    // Listen to duration changes
+    widget.player.stream.duration.listen((duration) {
+      if (mounted) {
+        setState(() {
+          _duration = duration;
+        });
+      }
+    });
+    
+    // Listen to volume changes
+    widget.player.stream.volume.listen((volume) {
+      if (mounted) {
+        setState(() {
+          _volume = volume;
+        });
+      }
+    });
+  }
+  
+  void _updatePlaybackState() async {
+    final playing = await widget.player.state.playing;
+    final position = await widget.player.state.position;
+    final duration = await widget.player.state.duration;
+    final volume = await widget.player.state.volume;
+    
+    if (mounted) {
+      setState(() {
+        _playing = playing;
+        _position = position;
+        _duration = duration;
+        _volume = volume;
+      });
+    }
+  }
+  
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +113,14 @@ class VideoControls extends StatelessWidget {
             // Play/Pause button
             IconButton(
               icon: Icon(
-                state.playing ? Icons.pause : Icons.play_arrow,
+                _playing ? Icons.pause : Icons.play_arrow,
                 color: Colors.white,
               ),
               onPressed: () {
-                if (state.playing) {
-                  state.player.pause();
+                if (_playing) {
+                  widget.player.pause();
                 } else {
-                  state.player.play();
+                  widget.player.play();
                 }
               },
             ),
@@ -44,14 +128,14 @@ class VideoControls extends StatelessWidget {
             // Position slider
             Expanded(
               child: Slider(
-                value: state.position.inMilliseconds.toDouble().clamp(
+                value: _position.inMilliseconds.toDouble().clamp(
                       0,
-                      state.duration.inMilliseconds.toDouble().max(0),
+                      _duration.inMilliseconds.toDouble().max(0),
                     ),
                 min: 0,
-                max: state.duration.inMilliseconds.toDouble().max(1),
+                max: _duration.inMilliseconds.toDouble().max(1),
                 onChanged: (value) {
-                  state.player.seek(Duration(milliseconds: value.toInt()));
+                  widget.player.seek(Duration(milliseconds: value.toInt()));
                 },
                 activeColor: AppTheme.primaryOrange,
                 inactiveColor: Colors.grey.shade600,
@@ -62,7 +146,7 @@ class VideoControls extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: Text(
-                "${_formatDuration(state.position)} / ${_formatDuration(state.duration)}",
+                "${_formatDuration(_position)} / ${_formatDuration(_duration)}",
                 style: const TextStyle(color: Colors.white),
               ),
             ),
@@ -70,24 +154,23 @@ class VideoControls extends StatelessWidget {
             // Volume button
             IconButton(
               icon: Icon(
-                state.volume > 0 ? Icons.volume_up : Icons.volume_off,
+                _volume > 0 ? Icons.volume_up : Icons.volume_off,
                 color: Colors.white,
               ),
               onPressed: () {
-                state.player.setVolume(state.volume > 0 ? 0 : 100);
+                widget.player.setVolume(_volume > 0 ? 0 : 100);
               },
             ),
             
-            // Fullscreen button (can implement actual fullscreen toggle)
-            IconButton(
-              icon: const Icon(
-                Icons.fullscreen,
-                color: Colors.white,
+            // Fullscreen button
+            if (widget.showFullScreenButton)
+              IconButton(
+                icon: const Icon(
+                  Icons.fullscreen,
+                  color: Colors.white,
+                ),
+                onPressed: widget.onFullScreenToggle,
               ),
-              onPressed: () {
-                // Would implement actual fullscreen logic if needed
-              },
-            ),
           ],
         ),
       ),

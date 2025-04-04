@@ -2,667 +2,442 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import '../theme/app_theme.dart';
-import '../utils/responsive_helper.dart';
-import '../widgets/custom_app_bar.dart';
 import '../providers/camera_devices_provider.dart';
 import '../models/camera_device.dart';
-import "../widgets/video_controls.dart";
+import '../theme/app_theme.dart';
+import '../widgets/video_controls.dart';
+import '../utils/responsive_helper.dart';
 
 class RecordViewScreen extends StatefulWidget {
-  const RecordViewScreen({Key? key}) : super(key: key);
+  final Camera? camera; // Make camera optional so the route can work without a parameter
+
+  const RecordViewScreen({Key? key, this.camera}) : super(key: key);
 
   @override
   State<RecordViewScreen> createState() => _RecordViewScreenState();
 }
 
 class _RecordViewScreenState extends State<RecordViewScreen> {
-  final _dateController = TextEditingController(text: '2025-04-01');
-  String _selectedCameraName = '';
-  
-  // Map to store MediaKit players for recordings
-  Player? _recordingPlayer;
-  VideoController? _videoController;
-  bool _playerInitialized = false;
+  int _selectedCameraIndex = 0;
+  Camera? _camera;
+  bool _isFullScreen = false;
+  late final Player _player;
+  late final VideoController _controller;
+  bool _isPlaying = false;
+  bool _isBuffering = false;
+  bool _hasError = false;
+  String _errorMessage = '';
+  List<Camera> _availableCameras = [];
+  List<String> _availableRecordings = [];
+  String? _selectedRecording;
   
   @override
   void initState() {
     super.initState();
+    _initializePlayer();
+  }
+  
+  void _initializePlayer() {
+    // Create a media kit player
+    _player = Player();
+    _controller = VideoController(_player);
     
-    // Initialize player for the selected camera
-    _recordingPlayer = Player();
-    _videoController = VideoController(_recordingPlayer!);
+    // Set initial camera if provided
+    if (widget.camera != null) {
+      _camera = widget.camera;
+    }
     
-    // Set up the player after the build is complete
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeSelectedCamera();
+    // Add event listeners
+    _player.stream.playing.listen((playing) {
+      if (mounted) {
+        setState(() {
+          _isPlaying = playing;
+        });
+      }
+    });
+    
+    _player.stream.buffering.listen((buffering) {
+      if (mounted) {
+        setState(() {
+          _isBuffering = buffering;
+        });
+      }
+    });
+    
+    _player.stream.error.listen((error) {
+      debugPrint('Player error: $error');
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = 'Failed to play recording: $error';
+        });
+      }
+    });
+    
+    // Load the camera if available
+    _fetchRecordings();
+  }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Get the list of available cameras from provider
+    final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    setState(() {
+      _availableCameras = cameraProvider.cameras;
+      
+      // If no camera was provided and there are available cameras, use the first one
+      if (_camera == null && _availableCameras.isNotEmpty) {
+        _camera = _availableCameras[0];
+        _fetchRecordings();
+      }
     });
   }
   
-  void _initializeSelectedCamera() {
-    final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
-    final selectedCamera = cameraDevicesProvider.selectedCamera;
-    
-    if (selectedCamera != null) {
-      _selectedCameraName = selectedCamera.name;
-      
-      // Try to load a recording if available (using the record URI which would normally
-      // be a past recording, but for demo purposes we're using it as-is)
-      if (selectedCamera.recordUri.isNotEmpty) {
-        _initializePlayer(selectedCamera.recordUri);
-      }
-    }
-  }
-  
-  Future<void> _initializePlayer(String streamUrl) async {
-    if (streamUrl.isEmpty) {
-      debugPrint('No record stream URL available for this camera');
+  // This would typically fetch recordings from a backend
+  // For demo, we'll create some sample recordings
+  void _fetchRecordings() {
+    if (_camera == null) {
+      setState(() {
+        _availableRecordings = [];
+      });
       return;
     }
     
-    try {
-      debugPrint('Initializing recording player with URL: $streamUrl');
-      await _recordingPlayer!.open(Media(streamUrl));
+    // In a real app, you'd fetch this from your backend
+    // For demo, we'll simulate recordings
+    setState(() {
+      _availableRecordings = [
+        '${_camera!.name} - Yesterday (10:00 AM)',
+        '${_camera!.name} - Yesterday (2:30 PM)',
+        '${_camera!.name} - Today (8:15 AM)',
+      ];
       
-      if (mounted) {
-        setState(() {
-          _playerInitialized = true;
-        });
+      // Auto-select first recording if available
+      if (_availableRecordings.isNotEmpty && _selectedRecording == null) {
+        _selectedRecording = _availableRecordings[0];
+        // In a real app, this URL would come from your backend
+        _loadRecording(_camera!.recordUri);
       }
-    } catch (e) {
-      debugPrint('Error initializing recording player: $e');
+    });
+  }
+  
+  void _loadRecording(String url) {
+    if (url.isEmpty) {
+      setState(() {
+        _hasError = true;
+        _errorMessage = 'No recording URL available';
+      });
+      return;
     }
+    
+    // Reset error state
+    setState(() {
+      _hasError = false;
+      _errorMessage = '';
+    });
+    
+    // Try to play the recording
+    try {
+      _player.open(Media(url));
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+        _errorMessage = 'Error opening recording: $e';
+      });
+    }
+  }
+  
+  void _selectCamera(int index) {
+    if (index >= 0 && index < _availableCameras.length) {
+      setState(() {
+        _selectedCameraIndex = index;
+        _camera = _availableCameras[index];
+        _selectedRecording = null;
+      });
+      
+      // Fetch recordings for the newly selected camera
+      _fetchRecordings();
+    }
+  }
+  
+  void _selectRecording(String recording) {
+    setState(() {
+      _selectedRecording = recording;
+    });
+    
+    // In a real app, you'd fetch the recording URL from your backend
+    // For demo, we'll use the camera's record URI
+    if (_camera != null) {
+      _loadRecording(_camera!.recordUri);
+    }
+  }
+  
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullScreen = !_isFullScreen;
+    });
   }
   
   @override
   void dispose() {
-    _dateController.dispose();
-    _recordingPlayer?.dispose();
+    _player.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = ResponsiveHelper.isDesktop(context);
-    
     return Scaffold(
-      backgroundColor: AppTheme.darkBackground,
-      appBar: CustomAppBar(
-        title: 'Recordings',
-        isDesktop: isDesktop,
-        actions: [
-          _buildDateSelector(),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: Row(
-        children: [
-          // Timeline sidebar - only visible on desktop/tablet
-          if (isDesktop || ResponsiveHelper.isTablet(context))
-            SizedBox(
-              width: 280,
-              child: Card(
-                margin: EdgeInsets.zero,
-                color: AppTheme.darkSurface,
-                elevation: 0,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-                child: Column(
-                  children: [
-                    _buildCalendar(),
-                    Expanded(
-                      child: _buildCamerasList(),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          
-          // Main content area
-          Expanded(
-            child: Column(
-              children: [
-                // Recording video display area
-                Expanded(
-                  child: _buildRecordingView(),
-                ),
-                
-                // Playback controls
-                _buildPlaybackControls(),
-              ],
-            ),
+      appBar: _isFullScreen 
+        ? null 
+        : AppBar(
+          title: Text(_camera != null 
+            ? 'Recordings: ${_camera!.name}' 
+            : 'Recordings'
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDateSelector() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: InkWell(
-        onTap: () async {
-          final date = await showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2020),
-            lastDate: DateTime.now(),
-            builder: (context, child) {
-              return Theme(
-                data: Theme.of(context).copyWith(
-                  colorScheme: const ColorScheme.dark(
-                    primary: AppTheme.primaryBlue,
-                    onPrimary: Colors.white,
-                    surface: AppTheme.darkSurface,
-                    onSurface: AppTheme.darkTextPrimary,
-                  ),
-                  dialogBackgroundColor: AppTheme.darkSurface,
-                ),
-                child: child!,
-              );
-            },
-          );
-          if (date != null) {
-            setState(() {
-              _dateController.text = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-            });
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: AppTheme.darkBackground,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Row(
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.fullscreen),
+              onPressed: _toggleFullScreen,
+            ),
+          ],
+        ),
+      body: SafeArea(
+        child: _isFullScreen
+          ? _buildPlayer()
+          : Column(
             children: [
-              const Icon(Icons.calendar_today, size: 16),
-              const SizedBox(width: 8),
-              Text(_dateController.text),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCalendar() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: AppTheme.darkSurface.withOpacity(0.8), width: 1),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'April 2025',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.chevron_left),
-                    onPressed: () {
-                      // UI only
-                    },
-                    iconSize: 20,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.chevron_right),
-                    onPressed: () {
-                      // UI only
-                    },
-                    iconSize: 20,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildCalendarGrid(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCalendarGrid() {
-    // Create a simple calendar grid
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 7,
-        childAspectRatio: 1.0,
-      ),
-      itemCount: 7 + 30, // 7 days of week + 30 days in month
-      itemBuilder: (context, index) {
-        if (index < 7) {
-          // Weekday headers
-          final weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-          return Center(
-            child: Text(
-              weekdays[index],
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.darkTextSecondary,
-              ),
-            ),
-          );
-        } else {
-          // Day cells
-          final day = index - 7 + 1;
-          final hasRecordings = [1, 5, 10, 15, 20, 25].contains(day);
-          final isSelected = day == 1; // April 1st is selected
-          
-          return InkWell(
-            onTap: () {
-              // UI only
-            },
-            child: Container(
-              margin: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: isSelected 
-                    ? AppTheme.primaryBlue 
-                    : hasRecordings 
-                        ? AppTheme.primaryBlue.withOpacity(0.1) 
-                        : Colors.transparent,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Center(
-                child: Text(
-                  day.toString(),
-                  style: TextStyle(
-                    color: isSelected 
-                        ? Colors.white 
-                        : hasRecordings 
-                            ? AppTheme.primaryBlue 
-                            : AppTheme.darkTextPrimary,
-                    fontWeight: isSelected || hasRecordings ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }
-      },
-    );
-  }
-
-  Widget _buildCamerasList() {
-    return Consumer<CameraDevicesProvider>(
-      builder: (context, provider, child) {
-        // Get all cameras from all devices
-        final allCameras = provider.allCameras;
-        
-        if (allCameras.isEmpty) {
-          return const Center(
-            child: Text(
-              'No cameras available.\nMake sure you are connected to the server.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
-            ),
-          );
-        }
-        
-        // Filter for cameras that have recording capabilities (have recordUri)
-        final recordingCameras = allCameras
-            .where((camera) => camera.recordUri.isNotEmpty || camera.recording)
-            .toList();
-        
-        if (recordingCameras.isEmpty) {
-          return const Center(
-            child: Text(
-              'No cameras with recordings found.\nCheck that cameras are properly configured.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16),
-            ),
-          );
-        }
-        
-        return ListView.builder(
-          itemCount: recordingCameras.length,
-          itemBuilder: (context, index) {
-            final camera = recordingCameras[index];
-            final isSelected = camera.name == _selectedCameraName;
-            
-            return _buildCameraRecordingItem(
-              camera: camera,
-              isSelected: isSelected,
-              onTap: () {
-                setState(() {
-                  _selectedCameraName = camera.name;
-                });
-                
-                // Find the device this camera belongs to
-                for (var device in provider.devicesList) {
-                  final cameraIndex = device.cameras.indexWhere((c) => c.name == camera.name);
-                  if (cameraIndex >= 0) {
-                    provider.setSelectedDevice(device.macKey);
-                    provider.setSelectedCameraIndex(cameraIndex);
-                    
-                    // Initialize player with this camera's recording
-                    if (camera.recordUri.isNotEmpty) {
-                      _initializePlayer(camera.recordUri);
-                    }
-                    break;
-                  }
-                }
-              },
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildCameraRecordingItem({
-    required Camera camera,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      selected: isSelected,
-      selectedTileColor: AppTheme.primaryBlue.withOpacity(0.15),
-      onTap: onTap,
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Center(
-          child: Icon(
-            Icons.videocam,
-            color: isSelected ? AppTheme.primaryBlue : AppTheme.primaryOrange,
-            size: 20,
-          ),
-        ),
-      ),
-      title: Text(
-        camera.name,
-        style: TextStyle(
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? AppTheme.primaryBlue : AppTheme.darkTextPrimary,
-        ),
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (camera.manufacturer.isNotEmpty || camera.hw.isNotEmpty)
-            Text(
-              '${camera.manufacturer} ${camera.hw}',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppTheme.darkTextSecondary,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          Text(
-            camera.recording ? 'Currently Recording' : 'Has Recordings',
-            style: TextStyle(
-              fontSize: 12,
-              color: camera.recording ? Colors.red : AppTheme.darkTextSecondary,
-            ),
-          ),
-        ],
-      ),
-      trailing: Icon(
-        Icons.play_circle_fill,
-        color: isSelected ? AppTheme.primaryBlue : AppTheme.primaryOrange,
-        size: 24,
-      ),
-    );
-  }
-
-  Widget _buildRecordingView() {
-    // Check if we have a selected camera
-    final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
-    final selectedCamera = cameraProvider.selectedCamera;
-    
-    if (selectedCamera == null) {
-      return const Center(
-        child: Text(
-          'No camera selected',
-          style: TextStyle(fontSize: 16),
-        ),
-      );
-    }
-    
-    // Check if player is initialized
-    if (!_playerInitialized || selectedCamera.recordUri.isEmpty) {
-      return Container(
-        margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.videocam,
-                size: 64,
-                color: AppTheme.primaryOrange,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'No Recording Available',
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: AppTheme.darkTextPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                selectedCamera.name,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppTheme.darkTextSecondary,
-                ),
-              ),
-              if (selectedCamera.recordUri.isEmpty)
+              // Camera selector
+              if (_availableCameras.length > 1)
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'This camera does not have a recording URI configured',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.red[300],
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    height: 60,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _availableCameras.length,
+                      itemBuilder: (context, index) {
+                        final camera = _availableCameras[index];
+                        final isSelected = index == _selectedCameraIndex;
+                        
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          child: ChoiceChip(
+                            label: Text(camera.name),
+                            selected: isSelected,
+                            onSelected: (selected) {
+                              if (selected) {
+                                _selectCamera(index);
+                              }
+                            },
+                            backgroundColor: Theme.of(context).cardColor,
+                            selectedColor: AppTheme.primaryOrange.withOpacity(0.2),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
-            ],
-          ),
-        ),
-      );
-    }
-    
-    // Show the video player
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Stack(
-        children: [
-          // Video
-          Positioned.fill(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Video(
-                controller: _videoController!,
-                controls: (state) => VideoControls(state),
-              ),
-            ),
-          ),
-          
-          // Camera info overlay
-          Positioned(
-            top: 16,
-            left: 16,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.fiber_manual_record,
-                    size: 12,
-                    color: AppTheme.error,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    selectedCamera.name,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
+  
+              // Recording selector
+              if (_availableRecordings.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      labelText: 'Select Recording',
+                      border: OutlineInputBorder(),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          
-          // Recording details overlay
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(
-                '${_dateController.text} (${selectedCamera.recordWidth}x${selectedCamera.recordHeight})',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPlaybackControls() {
-    return Container(
-      height: 100,
-      color: AppTheme.darkSurface,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Column(
-        children: [
-          // Progress slider
-          Slider(
-            value: 0.3,
-            onChanged: (value) {
-              // UI only
-            },
-            activeColor: AppTheme.primaryBlue,
-            inactiveColor: AppTheme.darkBackground,
-          ),
-          
-          // Time and controls
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                '01:45 / 05:30',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppTheme.darkTextSecondary,
-                ),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.skip_previous),
-                    onPressed: () {
-                      // UI only
-                    },
-                    color: AppTheme.darkTextPrimary,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.replay_10),
-                    onPressed: () {
-                      // UI only
-                    },
-                    color: AppTheme.darkTextPrimary,
-                  ),
-                  FloatingActionButton(
-                    mini: true,
-                    backgroundColor: AppTheme.primaryBlue,
-                    foregroundColor: Colors.white,
-                    onPressed: () {
-                      // Pause/play the recording player
-                      if (_recordingPlayer != null && _playerInitialized) {
-                        _recordingPlayer!.playOrPause();
+                    value: _selectedRecording,
+                    items: _availableRecordings.map((recording) {
+                      return DropdownMenuItem<String>(
+                        value: recording,
+                        child: Text(recording),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        _selectRecording(value);
                       }
                     },
-                    child: const Icon(Icons.pause),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.forward_10),
-                    onPressed: () {
-                      // UI only
-                    },
-                    color: AppTheme.darkTextPrimary,
+                ),
+  
+              // Player section
+              Expanded(
+                child: _buildPlayer(),
+              ),
+              
+              // Camera details at the bottom
+              if (_camera != null)
+                _buildCameraDetails(),
+            ],
+          ),
+      ),
+      floatingActionButton: _isFullScreen 
+        ? FloatingActionButton(
+            child: const Icon(Icons.fullscreen_exit),
+            onPressed: _toggleFullScreen,
+          )
+        : null,
+    );
+  }
+  
+  Widget _buildPlayer() {
+    if (_camera == null) {
+      return const Center(
+        child: Text('No camera selected'),
+      );
+    }
+    
+    if (_selectedRecording == null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.video_library,
+              size: 64,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _availableRecordings.isEmpty
+                ? 'No recordings available'
+                : 'Select a recording to play',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ],
+        ),
+      );
+    }
+    
+    if (_hasError) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Error playing recording',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Text(
+                _errorMessage,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+              onPressed: () {
+                if (_camera != null) {
+                  _loadRecording(_camera!.recordUri);
+                }
+              },
+            ),
+          ],
+        ),
+      );
+    }
+    
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Video player
+        Video(
+          controller: _controller,
+          controls: (player) => VideoControls(player: player),
+        ),
+        
+        // Buffering indicator (show when buffering and not playing yet)
+        if (_isBuffering && !_isPlaying)
+          const CircularProgressIndicator(),
+      ],
+    );
+  }
+  
+  Widget _buildCameraDetails() {
+    if (_camera == null) return const SizedBox.shrink();
+    
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      color: Theme.of(context).cardColor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Camera name and status
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _camera!.name,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.skip_next),
-                    onPressed: () {
-                      // UI only
-                    },
-                    color: AppTheme.darkTextPrimary,
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        _camera!.recording ? Icons.fiber_manual_record : Icons.stop,
+                        size: 16,
+                        color: _camera!.recording ? Colors.red : Colors.grey,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _camera!.recording ? 'Recording' : 'Not Recording',
+                        style: TextStyle(
+                          color: _camera!.recording ? Colors.red : Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              Row(
+              
+              // Resolution info
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.download),
-                    onPressed: () {
-                      // UI only
-                    },
-                    color: AppTheme.darkTextPrimary,
-                    tooltip: 'Download',
+                  Text(
+                    'Recording: ${_camera!.recordWidth}x${_camera!.recordHeight}',
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.fullscreen),
-                    onPressed: () {
-                      // UI only
-                    },
-                    color: AppTheme.darkTextPrimary,
-                    tooltip: 'Fullscreen',
-                  ),
+                  if (_camera!.recordPath.isNotEmpty)
+                    Text(
+                      'Path: ${_camera!.recordPath}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                 ],
               ),
             ],
           ),
+          
+          // Selected recording
+          if (_selectedRecording != null) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.video_file, size: 16),
+                const SizedBox(width: 4),
+                Text('Current: $_selectedRecording'),
+              ],
+            ),
+          ],
         ],
       ),
     );

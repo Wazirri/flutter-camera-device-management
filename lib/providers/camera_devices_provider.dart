@@ -4,27 +4,43 @@ import 'package:flutter/material.dart';
 import '../models/camera_device.dart';
 import 'websocket_provider.dart';
 
+// Changed to `extends ChangeNotifier` for proper inheritance
 class CameraDevicesProvider extends ChangeNotifier {
   final Map<String, CameraDevice> _devices = {};
   CameraDevice? _selectedDevice;
   int _selectedCameraIndex = 0;
+  bool _isLoading = false;
 
   Map<String, CameraDevice> get devices => _devices;
   List<CameraDevice> get devicesList => _devices.values.toList();
   CameraDevice? get selectedDevice => _selectedDevice;
   int get selectedCameraIndex => _selectedCameraIndex;
-  
-  // Get devices grouped by MAC address
-  Map<String, CameraDevice> get devicesByMacAddress => _devices;
+  bool get isLoading => _isLoading;
   
   // Get all cameras from all devices as a flat list
-  List<Camera> get allCameras {
-    List<Camera> cameras = [];
+  List<Camera> get cameras {
+    List<Camera> camerasList = [];
     for (var device in _devices.values) {
-      cameras.addAll(device.cameras);
+      camerasList.addAll(device.cameras);
     }
-    return cameras;
+    return camerasList;
   }
+  
+  // Get devices grouped by MAC address (for UI display and filtering)
+  Map<String, List<Camera>> getCamerasByMacAddress() {
+    Map<String, List<Camera>> result = {};
+    
+    for (var deviceEntry in _devices.entries) {
+      String macAddress = deviceEntry.key;
+      CameraDevice device = deviceEntry.value;
+      result[macAddress] = device.cameras;
+    }
+    
+    return result;
+  }
+  
+  // Get devices grouped by MAC address as a map of key to device
+  Map<String, CameraDevice> get devicesByMacAddress => _devices;
   
   // Get the selected camera from the selected device
   Camera? get selectedCamera {
@@ -53,6 +69,18 @@ class CameraDevicesProvider extends ChangeNotifier {
       _selectedCameraIndex = index;
       notifyListeners();
     }
+  }
+  
+  // Refresh cameras - simulates a refresh by triggering UI update
+  void refreshCameras() {
+    _isLoading = true;
+    notifyListeners();
+    
+    // Simulate a delay for refresh
+    Future.delayed(const Duration(seconds: 1), () {
+      _isLoading = false;
+      notifyListeners();
+    });
   }
 
   // Process "changed" messages from WebSocket
