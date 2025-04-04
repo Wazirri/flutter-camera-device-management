@@ -1,0 +1,29 @@
+--- camera_device.dart
++++ camera_device.dart
+@@ -40,6 +40,8 @@
+   final int subHeight;
+   final bool connected;
+   final String? disconnected;
++  final String? group;
++  final bool? soundRec;
+   final String lastSeenAt;
+   final bool recording;
+   
+@@ -65,6 +67,8 @@
+     this.subHeight = 0,
+     this.connected = false,
+     this.disconnected,
++    this.group,
++    this.soundRec,
+     required this.lastSeenAt,
+     this.recording = false,
+   });
+@@ -169,6 +179,8 @@
+       subHeight: map['subHeight'] ?? 0,
+       connected: map['connected'] ?? false,
+       disconnected: map['disconnected'],
++      group: map['group'],
++      soundRec: map['soundRec'],
+       lastSeenAt: map['lastSeenAt'] ?? DateTime.now().toIso8601String(),
+       recording: map['recording'] ?? false,
+     );
