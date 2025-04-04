@@ -29,10 +29,13 @@ class WebSocketProvider extends ChangeNotifier {
         final String dataPath = message['data'].toString();
         if (dataPath.startsWith('ecs.slaves.m_')) {
           debugPrint('✅ Forwarding device message to CameraDevicesProvider: ${message['data']} = ${message['val']}');
+          _cameraDevicesProvider!.processWebSocketMessage(message);
         }
+      } 
+      // Process all other messages as well
+      else {
+        _cameraDevicesProvider!.processWebSocketMessage(message);
       }
-      
-      _cameraDevicesProvider!.processWebSocketMessage(message);
     } else {
       debugPrint('❌ ERROR: CameraDevicesProvider is null, cannot process message: ${json.encode(message)}');
     }
