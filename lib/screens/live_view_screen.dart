@@ -354,8 +354,8 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
               _buildInfoChip(Icons.language, 'IP: ${_camera!.ip}'),
               if (_camera!.manufacturer.isNotEmpty)
                 _buildInfoChip(Icons.business, 'Manufacturer: ${_camera!.manufacturer}'),
-              if (_camera!.model.isNotEmpty)
-                _buildInfoChip(Icons.category, 'Model: ${_camera!.model}'),
+              if (_camera!.brand.isNotEmpty)
+                _buildInfoChip(Icons.category, 'Brand: ${_camera!.brand}'),
             ],
           ),
         ],
@@ -390,9 +390,9 @@ class _LiveViewScreenState extends State<LiveViewScreen> {
               const Divider(),
               _buildDetailItem('Name', _camera!.name),
               _buildDetailItem('IP Address', _camera!.ip),
-              _buildDetailItem('MAC Address', _camera!.mac),
+              _buildDetailItem('ID', _camera!.id), // Using ID instead of MAC address
               _buildDetailItem('Manufacturer', _camera!.manufacturer),
-              _buildDetailItem('Model', _camera!.model),
+              _buildDetailItem('Brand', _camera!.brand), // Using Brand instead of Model
               _buildDetailItem('RTSP URI', _camera!.rtspUri),
               _buildDetailItem('Country', _camera!.country),
               const SizedBox(height: 24),
