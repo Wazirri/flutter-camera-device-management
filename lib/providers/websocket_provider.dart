@@ -75,7 +75,7 @@ class WebSocketProvider with ChangeNotifier {
   }
   
   // Method to clear WebSocket logs
-  void clearLog() {
+  void clearLogs() {
     _webSocketService.clearLogs();
     notifyListeners();
   }
