@@ -142,8 +142,8 @@ class CameraDevicesProvider with ChangeNotifier {
             }
           }
           break;
-        case 'cam':
-          // Check if this is a camera property pattern with cam[X]
+        default:
+          // Check if this is a camera property pattern (cam[X])
           final camPattern = RegExp(r'cam\[(\d+)\]');
           final match = camPattern.firstMatch(propertyPath[0]);
           
@@ -158,36 +158,71 @@ class CameraDevicesProvider with ChangeNotifier {
               debugPrint('Error parsing camera index from ${propertyPath[0]}');
             }
           }
-          break;
-        case 'camreports':
-          if (propertyPath.length > 2) {
+          
+          // Handle camera reports which come separately with camera name as key
+          else if (propertyPath[0] == 'camreports' && propertyPath.length > 2) {
             final cameraName = propertyPath[1];
             final propertyName = propertyPath[2];
             
-            // Find camera by name
-            final cameraIndex = device.cameras.indexWhere((cam) => cam.name == cameraName);
+            debugPrint('Processing camera report for $cameraName: $propertyName = $value');
             
-            if (cameraIndex >= 0) {
-              debugPrint('Found camera with name $cameraName at index $cameraIndex');
-              final camera = device.cameras[cameraIndex];
+            // Find camera by name first
+            int cameraIndex = device.cameras.indexWhere((cam) => cam.name == cameraName);
+            
+            // If camera doesn't exist yet, we need to create a placeholder
+            if (cameraIndex < 0) {
+              debugPrint('Camera $cameraName not found in device - creating placeholder');
               
-              // Update camera status properties
-              switch (propertyName) {
-                case 'connected':
-                  camera.connected = value == 1;
-                  break;
-                case 'disconnected':
-                  camera.disconnected = value.toString();
-                  break;
-                case 'last_seen_at':
-                  camera.lastSeenAt = value.toString();
-                  break;
-                case 'recording':
-                  camera.recording = value == true || value == 1;
-                  break;
-              }
-            } else {
-              debugPrint('Warning: Camera report for $cameraName but no camera with that name found');
+              // Find the next available index
+              int nextIndex = device.cameras.length;
+              
+              // Create a new camera with the name from the report
+              Camera newCamera = Camera(
+                index: nextIndex,
+                name: cameraName,
+                ip: '',
+                username: '',
+                password: '',
+                brand: '',
+                mediaUri: '',
+                recordUri: '',
+                subUri: '',
+                remoteUri: '',
+                mainSnapShot: '',
+                subSnapShot: '',
+                recordWidth: 0,
+                recordHeight: 0,
+                subWidth: 0, 
+                subHeight: 0,
+                connected: false,
+                lastSeenAt: '',
+                recording: false,
+              );
+              
+              // Add the new camera to the device
+              device.cameras.add(newCamera);
+              cameraIndex = nextIndex;
+              debugPrint('Created placeholder camera at index $cameraIndex');
+            }
+            
+            // Now we have a valid camera index, update the property
+            final camera = device.cameras[cameraIndex];
+            
+            // Update camera status properties from the report
+            switch (propertyName) {
+              case 'connected':
+                camera.connected = value == 1;
+                debugPrint('Updated camera $cameraName connected status: ${camera.connected}');
+                break;
+              case 'disconnected':
+                camera.disconnected = value.toString();
+                break;
+              case 'last_seen_at':
+                camera.lastSeenAt = value.toString();
+                break;
+              case 'recording':
+                camera.recording = value == true || value == 1;
+                break;
             }
           }
           break;
@@ -197,11 +232,14 @@ class CameraDevicesProvider with ChangeNotifier {
   
   // Update camera properties within a device
   void _updateCameraProperty(CameraDevice device, int cameraIndex, List<String> propertyPath, dynamic value) {
-    // Find or create the camera
+    // Ensure we have enough cameras in the array
     while (device.cameras.length <= cameraIndex) {
+      int nextIndex = device.cameras.length;
+      debugPrint('Creating camera at index $nextIndex because we need index $cameraIndex');
+      
       device.cameras.add(Camera(
-        index: device.cameras.length,
-        name: 'Camera ${device.cameras.length + 1}',
+        index: nextIndex,
+        name: 'Camera ${nextIndex + 1}',
         ip: '',
         username: '',
         password: '',
@@ -231,6 +269,7 @@ class CameraDevicesProvider with ChangeNotifier {
     switch (propertyName) {
       case 'name':
         camera.name = value.toString();
+        debugPrint('Set camera[$cameraIndex] name to: ${camera.name}');
         break;
       case 'cameraIp':
         camera.ip = value.toString();
