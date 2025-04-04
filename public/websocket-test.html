@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #282c34;
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #F7941E;
+    }
+    .status {
+      background-color: #00ADEE;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    .messages {
+      background-color: #333;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+      height: 300px;
+      overflow-y: auto;
+    }
+    .message {
+      margin-bottom: 10px;
+      padding: 10px;
+      background-color: #444;
+      border-radius: 5px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: none;
+    }
+    input {
+      width: 70%;
+      background-color: #444;
+      color: white;
+    }
+    button {
+      width: 28%;
+      background-color: #F7941E;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>WebSocket Test Client</h1>
+    <div class="status" id="connection-status">Not connected</div>
+    
+    <div>
+      <input type="text" id="message-input" placeholder="Enter message...">
+      <button id="send-button">Send</button>
+    </div>
+    
+    <div class="messages" id="messages"></div>
+    
+    <button id="login-button">Send LOGIN test test</button>
+    <button id="monitor-button">Send DO MONITORECS</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const statusElement = document.getElementById('connection-status');
+      const messagesElement = document.getElementById('messages');
+      const messageInput = document.getElementById('message-input');
+      const sendButton = document.getElementById('send-button');
+      const loginButton = document.getElementById('login-button');
+      const monitorButton = document.getElementById('monitor-button');
+      
+      // Determine WebSocket URL
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${protocol}//${window.location.host}/ws`;
+      
+      // Create WebSocket connection
+      const socket = new WebSocket(wsUrl);
+      
+      // Connection opened
+      socket.addEventListener('open', (event) => {
+        statusElement.textContent = 'Connected to WebSocket server';
+        statusElement.style.backgroundColor = '#4CAF50';
+        addMessage('System', 'Connected to server');
+      });
+      
+      // Connection closed
+      socket.addEventListener('close', (event) => {
+        statusElement.textContent = 'Disconnected from WebSocket server';
+        statusElement.style.backgroundColor = '#F44336';
+        addMessage('System', 'Disconnected from server');
+      });
+      
+      // Connection error
+      socket.addEventListener('error', (event) => {
+        statusElement.textContent = 'WebSocket connection error';
+        statusElement.style.backgroundColor = '#F44336';
+        addMessage('Error', 'Connection error');
+      });
+      
+      // Listen for messages
+      socket.addEventListener('message', (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          addMessage('Received', JSON.stringify(data, null, 2));
+        } catch (e) {
+          addMessage('Received (Text)', event.data);
+        }
+      });
+      
+      // Send message
+      sendButton.addEventListener('click', () => {
+        const message = messageInput.value;
+        if (message && socket.readyState === WebSocket.OPEN) {
+          socket.send(message);
+          addMessage('Sent', message);
+          messageInput.value = '';
+        }
+      });
+      
+      // Handle Enter key in input
+      messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendButton.click();
+        }
+      });
+      
+      // Send login message
+      loginButton.addEventListener('click', () => {
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send('LOGIN test test');
+          addMessage('Sent', 'LOGIN test test');
+        }
+      });
+      
+      // Send monitor message
+      monitorButton.addEventListener('click', () => {
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send('DO MONITORECS');
+          addMessage('Sent', 'DO MONITORECS');
+        }
+      });
+      
+      // Helper function to add a message to the messages container
+      function addMessage(type, content) {
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message';
+        messageElement.innerHTML = `<strong>${type}:</strong><br><pre>${content}</pre>`;
+        messagesElement.appendChild(messageElement);
+        messagesElement.scrollTop = messagesElement.scrollHeight;
+      }
+    });
+  </script>
+</body>
+</html>

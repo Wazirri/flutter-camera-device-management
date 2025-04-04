@@ -86,6 +86,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     // Register observer for app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
+    
+    // Add this delay to ensure provider is available after widget is built
+    Future.microtask(() {
+      // Access providers safely after widget tree is built
+      final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
+      final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+      
+      // Initialize any required connections here if needed
+    });
   }
 
   @override
