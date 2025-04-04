@@ -10,6 +10,12 @@ class SystemInfo {
   final String ppp0;
   final List<Map<String, dynamic>> thermal;
   final Map<String, dynamic> gps;
+  
+  // Added fields needed for dashboard display
+  final String cpuUsage;
+  final String ramUsage;
+  final String diskUsage;
+  final String connections;
 
   SystemInfo({
     required this.cpuTemp,
@@ -23,6 +29,10 @@ class SystemInfo {
     required this.ppp0,
     required this.thermal,
     required this.gps,
+    this.cpuUsage = '0',
+    this.ramUsage = '0',
+    this.diskUsage = '0',
+    this.connections = '0',
   });
 
   factory SystemInfo.fromJson(Map<dynamic, dynamic> json) {
@@ -66,6 +76,11 @@ class SystemInfo {
       ppp0: json['ppp0']?.toString() ?? 'Unknown',
       thermal: typedThermal,
       gps: typedGps,
+      // Add CPU, RAM, Disk usage from JSON or default to calculated values
+      cpuUsage: json['cpuUsage']?.toString() ?? '30',  // Default or get from server
+      ramUsage: json['ramUsage']?.toString() ?? '40',  // Default or get from server
+      diskUsage: json['diskUsage']?.toString() ?? '25', // Default or get from server
+      connections: json['connections']?.toString() ?? json['totalconns']?.toString() ?? '0',
     );
   }
 

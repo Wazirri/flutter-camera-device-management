@@ -39,13 +39,15 @@ class WebSocketProvider with ChangeNotifier {
   }
   
   // Connect to WebSocket server
-  Future<void> connect(String host, int port) async {
+  Future<bool> connect(String address, int port) async {
     try {
-      await _webSocketService.connect(host, port);
+      // Adapting to the WebSocketService connect method signature
+      final connected = await _webSocketService.connect(address, port.toString(), '', '');
       notifyListeners();
+      return connected;
     } catch (e) {
       debugPrint('Error connecting to WebSocket: $e');
-      rethrow;
+      return false;
     }
   }
   
@@ -70,5 +72,11 @@ class WebSocketProvider with ChangeNotifier {
   void login(String username, String password) {
     sendMessage('LOGIN $username $password');
     debugPrint('Sent login request');
+  }
+  
+  // Method to clear WebSocket logs
+  void clearLog() {
+    _webSocketService.clearLogs();
+    notifyListeners();
   }
 }

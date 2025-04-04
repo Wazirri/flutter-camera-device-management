@@ -1,0 +1,117 @@
+lib/screens/dashboard_screen.dart:696:50: Error: The getter 'connections' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'connections'.
+                                  value: sysInfo.connections,
+                                                 ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:734:75: Error: The getter 'cpuUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cpuUsage'.
+                                              value: double.parse(sysInfo.cpuUsage) / 100,
+                                                                          ^^^^^^^^
+lib/screens/dashboard_screen.dart:735:90: Error: The getter 'cpuUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cpuUsage'.
+                                              color: _getUsageColor(double.parse(sysInfo.cpuUsage)),
+                                                                                         ^^^^^^^^
+lib/screens/dashboard_screen.dart:737:70: Error: The getter 'cpuUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cpuUsage'.
+                                              percentage: '${sysInfo.cpuUsage}%',
+                                                                     ^^^^^^^^
+lib/screens/dashboard_screen.dart:744:75: Error: The getter 'ramUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'ramUsage'.
+                                              value: double.parse(sysInfo.ramUsage) / 100,
+                                                                          ^^^^^^^^
+lib/screens/dashboard_screen.dart:745:90: Error: The getter 'ramUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'ramUsage'.
+                                              color: _getUsageColor(double.parse(sysInfo.ramUsage)),
+                                                                                         ^^^^^^^^
+lib/screens/dashboard_screen.dart:747:70: Error: The getter 'ramUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'ramUsage'.
+                                              percentage: '${sysInfo.ramUsage}%',
+                                                                     ^^^^^^^^
+lib/screens/dashboard_screen.dart:754:75: Error: The getter 'diskUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'diskUsage'.
+                                              value: double.parse(sysInfo.diskUsage) / 100,
+                                                                          ^^^^^^^^^
+lib/screens/dashboard_screen.dart:755:90: Error: The getter 'diskUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'diskUsage'.
+                                              color: _getUsageColor(double.parse(sysInfo.diskUsage)),
+                                                                                         ^^^^^^^^^
+lib/screens/dashboard_screen.dart:757:70: Error: The getter 'diskUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'diskUsage'.
+                                              percentage: '${sysInfo.diskUsage}%',
+                                                                     ^^^^^^^^^
+lib/screens/dashboard_screen.dart:767:73: Error: The getter 'cpuUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cpuUsage'.
+                                            value: double.parse(sysInfo.cpuUsage) / 100,
+                                                                        ^^^^^^^^
+lib/screens/dashboard_screen.dart:768:88: Error: The getter 'cpuUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cpuUsage'.
+                                            color: _getUsageColor(double.parse(sysInfo.cpuUsage)),
+                                                                                       ^^^^^^^^
+lib/screens/dashboard_screen.dart:770:68: Error: The getter 'cpuUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cpuUsage'.
+                                            percentage: '${sysInfo.cpuUsage}%',
+                                                                   ^^^^^^^^
+lib/screens/dashboard_screen.dart:775:73: Error: The getter 'ramUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'ramUsage'.
+                                            value: double.parse(sysInfo.ramUsage) / 100,
+                                                                        ^^^^^^^^
+lib/screens/dashboard_screen.dart:776:88: Error: The getter 'ramUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'ramUsage'.
+                                            color: _getUsageColor(double.parse(sysInfo.ramUsage)),
+                                                                                       ^^^^^^^^
+lib/screens/dashboard_screen.dart:778:68: Error: The getter 'ramUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'ramUsage'.
+                                            percentage: '${sysInfo.ramUsage}%',
+                                                                   ^^^^^^^^
+lib/screens/dashboard_screen.dart:783:73: Error: The getter 'diskUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'diskUsage'.
+                                            value: double.parse(sysInfo.diskUsage) / 100,
+                                                                        ^^^^^^^^^
+lib/screens/dashboard_screen.dart:784:88: Error: The getter 'diskUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'diskUsage'.
+                                            color: _getUsageColor(double.parse(sysInfo.diskUsage)),
+                                                                                       ^^^^^^^^^
+lib/screens/dashboard_screen.dart:786:68: Error: The getter 'diskUsage' isn't defined for the class 'SystemInfo'.
+ - 'SystemInfo' is from 'package:camera_device_manager/models/system_info.dart' ('lib/models/system_info.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'diskUsage'.
+                                            percentage: '${sysInfo.diskUsage}%',
+                                                                   ^^^^^^^^^
+lib/screens/login_screen.dart:426:58: Error: Too many positional arguments: 2 allowed, but 4 found.
+Try removing the extra positional arguments.
+        final connected = await webSocketProvider.connect(
+                                                         ^
+lib/screens/websocket_log_screen.dart:20:70: Error: The method 'clearLog' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:camera_device_manager/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'clearLog'.
+              Provider.of<WebSocketProvider>(context, listen: false).clearLog();
+                                                                     ^^^^^^^^
+lib/providers/websocket_provider.dart:35:35: Error: The method 'updateDeviceFromChangedMessage' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'updateDeviceFromChangedMessage'.
+          _cameraDevicesProvider!.updateDeviceFromChangedMessage(message);
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/providers/websocket_provider.dart:44:38: Error: Too few positional arguments: 4 required, 2 given.
+      await _webSocketService.connect(host, port);
+                                     ^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **
+

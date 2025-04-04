@@ -353,3 +353,9 @@ class WebSocketService with ChangeNotifier {
     super.dispose();
   }
 }
+
+  // Clear WebSocket logs
+  void clearLogs() {
+    _messageLog = [];
+    notifyListeners();
+  }
