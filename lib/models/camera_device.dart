@@ -216,6 +216,8 @@ class Camera {
     int? subHeight,
     bool? connected,
     String? disconnected,
+    String? group,
+    bool? soundRec,
     String? lastSeenAt,
     bool? recording,
   }) {
@@ -246,6 +248,8 @@ class Camera {
       subHeight: subHeight ?? this.subHeight,
       connected: connected ?? this.connected,
       disconnected: disconnected ?? this.disconnected,
+      group: group ?? this.group,
+      soundRec: soundRec ?? this.soundRec,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
       recording: recording ?? this.recording,
     );
@@ -314,6 +318,8 @@ class Camera {
       'subHeight': subHeight,
       'connected': connected,
       'disconnected': disconnected,
+      'group': group,
+      'soundRec': soundRec,
       'lastSeenAt': lastSeenAt,
       'recording': recording,
     };

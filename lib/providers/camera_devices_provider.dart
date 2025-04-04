@@ -347,6 +347,8 @@ class CameraDevicesProvider with ChangeNotifier {
               subHeight: 0,
               connected: false,
               lastSeenAt: DateTime.now().toIso8601String(),
+              group: '',
+              soundRec: false,
               recording: false,
             );
             
@@ -394,6 +396,8 @@ class CameraDevicesProvider with ChangeNotifier {
       
       // ONVIF properties
       case 'xAddrs':
+        return camera.copyWith(xAddrs: value.toString());
+      case 'xAddr': // Handle both xAddrs and xAddr
         return camera.copyWith(xAddrs: value.toString());
       
       // Stream URI properties
@@ -449,8 +453,16 @@ class CameraDevicesProvider with ChangeNotifier {
       case 'subheight':
         return camera.copyWith(subHeight: value is int ? value : int.tryParse(value.toString()) ?? 0);
         
+      // Group property
+      case 'group':
+        return camera.copyWith(group: value.toString());
+        
+      // Sound recording property
+      case 'soundRec':
+        return camera.copyWith(soundRec: value is bool ? value : (value.toString().toLowerCase() == 'true' || value.toString() == '1'));
+        
       default:
-        print('⚠️ Unknown camera property: $propertyName with value: $value');
+        print('⚠️ Unknown camera property: $propertyName = $value');
         return camera; // No change for unknown properties
     }
   }
@@ -508,6 +520,8 @@ class CameraDevicesProvider with ChangeNotifier {
         subHeight: cameraData['subHeight'] ?? updatedCameras[existingIndex].subHeight,
         connected: cameraData['connected'] ?? updatedCameras[existingIndex].connected,
         disconnected: cameraData['disconnected'] ?? updatedCameras[existingIndex].disconnected,
+        group: cameraData['group'] ?? updatedCameras[existingIndex].group,
+        soundRec: cameraData['soundRec'] ?? updatedCameras[existingIndex].soundRec,
         lastSeenAt: cameraData['lastSeenAt'] ?? updatedCameras[existingIndex].lastSeenAt,
         recording: cameraData['recording'] ?? updatedCameras[existingIndex].recording,
       );
@@ -534,6 +548,8 @@ class CameraDevicesProvider with ChangeNotifier {
         subHeight: cameraData['subHeight'] ?? 0,
         connected: cameraData['connected'] ?? false,
         lastSeenAt: cameraData['lastSeenAt'] ?? DateTime.now().toIso8601String(),
+        group: cameraData['group'] ?? '',
+        soundRec: cameraData['soundRec'] ?? false,
         recording: cameraData['recording'] ?? false,
       );
       updatedCameras.add(newCamera);
@@ -579,6 +595,9 @@ class CameraDevicesProvider with ChangeNotifier {
         print('      Brand: ${cam.brand}');
         print('      Media URI: ${cam.mediaUri}');
         print('      Record URI: ${cam.recordUri}');
+        print('      Group: ${cam.group ?? "None"}');
+        print('      Sound Rec: ${cam.soundRec ?? false}');
+        print('      xAddrs: ${cam.xAddrs}');
       }
       
       print('-----------------------');
