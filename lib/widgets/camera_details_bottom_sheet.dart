@@ -120,7 +120,8 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                     DetailItem(name: 'Brand', value: camera.brand),
                     DetailItem(name: 'Manufacturer', value: camera.manufacturer),
                     DetailItem(name: 'Country', value: camera.country),
-                    DetailItem(name: 'Sound Recording', value: camera.soundRec ? 'Enabled' : 'Disabled'),
+                    // soundRec özelliği olmadığından, bu satırı değiştirdik
+                    DetailItem(name: 'Sound Recording', value: 'Unknown'),
                   ],
                 ),
                 _buildDetailGroup(
@@ -128,7 +129,8 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   title: 'Connection URLs',
                   details: [
                     DetailItem(name: 'xAddrs', value: camera.xAddrs),
-                    DetailItem(name: 'xAddr', value: camera.xAddr),
+                    // xAddr özelliği olmadığından, bu satırı değiştirdik
+                    DetailItem(name: 'xAddr', value: 'Unknown'),
                     DetailItem(name: 'Media URI', value: camera.mediaUri),
                     DetailItem(name: 'Record URI', value: camera.recordUri),
                     DetailItem(name: 'Sub URI', value: camera.subUri),

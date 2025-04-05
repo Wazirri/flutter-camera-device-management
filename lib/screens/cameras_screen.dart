@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import 'live_view_screen.dart';
 import 'record_view_screen.dart';
-
 import "../widgets/camera_details_bottom_sheet.dart";
+
 class CamerasScreen extends StatefulWidget {
   const CamerasScreen({Key? key}) : super(key: key);
 
@@ -41,26 +41,6 @@ class _CamerasScreenState extends State<CamerasScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.darkBackground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.6,
-          minChildSize: 0.3,
-          maxChildSize: 0.95,
-          expand: false,
-          builder: (context, scrollController) {
-            return CameraDetailsBottomSheet(
-              camera: camera,
-              scrollController: scrollController,
-            );
-          },
-        );
-      },
-    );
-  }
       backgroundColor: AppTheme.darkBackground,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -446,13 +426,13 @@ class _CamerasScreenState extends State<CamerasScreen> {
                                 children: [
                                   IconButton(
                                     icon: const Icon(Icons.videocam),
-                                    tooltip: 'Live View',
                                     onPressed: () => _openLiveView(camera),
+                                    tooltip: 'Live View',
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.video_library),
-                                    tooltip: 'Recordings',
                                     onPressed: () => _openRecordView(camera),
+                                    tooltip: 'Recordings',
                                   ),
                                 ],
                               ),
@@ -464,6 +444,7 @@ class _CamerasScreenState extends State<CamerasScreen> {
                   ),
           );
           
+          // Combine filters with content
           return Column(
             children: [
               macAddressFilters,
@@ -476,8 +457,8 @@ class _CamerasScreenState extends State<CamerasScreen> {
   }
 }
 
-// Search delegate for cameras
-class CameraSearchDelegate extends SearchDelegate<Camera?> {
+// Camera Search Delegate for searching cameras
+class CameraSearchDelegate extends SearchDelegate<Camera> {
   final Function(Camera) onCameraSelected;
   
   CameraSearchDelegate({required this.onCameraSelected});
@@ -493,58 +474,79 @@ class CameraSearchDelegate extends SearchDelegate<Camera?> {
       ),
     ];
   }
-
+  
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
       onPressed: () {
-        close(context, null);
+        close(context, Camera(
+          index: -1, 
+          name: '', 
+          ip: '', 
+          username: '', 
+          password: '', 
+          brand: '', 
+          mediaUri: '', 
+          recordUri: '', 
+          subUri: '', 
+          remoteUri: '', 
+          mainSnapShot: '', 
+          subSnapShot: '', 
+          recordWidth: 0, 
+          recordHeight: 0, 
+          subWidth: 0, 
+          subHeight: 0, 
+          connected: false, 
+          lastSeenAt: '', 
+          recording: false,
+        ));
       },
     );
   }
-
+  
   @override
   Widget buildResults(BuildContext context) {
-    return buildSearchResults(context);
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    return buildSearchResults(context);
+    return _buildSearchResults(context);
   }
   
-  Widget buildSearchResults(BuildContext context) {
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return _buildSearchResults(context);
+  }
+  
+  Widget _buildSearchResults(BuildContext context) {
     final provider = Provider.of<CameraDevicesProvider>(context, listen: false);
     final cameras = provider.cameras;
     
     if (query.isEmpty) {
       return const Center(
-        child: Text('Enter camera name or IP to search'),
+        child: Text('Type to search cameras...'),
       );
     }
     
+    final lowercaseQuery = query.toLowerCase();
     final filteredCameras = cameras.where((camera) {
-      return camera.name.toLowerCase().contains(query.toLowerCase()) ||
-             camera.ip.toLowerCase().contains(query.toLowerCase()) ||
-             camera.manufacturer.toLowerCase().contains(query.toLowerCase());
+      return camera.name.toLowerCase().contains(lowercaseQuery) || 
+             camera.ip.toLowerCase().contains(lowercaseQuery) ||
+             camera.brand.toLowerCase().contains(lowercaseQuery);
     }).toList();
     
     if (filteredCameras.isEmpty) {
       return Center(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(
               Icons.search_off,
-              size: 64.0,
+              size: 64,
               color: Colors.grey,
             ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 16),
             Text(
               'No results found for "$query"',
               style: const TextStyle(
-                fontSize: 16.0,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
