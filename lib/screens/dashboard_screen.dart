@@ -8,13 +8,19 @@ import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/status_indicator.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
 
   @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  @override
   Widget build(BuildContext context) {
     final isDesktop = ResponsiveHelper.isDesktop(context);
-    final websocketProvider = Provider.of<WebSocketProvider>(context);
+    // Provider değişkenini burada tanımlayalım
+    final websocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
     
     return Scaffold(
       backgroundColor: AppTheme.darkBackground,
@@ -88,9 +94,9 @@ class DashboardScreen extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: const [
-                            Icon(Icons.add),
+                            Icon(Icons.add_circle_outline_rounded),
                             SizedBox(width: 8),
-                            Text('Add New Device'),
+                            Text('Add Device'),
                           ],
                         ),
                       ),
@@ -145,23 +151,23 @@ class DashboardScreen extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: isSmallScreen ? 2 : 4,
-      childAspectRatio: isSmallScreen ? 1.2 : 1.5,
+      childAspectRatio: isSmallScreen ? 1.5 : 2.0,
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
       children: [
         _buildStatCard(
           context,
-          title: 'Total Cameras',
-          value: '12',
-          icon: Icons.camera_alt_rounded,
-          color: AppTheme.primaryBlue,
+          title: 'Online Cameras',
+          value: '18',
+          icon: Icons.videocam_rounded,
+          color: AppTheme.online,
         ),
         _buildStatCard(
           context,
-          title: 'Active Devices',
-          value: '8',
-          icon: Icons.devices_rounded,
-          color: AppTheme.online,
+          title: 'Offline Cameras',
+          value: '3',
+          icon: Icons.videocam_off_rounded,
+          color: AppTheme.offline,
         ),
         _buildStatCard(
           context,
@@ -221,7 +227,7 @@ class DashboardScreen extends StatelessWidget {
                 color: AppTheme.darkTextPrimary,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             Text(
               title,
               style: TextStyle(
@@ -274,9 +280,8 @@ class DashboardScreen extends StatelessWidget {
               return _buildCameraActivityCard(
                 context,
                 name: 'Camera ${index + 1}',
-                location: 'Location ${index + 1}',
                 timestamp: '${index + 1}h ago',
-                status: index % 3 == 0 ? DeviceStatus.warning : DeviceStatus.online,
+                status: index == 2 ? DeviceStatus.offline : DeviceStatus.online,
               );
             },
           ),
@@ -288,19 +293,18 @@ class DashboardScreen extends StatelessWidget {
   Widget _buildCameraActivityCard(
     BuildContext context, {
     required String name,
-    required String location,
     required String timestamp,
     required DeviceStatus status,
   }) {
     return Card(
       color: AppTheme.darkSurface,
       elevation: 2,
+      margin: const EdgeInsets.only(right: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      margin: const EdgeInsets.only(right: 16),
       child: Container(
-        width: 280,
+        width: 250,
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -310,38 +314,18 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryBlue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.videocam_rounded,
-                        color: AppTheme.primaryBlue,
-                        size: 20,
-                      ),
+                    const Icon(
+                      Icons.videocam_rounded,
+                      color: AppTheme.darkTextPrimary,
                     ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: AppTheme.darkTextPrimary,
-                          ),
-                        ),
-                        Text(
-                          location,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.darkTextSecondary,
-                          ),
-                        ),
-                      ],
+                    const SizedBox(width: 8),
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.darkTextPrimary,
+                      ),
                     ),
                   ],
                 ),
@@ -409,7 +393,7 @@ class DashboardScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/camera-devices');
+                // No implementation, UI only
               },
               child: Row(
                 children: const [
@@ -430,14 +414,14 @@ class DashboardScreen extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: _buildDeviceStatusTable(context),
+            child: _buildDeviceTable(context),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildDeviceStatusTable(BuildContext context) {
+  Widget _buildDeviceTable(BuildContext context) {
     return Column(
       children: [
         Row(
@@ -744,7 +728,7 @@ class DashboardScreen extends StatelessWidget {
   }
   
   Widget _buildRamUsageCard(BuildContext context, SystemInfo sysInfo) {
-    final usagePercentage = sysInfo.ramUsagePercentage;
+    final double usagePercentage = sysInfo.ramUsagePercentage;
     
     return Container(
       padding: const EdgeInsets.all(16),
@@ -761,52 +745,58 @@ class DashboardScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryBlue.withOpacity(0.1),
+                  color: AppTheme.primaryOrange.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  Icons.memory_outlined,
-                  color: AppTheme.primaryBlue,
+                  Icons.memory_rounded,
+                  color: AppTheme.primaryOrange,
                   size: 20,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               const Text(
                 'RAM Usage',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.darkTextSecondary,
+                  color: AppTheme.darkTextPrimary,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${usagePercentage.toStringAsFixed(1)}%',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: _getRamUsageColor(usagePercentage),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: usagePercentage / 100,
-              backgroundColor: Colors.grey.shade800,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                _getRamUsageColor(usagePercentage),
-              ),
-              minHeight: 12,
+              backgroundColor: AppTheme.darkBackground,
+              valueColor: AlwaysStoppedAnimation<Color>(_getRamUsageColor(usagePercentage)),
+              minHeight: 8,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${usagePercentage.toStringAsFixed(1)}%',
-                style: const TextStyle(
+                'Free: ${sysInfo.formattedFreeRam}',
+                style: TextStyle(
                   fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.darkTextPrimary,
+                  color: AppTheme.darkTextSecondary,
                 ),
               ),
               Text(
-                'Free: ${sysInfo.formattedFreeRam} / Total: ${sysInfo.formattedTotalRam}',
+                'Total: ${sysInfo.formattedTotalRam}',
                 style: TextStyle(
                   fontSize: 14,
                   color: AppTheme.darkTextSecondary,
@@ -820,6 +810,8 @@ class DashboardScreen extends StatelessWidget {
   }
   
   Widget _buildThermalAndNetworkCard(BuildContext context, SystemInfo sysInfo) {
+    final isSmallScreen = ResponsiveHelper.isMobile(context);
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -830,190 +822,264 @@ class DashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Thermal & Network',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: AppTheme.darkTextSecondary,
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppTheme.warning.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.thermostat_rounded,
+                            color: AppTheme.warning,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Text(
+                          'Thermal Sensors',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: AppTheme.darkTextPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    ...sysInfo.thermal.map((sensor) {
+                      final entry = sensor.entries.first;
+                      final name = entry.key;
+                      final temp = entry.value;
+                      
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              name.replaceAll('-thermal', '').toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppTheme.darkTextPrimary,
+                              ),
+                            ),
+                            Text(
+                              '${temp.toStringAsFixed(1)}°C',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: _getTemperatureColor(temp),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                ),
+              ),
+              if (!isSmallScreen) const SizedBox(width: 24),
+              if (!isSmallScreen)
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryBlue.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.wifi_rounded,
+                              color: AppTheme.primaryBlue,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Text(
+                            'Network Interfaces',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppTheme.darkTextPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'eth0',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.darkTextPrimary,
+                            ),
+                          ),
+                          Text(
+                            sysInfo.eth0 != 'Yok' ? sysInfo.eth0 : 'Disconnected',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: sysInfo.eth0 != 'Yok' ? AppTheme.online : AppTheme.offline,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'ppp0',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.darkTextPrimary,
+                            ),
+                          ),
+                          Text(
+                            sysInfo.ppp0 != 'Yok' ? sysInfo.ppp0 : 'Disconnected',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: sysInfo.ppp0 != 'Yok' ? AppTheme.online : AppTheme.offline,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Active Sessions',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: AppTheme.darkTextPrimary,
+                            ),
+                          ),
+                          Text(
+                            sysInfo.sessions,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.darkTextPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          if (isSmallScreen) const SizedBox(height: 24),
+          if (isSmallScreen)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryBlue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.wifi_rounded,
+                        color: AppTheme.primaryBlue,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Network Interfaces',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppTheme.darkTextPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'eth0',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppTheme.darkTextPrimary,
+                      ),
+                    ),
+                    Text(
+                      sysInfo.eth0 != 'Yok' ? sysInfo.eth0 : 'Disconnected',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: sysInfo.eth0 != 'Yok' ? AppTheme.online : AppTheme.offline,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'ppp0',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppTheme.darkTextPrimary,
+                      ),
+                    ),
+                    Text(
+                      sysInfo.ppp0 != 'Yok' ? sysInfo.ppp0 : 'Disconnected',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: sysInfo.ppp0 != 'Yok' ? AppTheme.online : AppTheme.offline,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Active Sessions',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppTheme.darkTextPrimary,
+                      ),
+                    ),
+                    Text(
+                      sysInfo.sessions,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.darkTextPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.warning.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.developer_board,
-                        color: AppTheme.warning,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'SOC Thermal',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppTheme.darkTextSecondary,
-                            ),
-                          ),
-                          Text(
-                            sysInfo.socThermal,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.darkTextPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.warning.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.memory,
-                        color: AppTheme.warning,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'GPU Thermal',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppTheme.darkTextSecondary,
-                            ),
-                          ),
-                          Text(
-                            sysInfo.gpuThermal,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.darkTextPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.online.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.router,
-                        color: AppTheme.online,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'ETH0',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppTheme.darkTextSecondary,
-                            ),
-                          ),
-                          Text(
-                            sysInfo.eth0,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.darkTextPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.offline.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.network_cell,
-                        color: AppTheme.offline,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'PPP0',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppTheme.darkTextSecondary,
-                            ),
-                          ),
-                          Text(
-                            sysInfo.ppp0,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.darkTextPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -1039,50 +1105,49 @@ class DashboardScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
-                  Icons.location_on_outlined,
+                  Icons.location_on_rounded,
                   color: AppTheme.primaryOrange,
                   size: 20,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               const Text(
-                'GPS Information',
+                'GPS Location',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: AppTheme.darkTextSecondary,
+                  color: AppTheme.darkTextPrimary,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Location',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppTheme.darkTextSecondary,
-                      ),
-                    ),
-                    Text(
-                      sysInfo.gpsLocation,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.darkTextPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Coordinates',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppTheme.darkTextSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${sysInfo.gps['lat']}, ${sysInfo.gps['lon']}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.darkTextPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   const Text(
                     'Speed',
@@ -1091,8 +1156,9 @@ class DashboardScreen extends StatelessWidget {
                       color: AppTheme.darkTextSecondary,
                     ),
                   ),
+                  const SizedBox(height: 4),
                   Text(
-                    sysInfo.gpsSpeed,
+                    '${sysInfo.gps['speed']} km/h',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -1108,23 +1174,88 @@ class DashboardScreen extends StatelessWidget {
     );
   }
   
-  Color _getTemperatureColor(double temp) {
-    if (temp >= 75) {
-      return Colors.red;
-    } else if (temp >= 65) {
+  Color _getTemperatureColor(double temperature) {
+    if (temperature < 50) {
+      return AppTheme.online;
+    } else if (temperature < 70) {
       return AppTheme.warning;
     } else {
-      return AppTheme.online;
+      return AppTheme.error;
     }
   }
   
   Color _getRamUsageColor(double percentage) {
-    if (percentage >= 90) {
-      return Colors.red;
-    } else if (percentage >= 70) {
+    if (percentage < 50) {
+      return AppTheme.online;
+    } else if (percentage < 80) {
       return AppTheme.warning;
     } else {
-      return AppTheme.online;
+      return AppTheme.error;
+    }
+  }
+}
+
+enum DeviceStatus { online, offline, warning }
+
+class StatusIndicator extends StatelessWidget {
+  final DeviceStatus status;
+  final bool showLabel;
+  
+  const StatusIndicator({
+    Key? key,
+    required this.status,
+    this.showLabel = false,
+  }) : super(key: key);
+  
+  @override
+  Widget build(BuildContext context) {
+    final Color statusColor = _getStatusColor();
+    final String statusText = _getStatusText();
+    
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+            color: statusColor,
+            shape: BoxShape.circle,
+          ),
+        ),
+        if (showLabel) ...[
+          const SizedBox(width: 6),
+          Text(
+            statusText,
+            style: TextStyle(
+              fontSize: 14,
+              color: statusColor,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+  
+  Color _getStatusColor() {
+    switch (status) {
+      case DeviceStatus.online:
+        return AppTheme.online;
+      case DeviceStatus.offline:
+        return AppTheme.offline;
+      case DeviceStatus.warning:
+        return AppTheme.warning;
+    }
+  }
+  
+  String _getStatusText() {
+    switch (status) {
+      case DeviceStatus.online:
+        return 'Online';
+      case DeviceStatus.offline:
+        return 'Offline';
+      case DeviceStatus.warning:
+        return 'Warning';
     }
   }
 }

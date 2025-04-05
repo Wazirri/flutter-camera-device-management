@@ -9,6 +9,17 @@ class WebSocketProvider with ChangeNotifier {
   final WebSocketService _webSocketService = WebSocketService();
   CameraDevicesProvider? _cameraDevicesProvider;
   
+  WebSocketProvider() {
+    // WebSocketService'den SystemInfo değişiklik bildirimini dinle
+    _webSocketService.addListener(_onWebSocketServiceUpdated);
+  }
+  
+  // WebSocketService değiştiğinde çağrılacak
+  void _onWebSocketServiceUpdated() {
+    // Provider'ı güncelle ve Widget'ları yeniden oluştur
+    notifyListeners();
+  }
+  
   WebSocketService get websocketService => _webSocketService;
   bool get isConnected => _webSocketService.isConnected;
   List<String> get messageLog => _webSocketService.messageLog;
@@ -64,6 +75,8 @@ class WebSocketProvider with ChangeNotifier {
   
   @override
   void dispose() {
+    // Listener'ı kaldır
+    _webSocketService.removeListener(_onWebSocketServiceUpdated);
     _webSocketService.dispose();
     super.dispose();
   }
