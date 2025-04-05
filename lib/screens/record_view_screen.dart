@@ -12,7 +12,6 @@ import '../utils/responsive_helper.dart';
 import '../utils/page_transitions.dart';
 
 class RecordViewScreen extends StatefulWidget {
-  static const String routeName = '/record_view_screen.dart'; // Added route constant
   final Camera? camera; // Make camera optional so the route can work without a parameter
 
   const RecordViewScreen({Key? key, this.camera}) : super(key: key);

@@ -1,66 +1,83 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../services/websocket_service.dart';
 import '../models/system_info.dart';
 import 'camera_devices_provider.dart';
 
 class WebSocketProvider with ChangeNotifier {
-  final WebSocketService _service = WebSocketService();
+  final WebSocketService _webSocketService = WebSocketService();
   CameraDevicesProvider? _cameraDevicesProvider;
-  SystemInfo? _systemInfo;
   
-  // Constructor
   WebSocketProvider() {
-    // Set up the message handler
-    _service.setMessageHandler(_handleMessage);
+    // Listen to WebSocketService changes and forward them to our listeners
+    _webSocketService.addListener(_onServiceChanged);
   }
   
-  // Connect camera devices provider
+  // Handle changes from WebSocketService
+  void _onServiceChanged() {
+    // Forward the notification to our listeners
+    notifyListeners();
+  }
+  
+  WebSocketService get websocketService => _webSocketService;
+  bool get isConnected => _webSocketService.isConnected;
+  List<String> get messageLog => _webSocketService.messageLog;
+  SystemInfo? get systemInfo => _webSocketService.systemInfo;
+  
+  // Set the reference to the camera devices provider
   void setCameraDevicesProvider(CameraDevicesProvider provider) {
     _cameraDevicesProvider = provider;
+    
+    // Set up message handler
+    _webSocketService.setMessageHandler(_handleParsedMessage);
   }
   
-  // Expose the service for direct access
-  WebSocketService get service => _service;
+  // Message handler to forward messages to camera devices provider
+  void _handleParsedMessage(Map<String, dynamic> message) {
+    if (_cameraDevicesProvider != null) {
+      // Add more detailed debug info for changed messages
+      if (message['c'] == 'changed' && message.containsKey('data') && message.containsKey('val')) {
+        final String dataPath = message['data'].toString();
+        if (dataPath.startsWith('ecs.slaves.m_')) {
+          print('✅ Forwarding device message to CameraDevicesProvider: ${message['data']} = ${message['val']}');
+          _cameraDevicesProvider!.processWebSocketMessage(message);
+        }
+      } 
+      // Process all other messages as well
+      else {
+        _cameraDevicesProvider!.processWebSocketMessage(message);
+      }
+    } else {
+      print('❌ ERROR: CameraDevicesProvider is null, cannot process message: ${json.encode(message)}');
+    }
+  }
   
-  // Expose system info for dashboard
-  SystemInfo? get systemInfo => _systemInfo;
-  
-  // Connection status
-  bool get isConnected => _service.isConnected;
-  List<String> get messageLog => _service.messageLog;
-  
-  // Connect to server
+  // Connect to WebSocket server
   Future<bool> connect(String address, String port, String username, String password) async {
-    return await _service.connect(address, port, username, password);
+    return await _webSocketService.connect(address, port, username, password);
   }
   
-  // Disconnect from server
-  void disconnect() {
-    _service.disconnect();
-  }
-  
-  // Send message
+  // Send a message
   void sendMessage(String message) {
-    _service.sendMessage(message);
+    _webSocketService.sendMessage(message);
+  }
+  
+  // Disconnect WebSocket
+  void disconnect() {
+    _webSocketService.disconnect();
   }
   
   // Clear message log
   void clearLog() {
-    _service.clearLog();
+    _webSocketService.clearLog();
   }
   
-  // Message handler
-  void _handleMessage(Map<String, dynamic> message) {
-    // Process system info updates
-    if (message.containsKey('c') && message['c'] == 'sysinfo') {
-      _systemInfo = SystemInfo.fromJson(message);
-      notifyListeners();
-    }
-    
-    // Forward to camera devices provider if available
-    if (_cameraDevicesProvider != null && 
-        message.containsKey('c') && message['c'] == 'changed') {
-      _cameraDevicesProvider!.processMessage(message);
-    }
+  @override
+  void dispose() {
+    // Remove listener from service
+    _webSocketService.removeListener(_onServiceChanged);
+    _webSocketService.dispose();
+    super.dispose();
   }
 }

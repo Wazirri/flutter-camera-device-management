@@ -10,7 +10,6 @@ import '../utils/responsive_helper.dart';
 import '../utils/page_transitions.dart';
 
 class LiveViewScreen extends StatefulWidget {
-  static const String routeName = '/live_view_screen.dart'; // Added route constant
   final Camera? camera; // Make camera optional so the route can work without a parameter
 
   const LiveViewScreen({Key? key, this.camera}) : super(key: key);

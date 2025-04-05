@@ -1,175 +1,144 @@
 class SystemInfo {
-  final String? cpuTemp;
-  final String? upTime;
-  final String? srvTime;
-  final String? freeRam;
-  final String? totalRam;
-  final String? usedRam;
-  final String? cpuUsage;
-  final String? diskFree;
-  final String? diskTotal;
-  final String? diskUsed;
-  final String? totalConns;
-  final String? sessions;
-  final String? socThermal;
-  final String? gpuThermal;
+  final String cpuTemp;
+  final String upTime;
+  final String srvTime;
+  final String totalRam;
+  final String freeRam;
+  final String totalConns;
+  final String sessions;
+  final String eth0;
+  final String ppp0;
+  final List<Map<String, dynamic>> thermal;
   final Map<String, dynamic> gps;
-  final Map<String, dynamic> eth0;
-  final Map<String, dynamic> ppp0;
-  
+
   SystemInfo({
-    this.cpuTemp,
-    this.upTime,
-    this.srvTime,
-    this.freeRam,
-    this.totalRam,
-    this.usedRam,
-    this.cpuUsage,
-    this.diskFree,
-    this.diskTotal,
-    this.diskUsed,
-    this.totalConns,
-    this.sessions,
-    this.socThermal,
-    this.gpuThermal,
-    Map<String, dynamic>? gps,
-    Map<String, dynamic>? eth0,
-    Map<String, dynamic>? ppp0,
-  }) : 
-    this.gps = gps ?? {'lat': '0.000000', 'lon': '0.000000', 'alt': '0', 'speed': '0'},
-    this.eth0 = eth0 ?? {'ip': 'N/A', 'mac': 'N/A', 'status': 'disconnected'},
-    this.ppp0 = ppp0 ?? {'ip': 'N/A', 'status': 'disconnected'};
-  
-  factory SystemInfo.fromJson(Map<String, dynamic> json) {
+    required this.cpuTemp,
+    required this.upTime,
+    required this.srvTime,
+    required this.totalRam,
+    required this.freeRam,
+    required this.totalConns,
+    required this.sessions,
+    required this.eth0,
+    required this.ppp0,
+    required this.thermal,
+    required this.gps,
+  });
+
+  factory SystemInfo.fromJson(Map<dynamic, dynamic> json) {
+    // Convert raw thermal list to properly typed List<Map<String, dynamic>>
+    List<Map<String, dynamic>> typedThermal = [];
+    if (json['thermal'] != null) {
+      for (var item in json['thermal']) {
+        if (item is Map) {
+          // Convert each thermal map to <String, dynamic>
+          final Map<String, dynamic> typedItem = {};
+          item.forEach((key, value) {
+            if (key is String) {
+              typedItem[key] = value;
+            }
+          });
+          typedThermal.add(typedItem);
+        }
+      }
+    }
+    
+    // Convert gps map to properly typed Map<String, dynamic>
+    Map<String, dynamic> typedGps = {'lat': '0', 'lon': '0', 'speed': '0'};
+    if (json['gps'] is Map) {
+      final rawGps = json['gps'] as Map;
+      rawGps.forEach((key, value) {
+        if (key is String) {
+          typedGps[key] = value.toString();
+        }
+      });
+    }
+    
     return SystemInfo(
-      cpuTemp: json['cpuTemp']?.toString(),
-      upTime: json['upTime']?.toString(),
-      srvTime: json['srvTime']?.toString(),
-      freeRam: json['freeRam']?.toString(),
-      totalRam: json['totalRam']?.toString(),
-      usedRam: json['usedRam']?.toString(),
-      cpuUsage: json['cpuUsage']?.toString(),
-      diskFree: json['diskFree']?.toString(),
-      diskTotal: json['diskTotal']?.toString(),
-      diskUsed: json['diskUsed']?.toString(),
-      totalConns: json['totalConns']?.toString(),
-      sessions: json['sessions']?.toString(),
-      socThermal: json['socThermal']?.toString() ?? 'N/A',
-      gpuThermal: json['gpuThermal']?.toString() ?? 'N/A',
-      gps: json['gps'] is Map ? Map<String, dynamic>.from(json['gps']) : null,
-      eth0: json['eth0'] is Map ? Map<String, dynamic>.from(json['eth0']) : null,
-      ppp0: json['ppp0'] is Map ? Map<String, dynamic>.from(json['ppp0']) : null,
+      cpuTemp: json['cpuTemp']?.toString() ?? '0',
+      upTime: json['upTime']?.toString() ?? '0',
+      srvTime: json['srvTime']?.toString() ?? '0',
+      totalRam: json['totalRam']?.toString() ?? '0',
+      freeRam: json['freeRam']?.toString() ?? '0',
+      totalConns: json['totalconns']?.toString() ?? '0',
+      sessions: json['sessions']?.toString() ?? '0',
+      eth0: json['eth0']?.toString() ?? 'Unknown',
+      ppp0: json['ppp0']?.toString() ?? 'Unknown',
+      thermal: typedThermal,
+      gps: typedGps,
     );
   }
-  
-  // Helper methods to get numeric values
-  double? getCpuTempValue() {
-    return cpuTemp != null ? double.tryParse(cpuTemp!) : null;
-  }
-  
-  int? getUpTimeValue() {
-    return upTime != null ? int.tryParse(upTime!) : null;
-  }
-  
-  double? getCpuUsageValue() {
-    return cpuUsage != null ? double.tryParse(cpuUsage!) : null;
-  }
-  
-  // Formatted getters
-  String get formattedCpuTemp {
-    if (cpuTemp == null) return 'N/A';
-    double? temp = double.tryParse(cpuTemp!);
-    return temp != null ? '${temp.toStringAsFixed(1)}°C' : 'N/A';
-  }
+
+  // Helper methods for formatted values
+  String get formattedCpuTemp => '$cpuTemp°C';
   
   String get formattedUpTime {
-    return formatTime(upTime);
+    final int seconds = int.tryParse(upTime) ?? 0;
+    final int hours = seconds ~/ 3600;
+    final int minutes = (seconds % 3600) ~/ 60;
+    final int remainingSeconds = seconds % 60;
+    return '${hours}h ${minutes}m ${remainingSeconds}s';
   }
   
   String get formattedSrvTime {
-    return formatTime(srvTime);
+    final int seconds = int.tryParse(srvTime) ?? 0;
+    final int hours = seconds ~/ 3600;
+    final int minutes = (seconds % 3600) ~/ 60;
+    final int remainingSeconds = seconds % 60;
+    return '${hours}h ${minutes}m ${remainingSeconds}s';
   }
   
   String get formattedTotalRam {
-    if (totalRam == null) return 'N/A';
-    try {
-      double ram = double.parse(totalRam!) / (1024 * 1024);
-      return '${ram.toStringAsFixed(2)} MB';
-    } catch (e) {
-      return totalRam!;
-    }
+    final double mb = (int.tryParse(totalRam) ?? 0) / (1024 * 1024);
+    return '${mb.toStringAsFixed(2)} MB';
   }
   
   String get formattedFreeRam {
-    if (freeRam == null) return 'N/A';
-    try {
-      double ram = double.parse(freeRam!) / (1024 * 1024);
-      return '${ram.toStringAsFixed(2)} MB';
-    } catch (e) {
-      return freeRam!;
-    }
+    final double mb = (int.tryParse(freeRam) ?? 0) / (1024 * 1024);
+    return '${mb.toStringAsFixed(2)} MB';
   }
   
   double get ramUsagePercentage {
-    if (totalRam == null || freeRam == null) return 0.0;
-    try {
-      double total = double.parse(totalRam!);
-      double free = double.parse(freeRam!);
-      if (total <= 0) return 0.0;
-      return ((total - free) / total) * 100;
-    } catch (e) {
-      return 0.0;
+    final int total = int.tryParse(totalRam) ?? 1;
+    final int free = int.tryParse(freeRam) ?? 0;
+    if (total <= 0) return 0;
+    final double used = (total - free) / total;
+    return used * 100;
+  }
+  
+  String get socThermal {
+    for (final item in thermal) {
+      if (item.containsKey('soc-thermal')) {
+        return '${item['soc-thermal']}°C';
+      }
     }
+    return 'N/A';
+  }
+  
+  String get gpuThermal {
+    for (final item in thermal) {
+      if (item.containsKey('gpu-thermal')) {
+        return '${item['gpu-thermal']}°C';
+      }
+    }
+    return 'N/A';
   }
   
   String get gpsLocation {
-    try {
-      String lat = gps['lat']?.toString() ?? '0.000000';
-      String lon = gps['lon']?.toString() ?? '0.000000';
-      
-      if (lat == '0.000000' && lon == '0.000000') {
-        return 'No GPS data';
-      }
-      
-      return '$lat, $lon';
-    } catch (e) {
-      return 'GPS Error';
+    final lat = gps['lat'] ?? '0';
+    final lon = gps['lon'] ?? '0';
+    if (lat == '0.000000' && lon == '0.000000') {
+      return 'No GPS Signal';
     }
+    return 'Lat: $lat, Lon: $lon';
   }
   
   String get gpsSpeed {
-    try {
-      String speed = gps['speed']?.toString() ?? '0';
-      double? speedValue = double.tryParse(speed);
-      
-      if (speedValue == null || speedValue <= 0) {
-        return '0 km/h';
-      }
-      
-      return '${speedValue.toStringAsFixed(1)} km/h';
-    } catch (e) {
+    final speed = gps['speed'] ?? '0';
+    if (speed == '0.000000') {
       return '0 km/h';
     }
-  }
-  
-  // Format time (uptime or srvTime) into human readable form
-  String formatTime(String? timeStr) {
-    int? seconds = timeStr != null ? int.tryParse(timeStr) : null;
-    if (seconds == null) return "N/A";
-    
-    int days = seconds ~/ 86400;
-    seconds %= 86400;
-    int hours = seconds ~/ 3600;
-    seconds %= 3600;
-    int minutes = seconds ~/ 60;
-    seconds %= 60;
-    
-    if (days > 0) {
-      return "${days}d ${hours}h ${minutes}m";
-    } else if (hours > 0) {
-      return "${hours}h ${minutes}m ${seconds}s";
-    } else {
-      return "${minutes}m ${seconds}s";
-    }
+    final double speedValue = double.tryParse(speed) ?? 0;
+    return '${speedValue.toStringAsFixed(2)} km/h';
   }
 }

@@ -4,11 +4,11 @@
 // future. If not, the values below would default to using the project name when this becomes a
 // 'flutter create' template.
 
-// The application's name
-PRODUCT_NAME = camera_device_manager
+// The application's name. By default this is also the title of the Flutter window.
+PRODUCT_NAME = workspace
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.cameraDeviceManager
+PRODUCT_BUNDLE_IDENTIFIER = com.example.workspace
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2023 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2025 com.example. All rights reserved.

@@ -124,7 +124,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Camera Device Manager',
-      theme: AppTheme.darkTheme(),
+      theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
       initialRoute: '/login',
       onGenerateRoute: (settings) {

@@ -1,186 +1,237 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
-import '../providers/camera_devices_provider.dart';
-import '../screens/live_view_screen.dart';
-import '../theme/app_theme.dart';
 
 class CameraGridItem extends StatelessWidget {
   final Camera camera;
-  final int cameraIndex;
-  final String deviceKey;
-  
+  final int index;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final VoidCallback onLiveView;
+  final VoidCallback onPlayback;
+
   const CameraGridItem({
     Key? key,
     required this.camera,
-    required this.cameraIndex,
-    required this.deviceKey,
+    required this.index,
+    required this.isSelected,
+    required this.onTap,
+    required this.onLiveView,
+    required this.onPlayback,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final connected = camera.connected;
-    final recording = camera.recording;
-    
-    // Status indicator color
-    Color statusColor = connected 
-        ? (recording ? AppTheme.primaryColor : AppTheme.successColor) 
-        : Colors.grey;
-    
-    String statusText = connected 
-        ? (recording ? 'Recording' : 'Connected') 
-        : 'Disconnected';
-    
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      elevation: 4,
-      child: InkWell(
-        onTap: () {
-          // Select the camera before navigating
-          final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
-          cameraProvider.selectDevice(deviceKey);
-          cameraProvider.selectCamera(cameraIndex);
-          
-          // Navigate to live view
-          Navigator.of(context).pushNamed(LiveViewScreen.routeName);
-        },
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: isSelected ? 8.0 : 3.0,
+        margin: const EdgeInsets.all(8.0),
+        color: isSelected 
+          ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+          : Theme.of(context).cardColor,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Thumbnail or preview
+            // Camera image or preview
             Expanded(
+              flex: 3,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Either show the camera's thumbnail or a placeholder
-                  camera.mainSnapShot.isNotEmpty
+                  // Camera image (placeholder or actual image)
+                  Container(
+                    color: Colors.black,
+                    child: camera.mainSnapShot.isNotEmpty
                       ? Image.network(
                           camera.mainSnapShot,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.black54,
-                              child: Center(
-                                child: Icon(
-                                  Icons.videocam_off,
-                                  color: Colors.white54,
-                                  size: 40,
-                                ),
-                              ),
-                            );
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
+                            return const Center(
+                              child: Icon(
+                                Icons.broken_image_outlined,
+                                size: 48.0,
+                                color: Colors.white54,
                               ),
                             );
                           },
                         )
-                      : Container(
-                          color: Colors.black54,
-                          child: Center(
-                            child: Icon(
-                              Icons.videocam,
-                              color: Colors.white54,
-                              size: 40,
-                            ),
+                      : const Center(
+                          child: Icon(
+                            Icons.videocam_off,
+                            size: 48.0,
+                            color: Colors.white54,
                           ),
                         ),
+                  ),
                   
-                  // Status indicator overlay
+                  // Camera status overlay (top-left corner)
                   Positioned(
                     top: 8,
-                    right: 8,
+                    left: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0,
+                        vertical: 4.0,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.6),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: statusColor,
-                              shape: BoxShape.circle,
-                            ),
+                          Icon(
+                            Icons.fiber_manual_record,
+                            color: Colors.white,
+                            size: 12,
                           ),
-                          const SizedBox(width: 4),
+                          SizedBox(width: 4),
                           Text(
-                            statusText,
-                            style: const TextStyle(
-                              fontSize: 12,
+                            'LIVE',
+                            style: TextStyle(
                               color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  
-                  // Recording indicator
-                  if (recording)
-                    Positioned(
-                      top: 8,
-                      left: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.7),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.fiber_manual_record,
-                          color: Colors.white,
-                          size: 12,
-                        ),
-                      ),
-                    ),
                 ],
               ),
             ),
             
-            // Camera information
-            Padding(
-              padding: const EdgeInsets.all(12),
+            // Camera details
+            Container(
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Camera name
                   Text(
                     camera.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: 16.0,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
+                  
                   const SizedBox(height: 4),
-                  Text(
-                    camera.ip,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.white70,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  
+                  // Camera status
+                  Row(
+                    children: [
+                      Icon(
+                        camera.connected ? Icons.link : Icons.link_off,
+                        size: 16.0,
+                        color: camera.connected
+                          ? Colors.green
+                          : Colors.red,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        camera.connected ? 'Connected' : 'Disconnected',
+                        style: TextStyle(
+                          fontSize: 12.0,
+                          color: camera.connected
+                            ? Colors.green
+                            : Colors.red,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
+            
+            // Action buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.videocam),
+                  tooltip: 'Live View',
+                  onPressed: onLiveView,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.video_library),
+                  tooltip: 'Recordings',
+                  onPressed: onPlayback,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.more_vert),
+                  tooltip: 'More Options',
+                  onPressed: () {
+                    // Show camera options
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Camera: ${camera.name}'),
+                          content: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _buildDetailRow('IP', camera.ip),
+                                _buildDetailRow('Brand', camera.brand),
+                                _buildDetailRow('Status', camera.connected ? 'Connected' : 'Disconnected'),
+                                if (camera.mediaUri.isNotEmpty) 
+                                  _buildDetailRow('Media URI', camera.mediaUri),
+                                if (camera.recordUri.isNotEmpty) 
+                                  _buildDetailRow('Record URI', camera.recordUri),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              child: const Text('Close'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
           ],
         ),
+      ),
+    );
+  }
+  
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$label: ',
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontFamily: 'monospace',
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

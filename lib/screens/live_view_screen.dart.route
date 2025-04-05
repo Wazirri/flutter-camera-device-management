@@ -1,2 +1,0 @@
-// Add this at the top of LiveViewScreen class
-static const String routeName = '/live-view';
