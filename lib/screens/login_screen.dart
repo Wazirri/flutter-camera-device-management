@@ -409,7 +409,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState?.validate() ?? false) {
       // Get form values
       final serverAddress = _serverAddressController.text;
-      final serverPort = _serverPortController.text;
+      final serverPort = int.parse(_serverPortController.text);
       final username = _emailController.text;
       final password = _passwordController.text;
       

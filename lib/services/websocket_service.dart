@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
@@ -44,7 +45,7 @@ class WebSocketService with ChangeNotifier {
   }
   
   // Connect to WebSocket server
-  Future<bool> connect(String address, String port, [String username = "admin", String password = "admin"]) async {
+  Future<bool> connect(String address, int port, [String username = "admin", String password = "admin"]) async {
     if (_isConnected) {
       print('Already connected to WebSocket server');
       return true;

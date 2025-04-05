@@ -17,6 +17,7 @@ import 'screens/websocket_log_screen.dart';
 import 'screens/multi_live_view_screen.dart';  // New multi-camera view screen
 import 'providers/settings_provider.dart';
 import 'theme/app_theme.dart';
+import 'utils/page_transitions.dart';
 import 'utils/responsive_helper.dart';
 import 'utils/page_transitions.dart';
 import 'widgets/desktop_side_menu.dart';
@@ -204,3 +205,26 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
+
+  // Helper method to create consistent page transitions across the app
+  Widget buildPageTransition(Widget page) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0);
+        const end = Offset.zero;
+        const curve = Curves.easeInOutCubic;
+        
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var offsetAnimation = animation.drive(tween);
+        
+        return SlideTransition(
+          position: offsetAnimation,
+          child: FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        );
+      },
+    ).buildPage(null, null, null);
+  }

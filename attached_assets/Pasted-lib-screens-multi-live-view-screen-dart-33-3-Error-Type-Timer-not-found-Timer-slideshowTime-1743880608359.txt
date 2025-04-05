@@ -1,0 +1,116 @@
+lib/screens/multi_live_view_screen.dart:33:3: Error: Type 'Timer' not found.
+  Timer? _slideshowTimer;
+  ^^^^^
+lib/main.dart:149:61: Error: Required named parameter 'currentRoute' must be provided.
+            drawer: isDesktop ? null : const DesktopSideMenu(),
+                                                            ^
+lib/widgets/desktop_side_menu.dart:8:9: Context: Found this candidate, but the arguments don't match.
+  const DesktopSideMenu({
+        ^^^^^^^^^^^^^^^
+lib/main.dart:153:53: Error: Required named parameter 'currentRoute' must be provided.
+                if (isDesktop) const DesktopSideMenu(),
+                                                    ^
+lib/widgets/desktop_side_menu.dart:8:9: Context: Found this candidate, but the arguments don't match.
+  const DesktopSideMenu({
+        ^^^^^^^^^^^^^^^
+lib/main.dart:166:21: Error: No named parameter with the name 'currentIndex'.
+                    currentIndex: _currentIndex,
+                    ^^^^^^^^^^^^
+lib/widgets/mobile_bottom_navigation_bar.dart:9:9: Context: Found this candidate, but the arguments don't match.
+  const MobileBottomNavigationBar({
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/main.dart:189:55: Error: No named parameter with the name 'cameraId'.
+            return buildPageTransition(LiveViewScreen(cameraId: cameraId));
+                                                      ^^^^^^^^
+lib/screens/live_view_screen.dart:15:9: Context: Found this candidate, but the arguments don't match.
+  const LiveViewScreen({Key? key, this.camera}) : super(key: key);
+        ^^^^^^^^^^^^^^
+lib/main.dart:193:57: Error: No named parameter with the name 'cameraId'.
+            return buildPageTransition(RecordViewScreen(cameraId: cameraId));
+                                                        ^^^^^^^^
+lib/screens/record_view_screen.dart:17:9: Context: Found this candidate, but the arguments don't match.
+  const RecordViewScreen({Key? key, this.camera}) : super(key: key);
+        ^^^^^^^^^^^^^^^^
+lib/main.dart:177:20: Error: The method 'buildPageTransition' isn't defined for the class '_MyAppState'.
+ - '_MyAppState' is from 'package:camera_device_manager/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'buildPageTransition'.
+            return buildPageTransition(const LoginScreen());
+                   ^^^^^^^^^^^^^^^^^^^
+lib/main.dart:179:20: Error: The method 'buildPageTransition' isn't defined for the class '_MyAppState'.
+ - '_MyAppState' is from 'package:camera_device_manager/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'buildPageTransition'.
+            return buildPageTransition(const CamerasScreen());
+                   ^^^^^^^^^^^^^^^^^^^
+lib/main.dart:181:20: Error: The method 'buildPageTransition' isn't defined for the class '_MyAppState'.
+ - '_MyAppState' is from 'package:camera_device_manager/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'buildPageTransition'.
+            return buildPageTransition(const DevicesScreen());
+                   ^^^^^^^^^^^^^^^^^^^
+lib/main.dart:183:20: Error: The method 'buildPageTransition' isn't defined for the class '_MyAppState'.
+ - '_MyAppState' is from 'package:camera_device_manager/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'buildPageTransition'.
+            return buildPageTransition(const CameraDevicesScreen());
+                   ^^^^^^^^^^^^^^^^^^^
+lib/main.dart:185:20: Error: The method 'buildPageTransition' isn't defined for the class '_MyAppState'.
+ - '_MyAppState' is from 'package:camera_device_manager/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'buildPageTransition'.
+            return buildPageTransition(const DashboardScreen());
+                   ^^^^^^^^^^^^^^^^^^^
+lib/main.dart:189:20: Error: The method 'buildPageTransition' isn't defined for the class '_MyAppState'.
+ - '_MyAppState' is from 'package:camera_device_manager/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'buildPageTransition'.
+            return buildPageTransition(LiveViewScreen(cameraId: cameraId));
+                   ^^^^^^^^^^^^^^^^^^^
+lib/main.dart:193:20: Error: The method 'buildPageTransition' isn't defined for the class '_MyAppState'.
+ - '_MyAppState' is from 'package:camera_device_manager/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'buildPageTransition'.
+            return buildPageTransition(RecordViewScreen(cameraId: cameraId));
+                   ^^^^^^^^^^^^^^^^^^^
+lib/main.dart:195:20: Error: The method 'buildPageTransition' isn't defined for the class '_MyAppState'.
+ - '_MyAppState' is from 'package:camera_device_manager/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'buildPageTransition'.
+            return buildPageTransition(const MultiLiveViewScreen());
+                   ^^^^^^^^^^^^^^^^^^^
+lib/main.dart:197:20: Error: The method 'buildPageTransition' isn't defined for the class '_MyAppState'.
+ - '_MyAppState' is from 'package:camera_device_manager/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'buildPageTransition'.
+            return buildPageTransition(const SettingsScreen());
+                   ^^^^^^^^^^^^^^^^^^^
+lib/main.dart:199:20: Error: The method 'buildPageTransition' isn't defined for the class '_MyAppState'.
+ - '_MyAppState' is from 'package:camera_device_manager/main.dart' ('lib/main.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'buildPageTransition'.
+            return buildPageTransition(const WebSocketLogScreen());
+                   ^^^^^^^^^^^^^^^^^^^
+lib/screens/login_screen.dart:428:11: Error: The argument type 'String' can't be assigned to the parameter type 'int'.
+          serverPort,
+          ^
+lib/screens/multi_live_view_screen.dart:33:3: Error: 'Timer' isn't a type.
+  Timer? _slideshowTimer;
+  ^^^^^
+lib/screens/multi_live_view_screen.dart:97:25: Error: The getter 'Timer' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'Timer'.
+      _slideshowTimer = Timer.periodic(
+                        ^^^^^
+lib/theme/app_theme.dart:61:22: Error: The argument type 'CardTheme' can't be assigned to the parameter type 'CardThemeData?'.
+ - 'CardTheme' is from 'package:flutter/src/material/card_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/card_theme.dart').
+ - 'CardThemeData' is from 'package:flutter/src/material/card_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/card_theme.dart').
+    cardTheme: const CardTheme(
+                     ^
+lib/theme/app_theme.dart:165:24: Error: The argument type 'TabBarTheme' can't be assigned to the parameter type 'TabBarThemeData?'.
+ - 'TabBarTheme' is from 'package:flutter/src/material/tab_bar_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/tab_bar_theme.dart').
+ - 'TabBarThemeData' is from 'package:flutter/src/material/tab_bar_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/tab_bar_theme.dart').
+    tabBarTheme: const TabBarTheme(
+                       ^
+lib/theme/app_theme.dart:228:24: Error: The argument type 'DialogTheme' can't be assigned to the parameter type 'DialogThemeData?'.
+ - 'DialogTheme' is from 'package:flutter/src/material/dialog_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/dialog_theme.dart').
+ - 'DialogThemeData' is from 'package:flutter/src/material/dialog_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/dialog_theme.dart').
+    dialogTheme: const DialogTheme(
+                       ^
+lib/providers/websocket_provider.dart:64:53: Error: The argument type 'int' can't be assigned to the parameter type 'String'.
+    return await _webSocketService.connect(address, port, username, password);
+                                                    ^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **

@@ -58,7 +58,7 @@ class AppTheme {
       elevation: 0,
     ),
     // Fix: Updated to work with newer Flutter versions that expect const constructors
-    cardTheme: const CardTheme(
+    cardTheme: CardTheme(
       color: darkSurface,
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -162,7 +162,7 @@ class AppTheme {
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     ),
     // Fix: Changed TabBarTheme to correct type for newer Flutter
-    tabBarTheme: const TabBarTheme(
+    tabBarTheme: TabBarTheme(
       labelColor: primaryBlue,
       unselectedLabelColor: darkTextSecondary,
       indicator: UnderlineTabIndicator(
@@ -225,7 +225,7 @@ class AppTheme {
       behavior: SnackBarBehavior.floating,
     ),
     // Fix: Changed DialogTheme to const constructor for newer Flutter
-    dialogTheme: const DialogTheme(
+    dialogTheme: DialogTheme(
       backgroundColor: darkSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(16)),
