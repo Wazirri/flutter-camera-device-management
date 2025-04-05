@@ -5,6 +5,7 @@ import '../providers/websocket_provider.dart';
 import '../widgets/desktop_side_menu.dart';
 import '../widgets/mobile_bottom_navigation_bar.dart';
 import '../utils/platform_utils.dart';
+import '../models/camera_device.dart';
 import 'cameras_screen.dart';
 
 class CameraDevicesScreen extends StatefulWidget {
@@ -188,7 +189,7 @@ class DeviceCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       device.macAddress,
-                      style: theme.textTheme.subtitle1?.copyWith(
+                      style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -201,17 +202,17 @@ class DeviceCard extends StatelessWidget {
               // Device info
               Text(
                 'IP: ${device.ipv4.isNotEmpty ? device.ipv4 : "Unknown"}',
-                style: theme.textTheme.bodyText2,
+                style: theme.textTheme.bodyMedium,
               ),
               SizedBox(height: 4),
               Text(
                 'Cameras: ${device.cameras.length}',
-                style: theme.textTheme.bodyText2,
+                style: theme.textTheme.bodyMedium,
               ),
               SizedBox(height: 4),
               Text(
                 'Status: ${device.status.toString().split('.').last}',
-                style: theme.textTheme.bodyText2,
+                style: theme.textTheme.bodyMedium,
               ),
               
               Spacer(),

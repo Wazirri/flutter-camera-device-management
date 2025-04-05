@@ -1,0 +1,127 @@
+
+lib/screens/cameras_screen.dart:8:8: Error: Error when reading 'lib/utils/platform_utils.dart': No such file or directory
+import '../utils/platform_utils.dart';
+       ^
+lib/screens/camera_devices_screen.dart:7:8: Error: Error when reading 'lib/utils/platform_utils.dart': No such file or directory
+import '../utils/platform_utils.dart';
+       ^
+lib/screens/camera_devices_screen.dart:131:9: Error: Type 'CameraDevice' not found.
+  final CameraDevice device;
+        ^^^^^^^^^^^^
+lib/screens/cameras_screen.dart:43:25: Error: The getter 'service' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:camera_device_manager/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'service'.
+      websocketProvider.service.requestCameraInfo();
+                        ^^^^^^^
+lib/screens/cameras_screen.dart:91:13: Error: No named parameter with the name 'deviceId'.
+            deviceId: _selectedDeviceId,
+            ^^^^^^^^
+lib/widgets/camera_grid_item.dart:12:9: Context: Found this candidate, but the arguments don't match.
+  const CameraGridItem({
+        ^^^^^^^^^^^^^^
+lib/screens/cameras_screen.dart:106:25: Error: Member not found: 'panelBackground'.
+        color: AppTheme.panelBackground,
+                        ^^^^^^^^^^^^^^^
+lib/screens/cameras_screen.dart:117:35: Error: Member not found: 'textColor'.
+                  color: AppTheme.textColor,
+                                  ^^^^^^^^^
+lib/screens/cameras_screen.dart:236:47: Error: Required named parameter 'onDestinationSelected' must be provided.
+                if (isDesktop) DesktopSideMenu(currentRoute: CamerasScreen.routeName),
+                                              ^
+lib/widgets/desktop_side_menu.dart:8:9: Context: Found this candidate, but the arguments don't match.
+  const DesktopSideMenu({
+        ^^^^^^^^^^^^^^^
+lib/screens/cameras_screen.dart:244:38: Error: Required named parameter 'onDestinationSelected' must be provided.
+          : MobileBottomNavigationBar(currentRoute: CamerasScreen.routeName),
+                                     ^
+lib/widgets/mobile_bottom_navigation_bar.dart:9:9: Context: Found this candidate, but the arguments don't match.
+  const MobileBottomNavigationBar({
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/cameras_screen.dart:81:23: Error: The getter 'PlatformUtils' isn't defined for the class '_CamerasScreenState'.
+ - '_CamerasScreenState' is from 'package:camera_device_manager/screens/cameras_screen.dart' ('lib/screens/cameras_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'PlatformUtils'.
+    final isDesktop = PlatformUtils.isDesktop();
+                      ^^^^^^^^^^^^^
+lib/screens/cameras_screen.dart:94:12: Error: A value of type 'List<dynamic>' can't be assigned to a variable of type 'List<Widget>'.
+ - 'List' is from 'dart:core'.
+ - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+        }).toList();
+           ^
+lib/screens/camera_devices_screen.dart:40:25: Error: The getter 'service' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:camera_device_manager/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'service'.
+      websocketProvider.service.requestCameraInfo();
+                        ^^^^^^^
+lib/screens/camera_devices_screen.dart:86:41: Error: Required named parameter 'onDestinationSelected' must be provided.
+          if (isDesktop) DesktopSideMenu(currentRoute: CameraDevicesScreen.routeName),
+                                        ^
+lib/widgets/desktop_side_menu.dart:8:9: Context: Found this candidate, but the arguments don't match.
+  const DesktopSideMenu({
+        ^^^^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:125:38: Error: Required named parameter 'onDestinationSelected' must be provided.
+          : MobileBottomNavigationBar(currentRoute: CameraDevicesScreen.routeName),
+                                     ^
+lib/widgets/mobile_bottom_navigation_bar.dart:9:9: Context: Found this candidate, but the arguments don't match.
+  const MobileBottomNavigationBar({
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:70:23: Error: The getter 'PlatformUtils' isn't defined for the class '_CameraDevicesScreenState'.
+ - '_CameraDevicesScreenState' is from 'package:camera_device_manager/screens/camera_devices_screen.dart' ('lib/screens/camera_devices_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'PlatformUtils'.
+    final isDesktop = PlatformUtils.isDesktop();
+                      ^^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:131:9: Error: 'CameraDevice' isn't a type.
+  final CameraDevice device;
+        ^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:147:12: Error: Undefined name 'DeviceStatus'.
+      case DeviceStatus.online:
+           ^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:150:12: Error: Undefined name 'DeviceStatus'.
+      case DeviceStatus.warning:
+           ^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:153:12: Error: Undefined name 'DeviceStatus'.
+      case DeviceStatus.error:
+           ^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:156:12: Error: Undefined name 'DeviceStatus'.
+      case DeviceStatus.offline:
+           ^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:191:46: Error: The getter 'subtitle1' isn't defined for the class 'TextTheme'.
+ - 'TextTheme' is from 'package:flutter/src/material/text_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/text_theme.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'subtitle1'.
+                      style: theme.textTheme.subtitle1?.copyWith(
+                                             ^^^^^^^^^
+lib/screens/camera_devices_screen.dart:204:40: Error: The getter 'bodyText2' isn't defined for the class 'TextTheme'.
+ - 'TextTheme' is from 'package:flutter/src/material/text_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/text_theme.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'bodyText2'.
+                style: theme.textTheme.bodyText2,
+                                       ^^^^^^^^^
+lib/screens/camera_devices_screen.dart:209:40: Error: The getter 'bodyText2' isn't defined for the class 'TextTheme'.
+ - 'TextTheme' is from 'package:flutter/src/material/text_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/text_theme.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'bodyText2'.
+                style: theme.textTheme.bodyText2,
+                                       ^^^^^^^^^
+lib/screens/camera_devices_screen.dart:214:40: Error: The getter 'bodyText2' isn't defined for the class 'TextTheme'.
+ - 'TextTheme' is from 'package:flutter/src/material/text_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/text_theme.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'bodyText2'.
+                style: theme.textTheme.bodyText2,
+                                       ^^^^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+
+
+
+
+
+
+
+
+
+
+
+
+
+warning: Run script build phase 'Run Script' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase. (in target 'Flutter Assemble' from project 'Runner')
+** BUILD FAILED **
+
+Building macOS application...                                           
+Error: Build process failed

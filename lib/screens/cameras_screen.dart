@@ -6,7 +6,6 @@ import '../widgets/camera_grid_item.dart';
 import '../widgets/desktop_side_menu.dart';
 import '../widgets/mobile_bottom_navigation_bar.dart';
 import '../utils/platform_utils.dart';
-import '../utils/page_transitions.dart';
 import '../theme/app_theme.dart';
 
 class CamerasScreen extends StatefulWidget {
@@ -85,11 +84,11 @@ class _CamerasScreenState extends State<CamerasScreen> {
     if (_selectedDeviceId.isNotEmpty) {
       final selectedDevice = cameraProvider.devices[_selectedDeviceId];
       if (selectedDevice != null) {
-        cameraTiles = selectedDevice.cameras.map((camera) {
+        cameraTiles = selectedDevice.cameras.map<Widget>((camera) {
           return CameraGridItem(
             camera: camera,
-            deviceId: _selectedDeviceId,
             cameraIndex: camera.index,
+            deviceKey: _selectedDeviceId,
           );
         }).toList();
       }
