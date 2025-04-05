@@ -154,6 +154,9 @@ class Camera {
   String lastSeenAt;          // When the camera was last seen
   bool recording;             // Whether the camera is currently recording
   
+  bool soundRec;
+  String xAddr;
+  
   Camera({
     required this.index,
     required this.name,
@@ -183,6 +186,8 @@ class Camera {
     this.disconnected = '-',
     required this.lastSeenAt,
     required this.recording,
+    this.soundRec = false,
+    this.xAddr = '',
   });
   
   // Added id getter to uniquely identify cameras
