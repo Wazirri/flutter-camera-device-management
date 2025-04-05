@@ -103,10 +103,10 @@ class WebSocketService with ChangeNotifier {
   void requestCameraInfo() {
     if (_isConnected && _channel != null && !_isAuthenticating) {
       print('[WebSocket] Explicitly requesting camera information');
-      // The DO LISTDEVS command requests all device information from the server
-      sendMessage('DO LISTDEVS');
-      // Also request camera properties
+      // Only use the valid command for camera information
       sendMessage('DO GETCAMS');
+      // Also refresh monitor info to make sure we get the latest data
+      sendMessage('DO MONITORECS');
     } else {
       print('[WebSocket] Not ready to request camera information');
     }
