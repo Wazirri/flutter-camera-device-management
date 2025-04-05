@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart'; // Import for MediaKit
 import 'screens/cameras_screen.dart';
@@ -15,7 +14,6 @@ import 'screens/record_view_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
 import 'screens/multi_live_view_screen.dart';  // New multi-camera view screen
-import 'screens/multi_live_view_screen.dart'; // New multi-camera view screen
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
 import 'utils/page_transitions.dart';
@@ -33,7 +31,7 @@ Future<void> main() async {
     MediaKit.ensureInitialized();
     
     // Set orientations (only for mobile platforms)
-    if (!kIsWeb) {
+    if (true) {
       try {
         await SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
@@ -43,7 +41,7 @@ Future<void> main() async {
         ]);
         
         // Set specific platform settings
-        if (!kIsWeb && (Platform.isIOS || Platform.isMacOS)) {
+        if (Platform.isIOS || Platform.isMacOS) {
           // iOS/macOS specific settings if needed
           debugPrint('Configuring iOS/macOS specific settings');
         }
