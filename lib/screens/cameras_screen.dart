@@ -7,6 +7,7 @@ import '../theme/app_theme.dart';
 import 'live_view_screen.dart';
 import 'record_view_screen.dart';
 
+import "../widgets/camera_details_bottom_sheet.dart";
 class CamerasScreen extends StatefulWidget {
   const CamerasScreen({Key? key}) : super(key: key);
 
@@ -31,6 +32,54 @@ class _CamerasScreenState extends State<CamerasScreen> {
     setState(() {
       selectedCamera = camera;
     });
+    
+    // Kamera detaylarını BottomSheet olarak göster
+    _showCameraDetails(camera);
+  }
+  
+  void _showCameraDetails(Camera camera) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppTheme.darkBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.3,
+          maxChildSize: 0.95,
+          expand: false,
+          builder: (context, scrollController) {
+            return CameraDetailsBottomSheet(
+              camera: camera,
+              scrollController: scrollController,
+            );
+          },
+        );
+      },
+    );
+  }
+      backgroundColor: AppTheme.darkBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.3,
+          maxChildSize: 0.95,
+          expand: false,
+          builder: (context, scrollController) {
+            return CameraDetailsBottomSheet(
+              camera: camera,
+              scrollController: scrollController,
+            );
+          },
+        );
+      },
+    );
   }
   
   void _openLiveView(Camera camera) {
