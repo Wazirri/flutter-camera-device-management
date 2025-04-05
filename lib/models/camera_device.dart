@@ -325,6 +325,8 @@ class Camera {
       'disconnected': disconnected,
       'lastSeenAt': lastSeenAt,
       'recording': recording,
+      'soundRec': soundRec,
+      'xAddr': xAddr,
     };
   }
   

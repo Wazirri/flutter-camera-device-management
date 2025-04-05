@@ -28,6 +28,27 @@ class _LoginScreenState extends State<LoginScreen> {
     // Set default values for production
     _serverAddressController.text = '85.104.114.145';
     _serverPortController.text = '1200';
+    
+    // Check for local server mode
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
+      if (webSocketProvider.isLocalServerMode) {
+        // If in local server mode, auto-connect
+        _serverAddressController.text = 'localhost';
+        _serverPortController.text = '5000';
+        _emailController.text = 'admin';
+        _passwordController.text = 'admin';
+        
+        debugPrint('🌐 Local server mode detected - will auto-connect to ws://localhost:5000/ws');
+        
+        // Auto-login after a short delay
+        Future.delayed(Duration(milliseconds: 500), () {
+          if (mounted) {
+            _handleLogin();
+          }
+        });
+      }
+    });
   }
 
   @override
