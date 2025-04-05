@@ -1,0 +1,107 @@
+
+lib/screens/dashboard_screen.dart:48:47: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+    final cameraCount = cameraDevicesProvider.cameras.length;
+                                              ^^^^^^^
+lib/screens/dashboard_screen.dart:49:47: Error: The getter 'uniqueDeviceCount' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'uniqueDeviceCount'.
+    final deviceCount = cameraDevicesProvider.uniqueDeviceCount;
+                                              ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:271:30: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+    final cameras = provider.cameras.take(5).toList();
+                             ^^^^^^^
+lib/screens/dashboard_screen.dart:447:30: Error: The getter 'uniqueDevices' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'uniqueDevices'.
+    final devices = provider.uniqueDevices.take(4).toList();
+                             ^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:712:81: Error: The argument type 'String?' can't be assigned to the parameter type 'String' because 'String?' is nullable and 'String' isn't.
+                            color: _getTemperatureColor(double.tryParse(sysInfo.cpuTemp) ?? 0),
+                                                                                ^
+lib/screens/dashboard_screen.dart:728:44: Error: The argument type 'String?' can't be assigned to the parameter type 'String' because 'String?' is nullable and 'String' isn't.
+                            value: sysInfo.totalConns,
+                                           ^
+lib/screens/dashboard_screen.dart:887:49: Error: The argument type 'String?' can't be assigned to the parameter type 'String' because 'String?' is nullable and 'String' isn't.
+                      '${((double.parse(sysInfo.totalRam) - double.parse(sysInfo.freeRam)) / (1024 * 1024)).toStringAsFixed(2)} MB'),
+                                                ^
+lib/screens/dashboard_screen.dart:887:82: Error: The argument type 'String?' can't be assigned to the parameter type 'String' because 'String?' is nullable and 'String' isn't.
+                      '${((double.parse(sysInfo.totalRam) - double.parse(sysInfo.freeRam)) / (1024 * 1024)).toStringAsFixed(2)} MB'),
+                                                                                 ^
+lib/screens/dashboard_screen.dart:985:48: Error: The argument type 'String?' can't be assigned to the parameter type 'String' because 'String?' is nullable and 'String' isn't.
+              _buildThermalItem('SoC', sysInfo.socThermal),
+                                               ^
+lib/screens/dashboard_screen.dart:987:48: Error: The argument type 'String?' can't be assigned to the parameter type 'String' because 'String?' is nullable and 'String' isn't.
+              _buildThermalItem('GPU', sysInfo.gpuThermal),
+                                               ^
+lib/screens/dashboard_screen.dart:1050:47: Error: The argument type 'Map<String, dynamic>' can't be assigned to the parameter type 'String'.
+ - 'Map' is from 'dart:core'.
+        _buildNetworkItem('Ethernet', sysInfo.eth0),
+                                              ^
+lib/screens/dashboard_screen.dart:1052:42: Error: The argument type 'Map<String, dynamic>' can't be assigned to the parameter type 'String'.
+ - 'Map' is from 'dart:core'.
+        _buildNetworkItem('PPP', sysInfo.ppp0),
+                                         ^
+lib/screens/dashboard_screen.dart:1054:54: Error: The argument type 'String?' can't be assigned to the parameter type 'String' because 'String?' is nullable and 'String' isn't.
+        _buildNetworkItem('Active Sessions', sysInfo.sessions),
+                                                     ^
+lib/screens/devices_screen.dart:159:42: Error: The getter 'devicesByMacAddress' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'devicesByMacAddress'.
+    final devicesByMac = devicesProvider.devicesByMacAddress;
+                                         ^^^^^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:479:35: Error: The method 'setSelectedDevice' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'setSelectedDevice'.
+                  devicesProvider.setSelectedDevice(device.macKey);
+                                  ^^^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:547:35: Error: The method 'setSelectedDevice' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'setSelectedDevice'.
+                  devicesProvider.setSelectedDevice(device.macKey);
+                                  ^^^^^^^^^^^^^^^^^
+lib/screens/live_view_screen.dart:119:42: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+      _availableCameras = cameraProvider.cameras;
+                                         ^^^^^^^
+lib/screens/record_view_screen.dart:166:42: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+      _availableCameras = cameraProvider.cameras;
+                                         ^^^^^^^
+lib/providers/camera_devices_provider.dart:89:11: Error: No named parameter with the name 'status'.
+          status: DeviceStatus.unknown,
+          ^^^^^^
+lib/models/camera_device.dart:24:3: Context: Found this candidate, but the arguments don't match.
+  CameraDevice({
+  ^^^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:134:22: Error: The getter 'globalIndex' isn't defined for the class 'Camera'.
+ - 'Camera' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'globalIndex'.
+          if (camera.globalIndex == cameraGlobalIndex) {
+                     ^^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:174:9: Error: No named parameter with the name 'globalIndex'.
+        globalIndex: -1,
+        ^^^^^^^^^^^
+lib/models/camera_device.dart:159:3: Context: Found this candidate, but the arguments don't match.
+  Camera({
+  ^^^^^^
+lib/providers/camera_devices_provider.dart:234:16: Error: The setter 'globalIndex' isn't defined for the class 'Camera'.
+ - 'Camera' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing setter, or defining a setter or field named 'globalIndex'.
+        camera.globalIndex = int.tryParse(value.toString()) ?? -1;
+               ^^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:247:16: Error: The setter 'status' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing setter, or defining a setter or field named 'status'.
+        device.status = _parseDeviceStatus(value.toString());
+               ^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+warning: Run script build phase 'Run Script' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase. (in target 'Flutter Assemble' from project 'Runner')
+** BUILD FAILED **

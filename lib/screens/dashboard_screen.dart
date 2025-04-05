@@ -216,7 +216,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildStatCard(
     BuildContext context, {
     required String title,
-    required String value,
+    required String? value,
     required IconData icon,
     required Color color,
   }) {
@@ -709,7 +709,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             title: 'CPU Temperature',
                             value: sysInfo.formattedCpuTemp,
                             icon: Icons.thermostat_outlined,
-                            color: _getTemperatureColor(double.tryParse(sysInfo.cpuTemp) ?? 0),
+                            color: _getTemperatureColor(sysInfo.getCpuTempValue() ?? 0),
                           ),
                           _buildSystemInfoCard(
                             title: 'Uptime',
@@ -725,7 +725,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                           _buildSystemInfoCard(
                             title: 'Network Connections',
-                            value: sysInfo.totalConns,
+                            value: sysInfo.totalConns ?? "0" ?? "0",
                             icon: Icons.lan_outlined,
                             color: AppTheme.primaryOrange,
                           ),
@@ -750,7 +750,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   
   Widget _buildSystemInfoCard({
     required String title,
-    required String value,
+    required String? value,
     required IconData icon,
     required Color color,
   }) {
@@ -884,7 +884,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     _buildRamInfoItem('Total', sysInfo.formattedTotalRam),
                     _buildRamInfoItem('Free', sysInfo.formattedFreeRam),
                     _buildRamInfoItem('Used', 
-                      '${((double.parse(sysInfo.totalRam) - double.parse(sysInfo.freeRam)) / (1024 * 1024)).toStringAsFixed(2)} MB'),
+                      '${((double.parse(sysInfo.totalRam ?? "0") - double.parse(sysInfo.freeRam ?? "0")) / (1024 * 1024)).toStringAsFixed(2)} MB'),
                   ],
                 ),
         ],
@@ -892,7 +892,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildRamInfoItem(String label, String value) {
+  Widget _buildRamInfoItem(String label, String? value) {
     return Column(
       children: [
         Text(
@@ -982,16 +982,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             _buildThermalItem('CPU', sysInfo.formattedCpuTemp),
             if (sysInfo.socThermal != 'N/A')
-              _buildThermalItem('SoC', sysInfo.socThermal),
+              _buildThermalItem("SoC", sysInfo.socThermal ?? "N/A"),
             if (sysInfo.gpuThermal != 'N/A')
-              _buildThermalItem('GPU', sysInfo.gpuThermal),
+              _buildThermalItem("GPU", sysInfo.gpuThermal ?? "N/A"),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildThermalItem(String label, String value) {
+  Widget _buildThermalItem(String label, String? value) {
     final temperature = double.tryParse(value.replaceAll('°C', '').trim()) ?? 0;
     
     return Container(
@@ -1047,16 +1047,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         const SizedBox(height: 16),
-        _buildNetworkItem('Ethernet', sysInfo.eth0),
+        _buildNetworkItem("Ethernet", sysInfo.eth0["ip"]?.toString() ?? "N/A"),
         const SizedBox(height: 12),
-        _buildNetworkItem('PPP', sysInfo.ppp0),
+        _buildNetworkItem("PPP", sysInfo.ppp0["ip"]?.toString() ?? "N/A"),
         const SizedBox(height: 12),
-        _buildNetworkItem('Active Sessions', sysInfo.sessions),
+        _buildNetworkItem("Active Sessions", sysInfo.sessions ?? "0"),
       ],
     );
   }
 
-  Widget _buildNetworkItem(String label, String value) {
+  Widget _buildNetworkItem(String label, String? value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

@@ -1,0 +1,2 @@
+// Add this at the top of DashboardScreen class
+static const String routeName = '/dashboard';
