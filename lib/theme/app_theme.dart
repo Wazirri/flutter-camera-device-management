@@ -57,11 +57,12 @@ class AppTheme {
       foregroundColor: darkTextPrimary,
       elevation: 0,
     ),
-    cardTheme: CardTheme(
+    // Fix: Updated to work with newer Flutter versions that expect const constructors
+    cardTheme: const CardTheme(
       color: darkSurface,
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -160,10 +161,13 @@ class AppTheme {
       iconColor: darkTextSecondary,
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     ),
+    // Fix: Changed TabBarTheme to correct type for newer Flutter
     tabBarTheme: const TabBarTheme(
       labelColor: primaryBlue,
       unselectedLabelColor: darkTextSecondary,
-      indicatorColor: primaryBlue,
+      indicator: UnderlineTabIndicator(
+        borderSide: BorderSide(color: primaryBlue, width: 2),
+      ),
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: darkSurface,
@@ -220,15 +224,16 @@ class AppTheme {
       ),
       behavior: SnackBarBehavior.floating,
     ),
-    dialogTheme: DialogTheme(
+    // Fix: Changed DialogTheme to const constructor for newer Flutter
+    dialogTheme: const DialogTheme(
       backgroundColor: darkSurface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
     ),
-    bottomSheetTheme: BottomSheetThemeData(
+    bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: darkSurface,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
     ),
@@ -315,6 +320,21 @@ class AppTheme {
         fontWeight: FontWeight.w500, 
         color: darkTextSecondary,
       ),
+    ),
+  );
+  
+  // Light Theme
+  static ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.light,
+    primaryColor: primaryBlue,
+    scaffoldBackgroundColor: Colors.white,
+    // Use the same theme structure as dark theme, but with light colors
+    // This is a simplified version just to have both themes available
+    colorScheme: const ColorScheme.light(
+      primary: primaryBlue,
+      secondary: primaryOrange,
+      error: Color(0xFFB00020),
     ),
   );
 }
