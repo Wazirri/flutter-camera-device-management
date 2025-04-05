@@ -237,19 +237,20 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                   0,
                 ),
 
+                _buildAnimatedMoreMenuItem(
                   context,
-                  const Icon(Icons.settings, color: AppTheme.primaryOrange),
+                  Icon(Icons.settings, color: AppTheme.primaryColor),
                   'Settings',
                   '/settings',
-                  0,
+                  1,
                 ),
                 
                 _buildAnimatedMoreMenuItem(
                   context,
-                  const Icon(Icons.feed, color: AppTheme.primaryBlue),
+                  Icon(Icons.feed, color: AppTheme.accentColor),
                   'WebSocket Logs',
                   '/websocket-logs',
-                  1,
+                  2,
                 ),
                 
                 const Padding(
@@ -259,10 +260,10 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                 
                 _buildAnimatedMoreMenuItem(
                   context,
-                  const Icon(Icons.logout, color: Colors.red),
+                  Icon(Icons.logout, color: Colors.red),
                   'Logout',
                   '/login',
-                  2,
+                  3,
                   textColor: Colors.red,
                 ),
                 
@@ -273,11 +274,6 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
           ),
         );
       },
-      // Use custom animation controller
-      transitionAnimationController: AnimationController(
-        duration: const Duration(milliseconds: 400),
-        vsync: Navigator.of(context).overlay!,
-      ),
     );
   }
   
