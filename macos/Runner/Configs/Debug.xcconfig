@@ -1,2 +1,5 @@
 #include "../../Flutter/Flutter-Debug.xcconfig"
 #include "Warnings.xcconfig"
+#include "AppInfo.xcconfig"
+
+ONLY_ACTIVE_ARCH = YES
