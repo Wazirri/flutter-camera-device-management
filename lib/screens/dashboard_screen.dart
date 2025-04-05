@@ -573,9 +573,7 @@ class DashboardScreen extends StatelessWidget {
   }
   
   Widget _buildSystemInfoSection(BuildContext context, WebSocketProvider provider) {
-    final sysInfo = provider.systemInfo;
-    final isSmallScreen = ResponsiveHelper.isMobile(context);
-    
+    // SystemInfo'yu Consumer ile dinleyerek her değişiklikte yenilenecek
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -601,8 +599,14 @@ class DashboardScreen extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: sysInfo == null
-                ? const Center(
+            // Consumer widget kullanarak WebSocketProvider'daki her değişikliği dinliyoruz
+            child: Consumer<WebSocketProvider>(
+              builder: (context, wsProvider, child) {
+                final sysInfo = wsProvider.systemInfo;
+                final isSmallScreen = ResponsiveHelper.isMobile(context);
+                
+                if (sysInfo == null) {
+                  return const Center(
                     child: Padding(
                       padding: EdgeInsets.all(24.0),
                       child: Column(
@@ -617,54 +621,64 @@ class DashboardScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                  )
-                : Column(
-                    children: [
-                      GridView.count(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: isSmallScreen ? 2 : 4,
-                        childAspectRatio: isSmallScreen ? 1.5 : 2.0,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        children: [
-                          _buildSystemInfoCard(
-                            title: 'CPU Temperature',
-                            value: sysInfo.formattedCpuTemp,
-                            icon: Icons.thermostat_outlined,
-                            color: _getTemperatureColor(double.tryParse(sysInfo.cpuTemp) ?? 0),
-                          ),
-                          _buildSystemInfoCard(
-                            title: 'Uptime',
-                            value: sysInfo.formattedUpTime,
-                            icon: Icons.timer_outlined,
-                            color: AppTheme.primaryBlue,
-                          ),
-                          _buildSystemInfoCard(
-                            title: 'Server Time',
-                            value: sysInfo.formattedSrvTime,
-                            icon: Icons.access_time,
-                            color: AppTheme.online,
-                          ),
-                          _buildSystemInfoCard(
-                            title: 'Network Connections',
-                            value: sysInfo.totalConns,
-                            icon: Icons.lan_outlined,
-                            color: AppTheme.primaryOrange,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      _buildRamUsageCard(context, sysInfo),
-                      const SizedBox(height: 16),
-                      _buildThermalAndNetworkCard(context, sysInfo),
-                      if (sysInfo.gps['lat'] != '0.000000' || sysInfo.gps['lon'] != '0.000000')
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16.0),
-                          child: _buildGpsCard(context, sysInfo),
+                  );
+                }
+                
+                return Column(
+                  children: [
+                    GridView.count(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      crossAxisCount: isSmallScreen ? 3 : 5,
+                      childAspectRatio: isSmallScreen ? 1.5 : 2.0,
+                      crossAxisSpacing: 16,
+                      mainAxisSpacing: 16,
+                      children: [
+                        _buildSystemInfoCard(
+                          title: 'CPU Temperature',
+                          value: sysInfo.formattedCpuTemp,
+                          icon: Icons.thermostat_outlined,
+                          color: _getTemperatureColor(double.tryParse(sysInfo.cpuTemp) ?? 0),
                         ),
-                    ],
-                  ),
+                        _buildSystemInfoCard(
+                          title: 'Uptime',
+                          value: sysInfo.formattedUpTime,
+                          icon: Icons.timer_outlined,
+                          color: AppTheme.primaryBlue,
+                        ),
+                        _buildSystemInfoCard(
+                          title: 'Server Time',
+                          value: sysInfo.formattedSrvTime,
+                          icon: Icons.access_time,
+                          color: AppTheme.online,
+                        ),
+                        _buildSystemInfoCard(
+                          title: 'Network Connections',
+                          value: sysInfo.totalConns,
+                          icon: Icons.lan_outlined,
+                          color: AppTheme.primaryOrange,
+                        ),
+                        _buildSystemInfoCard(
+                          title: 'Firmware Version',
+                          value: sysInfo.version,
+                          icon: Icons.system_update_alt,
+                          color: AppTheme.primaryBlue,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    _buildRamUsageCard(context, sysInfo),
+                    const SizedBox(height: 16),
+                    _buildThermalAndNetworkCard(context, sysInfo),
+                    if (sysInfo.gps['lat'] != '0.000000' || sysInfo.gps['lon'] != '0.000000')
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: _buildGpsCard(context, sysInfo),
+                      ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ],

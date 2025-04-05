@@ -10,6 +10,7 @@ class SystemInfo {
   final String ppp0;
   final List<Map<String, dynamic>> thermal;
   final Map<String, dynamic> gps;
+  final String version; // Versiyon bilgisi eklendi
 
   SystemInfo({
     required this.cpuTemp,
@@ -23,6 +24,7 @@ class SystemInfo {
     required this.ppp0,
     required this.thermal,
     required this.gps,
+    required this.version,
   });
 
   factory SystemInfo.fromJson(Map<dynamic, dynamic> json) {
@@ -66,6 +68,7 @@ class SystemInfo {
       ppp0: json['ppp0']?.toString() ?? 'Unknown',
       thermal: typedThermal,
       gps: typedGps,
+      version: json['version']?.toString() ?? 'Unknown',
     );
   }
 

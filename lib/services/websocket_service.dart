@@ -185,6 +185,9 @@ class WebSocketService with ChangeNotifier {
               _monitorCommandSent = true;
             }
             
+            // Her sysinfo mesajında notifyListeners çağrılıyor
+            // Bu sayede arayüzdeki sistem bilgileri gerçek zamanlı güncelleniyor
+            print('✅ Sistem bilgileri güncellendi: CPU Sıcaklığı=${_systemInfo?.cpuTemp}°C, RAM Kullanımı=${_systemInfo?.ramUsagePercentage.toStringAsFixed(1)}%');
             notifyListeners();
           }
           
