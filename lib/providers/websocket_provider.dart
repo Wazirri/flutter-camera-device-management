@@ -7,6 +7,8 @@ import 'camera_devices_provider.dart';
 
 class WebSocketProvider with ChangeNotifier {
   final WebSocketService _webSocketService = WebSocketService();
+  String _serverIp = "85.104.114.145";
+  int _serverPort = 1200;
   CameraDevicesProvider? _cameraDevicesProvider;
   
   WebSocketProvider() {
@@ -22,6 +24,8 @@ class WebSocketProvider with ChangeNotifier {
   
   WebSocketService get websocketService => _webSocketService;
   bool get isConnected => _webSocketService.isConnected;
+  String get serverIp => _serverIp;
+  int get serverPort => _serverPort;
   List<String> get messageLog => _webSocketService.messageLog;
   SystemInfo? get systemInfo => _webSocketService.systemInfo;
   
@@ -54,7 +58,9 @@ class WebSocketProvider with ChangeNotifier {
   }
   
   // Connect to WebSocket server
-  Future<bool> connect(String address, String port, String username, String password) async {
+  Future<bool> connect(String address, int port, [String username = "admin", String password = "admin"]) async {
+    _serverIp = address;
+    _serverPort = port;
     return await _webSocketService.connect(address, port, username, password);
   }
   

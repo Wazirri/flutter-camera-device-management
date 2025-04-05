@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../providers/settings_provider.dart';
+import '../providers/websocket_provider.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
-import '../widgets/custom_app_bar.dart';
-import '../providers/websocket_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -13,484 +13,468 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
-  bool _emailAlertsEnabled = false;
-  bool _autoUpdateEnabled = true;
-  double _storageLimit = 70;
-  String _videoQuality = 'High';
-  String _retentionPeriod = '30 Days';
+  final _formKey = GlobalKey<FormState>();
+  
+  // Text editing controllers
+  late TextEditingController _serverIpController;
+  late TextEditingController _serverPortController;
+  late TextEditingController _usernameController;
+  late TextEditingController _passwordController;
+  late TextEditingController _slideshowIntervalController;
   
   @override
-  Widget build(BuildContext context) {
-    final isDesktop = ResponsiveHelper.isDesktop(context);
+  void initState() {
+    super.initState();
     
-    return Scaffold(
-      backgroundColor: AppTheme.darkBackground,
-      appBar: CustomAppBar(
-        title: 'Settings',
-        isDesktop: isDesktop,
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ResponsiveHelper.responsiveWidget(
-            context: context,
-            mobile: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: _buildSettingSections(context),
-            ),
-            desktop: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      _buildGeneralSettingsSection(context),
-                      const SizedBox(height: 16),
-                      _buildStorageSection(context),
-                    ],
-                  ),
+    // Initialize controllers
+    final settings = Provider.of<SettingsProvider>(context, listen: false);
+    _serverIpController = TextEditingController(text: settings.serverIp);
+    _serverPortController = TextEditingController(text: settings.serverPort.toString());
+    _usernameController = TextEditingController(text: settings.username);
+    _passwordController = TextEditingController(text: settings.password);
+    _slideshowIntervalController = TextEditingController(text: settings.slideshowInterval.toString());
+  }
+  
+  @override
+  void dispose() {
+    // Dispose controllers
+    _serverIpController.dispose();
+    _serverPortController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _slideshowIntervalController.dispose();
+    super.dispose();
+  }
+  
+  void _saveSettings() {
+    if (_formKey.currentState!.validate()) {
+      final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+      final wsProvider = Provider.of<WebSocketProvider>(context, listen: false);
+      
+      // Save connection settings
+      settingsProvider.setConnectionParams(
+        serverIp: _serverIpController.text,
+        serverPort: int.parse(_serverPortController.text),
+        username: _usernameController.text,
+        password: _passwordController.text,
+      );
+      
+      // Save slideshow interval
+      settingsProvider.setSlideshowInterval(
+        double.parse(_slideshowIntervalController.text)
+      );
+      
+      // Show a confirmation
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Settings saved successfully'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      
+      // If WebSocket is connected and connection params changed, ask to reconnect
+      if (wsProvider.isConnected &&
+          (wsProvider.serverIp != _serverIpController.text ||
+           wsProvider.serverPort != int.parse(_serverPortController.text))) {
+        _showReconnectDialog();
+      }
+    }
+  }
+  
+  void _resetSettings() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset Settings'),
+        content: const Text(
+          'This will reset all settings to their default values. Continue?'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('CANCEL'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // Reset settings
+              final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+              settingsProvider.resetToDefaults();
+              
+              // Update controllers
+              _serverIpController.text = settingsProvider.serverIp;
+              _serverPortController.text = settingsProvider.serverPort.toString();
+              _usernameController.text = settingsProvider.username;
+              _passwordController.text = settingsProvider.password;
+              _slideshowIntervalController.text = settingsProvider.slideshowInterval.toString();
+              
+              // Show confirmation
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Settings reset to defaults'),
+                  behavior: SnackBarBehavior.floating,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    children: [
-                      _buildNotificationSection(context),
-                      const SizedBox(height: 16),
-                      _buildSecuritySection(context),
-                      const SizedBox(height: 16),
-                      _buildSystemSection(context),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  List<Widget> _buildSettingSections(BuildContext context) {
-    return [
-      _buildGeneralSettingsSection(context),
-      const SizedBox(height: 16),
-      _buildNotificationSection(context),
-      const SizedBox(height: 16),
-      _buildStorageSection(context),
-      const SizedBox(height: 16),
-      _buildSecuritySection(context),
-      const SizedBox(height: 16),
-      _buildSystemSection(context),
-    ];
-  }
-
-  Widget _buildGeneralSettingsSection(BuildContext context) {
-    return _buildSettingCard(
-      title: 'General Settings',
-      icon: Icons.settings,
-      children: [
-        _buildDropdownSetting(
-          title: 'Video Quality',
-          value: _videoQuality,
-          options: const ['Low', 'Medium', 'High', 'Ultra'],
-          onChanged: (newValue) {
-            if (newValue != null) {
-              setState(() {
-                _videoQuality = newValue;
-              });
-            }
-          },
-        ),
-        const Divider(),
-        _buildDropdownSetting(
-          title: 'Retention Period',
-          value: _retentionPeriod,
-          options: const ['7 Days', '14 Days', '30 Days', '60 Days', '90 Days'],
-          onChanged: (newValue) {
-            if (newValue != null) {
-              setState(() {
-                _retentionPeriod = newValue;
-              });
-            }
-          },
-        ),
-        const Divider(),
-        ListTile(
-          title: const Text('Time Zone'),
-          subtitle: const Text('UTC+00:00 (Auto)'),
-          trailing: IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              // UI only
-            },
-          ),
-        ),
-        const Divider(),
-        ListTile(
-          title: const Text('Date Format'),
-          subtitle: const Text('YYYY-MM-DD'),
-          trailing: IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              // UI only
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildNotificationSection(BuildContext context) {
-    return _buildSettingCard(
-      title: 'Notifications',
-      icon: Icons.notifications_outlined,
-      children: [
-        SwitchListTile(
-          title: const Text('Enable Notifications'),
-          subtitle: const Text('Receive alerts for important events'),
-          value: _notificationsEnabled,
-          activeColor: AppTheme.primaryBlue,
-          onChanged: (value) {
-            setState(() {
-              _notificationsEnabled = value;
-            });
-          },
-        ),
-        const Divider(),
-        SwitchListTile(
-          title: const Text('Email Alerts'),
-          subtitle: const Text('Receive alerts via email'),
-          value: _emailAlertsEnabled,
-          activeColor: AppTheme.primaryBlue,
-          onChanged: (value) {
-            setState(() {
-              _emailAlertsEnabled = value;
-            });
-          },
-        ),
-        const Divider(),
-        ExpansionTile(
-          title: const Text('Notification Types'),
-          children: [
-            CheckboxListTile(
-              title: const Text('Motion Detection'),
-              value: true,
-              onChanged: (bool? value) {
-                // UI only
-              },
-              activeColor: AppTheme.primaryBlue,
-            ),
-            CheckboxListTile(
-              title: const Text('Device Status Changes'),
-              value: true,
-              onChanged: (bool? value) {
-                // UI only
-              },
-              activeColor: AppTheme.primaryBlue,
-            ),
-            CheckboxListTile(
-              title: const Text('System Updates'),
-              value: false,
-              onChanged: (bool? value) {
-                // UI only
-              },
-              activeColor: AppTheme.primaryBlue,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStorageSection(BuildContext context) {
-    return _buildSettingCard(
-      title: 'Storage',
-      icon: Icons.storage_outlined,
-      children: [
-        ListTile(
-          title: const Text('Storage Usage'),
-          subtitle: Text('${_storageLimit.toInt()}% of available space'),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: LinearProgressIndicator(
-            value: _storageLimit / 100,
-            backgroundColor: AppTheme.darkBackground,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              _storageLimit > 90
-                  ? AppTheme.error
-                  : _storageLimit > 70
-                      ? AppTheme.warning
-                      : AppTheme.primaryBlue,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        const Divider(),
-        ListTile(
-          title: const Text('Storage Limit'),
-          subtitle: Text('${_storageLimit.toInt()}% of available space'),
-          trailing: SizedBox(
-            width: 120,
-            child: Slider(
-              value: _storageLimit,
-              min: 10,
-              max: 100,
-              divisions: 9,
-              label: '${_storageLimit.toInt()}%',
-              onChanged: (double value) {
-                setState(() {
-                  _storageLimit = value;
-                });
-              },
-              activeColor: AppTheme.primaryBlue,
-            ),
-          ),
-        ),
-        const Divider(),
-        ListTile(
-          title: const Text('Cleanup Old Recordings'),
-          subtitle: const Text('Automatically delete recordings older than retention period'),
-          trailing: ElevatedButton(
-            onPressed: () {
-              // UI only
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryBlue,
-            ),
-            child: const Text('Clean Up'),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSecuritySection(BuildContext context) {
-    return _buildSettingCard(
-      title: 'Security',
-      icon: Icons.security_outlined,
-      children: [
-        ListTile(
-          title: const Text('Change Password'),
-          leading: const Icon(Icons.lock_outline),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () {
-            // UI only
-          },
-        ),
-        const Divider(),
-        ListTile(
-          title: const Text('Two-Factor Authentication'),
-          subtitle: const Text('Disabled'),
-          leading: const Icon(Icons.phonelink_lock),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () {
-            // UI only
-          },
-        ),
-        const Divider(),
-        ListTile(
-          title: const Text('API Keys'),
-          subtitle: const Text('Manage API access'),
-          leading: const Icon(Icons.vpn_key_outlined),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () {
-            // UI only
-          },
-        ),
-        const Divider(),
-        ListTile(
-          title: const Text('Session Management'),
-          subtitle: const Text('Manage active sessions'),
-          leading: const Icon(Icons.devices_outlined),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () {
-            // UI only
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSystemSection(BuildContext context) {
-    return _buildSettingCard(
-      title: 'System',
-      icon: Icons.system_update_outlined,
-      children: [
-        SwitchListTile(
-          title: const Text('Automatic Updates'),
-          subtitle: const Text('Keep system up to date automatically'),
-          value: _autoUpdateEnabled,
-          activeColor: AppTheme.primaryBlue,
-          onChanged: (value) {
-            setState(() {
-              _autoUpdateEnabled = value;
-            });
-          },
-        ),
-        const Divider(),
-        const ListTile(
-          title: Text('Current Version'),
-          subtitle: Text('v1.2.0'),
-          trailing: Text('Up to date', style: TextStyle(color: AppTheme.online)),
-        ),
-        const Divider(),
-        Consumer<WebSocketProvider>(
-          builder: (context, provider, child) {
-            final isConnected = provider.isConnected;
-            return ListTile(
-              title: const Text('WebSocket Logs'),
-              subtitle: Text(isConnected 
-                ? 'View WebSocket communication logs (Connected)'
-                : 'View WebSocket communication logs (Disconnected)'
-              ),
-              leading: Icon(
-                Icons.wifi_tethering,
-                color: isConnected ? AppTheme.online : AppTheme.offline,
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                Navigator.pushNamed(context, '/websocket-logs');
-              },
-            );
-          },
-        ),
-        const Divider(),
-        ListTile(
-          title: const Text('System Logs'),
-          subtitle: const Text('View system logs and diagnostic information'),
-          trailing: IconButton(
-            icon: const Icon(Icons.download_outlined),
-            onPressed: () {
-              // UI only
-            },
-          ),
-        ),
-        const Divider(),
-        ListTile(
-          title: const Text('Backup & Restore'),
-          subtitle: const Text('Backup system settings or restore from backup'),
-          trailing: IconButton(
-            icon: const Icon(Icons.backup_outlined),
-            onPressed: () {
-              // UI only
-            },
-          ),
-        ),
-        const Divider(),
-        ListTile(
-          title: const Text('Factory Reset'),
-          subtitle: const Text('Reset all settings to default values'),
-          trailing: TextButton(
-            onPressed: () {
-              _showFactoryResetDialog();
+              );
             },
             style: TextButton.styleFrom(
-              foregroundColor: AppTheme.error,
+              foregroundColor: Colors.red,
             ),
-            child: const Text('Reset'),
+            child: const Text('RESET'),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
-
-  Widget _buildSettingCard({
-    required String title,
-    required IconData icon,
-    required List<Widget> children,
-  }) {
-    return Card(
-      color: AppTheme.darkSurface,
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Icon(
-                  icon,
-                  color: AppTheme.primaryBlue,
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+  
+  void _showReconnectDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reconnect?'),
+        content: const Text(
+          'Connection settings have changed. Would you like to reconnect to the server now?'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('LATER'),
           ),
-          const Divider(height: 1),
-          ...children,
-          const SizedBox(height: 8),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              final wsProvider = Provider.of<WebSocketProvider>(context, listen: false);
+              wsProvider.disconnect();
+              wsProvider.connect(
+                _serverIpController.text,
+                int.parse(_serverPortController.text),
+              );
+            },
+            child: const Text('RECONNECT'),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildDropdownSetting({
-    required String title,
-    required String value,
-    required List<String> options,
-    required Function(String?) onChanged,
-  }) {
-    return ListTile(
-      title: Text(title),
-      trailing: DropdownButton<String>(
-        value: value,
-        onChanged: onChanged,
-        items: options.map<DropdownMenuItem<String>>((String option) {
-          return DropdownMenuItem<String>(
-            value: option,
-            child: Text(option),
-          );
-        }).toList(),
-        dropdownColor: AppTheme.darkSurface,
-        underline: Container(),
+  @override
+  Widget build(BuildContext context) {
+    final settingsProvider = Provider.of<SettingsProvider>(context);
+    final wsProvider = Provider.of<WebSocketProvider>(context);
+    final isDesktop = ResponsiveHelper.isDesktop(context);
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Settings'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Reset to defaults',
+            onPressed: _resetSettings,
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(
+          horizontal: isDesktop ? 32.0 : 16.0,
+          vertical: 16.0,
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Connection Settings Section
+              _buildSectionHeader(context, 'Connection Settings'),
+              Card(
+                margin: const EdgeInsets.only(bottom: 24.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Server IP
+                      TextFormField(
+                        controller: _serverIpController,
+                        decoration: const InputDecoration(
+                          labelText: 'Server IP',
+                          hintText: 'Enter server IP address',
+                          prefixIcon: Icon(Icons.computer),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter server IP';
+                          }
+                          // Simple IP validation
+                          final ipPattern = RegExp(
+                            r'^(\d{1,3}\.){3}\d{1,3}$'
+                          );
+                          if (!ipPattern.hasMatch(value)) {
+                            return 'Please enter a valid IP address';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Server Port
+                      TextFormField(
+                        controller: _serverPortController,
+                        decoration: const InputDecoration(
+                          labelText: 'Server Port',
+                          hintText: 'Enter server port number',
+                          prefixIcon: Icon(Icons.settings_ethernet),
+                        ),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter server port';
+                          }
+                          final port = int.tryParse(value);
+                          if (port == null || port <= 0 || port > 65535) {
+                            return 'Please enter a valid port (1-65535)';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Username
+                      TextFormField(
+                        controller: _usernameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Username',
+                          hintText: 'Enter username',
+                          prefixIcon: Icon(Icons.person),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter username';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Password
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          hintText: 'Enter password',
+                          prefixIcon: const Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.visibility),
+                            onPressed: () {
+                              // Toggle password visibility
+                            },
+                          ),
+                        ),
+                        obscureText: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter password';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Auto Connect Switch
+                      SwitchListTile(
+                        title: const Text('Auto Connect'),
+                        subtitle: const Text(
+                          'Automatically connect to server on startup'
+                        ),
+                        value: settingsProvider.autoConnect,
+                        onChanged: (value) {
+                          settingsProvider.setAutoConnect(value);
+                        },
+                        secondary: const Icon(Icons.power_settings_new),
+                      ),
+                      
+                      // Connection status
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              wsProvider.isConnected
+                                  ? Icons.check_circle
+                                  : Icons.error,
+                              color: wsProvider.isConnected
+                                  ? Colors.green
+                                  : Colors.red,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              wsProvider.isConnected
+                                  ? 'Connected to server'
+                                  : 'Not connected',
+                              style: TextStyle(
+                                color: wsProvider.isConnected
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              // Display Settings Section
+              _buildSectionHeader(context, 'Display Settings'),
+              Card(
+                margin: const EdgeInsets.only(bottom: 24.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Dark Mode Switch
+                      SwitchListTile(
+                        title: const Text('Dark Mode'),
+                        subtitle: const Text(
+                          'Use dark theme throughout the app'
+                        ),
+                        value: settingsProvider.darkMode,
+                        onChanged: (value) {
+                          settingsProvider.setDarkMode(value);
+                        },
+                        secondary: Icon(
+                          settingsProvider.darkMode
+                              ? Icons.dark_mode
+                              : Icons.light_mode,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              // Multi-view Settings Section
+              _buildSectionHeader(context, 'Multi Camera View Settings'),
+              Card(
+                margin: const EdgeInsets.only(bottom: 24.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Auto Slideshow Switch
+                      SwitchListTile(
+                        title: const Text('Auto Slideshow'),
+                        subtitle: const Text(
+                          'Automatically cycle between camera pages'
+                        ),
+                        value: settingsProvider.autoSlideshowEnabled,
+                        onChanged: (value) {
+                          settingsProvider.setAutoSlideshowEnabled(value);
+                        },
+                        secondary: const Icon(Icons.slideshow),
+                      ),
+                      const SizedBox(height: 16),
+                      
+                      // Slideshow Interval Slider
+                      Visibility(
+                        visible: settingsProvider.autoSlideshowEnabled,
+                        maintainState: true,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 16.0),
+                              child: Text(
+                                'Page Change Interval: ${settingsProvider.slideshowInterval.toStringAsFixed(0)} seconds',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ),
+                            Slider(
+                              value: settingsProvider.slideshowInterval,
+                              min: 5,
+                              max: 120,
+                              divisions: 23,
+                              label: '${settingsProvider.slideshowInterval.toStringAsFixed(0)} sec',
+                              onChanged: (value) {
+                                settingsProvider.setSlideshowInterval(value);
+                                _slideshowIntervalController.text = value.toString();
+                              },
+                            ),
+                            // Manual input for precise control
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: TextFormField(
+                                controller: _slideshowIntervalController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Interval (seconds)',
+                                  hintText: 'Enter interval in seconds',
+                                  prefixIcon: Icon(Icons.timer),
+                                ),
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter an interval';
+                                  }
+                                  final interval = double.tryParse(value);
+                                  if (interval == null || interval < 5 || interval > 120) {
+                                    return 'Value must be between 5-120 seconds';
+                                  }
+                                  return null;
+                                },
+                                onChanged: (value) {
+                                  final interval = double.tryParse(value);
+                                  if (interval != null && interval >= 5 && interval <= 120) {
+                                    settingsProvider.setSlideshowInterval(interval);
+                                  }
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              // Save Button
+              Center(
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.save),
+                  label: const Text('SAVE SETTINGS'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.accentColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
+                  ),
+                  onPressed: _saveSettings,
+                ),
+              ),
+              const SizedBox(height: 32),
+            ],
+          ),
+        ),
       ),
     );
   }
-
-  void _showFactoryResetDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppTheme.darkSurface,
-          title: const Text('Factory Reset'),
-          content: const Text(
-            'Are you sure you want to reset all settings to default values? This action cannot be undone.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                // UI only
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: AppTheme.error,
-              ),
-              child: const Text('Reset'),
-            ),
-          ],
-        );
-      },
+  
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          color: AppTheme.accentColor,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }

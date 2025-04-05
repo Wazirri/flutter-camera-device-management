@@ -15,7 +15,7 @@ import 'screens/record_view_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
 import 'screens/multi_live_view_screen.dart';  // New multi-camera view screen
-import 'screens/multi_live_view_screen.dart'; // New multi-camera view screen
+import 'providers/settings_provider.dart';
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
 import 'utils/page_transitions.dart';
@@ -24,17 +24,17 @@ import 'widgets/mobile_bottom_navigation_bar.dart';
 import 'providers/websocket_provider.dart';
 import 'providers/camera_devices_provider.dart';
 
-Future<void> main() async {
-  // This captures errors that happen during initialization
-  runZonedGuarded(() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    
-    // Initialize MediaKit
-    MediaKit.ensureInitialized();
-    
-    // Set orientations (only for mobile platforms)
-    if (!kIsWeb) {
-      try {
+void main() async {
+  // Ensure that MediaKit is initialized
+  MediaKit.ensureInitialized();
+  
+  // Ensure Flutter bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Set orientation preferences
+  if (!kIsWeb) {
+    try {
+      if (Platform.isAndroid || Platform.isIOS) {
         await SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
           DeviceOrientation.portraitDown,
@@ -47,33 +47,31 @@ Future<void> main() async {
           // iOS/macOS specific settings if needed
           debugPrint('Configuring iOS/macOS specific settings');
         }
-      } catch (e) {
-        debugPrint('Error setting orientations: $e');
       }
+    } catch (e) {
+      debugPrint('Error setting orientations: $e');
     }
-    
-    // Create providers first
-    final webSocketProvider = WebSocketProvider();
-    final cameraDevicesProvider = CameraDevicesProvider();
-    
-    // Connect the providers
-    webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
-    
-    // Run the app with providers
-    runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider<WebSocketProvider>.value(value: webSocketProvider),
-          ChangeNotifierProvider<CameraDevicesProvider>.value(value: cameraDevicesProvider),
-        ],
-        child: const MyApp(),
-      ),
-    );
-  }, (error, stackTrace) {
-    // Log any errors that occur during initialization
-    debugPrint('Caught error: $error');
-    debugPrint('Stack trace: $stackTrace');
-  });
+  }
+  
+  // Create providers first
+  final webSocketProvider = WebSocketProvider();
+  final cameraDevicesProvider = CameraDevicesProvider();
+  final settingsProvider = SettingsProvider();
+  
+  // Connect the providers
+  webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
+  
+  // Run the app with providers
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<WebSocketProvider>.value(value: webSocketProvider),
+        ChangeNotifierProvider<CameraDevicesProvider>.value(value: cameraDevicesProvider),
+        ChangeNotifierProvider<SettingsProvider>.value(value: settingsProvider),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -83,263 +81,126 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  @override
-  void initState() {
-    super.initState();
-    // Register observer for app lifecycle changes
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    // Remove observer when app is disposed
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Handle app lifecycle changes
-    debugPrint('App lifecycle state changed to: $state');
-    
-    // Handle specific state changes if needed
-    switch (state) {
-      case AppLifecycleState.resumed:
-        // App is visible and responding to user input
-        break;
-      case AppLifecycleState.inactive:
-        // App is inactive, happens when notifications or modal alerts appear
-        break;
-      case AppLifecycleState.paused:
-        // App is not visible
-        break;
-      case AppLifecycleState.detached:
-        // Application is in detached state (applicable for iOS and Android)
-        break;
-      default:
-        break;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Camera Device Manager',
-      theme: AppTheme.darkTheme,
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
-      onGenerateRoute: (settings) {
-        // Define custom page transitions for different routes
-        Widget page;
-        
-        switch(settings.name) {
-          case '/login':
-            page = const LoginScreen();
-            // Fade in transition for login
-            return AppPageTransitions.fade(page);
-            
-          case '/dashboard':
-            page = AppShell(
-              currentRoute: settings.name ?? '/dashboard',
-              child: const DashboardScreen(),
-            );
-            // Shared axis transition for dashboard (feels connected to login)
-            return AppPageTransitions.sharedAxisHorizontal(page);
-            
-          case '/live-view':
-            // Check if there's a camera parameter passed
-            final args = settings.arguments;
-            if (args is Map && args.containsKey('camera')) {
-              page = AppShell(
-                currentRoute: settings.name ?? '/live-view',
-                child: LiveViewScreen(camera: args['camera']),
-              );
-            } else {
-              page = AppShell(
-                currentRoute: settings.name ?? '/live-view',
-                child: const LiveViewScreen(),
-              );
-            }
-            // Zoom transition for camera views to emphasize content
-            return AppPageTransitions.zoomIn(page);
-            
-          case '/recordings':
-            final args = settings.arguments;
-            if (args is Map && args.containsKey('camera')) {
-              page = AppShell(
-                currentRoute: settings.name ?? '/recordings',
-                child: RecordViewScreen(camera: args['camera']),
-              );
-            } else {
-              page = AppShell(
-                currentRoute: settings.name ?? '/recordings',
-                child: const RecordViewScreen(),
-              );
-            }
-            // Slide up transition for recordings
-            return AppPageTransitions.slideUp(page);
-          case '/multi-live-view':
-            page = AppShell(
-              currentRoute: settings.name ?? '/multi-live-view',
-              child: const MultiLiveViewScreen(),
-            );
-            return AppPageTransitions.sharedAxisHorizontal(page);
-            
-          case '/cameras':
-            page = AppShell(
-              currentRoute: settings.name ?? '/cameras',
-              child: const CamerasScreen(),
-            );
-            // Horizontal slide for navigation
-            return AppPageTransitions.slideHorizontal(page);
-            
-          case '/devices':
-            page = AppShell(
-              currentRoute: settings.name ?? '/devices',
-              child: const DevicesScreen(),
-            );
-            // Horizontal slide for navigation
-            return AppPageTransitions.slideHorizontal(page);
-            
-          case '/camera-devices':
-            page = AppShell(
-              currentRoute: settings.name ?? '/camera-devices',
-              child: const CameraDevicesScreen(),
-            );
-            // Horizontal slide for navigation
-            return AppPageTransitions.slideHorizontal(page);
-            
-          case '/settings':
-            page = AppShell(
-              currentRoute: settings.name ?? '/settings',
-              child: const SettingsScreen(),
-            );
-            // Scale and fade for settings to stand out
-            return AppPageTransitions.scaleAndFade(page);
-            
-          case '/websocket-logs':
-            page = const WebSocketLogScreen();
-            // Slide up for overlay-like screen
-            return AppPageTransitions.slideUp(page);
-            
-          default:
-            page = AppShell(
-              currentRoute: '/dashboard',
-              child: const DashboardScreen(),
-            );
-            // Default transition
-            return AppPageTransitions.fade(page);
-        }
-      },
-    );
-  }
-}
-
-class AppShell extends StatefulWidget {
-  final Widget child;
-  final String currentRoute;
-
-  const AppShell({
-    Key? key,
-    required this.child,
-    required this.currentRoute,
-  }) : super(key: key);
-
-  @override
-  State<AppShell> createState() => _AppShellState();
-}
-
-class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
+class _MyAppState extends State<MyApp> {
+  int _currentIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   
   @override
   void initState() {
     super.initState();
-    // Add observer for app lifecycle changes
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    // Clean up observer
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Handle app lifecycle state changes
-    debugPrint('AppShell lifecycle state: $state');
     
-    if (state == AppLifecycleState.resumed) {
-      // When app is resumed from background, rebuild UI if needed
-      if (mounted) {
-        setState(() {
-          // Refresh the UI
-        });
+    // Initialize auto-connect if enabled
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Get providers
+      final wsProvider = Provider.of<WebSocketProvider>(context, listen: false);
+      final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+      
+      // Wait for settings to be initialized
+      if (!settingsProvider.isInitialized) {
+        // Wait for settings to load (you can add a proper future wait here)
+        await Future.delayed(const Duration(milliseconds: 500));
       }
-    }
+      
+      // Auto-connect if enabled
+      if (settingsProvider.autoConnect && !wsProvider.isConnected) {
+        wsProvider.connect(
+          settingsProvider.serverIp,
+          settingsProvider.serverPort,
+          settingsProvider.username,
+          settingsProvider.password,
+        );
+      }
+    });
+  }
+  
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Determine device type for responsive layout
-    final isDesktop = ResponsiveHelper.isDesktop(context);
-    final isTablet = ResponsiveHelper.isTablet(context);
-    final isMobile = ResponsiveHelper.isMobile(context);
+    // Use settings provider to get theme mode
+    final settingsProvider = Provider.of<SettingsProvider>(context);
+    final themeMode = settingsProvider.darkMode ? ThemeMode.dark : ThemeMode.light;
     
-    return Scaffold(
-      key: _scaffoldKey,
-      drawer: isMobile
-          ? SizedBox(
-              width: 250,
-              child: DesktopSideMenu(
-                currentRoute: widget.currentRoute,
-                onDestinationSelected: _navigateToRoute,
-              ),
-            )
-          : null,
-      body: SafeArea(
-        child: Row(
-          children: [
-            // Desktop side menu
-            if (isDesktop || isTablet)
-              DesktopSideMenu(
-                currentRoute: widget.currentRoute,
-                onDestinationSelected: _navigateToRoute,
-              ),
-            
-            // Main content
-            Expanded(
-              child: widget.child,
+    return MaterialApp(
+      title: 'Camera Device Manager',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
+      home: Builder(
+        builder: (context) {
+          final isDesktop = ResponsiveHelper.isDesktop(context);
+          
+          // Main screen list
+          final List<Widget> _screens = [
+            const DashboardScreen(),
+            const CamerasScreen(),
+            const DevicesScreen(),
+            // New Multi Live View Screen
+            const MultiLiveViewScreen(),
+          ];
+          
+          return Scaffold(
+            key: _scaffoldKey,
+            drawer: isDesktop ? null : const DesktopSideMenu(),
+            body: Row(
+              children: [
+                // Show side menu on desktop
+                if (isDesktop) const DesktopSideMenu(),
+                
+                // Main content area
+                Expanded(
+                  child: _screens[_currentIndex],
+                ),
+              ],
             ),
-          ],
-        ),
+            
+            // Show bottom navigation on mobile
+            bottomNavigationBar: isDesktop
+                ? null
+                : MobileBottomNavigationBar(
+                    currentIndex: _currentIndex,
+                    onTap: _onItemTapped,
+                  ),
+          );
+        },
       ),
-      // Mobile bottom navigation
-      bottomNavigationBar: isMobile
-          ? MobileBottomNavigationBar(
-              currentRoute: widget.currentRoute,
-              onDestinationSelected: _navigateToRoute,
-            )
-          : null,
-    );
-  }
-
-  void _navigateToRoute(String route) {
-    try {
-      if (route != widget.currentRoute) {
-        Navigator.pushReplacementNamed(context, route);
-      }
       
-      // Close drawer if open
-      if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
-        Navigator.of(context).pop();
-      }
-    } catch (e) {
-      // Handle any navigation errors
-      debugPrint('Navigation error: $e');
-    }
+      // Route generator for named routes
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/login':
+            return buildPageTransition(const LoginScreen());
+          case '/cameras':
+            return buildPageTransition(const CamerasScreen());
+          case '/devices':
+            return buildPageTransition(const DevicesScreen());
+          case '/camera_devices':
+            return buildPageTransition(const CameraDevicesScreen());
+          case '/dashboard':
+            return buildPageTransition(const DashboardScreen());
+          case '/live_view':
+            final args = settings.arguments as Map<String, dynamic>?;
+            final cameraId = args?['cameraId'] as String? ?? '';
+            return buildPageTransition(LiveViewScreen(cameraId: cameraId));
+          case '/record_view':
+            final args = settings.arguments as Map<String, dynamic>?;
+            final cameraId = args?['cameraId'] as String? ?? '';
+            return buildPageTransition(RecordViewScreen(cameraId: cameraId));
+          case '/multi_live_view':
+            return buildPageTransition(const MultiLiveViewScreen());
+          case '/settings':
+            return buildPageTransition(const SettingsScreen());
+          case '/websocket_log':
+            return buildPageTransition(const WebSocketLogScreen());
+          default:
+            return null;
+        }
+      },
+    );
   }
 }

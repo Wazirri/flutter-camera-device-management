@@ -1,0 +1,89 @@
+lib/widgets/mobile_bottom_navigation_bar.dart:204:33: Error: Can't find ']' to match '['.
+              children: <Widget>[
+                                ^
+lib/widgets/mobile_bottom_navigation_bar.dart:184:39: Error: Can't find '}' to match '{'.
+      builder: (BuildContext context) {
+                                      ^
+lib/widgets/mobile_bottom_navigation_bar.dart:275:8: Error: Expected a class member, but got ','.
+      },
+       ^
+lib/widgets/mobile_bottom_navigation_bar.dart:277:7: Error: Variables must be declared using the keywords 'const', 'final', 'var' or a type name.
+Try adding the name of the type of the variable or the keyword 'var'.
+      transitionAnimationController: AnimationController(
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/widgets/mobile_bottom_navigation_bar.dart:277:7: Error: Expected ';' after this.
+      transitionAnimationController: AnimationController(
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/widgets/mobile_bottom_navigation_bar.dart:277:36: Error: Expected a class member, but got ':'.
+      transitionAnimationController: AnimationController(
+                                   ^
+lib/widgets/mobile_bottom_navigation_bar.dart:278:17: Error: Non-optional parameters can't have a default value.
+Try removing the default value or making the parameter optional.
+        duration: const Duration(milliseconds: 400),
+                ^
+lib/widgets/mobile_bottom_navigation_bar.dart:279:14: Error: Non-optional parameters can't have a default value.
+Try removing the default value or making the parameter optional.
+        vsync: Navigator.of(context).overlay!,
+             ^
+lib/widgets/mobile_bottom_navigation_bar.dart:280:8: Error: Expected '{' before this.
+      ),
+       ^
+lib/widgets/mobile_bottom_navigation_bar.dart:280:8: Error: Expected a class member, but got ','.
+      ),
+       ^
+lib/widgets/mobile_bottom_navigation_bar.dart:281:5: Error: Expected a class member, but got ')'.
+    );
+    ^
+lib/widgets/mobile_bottom_navigation_bar.dart:281:6: Error: Expected a class member, but got ';'.
+    );
+     ^
+lib/widgets/mobile_bottom_navigation_bar.dart:321:1: Error: Expected a declaration, but got '}'.
+}
+^
+lib/widgets/mobile_bottom_navigation_bar.dart:21:8: Error: 'AnimationController' isn't a type.
+  late AnimationController _animationController;
+       ^^^^^^^^^^^^^^^^^^^
+lib/widgets/mobile_bottom_navigation_bar.dart:277:38: Context: This isn't a type.
+      transitionAnimationController: AnimationController(
+                                     ^^^^^^^^^^^^^^^^^^^
+lib/widgets/mobile_bottom_navigation_bar.dart:279:29: Error: Undefined name 'context'.
+        vsync: Navigator.of(context).overlay!,
+                            ^^^^^^^
+lib/widgets/mobile_bottom_navigation_bar.dart:279:26: Error: Method invocation is not a constant expression.
+        vsync: Navigator.of(context).overlay!,
+                         ^^
+lib/widgets/mobile_bottom_navigation_bar.dart:33:47: Error: Too few positional arguments: 2 required, 0 given.
+    _animationController = AnimationController(
+                                              ^
+lib/widgets/mobile_bottom_navigation_bar.dart:271:15: Error: Expected an identifier, but got ']'.
+Try inserting an identifier before ']'.
+              ],
+              ^
+lib/widgets/mobile_bottom_navigation_bar.dart:271:15: Error: Expected ')' before this.
+              ],
+              ^
+lib/widgets/mobile_bottom_navigation_bar.dart:186:27: Error: Too many positional arguments: 0 allowed, but 5 found.
+Try removing the extra positional arguments.
+          child: Container(
+                          ^
+../../../../Flutter/flutter/packages/flutter/lib/src/widgets/container.dart:255:3: Context: Found this candidate, but the arguments don't match.
+  Container({
+  ^^^^^^^^^
+lib/widgets/mobile_bottom_navigation_bar.dart:273:11: Error: Expected ';' after this.
+          ),
+          ^
+lib/widgets/mobile_bottom_navigation_bar.dart:273:12: Error: Expected an identifier, but got ','.
+Try inserting an identifier before ','.
+          ),
+           ^
+lib/widgets/mobile_bottom_navigation_bar.dart:273:12: Error: Unexpected token ';'.
+          ),
+           ^
+lib/widgets/mobile_bottom_navigation_bar.dart:316:11: Error: Undefined name 'widget'.
+          widget.onDestinationSelected(route);
+          ^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+warning: Run script build phase 'Run Script' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase. (in target 'Flutter Assemble' from project 'Runner')
+** BUILD FAILED **

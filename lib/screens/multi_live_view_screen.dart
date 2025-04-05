@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import '../providers/camera_devices_provider.dart';
+import '../providers/settings_provider.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
-import '../widgets/video_controls.dart';
 import '../utils/responsive_helper.dart';
 
 class MultiLiveViewScreen extends StatefulWidget {
@@ -15,7 +15,7 @@ class MultiLiveViewScreen extends StatefulWidget {
   State<MultiLiveViewScreen> createState() => _MultiLiveViewScreenState();
 }
 
-class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
+class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> with TickerProviderStateMixin {
   static const int maxCamerasPerPage = 32;
   
   // State variables
@@ -29,10 +29,89 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
   int _totalPages = 1;
   int _gridColumns = 2; // Default grid columns
   
+  // Timer for auto slideshow
+  Timer? _slideshowTimer;
+  late AnimationController _pageTransitionController;
+  late Animation<double> _pageTransitionAnimation;
+  
   @override
   void initState() {
     super.initState();
     _initializePlayers();
+    
+    // Setup animation controller for page transitions
+    _pageTransitionController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    
+    _pageTransitionAnimation = CurvedAnimation(
+      parent: _pageTransitionController,
+      curve: Curves.easeInOut,
+    );
+  }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Get available cameras from provider
+    final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    final cameras = cameraProvider.cameras;
+    final settingsProvider = Provider.of<SettingsProvider>(context);
+    
+    setState(() {
+      _availableCameras = cameras;
+      _totalPages = (cameras.length / maxCamerasPerPage).ceil();
+      
+      // Initialize all slots with available cameras
+      for (int i = 0; i < maxCamerasPerPage && i < cameras.length; i++) {
+        _selectCameraForSlot(i, cameras[i]);
+      }
+    });
+    
+    // Adjust grid columns based on screen size
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (screenWidth > 1200) {
+      _gridColumns = 4;
+    } else if (screenWidth > 800) {
+      _gridColumns = 3;
+    } else {
+      _gridColumns = 2;
+    }
+    
+    // Setup slideshow timer if enabled
+    _setupSlideshowTimer();
+  }
+  
+  void _setupSlideshowTimer() {
+    // Cancel existing timer if any
+    _slideshowTimer?.cancel();
+    
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    
+    // Only setup timer if slideshow is enabled
+    if (settingsProvider.autoSlideshowEnabled && _totalPages > 1) {
+      final interval = settingsProvider.slideshowInterval;
+      
+      _slideshowTimer = Timer.periodic(
+        Duration(seconds: interval.toInt()),
+        (timer) {
+          if (_totalPages > 1) {
+            int nextPage = (_currentPage + 1) % _totalPages;
+            _animateToPage(nextPage);
+          }
+        },
+      );
+    }
+  }
+  
+  void _animateToPage(int page) {
+    // Start the animation
+    _pageTransitionController.forward(from: 0.0).then((_) {
+      _changePage(page);
+      // You can add more transition effects here if needed
+    });
   }
   
   void _initializePlayers() {
@@ -62,35 +141,6 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           });
         }
       });
-    }
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    
-    // Get available cameras from provider
-    final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
-    final cameras = cameraProvider.cameras;
-    
-    setState(() {
-      _availableCameras = cameras;
-      _totalPages = (cameras.length / maxCamerasPerPage).ceil();
-      
-      // Initialize all slots with available cameras
-      for (int i = 0; i < maxCamerasPerPage && i < cameras.length; i++) {
-        _selectCameraForSlot(i, cameras[i]);
-      }
-    });
-    
-    // Adjust grid columns based on screen size
-    final screenWidth = MediaQuery.of(context).size.width;
-    if (screenWidth > 1200) {
-      _gridColumns = 4;
-    } else if (screenWidth > 800) {
-      _gridColumns = 3;
-    } else {
-      _gridColumns = 2;
     }
   }
   
@@ -277,6 +327,10 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
   
   @override
   void dispose() {
+    // Dispose slideshow timer
+    _slideshowTimer?.cancel();
+    _pageTransitionController.dispose();
+    
     // Dispose all players
     for (final player in _players) {
       player.dispose();
@@ -287,11 +341,32 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = ResponsiveHelper.isDesktop(context);
+    final settingsProvider = Provider.of<SettingsProvider>(context);
     
     return Scaffold(
       appBar: AppBar(
         title: const Text('Multi Camera View'),
         actions: [
+          // Slideshow toggle
+          IconButton(
+            icon: Icon(
+              settingsProvider.autoSlideshowEnabled 
+                ? Icons.slideshow 
+                : Icons.slideshow_outlined,
+              color: settingsProvider.autoSlideshowEnabled 
+                ? AppTheme.accentColor 
+                : null,
+            ),
+            tooltip: settingsProvider.autoSlideshowEnabled 
+                ? 'Disable slideshow' 
+                : 'Enable slideshow',
+            onPressed: () {
+              settingsProvider.setAutoSlideshowEnabled(
+                !settingsProvider.autoSlideshowEnabled
+              );
+              _setupSlideshowTimer(); // Reset timer based on new setting
+            },
+          ),
           // Grid layout selector
           PopupMenuButton<int>(
             tooltip: 'Change grid layout',
@@ -322,150 +397,183 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
       ),
       body: Column(
         children: [
+          // Page indicator at the top
+          if (_totalPages > 1)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(_totalPages, (index) {
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: const EdgeInsets.symmetric(horizontal: 3.0),
+                    height: 8,
+                    width: _currentPage == index ? 24 : 8,
+                    decoration: BoxDecoration(
+                      color: _currentPage == index 
+                        ? AppTheme.accentColor 
+                        : AppTheme.accentColor.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          
           // Grid view of cameras
           Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(8.0),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: _gridColumns,
-                childAspectRatio: 16 / 9,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: maxCamerasPerPage,
-              itemBuilder: (context, index) {
-                final camera = _selectedCameras[index];
-                final isLoading = _loadingStates[index];
-                final hasError = _errorStates[index];
-                
-                return Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onTap: () => _showCameraSelector(index),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        // Camera slot
-                        if (camera == null)
-                          // Empty slot
-                          Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_circle_outline,
-                                  size: 48,
-                                  color: Colors.grey[400],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Add Camera',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        else if (hasError)
-                          // Error state
-                          Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.error_outline,
-                                  size: 48,
-                                  color: Colors.red,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Stream Error',
-                                  style: TextStyle(
-                                    color: Colors.red[300],
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                ElevatedButton.icon(
-                                  icon: const Icon(Icons.refresh, size: 14),
-                                  label: const Text('Retry'),
-                                  onPressed: () => _selectCameraForSlot(index, camera),
-                                  style: ElevatedButton.styleFrom(
-                                    minimumSize: const Size(80, 28),
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        else
-                          // Video player
-                          Video(
-                            controller: _controllers[index],
-                            controls: null, // Simple controls or none for grid view
-                          ),
-                        
-                        // Loading indicator
-                        if (isLoading && camera != null && !hasError)
-                          const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        
-                        // Camera name overlay at the top
-                        if (camera != null)
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              color: Colors.black.withOpacity(0.7),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: AnimatedBuilder(
+              animation: _pageTransitionAnimation,
+              builder: (context, child) {
+                // Use the animation value to create a transition effect
+                return FadeTransition(
+                  opacity: _pageTransitionAnimation,
+                  child: child,
+                );
+              },
+              child: GridView.builder(
+                padding: const EdgeInsets.all(8.0),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: _gridColumns,
+                  childAspectRatio: 16 / 9,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                ),
+                itemCount: maxCamerasPerPage,
+                itemBuilder: (context, index) {
+                  final camera = _selectedCameras[index];
+                  final isLoading = _loadingStates[index];
+                  final hasError = _errorStates[index];
+                  
+                  return Card(
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: () => _showCameraSelector(index),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          // Camera slot
+                          if (camera == null)
+                            // Empty slot
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Expanded(
-                                    child: Text(
-                                      camera.name,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
                                   Icon(
-                                    camera.connected ? Icons.link : Icons.link_off,
-                                    size: 14,
-                                    color: camera.connected ? Colors.green : Colors.red,
+                                    Icons.add_circle_outline,
+                                    size: 48,
+                                    color: Colors.grey[400],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Add Camera',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                    ),
                                   ),
                                 ],
                               ),
+                            )
+                          else if (hasError)
+                            // Error state
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.error_outline,
+                                    size: 48,
+                                    color: Colors.red,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Stream Error',
+                                    style: TextStyle(
+                                      color: Colors.red[300],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  ElevatedButton.icon(
+                                    icon: const Icon(Icons.refresh, size: 14),
+                                    label: const Text('Retry'),
+                                    onPressed: () => _selectCameraForSlot(index, camera),
+                                    style: ElevatedButton.styleFrom(
+                                      minimumSize: const Size(80, 28),
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          else
+                            // Video player
+                            Video(
+                              controller: _controllers[index],
+                              controls: null, // Simple controls or none for grid view
                             ),
-                          ),
                           
-                        // Change camera button at the bottom
-                        if (camera != null)
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Material(
-                              color: Colors.transparent,
-                              child: IconButton(
-                                icon: const Icon(Icons.sync),
-                                color: Colors.white,
-                                tooltip: 'Change camera',
-                                onPressed: () => _showCameraSelector(index),
+                          // Loading indicator
+                          if (isLoading && camera != null && !hasError)
+                            const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          
+                          // Camera name overlay at the top
+                          if (camera != null)
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                color: Colors.black.withOpacity(0.7),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        camera.name,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Icon(
+                                      camera.connected ? Icons.link : Icons.link_off,
+                                      size: 14,
+                                      color: camera.connected ? Colors.green : Colors.red,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                      ],
+                          
+                          // Change camera button at the bottom
+                          if (camera != null)
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: IconButton(
+                                  icon: const Icon(Icons.sync),
+                                  color: Colors.white,
+                                  tooltip: 'Change camera',
+                                  onPressed: () => _showCameraSelector(index),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
           
@@ -487,7 +595,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                   IconButton(
                     icon: const Icon(Icons.arrow_back_ios),
                     onPressed: _currentPage > 0
-                        ? () => _changePage(_currentPage - 1)
+                        ? () => _animateToPage(_currentPage - 1)
                         : null,
                   ),
                   const SizedBox(width: 16),
@@ -499,7 +607,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                   IconButton(
                     icon: const Icon(Icons.arrow_forward_ios),
                     onPressed: _currentPage < _totalPages - 1
-                        ? () => _changePage(_currentPage + 1)
+                        ? () => _animateToPage(_currentPage + 1)
                         : null,
                   ),
                 ],
@@ -510,4 +618,3 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     );
   }
 }
-
