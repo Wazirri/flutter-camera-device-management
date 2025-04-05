@@ -14,6 +14,11 @@ class WebSocketProvider with ChangeNotifier {
     _service.setMessageHandler(_handleMessage);
   }
   
+  // Connect camera devices provider
+  void setCameraDevicesProvider(CameraDevicesProvider provider) {
+    _cameraDevicesProvider = provider;
+  }
+  
   // Expose the service for direct access
   WebSocketService get service => _service;
   
@@ -23,11 +28,6 @@ class WebSocketProvider with ChangeNotifier {
   // Connection status
   bool get isConnected => _service.isConnected;
   List<String> get messageLog => _service.messageLog;
-  
-  // Connect the camera devices provider
-  void setCameraDevicesProvider(CameraDevicesProvider provider) {
-    _cameraDevicesProvider = provider;
-  }
   
   // Connect to server
   Future<bool> connect(String address, String port, String username, String password) async {

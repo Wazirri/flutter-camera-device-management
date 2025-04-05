@@ -10,6 +10,7 @@ import '../widgets/custom_app_bar.dart';
 import '../widgets/status_indicator.dart';
 
 class DashboardScreen extends StatefulWidget {
+  static const String routeName = '/dashboard_screen.dart'; // Added route constant
   const DashboardScreen({Key? key}) : super(key: key);
 
   @override
