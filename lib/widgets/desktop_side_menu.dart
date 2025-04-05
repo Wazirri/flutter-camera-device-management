@@ -8,10 +8,12 @@ import '../theme/app_theme.dart';
 
 class DesktopSideMenu extends StatelessWidget {
   final String currentRoute;
+  final Function(String)? onDestinationSelected;
   
   const DesktopSideMenu({
     Key? key,
     required this.currentRoute,
+    this.onDestinationSelected,
   }) : super(key: key);
 
   @override
@@ -19,7 +21,14 @@ class DesktopSideMenu extends StatelessWidget {
     return NavigationRail(
       selectedIndex: _getSelectedIndex(),
       onDestinationSelected: (int index) {
-        _onDestinationSelected(context, index);
+        // If onDestinationSelected callback is provided, use it
+        if (onDestinationSelected != null) {
+          final route = _getRouteForIndex(index);
+          onDestinationSelected!(route);
+        } else {
+          // Otherwise use the default implementation
+          _onDestinationSelectedInternal(context, index);
+        }
       },
       backgroundColor: AppTheme.panelBackground,
       labelType: NavigationRailLabelType.selected,
@@ -65,42 +74,40 @@ class DesktopSideMenu extends StatelessWidget {
 
   int _getSelectedIndex() {
     switch (currentRoute) {
-      case DashboardScreen.routeName:
+      case '/dashboard':
         return 0;
-      case CamerasScreen.routeName:
+      case '/cameras':
         return 1;
-      case CameraDevicesScreen.routeName:
+      case '/camera-devices':
         return 2;
-      case LiveViewScreen.routeName:
+      case '/live-view':
         return 3;
-      case RecordViewScreen.routeName:
+      case '/recordings':
         return 4;
       default:
         return 0;
     }
   }
 
-  void _onDestinationSelected(BuildContext context, int index) {
-    String route;
+  String _getRouteForIndex(int index) {
     switch (index) {
       case 0:
-        route = DashboardScreen.routeName;
-        break;
+        return '/dashboard';
       case 1:
-        route = CamerasScreen.routeName;
-        break;
+        return '/cameras';
       case 2:
-        route = CameraDevicesScreen.routeName;
-        break;
+        return '/camera-devices';
       case 3:
-        route = LiveViewScreen.routeName;
-        break;
+        return '/live-view';
       case 4:
-        route = RecordViewScreen.routeName;
-        break;
+        return '/recordings';
       default:
-        route = DashboardScreen.routeName;
+        return '/dashboard';
     }
+  }
+
+  void _onDestinationSelectedInternal(BuildContext context, int index) {
+    String route = _getRouteForIndex(index);
     
     if (route != currentRoute) {
       Navigator.of(context).pushReplacementNamed(route);

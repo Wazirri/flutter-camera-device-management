@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import '../screens/dashboard_screen.dart';
-import '../screens/cameras_screen.dart';
-import '../screens/camera_devices_screen.dart';
-import '../screens/live_view_screen.dart';
-import '../screens/record_view_screen.dart';
 import '../theme/app_theme.dart';
 
 class MobileBottomNavigationBar extends StatelessWidget {
   final String currentRoute;
+  final Function(String)? onDestinationSelected;
   
   const MobileBottomNavigationBar({
     Key? key,
     required this.currentRoute,
+    this.onDestinationSelected,
   }) : super(key: key);
 
   @override
@@ -55,15 +52,15 @@ class MobileBottomNavigationBar extends StatelessWidget {
 
   int _getSelectedIndex() {
     switch (currentRoute) {
-      case DashboardScreen.routeName:
+      case '/dashboard':
         return 0;
-      case CamerasScreen.routeName:
+      case '/cameras':
         return 1;
-      case CameraDevicesScreen.routeName:
+      case '/camera-devices':
         return 2;
-      case LiveViewScreen.routeName:
+      case '/live-view':
         return 3;
-      case RecordViewScreen.routeName:
+      case '/recordings':
         return 4;
       default:
         return 0;
@@ -74,26 +71,32 @@ class MobileBottomNavigationBar extends StatelessWidget {
     String route;
     switch (index) {
       case 0:
-        route = DashboardScreen.routeName;
+        route = '/dashboard';
         break;
       case 1:
-        route = CamerasScreen.routeName;
+        route = '/cameras';
         break;
       case 2:
-        route = CameraDevicesScreen.routeName;
+        route = '/camera-devices';
         break;
       case 3:
-        route = LiveViewScreen.routeName;
+        route = '/live-view';
         break;
       case 4:
-        route = RecordViewScreen.routeName;
+        route = '/recordings';
         break;
       default:
-        route = DashboardScreen.routeName;
+        route = '/dashboard';
     }
     
-    if (route != currentRoute) {
-      Navigator.of(context).pushReplacementNamed(route);
+    // If onDestinationSelected callback is provided, use it
+    if (onDestinationSelected != null) {
+      onDestinationSelected!(route);
+    } else {
+      // Otherwise use the default implementation
+      if (route != currentRoute) {
+        Navigator.of(context).pushReplacementNamed(route);
+      }
     }
   }
 }
