@@ -13,12 +13,42 @@ class CameraDevicesProvider with ChangeNotifier {
   String get selectedDeviceId => _selectedDeviceId;
   int get selectedCameraIndex => _selectedCameraIndex;
   
+  // Added getters for dashboard and device screens
+  List<Camera> get cameras {
+    List<Camera> allCameras = [];
+    for (var device in _devices.values) {
+      allCameras.addAll(device.cameras);
+    }
+    return allCameras;
+  }
+  
+  int get uniqueDeviceCount => _devices.length;
+  
+  List<CameraDevice> get uniqueDevices => _devices.values.toList();
+  
+  Map<String, List<CameraDevice>> get devicesByMacAddress {
+    Map<String, List<CameraDevice>> result = {};
+    for (var device in _devices.values) {
+      String macKey = device.macKey;
+      if (!result.containsKey(macKey)) {
+        result[macKey] = [];
+      }
+      result[macKey]!.add(device);
+    }
+    return result;
+  }
+  
   // Selectors
   void selectDevice(String deviceId) {
     if (_devices.containsKey(deviceId)) {
       _selectedDeviceId = deviceId;
       notifyListeners();
     }
+  }
+  
+  // Added for compatibility with devices_screen.dart
+  void setSelectedDevice(String deviceId) {
+    selectDevice(deviceId);
   }
   
   void selectCamera(int cameraIndex) {
