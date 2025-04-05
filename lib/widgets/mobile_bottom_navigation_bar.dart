@@ -232,7 +232,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                 _buildAnimatedMoreMenuItem(
                 _buildAnimatedMoreMenuItem(
                   context,
-                  const Icon(Icons.grid_view, color: AppTheme.accentColor),
+                  Icon(Icons.grid_view, color: AppTheme.accentColor),
                   'Multi Camera View',
                   '/multi-live-view',
                   0,

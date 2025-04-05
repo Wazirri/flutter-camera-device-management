@@ -402,7 +402,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                           // Video player
                           Video(
                             controller: _controllers[index],
-                            controls: NoVideoControls, // Simple controls or none for grid view
+                            controls: null, // Simple controls or none for grid view
                           ),
                         
                         // Loading indicator
@@ -511,7 +511,3 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
   }
 }
 
-// Simple control provider that doesn't display any controls
-Widget NoVideoControls(VideoController controller) {
-  return const SizedBox.shrink();
-}
