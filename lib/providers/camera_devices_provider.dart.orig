@@ -102,6 +102,7 @@ class CameraDevicesProvider with ChangeNotifier {
     // In the current implementation, cameras are refreshed through WebSocket messages
     print('Requesting camera refresh via WebSocket...');
   }
+
   
   // Process a WebSocket message and update our devices
   void processWebSocketMessage(Map<String, dynamic> message) {
@@ -109,7 +110,7 @@ class CameraDevicesProvider with ChangeNotifier {
         message.containsKey('data') && 
         message.containsKey('val')) {
       
-      String dataPath = message['data'].toString();
+      final String dataPath = message['data'].toString();
       
       // Check if this is a device message (starts with ecs.slaves.m_)
       if (dataPath.startsWith('ecs.slaves.m_')) {
@@ -120,11 +121,15 @@ class CameraDevicesProvider with ChangeNotifier {
         List<String> pathParts = dataPath.split('.');
         String deviceIdPath = pathParts[2]; // Get the m_XX... part
         
+        // Enhanced debugging for path parts
+        print('🔍 [CameraProvider] Analyzing path: $dataPath');
+        print('🔍 [CameraProvider] Path parts: ${pathParts.join(' >> ')}');
+        
         // Basic processing of device ID
         String deviceId = deviceIdPath;
         bool isCameraProperty = deviceIdPath.contains('cam');
         
-        // Extract the base device ID (without cam suffix) for device lookup
+        // Extract the base device ID (without cam suffix) for device lookup 
         String baseDeviceId = deviceId;
         if (isCameraProperty) {
           baseDeviceId = deviceId.split('cam')[0];
@@ -229,8 +234,10 @@ class CameraDevicesProvider with ChangeNotifier {
   void _updateCameraProperty(CameraDevice device, String propertyPath, dynamic value) {
     // Camera properties can come in different formats
     List<String> parts = propertyPath.split('.');
+    print('🔧 [CameraProvider] Parsing camera property path: $propertyPath');
+    print('🔧 [CameraProvider] Path parts: ${parts.join(' | ')}');
     
-    // Format 1: cam[0].property - Extract camera index from brackets
+    // Format 1: cam[0].property (or just cam[0] for direct path) - Extract camera index from brackets
     if (parts.length >= 1 && parts[0].startsWith('cam[') && parts[0].contains(']')) {
       String indexPart = parts[0].substring(4, parts[0].indexOf(']'));
       int? cameraIndex;
@@ -595,6 +602,9 @@ class CameraDevicesProvider with ChangeNotifier {
         print('      Brand: ${cam.brand}');
         print('      Media URI: ${cam.mediaUri}');
         print('      Record URI: ${cam.recordUri}');
+        print('      Group: ${cam.group ?? "None"}');
+        print('      Sound Rec: ${cam.soundRec ?? false}');
+        print('      xAddrs: ${cam.xAddrs}');
       }
       
       print('-----------------------');
