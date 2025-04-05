@@ -13,6 +13,7 @@ class AppTheme {
   static const Color surfaceColor = Color(0xFF1E1E1E);
   static const Color darkSurface = Color(0xFF1E1E1E);
   static const Color errorColor = Color(0xFFCF6679);
+  static const Color error = Color(0xFFCF6679); // Alias for errorColor
   static const Color darkBorder = Color(0xFF2D2D2D);
   
   // Additional UI colors
@@ -26,10 +27,11 @@ class AppTheme {
   
   // Status colors
   static const Color successColor = Color(0xFF4CAF50);
-  static const Color online = Color(0xFF4CAF50);
+  static const Color online = Color(0xFF4CAF50); // Alias for successColor
   static const Color warningColor = Color(0xFFFFC107);
-  static const Color warning = Color(0xFFFFC107);
+  static const Color warning = Color(0xFFFFC107); // Alias for warningColor
   static const Color dangerColor = Color(0xFFF44336);
+  static const Color offline = Color(0xFF9E9E9E); // Gray for offline status
   static const Color infoColor = Color(0xFF2196F3);
   
   // Create the material theme
