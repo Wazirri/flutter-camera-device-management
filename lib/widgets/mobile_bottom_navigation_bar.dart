@@ -230,6 +230,14 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                 
                 // Menu items with staggered animation
                 _buildAnimatedMoreMenuItem(
+                _buildAnimatedMoreMenuItem(
+                  context,
+                  const Icon(Icons.grid_view, color: AppTheme.accentColor),
+                  'Multi Camera View',
+                  '/multi-live-view',
+                  0,
+                ),
+
                   context,
                   const Icon(Icons.settings, color: AppTheme.primaryOrange),
                   'Settings',

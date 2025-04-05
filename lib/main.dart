@@ -14,6 +14,8 @@ import 'screens/login_screen.dart';
 import 'screens/record_view_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
+import 'screens/multi_live_view_screen.dart';  // New multi-camera view screen
+import 'screens/multi_live_view_screen.dart'; // New multi-camera view screen
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
 import 'utils/page_transitions.dart';
@@ -177,6 +179,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             }
             // Slide up transition for recordings
             return AppPageTransitions.slideUp(page);
+          case '/multi-live-view':
+            page = AppShell(
+              currentRoute: settings.name ?? '/multi-live-view',
+              child: const MultiLiveViewScreen(),
+            );
+            return AppPageTransitions.sharedAxisHorizontal(page);
             
           case '/cameras':
             page = AppShell(
