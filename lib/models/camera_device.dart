@@ -253,6 +253,8 @@ class Camera {
       disconnected: disconnected ?? this.disconnected,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
       recording: recording ?? this.recording,
+      soundRec: this.soundRec,
+      xAddr: this.xAddr,
     );
   }
   
@@ -287,6 +289,8 @@ class Camera {
       disconnected: json['disconnected'] ?? '-',
       lastSeenAt: json['lastSeenAt'] ?? '',
       recording: json['recording'] ?? false,
+      soundRec: json['soundRec'] ?? false,
+      xAddr: json['xAddr'] ?? '',
     );
   }
   
@@ -326,17 +330,40 @@ class Camera {
   
   // Get the appropriate RTSP URI for streaming
   String get rtspUri {
-    // First try to use mediaUri, if empty try other URIs in order of preference
-    if (mediaUri.isNotEmpty) {
-      return mediaUri;
-    } else if (subUri.isNotEmpty) {
-      return subUri;
+    // Öncelikle sadece subUri'yi kullan (talep üzerine değiştirildi)
+    if (subUri.isNotEmpty) {
+      return _addCredentialsToUrl(subUri);
+    } else if (mediaUri.isNotEmpty) {
+      return _addCredentialsToUrl(mediaUri);
     } else if (remoteUri.isNotEmpty) {
-      return remoteUri;
+      return _addCredentialsToUrl(remoteUri);
     } else if (recordUri.isNotEmpty) {
-      return recordUri;
+      return _addCredentialsToUrl(recordUri);
     }
     return ""; // Return empty string if no URI is available
+  }
+  
+  // Add username and password to RTSP URL
+  String _addCredentialsToUrl(String url) {
+    if (url.isEmpty || !url.startsWith('rtsp://')) {
+      return url;
+    }
+    
+    // Eğer zaten kimlik bilgileri varsa, URL'i olduğu gibi döndür
+    if (url.contains('@')) {
+      return url;
+    }
+    
+    // Kullanıcı adı veya şifre boşsa, URL'i olduğu gibi döndür
+    if (username.isEmpty || password.isEmpty) {
+      return url;
+    }
+    
+    // rtsp:// kısmını çıkar
+    final urlWithoutProtocol = url.substring(7);
+    
+    // Kullanıcı adı ve şifreyi URL'e ekle
+    return 'rtsp://$username:$password@$urlWithoutProtocol';
   }
   
   // Added getter for compatibility

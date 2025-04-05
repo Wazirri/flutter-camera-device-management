@@ -211,7 +211,8 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
       if (_availableRecordings.isNotEmpty) {
         _selectedRecording = _availableRecordings[0];
         // In a real app, this URL would come from your backend based on the recording
-        _loadRecording(_camera!.recordUri);
+        // Kullanıcı adı ve şifre eklenmiş RTSP URL'ini kullan
+        _loadRecording(_camera!.rtspUri);
       } else {
         _selectedRecording = null;
       }
@@ -278,7 +279,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
       // In a real app, you'd fetch the recording URL from your backend
       // For demo, we'll use the camera's record URI
       if (_camera != null) {
-        _loadRecording(_camera!.recordUri);
+        _loadRecording(_camera!.rtspUri);
       }
       
       _animationController.forward();
