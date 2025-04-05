@@ -55,6 +55,50 @@ class CameraDevicesProvider with ChangeNotifier {
     return _selectedDevice!.cameras[_selectedCameraIndex];
   }
 
+  // Get a camera by its ID (used for route navigation)
+  Camera? getCameraById(String cameraId) {
+    // If camera ID is empty, return null
+    if (cameraId.isEmpty) {
+      return null;
+    }
+    
+    // Search through all devices and cameras
+    for (var device in _devices.values) {
+      for (var camera in device.cameras) {
+        // Create a unique ID for each camera based on device MAC and camera index
+        String id = "${device.macKey}_${camera.index}";
+        if (id == cameraId) {
+          return camera;
+        }
+      }
+    }
+    
+    // If no camera is found, return null
+    return null;
+  }
+  
+  // Get a camera by its ID (used for route navigation)
+  Camera? getCameraById(String cameraId) {
+    // If camera ID is empty, return null
+    if (cameraId.isEmpty) {
+      return null;
+    }
+    
+    // Search through all devices and cameras
+    for (var device in _devices.values) {
+      for (var camera in device.cameras) {
+        // Create a unique ID for each camera based on device MAC and camera index
+        String id = "${device.macKey}_${camera.index}";
+        if (id == cameraId) {
+          return camera;
+        }
+      }
+    }
+    
+    // If no camera is found, return null
+    return null;
+  }
+
   void setSelectedDevice(String macAddress) {
     if (_devices.containsKey(macAddress)) {
       _selectedDevice = _devices[macAddress];

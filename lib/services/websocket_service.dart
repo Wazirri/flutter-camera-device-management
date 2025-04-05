@@ -20,7 +20,7 @@ class WebSocketService with ChangeNotifier {
   String _username = '';
   String _password = '';
   String _address = '';
-  String _port = '';
+  int _port = 1200; // Changed to int to match connect() parameter type
   
   // Auto-reconnect properties
   Timer? _reconnectTimer;

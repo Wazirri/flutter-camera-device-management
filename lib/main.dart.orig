@@ -176,7 +176,7 @@ class _MyAppState extends State<MyApp> {
             bottomNavigationBar: isDesktop
                 ? null
                 : MobileBottomNavigationBar(
-                    currentRoute: "/dashboard", onDestinationSelected: (route) => Navigator.of(context).pushNamed(route),
+                    currentIndex: _currentIndex,
                     onTap: _onItemTapped,
                   ),
           );
@@ -219,7 +219,7 @@ class _MyAppState extends State<MyApp> {
 }
 
   // Helper method to create consistent page transitions across the app
-  Route<dynamic> buildPageTransition(Widget page) {
+  Widget buildPageTransition(Widget page) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => page,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {

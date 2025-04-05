@@ -1,0 +1,117 @@
+lib/main.dart:150:61: Error: Required named parameter 'currentRoute' must be provided.
+            drawer: isDesktop ? null : const DesktopSideMenu(),
+                                                            ^
+lib/widgets/desktop_side_menu.dart:8:9: Context: Found this candidate, but the arguments don't match.
+  const DesktopSideMenu({
+        ^^^^^^^^^^^^^^^
+lib/main.dart:154:53: Error: Required named parameter 'currentRoute' must be provided.
+                if (isDesktop) const DesktopSideMenu(),
+                                                    ^
+lib/widgets/desktop_side_menu.dart:8:9: Context: Found this candidate, but the arguments don't match.
+  const DesktopSideMenu({
+        ^^^^^^^^^^^^^^^
+lib/main.dart:167:21: Error: No named parameter with the name 'currentIndex'.
+                    currentIndex: _currentIndex,
+                    ^^^^^^^^^^^^
+lib/widgets/mobile_bottom_navigation_bar.dart:9:9: Context: Found this candidate, but the arguments don't match.
+  const MobileBottomNavigationBar({
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/main.dart:190:55: Error: No named parameter with the name 'cameraId'.
+            return buildPageTransition(LiveViewScreen(cameraId: cameraId));
+                                                      ^^^^^^^^
+lib/screens/live_view_screen.dart:15:9: Context: Found this candidate, but the arguments don't match.
+  const LiveViewScreen({Key? key, this.camera}) : super(key: key);
+        ^^^^^^^^^^^^^^
+lib/main.dart:194:57: Error: No named parameter with the name 'cameraId'.
+            return buildPageTransition(RecordViewScreen(cameraId: cameraId));
+                                                        ^^^^^^^^
+lib/screens/record_view_screen.dart:17:9: Context: Found this candidate, but the arguments don't match.
+  const RecordViewScreen({Key? key, this.camera}) : super(key: key);
+        ^^^^^^^^^^^^^^^^
+lib/main.dart:178:20: Error: A value of type 'Widget' can't be returned from a function with return type 'Route<dynamic>?'.
+ - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+ - 'Route' is from 'package:flutter/src/widgets/navigator.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/navigator.dart').
+            return buildPageTransition(const LoginScreen());
+                   ^
+lib/main.dart:180:20: Error: A value of type 'Widget' can't be returned from a function with return type 'Route<dynamic>?'.
+ - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+ - 'Route' is from 'package:flutter/src/widgets/navigator.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/navigator.dart').
+            return buildPageTransition(const CamerasScreen());
+                   ^
+lib/main.dart:182:20: Error: A value of type 'Widget' can't be returned from a function with return type 'Route<dynamic>?'.
+ - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+ - 'Route' is from 'package:flutter/src/widgets/navigator.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/navigator.dart').
+            return buildPageTransition(const DevicesScreen());
+                   ^
+lib/main.dart:184:20: Error: A value of type 'Widget' can't be returned from a function with return type 'Route<dynamic>?'.
+ - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+ - 'Route' is from 'package:flutter/src/widgets/navigator.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/navigator.dart').
+            return buildPageTransition(const CameraDevicesScreen());
+                   ^
+lib/main.dart:186:20: Error: A value of type 'Widget' can't be returned from a function with return type 'Route<dynamic>?'.
+ - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+ - 'Route' is from 'package:flutter/src/widgets/navigator.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/navigator.dart').
+            return buildPageTransition(const DashboardScreen());
+                   ^
+lib/main.dart:190:20: Error: A value of type 'Widget' can't be returned from a function with return type 'Route<dynamic>?'.
+ - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+ - 'Route' is from 'package:flutter/src/widgets/navigator.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/navigator.dart').
+            return buildPageTransition(LiveViewScreen(cameraId: cameraId));
+                   ^
+lib/main.dart:194:20: Error: A value of type 'Widget' can't be returned from a function with return type 'Route<dynamic>?'.
+ - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+ - 'Route' is from 'package:flutter/src/widgets/navigator.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/navigator.dart').
+            return buildPageTransition(RecordViewScreen(cameraId: cameraId));
+                   ^
+lib/main.dart:196:20: Error: A value of type 'Widget' can't be returned from a function with return type 'Route<dynamic>?'.
+ - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+ - 'Route' is from 'package:flutter/src/widgets/navigator.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/navigator.dart').
+            return buildPageTransition(const MultiLiveViewScreen());
+                   ^
+lib/main.dart:198:20: Error: A value of type 'Widget' can't be returned from a function with return type 'Route<dynamic>?'.
+ - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+ - 'Route' is from 'package:flutter/src/widgets/navigator.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/navigator.dart').
+            return buildPageTransition(const SettingsScreen());
+                   ^
+lib/main.dart:200:20: Error: A value of type 'Widget' can't be returned from a function with return type 'Route<dynamic>?'.
+ - 'Widget' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+ - 'Route' is from 'package:flutter/src/widgets/navigator.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/navigator.dart').
+            return buildPageTransition(const WebSocketLogScreen());
+                   ^
+lib/main.dart:229:17: Error: The value 'null' can't be assigned to the parameter type 'BuildContext' because 'BuildContext' is not nullable.
+ - 'BuildContext' is from 'package:flutter/src/widgets/framework.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart').
+    ).buildPage(null, null, null);
+                ^
+lib/main.dart:229:23: Error: The value 'null' can't be assigned to the parameter type 'Animation<double>' because 'Animation<double>' is not nullable.
+ - 'Animation' is from 'package:flutter/src/animation/animation.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/animation/animation.dart').
+    ).buildPage(null, null, null);
+                      ^
+lib/main.dart:229:29: Error: The value 'null' can't be assigned to the parameter type 'Animation<double>' because 'Animation<double>' is not nullable.
+ - 'Animation' is from 'package:flutter/src/animation/animation.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/animation/animation.dart').
+    ).buildPage(null, null, null);
+                            ^
+lib/theme/app_theme.dart:61:16: Error: The argument type 'CardTheme' can't be assigned to the parameter type 'CardThemeData?'.
+ - 'CardTheme' is from 'package:flutter/src/material/card_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/card_theme.dart').
+ - 'CardThemeData' is from 'package:flutter/src/material/card_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/card_theme.dart').
+    cardTheme: CardTheme(
+               ^
+lib/theme/app_theme.dart:165:18: Error: The argument type 'TabBarTheme' can't be assigned to the parameter type 'TabBarThemeData?'.
+ - 'TabBarTheme' is from 'package:flutter/src/material/tab_bar_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/tab_bar_theme.dart').
+ - 'TabBarThemeData' is from 'package:flutter/src/material/tab_bar_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/tab_bar_theme.dart').
+    tabBarTheme: TabBarTheme(
+                 ^
+lib/theme/app_theme.dart:228:18: Error: The argument type 'DialogTheme' can't be assigned to the parameter type 'DialogThemeData?'.
+ - 'DialogTheme' is from 'package:flutter/src/material/dialog_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/dialog_theme.dart').
+ - 'DialogThemeData' is from 'package:flutter/src/material/dialog_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/dialog_theme.dart').
+    dialogTheme: DialogTheme(
+                 ^
+lib/services/websocket_service.dart:57:15: Error: A value of type 'int' can't be assigned to a variable of type 'String'.
+      _port = port;
+              ^
+lib/services/websocket_service.dart:297:27: Error: The argument type 'String' can't be assigned to the parameter type 'int'.
+        connect(_address, _port, _username, _password);
+                          ^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **

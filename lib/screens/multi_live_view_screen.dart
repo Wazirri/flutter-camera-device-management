@@ -1,10 +1,8 @@
-import 'dart:async';
+import 'dart:async' show Timer;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import 'dart:async';
-import 'dart:async';
 import '../providers/camera_devices_provider.dart';
 import '../providers/settings_provider.dart';
 import '../models/camera_device.dart';

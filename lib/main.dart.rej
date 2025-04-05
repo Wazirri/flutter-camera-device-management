@@ -1,0 +1,24 @@
+--- lib/main.dart
++++ lib/main.dart
+@@ -147,11 +147,19 @@
+ 
+           return Scaffold(
+             key: _scaffoldKey,
+-            drawer: isDesktop ? null : const DesktopSideMenu(),
++            drawer: isDesktop ? null : DesktopSideMenu(
++              currentRoute: '/dashboard', // Provide current route
++              onDestinationSelected: (route) {
++                // Navigate to the selected route
++                Navigator.of(context).pushNamed(route);
++              },
++            ),
+             body: Row(
+               children: [
+                 // Show side menu on desktop
+-                if (isDesktop) const DesktopSideMenu(),
++                if (isDesktop) DesktopSideMenu(
++                  currentRoute: '/dashboard',
++                  onDestinationSelected: (route) => Navigator.of(context).pushNamed(route)),
+                 
+                 // Main content area
+                 Expanded(
