@@ -25,12 +25,6 @@ class CameraDevicesProvider with ChangeNotifier {
     return camerasList;
   }
   
-  // Get unique device IDs (typically MAC addresses)
-  List<String> get uniqueDevices => _devices.keys.toList();
-  
-  // Get the count of unique devices
-  int get uniqueDeviceCount => _devices.length;
-  
   // Get devices grouped by MAC address (for UI display and filtering)
   Map<String, List<Camera>> getCamerasByMacAddress() {
     Map<String, List<Camera>> result = {};
@@ -54,273 +48,326 @@ class CameraDevicesProvider with ChangeNotifier {
     }
     
     // Make sure the selected index is valid
-    if (_selectedCameraIndex >= 0 && _selectedCameraIndex < _selectedDevice!.cameras.length) {
-      return _selectedDevice!.cameras[_selectedCameraIndex];
+    if (_selectedCameraIndex >= _selectedDevice!.cameras.length) {
+      _selectedCameraIndex = 0;
     }
     
-    return null;
+    return _selectedDevice!.cameras[_selectedCameraIndex];
   }
-  
-  // Set loading state
-  void setLoading(bool value) {
-    _isLoading = value;
-    notifyListeners();
-  }
-  
-  // Select a device by its key (typically MAC address)
-  void selectDevice(String deviceKey) {
-    if (_devices.containsKey(deviceKey)) {
-      _selectedDevice = _devices[deviceKey];
-      _selectedCameraIndex = 0; // Reset to first camera
+
+  void setSelectedDevice(String macAddress) {
+    if (_devices.containsKey(macAddress)) {
+      _selectedDevice = _devices[macAddress];
+      _selectedCameraIndex = 0; // Reset camera index when device changes
       notifyListeners();
     }
   }
-  
-  // Compatibility method for setSelectedDevice
-  void setSelectedDevice(String deviceKey) {
-    selectDevice(deviceKey);
-  }
-  
-  // Select a camera on the current device
-  void selectCamera(int index) {
-    if (_selectedDevice != null && 
-        index >= 0 && 
-        index < _selectedDevice!.cameras.length) {
+
+  void setSelectedCameraIndex(int index) {
+    if (_selectedDevice != null && index >= 0 && index < _selectedDevice!.cameras.length) {
       _selectedCameraIndex = index;
       notifyListeners();
     }
   }
   
-  // Compatibility method for setSelectedCameraIndex
-  void setSelectedCameraIndex(int index) {
-    selectCamera(index);
-  }
-  
-  // Refresh cameras (dummy method for compatibility)
+  // Refresh cameras - simulates a refresh by triggering UI update
   void refreshCameras() {
-    // This method is kept for compatibility with existing code
-    // In the current implementation, cameras are refreshed through WebSocket messages
-    debugPrint('Requesting camera refresh (no-op in current implementation)');
+    _isLoading = true;
+    notifyListeners();
+    
+    // Simulate a delay for refresh
+    Future.delayed(const Duration(seconds: 1), () {
+      _isLoading = false;
+      notifyListeners();
+    });
   }
-  
-  // Process a WebSocket message and update our devices
+
+  // Process "changed" messages from WebSocket
   void processWebSocketMessage(Map<String, dynamic> message) {
-    if (message['c'] == 'changed' && 
-        message.containsKey('data') && 
-        message.containsKey('val')) {
+    if (message['c'] == 'changed' && message.containsKey('data') && message.containsKey('val')) {
+      final String dataPath = message['data'];
+      final dynamic value = message['val'];
       
-      String dataPath = message['data'].toString();
+      // Debugging log the message
+      print('Processing WebSocket message: ${json.encode(message)}');
       
-      // Check if this is a device message (starts with ecs.slaves.m_)
+      // Check if this is a camera device-related message
       if (dataPath.startsWith('ecs.slaves.m_')) {
-        // Extract device ID (MAC address)
-        // Path format: ecs.slaves.m_XX_XX_XX_XX_XX_XX or ecs.slaves.m_XX_XX_XX_XX_XX_XXcam
-        String deviceIdWithPath = dataPath.split('.')[2]; // Get the m_XX... part
-        
-        // If it contains 'cam', it's a camera property update
-        bool isCameraProperty = deviceIdWithPath.contains('cam');
-        
-        // Extract the device ID part (with or without cam) from path
-        String deviceKey = deviceIdWithPath;
-        
-        // Extract MAC address in standard format and as key for the device
-        String macAddress = deviceKey.replaceAll('m_', '').replaceAll('_', ':');
-        if (macAddress.contains('cam')) {
-          macAddress = macAddress.split('cam')[0];
-        }
-        
-        // Create device if it doesn't exist yet
-        if (!_devices.containsKey(deviceKey) && !isCameraProperty) {
-          final newDevice = CameraDevice(
-            macAddress: macAddress,
-            macKey: deviceKey,
-            ipv4: '',
-            lastSeenAt: DateTime.now().toIso8601String(),
-            connected: true,
-            uptime: '0',
-            deviceType: 'Unknown',
-            firmwareVersion: 'Unknown',
-            recordPath: '',
-            cameras: [],
-          );
-          _devices[deviceKey] = newDevice;
-        }
-        
-        // Update device properties
-        if (_devices.containsKey(deviceKey)) {
-          final device = _devices[deviceKey]!;
+        // Extract the MAC address from the data path
+        // Format is like: ecs.slaves.m_26_C1_7A_0B_1F_19.property
+        final parts = dataPath.split('.');
+        if (parts.length >= 3) {
+          final macKey = parts[2]; // Get m_26_C1_7A_0B_1F_19
+          final macAddress = macKey.substring(2).replaceAll('_', ':'); // Convert to proper MAC format
           
-          // Handle device property update
-          if (message['val'] is Map) {
-            // Check for key-value map data
-            Map<String, dynamic> properties = Map<String, dynamic>.from(message['val']);
-            _updateDeviceProperties(device, properties);
+          print('Extracted macKey: $macKey, macAddress: $macAddress');
+          
+          // Create the device if it doesn't exist yet
+          if (!_devices.containsKey(macKey)) {
+            print('Creating new device with macKey: $macKey');
+            _devices[macKey] = CameraDevice(
+              macAddress: macAddress,
+              macKey: macKey,
+              ipv4: '',
+              lastSeenAt: '',
+              connected: false,
+              uptime: '',
+              deviceType: '',
+              firmwareVersion: '',
+              recordPath: '',
+              cameras: [],
+            );
             
-            // Extract camera information if available
-            if (properties.containsKey('cameras') && properties['cameras'] is List) {
-              List<dynamic> cameraData = properties['cameras'];
-              for (var cam in cameraData) {
-                if (cam is Map) {
-                  _updateCameraData(device, cam);
-                }
-              }
+            // If this is the first device we're seeing, select it automatically
+            if (_selectedDevice == null) {
+              _selectedDevice = _devices[macKey];
+              print('Auto-selected first device: $macKey');
             }
           }
           
-          // Handle direct path updates (with value as String or other primitive)
-          else {
-            // Extract property name from path (everything after the last dot)
-            List<String> pathParts = dataPath.split('.');
-            if (pathParts.length > 3) {
-              String propertyName = pathParts.sublist(3).join('.');
-              var propertyValue = message['val'];
-              
-              // Update the property on the device
-              _setDeviceProperty(device, propertyName, propertyValue);
-            }
-          }
-          
-          // If this is our first device, make it the selected one
-          if (_selectedDevice == null) {
-            _selectedDevice = device;
-          }
-          
-          notifyListeners();
+          _updateDeviceProperty(macKey, parts, value);
+          notifyListeners(); // Notify after any device update
         }
       }
     }
   }
   
-  // Helper method to update device properties
-  void _updateDeviceProperties(CameraDevice device, Map<String, dynamic> properties) {
-    // Create a copy of the device with updated properties
-    CameraDevice updatedDevice = device.copyWith(
-      ipv4: properties['ipv4'] ?? device.ipv4,
-      lastSeenAt: properties['lastSeenAt'] ?? device.lastSeenAt,
-      connected: properties['connected'] ?? device.connected,
-      uptime: properties['uptime']?.toString() ?? device.uptime,
-      deviceType: properties['deviceType'] ?? device.deviceType,
-      firmwareVersion: properties['firmwareVersion'] ?? device.firmwareVersion,
-      recordPath: properties['recordPath'] ?? device.recordPath,
-    );
+  // Update specific device property based on the data path
+  void _updateDeviceProperty(String macKey, List<String> parts, dynamic value) {
+    final device = _devices[macKey]!;
     
-    // Update the device in our map
-    _devices[device.macKey] = updatedDevice;
-  }
-  
-  // Helper method to update camera data
-  void _updateCameraData(CameraDevice device, Map<dynamic, dynamic> cameraData) {
-    int cameraIndex = cameraData['index'] ?? 0;
-    List<Camera> updatedCameras = List.from(device.cameras);
+    // Skip ecs.slaves.macKey prefix to get the actual property path
+    final propertyPath = parts.sublist(3);
     
-    // Check if this camera already exists
-    int existingIndex = updatedCameras.indexWhere((cam) => cam.index == cameraIndex);
-    
-    if (existingIndex >= 0) {
-      // Update existing camera
-      Camera updatedCamera = updatedCameras[existingIndex].copyWith(
-        name: cameraData['name'] ?? updatedCameras[existingIndex].name,
-        ip: cameraData['ip'] ?? updatedCameras[existingIndex].ip,
-        rawIp: cameraData['rawIp'] ?? updatedCameras[existingIndex].rawIp,
-        username: cameraData['username'] ?? updatedCameras[existingIndex].username,
-        password: cameraData['password'] ?? updatedCameras[existingIndex].password,
-        brand: cameraData['brand'] ?? updatedCameras[existingIndex].brand,
-        hw: cameraData['hw'] ?? updatedCameras[existingIndex].hw,
-        manufacturer: cameraData['manufacturer'] ?? updatedCameras[existingIndex].manufacturer,
-        country: cameraData['country'] ?? updatedCameras[existingIndex].country,
-        xAddrs: cameraData['xAddrs'] ?? updatedCameras[existingIndex].xAddrs,
-        mediaUri: cameraData['mediaUri'] ?? updatedCameras[existingIndex].mediaUri,
-        recordUri: cameraData['recordUri'] ?? updatedCameras[existingIndex].recordUri,
-        subUri: cameraData['subUri'] ?? updatedCameras[existingIndex].subUri,
-        remoteUri: cameraData['remoteUri'] ?? updatedCameras[existingIndex].remoteUri,
-        mainSnapShot: cameraData['mainSnapShot'] ?? updatedCameras[existingIndex].mainSnapShot,
-        subSnapShot: cameraData['subSnapShot'] ?? updatedCameras[existingIndex].subSnapShot,
-        recordPath: cameraData['recordPath'] ?? updatedCameras[existingIndex].recordPath,
-        recordCodec: cameraData['recordCodec'] ?? updatedCameras[existingIndex].recordCodec,
-        recordWidth: cameraData['recordWidth'] ?? updatedCameras[existingIndex].recordWidth,
-        recordHeight: cameraData['recordHeight'] ?? updatedCameras[existingIndex].recordHeight,
-        subCodec: cameraData['subCodec'] ?? updatedCameras[existingIndex].subCodec,
-        subWidth: cameraData['subWidth'] ?? updatedCameras[existingIndex].subWidth,
-        subHeight: cameraData['subHeight'] ?? updatedCameras[existingIndex].subHeight,
-        connected: cameraData['connected'] ?? updatedCameras[existingIndex].connected,
-        disconnected: cameraData['disconnected'] ?? updatedCameras[existingIndex].disconnected,
-        lastSeenAt: cameraData['lastSeenAt'] ?? updatedCameras[existingIndex].lastSeenAt,
-        recording: cameraData['recording'] ?? updatedCameras[existingIndex].recording,
-      );
-      updatedCameras[existingIndex] = updatedCamera;
-    } else {
-      // Add new camera
-      Camera newCamera = Camera(
-        index: cameraIndex,
-        name: cameraData['name'] ?? 'Camera $cameraIndex',
-        ip: cameraData['ip'] ?? '',
-        rawIp: cameraData['rawIp'] ?? 0,
-        username: cameraData['username'] ?? '',
-        password: cameraData['password'] ?? '',
-        brand: cameraData['brand'] ?? '',
-        mediaUri: cameraData['mediaUri'] ?? '',
-        recordUri: cameraData['recordUri'] ?? '',
-        subUri: cameraData['subUri'] ?? '',
-        remoteUri: cameraData['remoteUri'] ?? '',
-        mainSnapShot: cameraData['mainSnapShot'] ?? '',
-        subSnapShot: cameraData['subSnapShot'] ?? '',
-        recordWidth: cameraData['recordWidth'] ?? 0,
-        recordHeight: cameraData['recordHeight'] ?? 0,
-        subWidth: cameraData['subWidth'] ?? 0,
-        subHeight: cameraData['subHeight'] ?? 0,
-        connected: cameraData['connected'] ?? false,
-        lastSeenAt: cameraData['lastSeenAt'] ?? DateTime.now().toIso8601String(),
-        recording: cameraData['recording'] ?? false,
-      );
-      updatedCameras.add(newCamera);
-    }
-    
-    // Update the device with the new cameras list
-    _devices[device.macKey] = device.copyWith(cameras: updatedCameras);
-  }
-  
-  // Helper method to set a specific property on a device
-  void _setDeviceProperty(CameraDevice device, String propertyName, dynamic propertyValue) {
-    // Create a map with the property
-    Map<String, dynamic> propertyMap = {};
-    propertyMap[propertyName] = propertyValue;
-    
-    // Use the update properties method
-    _updateDeviceProperties(device, propertyMap);
-  }
-  
-  // Debug function to dump all devices and their properties
-  void debugPrintDevices() {
-    print('=== Device Debug Info ===');
-    print('Total devices: ${_devices.length}');
-    
-    for (var entry in _devices.entries) {
-      print('Device ID: ${entry.key}');
-      print('  MAC Address: ${entry.value.macAddress}');
-      print('  MAC Key: ${entry.value.macKey}');
-      print('  IP: ${entry.value.ipv4}');
-      print('  Connected: ${entry.value.connected}');
-      print('  Last Seen: ${entry.value.lastSeenAt}');
-      print('  Uptime: ${entry.value.uptime}');
-      print('  Device Type: ${entry.value.deviceType}');
-      print('  Firmware: ${entry.value.firmwareVersion}');
-      print('  Cameras: ${entry.value.cameras.length}');
-      
-      // Print camera details
-      for (int i = 0; i < entry.value.cameras.length; i++) {
-        final cam = entry.value.cameras[i];
-        print('    Camera $i: ${cam.name}');
-        print('      IP: ${cam.ip}');
-        print('      Connected: ${cam.connected}');
-        print('      Brand: ${cam.brand}');
-        print('      Media URI: ${cam.mediaUri}');
-        print('      Record URI: ${cam.recordUri}');
+    if (propertyPath.isNotEmpty) {
+      switch (propertyPath[0]) {
+        case 'ipv4':
+          device.ipv4 = value.toString();
+          break;
+        case 'connected':
+          device.connected = value == 1;
+          break;
+        case 'last_seen_at':
+          device.lastSeenAt = value.toString();
+          break;
+        case 'test':
+          if (propertyPath.length > 1 && propertyPath[1] == 'uptime') {
+            device.uptime = value.toString();
+          }
+          break;
+        case 'app':
+          if (propertyPath.length > 1) {
+            switch (propertyPath[1]) {
+              case 'deviceType':
+                device.deviceType = value.toString();
+                break;
+              case 'firmware_version':
+                device.firmwareVersion = value.toString();
+                break;
+              case 'recordPath':
+                device.recordPath = value.toString();
+                break;
+            }
+          }
+          break;
+        default:
+          // Check if this is a camera property pattern (cam[X])
+          final camPattern = RegExp(r'cam\[(\d+)\]');
+          final match = camPattern.firstMatch(propertyPath[0]);
+          
+          if (match != null) {
+            // Extract camera index from the match
+            final cameraIndex = int.tryParse(match.group(1) ?? '-1') ?? -1;
+            
+            if (cameraIndex >= 0) {
+              print('Updating camera $cameraIndex property: ${propertyPath.join('.')} = $value');
+              _updateCameraProperty(device, cameraIndex, propertyPath, value);
+            } else {
+              print('Error parsing camera index from ${propertyPath[0]}');
+            }
+          }
+          
+          // Handle camera reports which come separately with camera name as key
+          else if (propertyPath[0] == 'camreports' && propertyPath.length > 2) {
+            final cameraName = propertyPath[1];
+            final propertyName = propertyPath[2];
+            
+            print('Processing camera report for $cameraName: $propertyName = $value');
+            
+            // Find camera by name first
+            int cameraIndex = device.cameras.indexWhere((cam) => cam.name == cameraName);
+            
+            // If camera doesn't exist yet, we need to create a placeholder
+            if (cameraIndex < 0) {
+              print('Camera $cameraName not found in device - creating placeholder');
+              
+              // Find the next available index
+              int nextIndex = device.cameras.length;
+              
+              // Create a new camera with the name from the report
+              Camera newCamera = Camera(
+                index: nextIndex,
+                name: cameraName,
+                ip: '',
+                username: '',
+                password: '',
+                brand: '',
+                mediaUri: '',
+                recordUri: '',
+                subUri: '',
+                remoteUri: '',
+                mainSnapShot: '',
+                subSnapShot: '',
+                recordWidth: 0,
+                recordHeight: 0,
+                subWidth: 0, 
+                subHeight: 0,
+                connected: false,
+                lastSeenAt: '',
+                recording: false,
+              );
+              
+              // Add the new camera to the device
+              device.cameras.add(newCamera);
+              cameraIndex = nextIndex;
+              print('Created placeholder camera at index $cameraIndex');
+            }
+            
+            // Now we have a valid camera index, update the property
+            final camera = device.cameras[cameraIndex];
+            
+            // Update camera status properties from the report
+            switch (propertyName) {
+              case 'connected':
+                camera.connected = value == 1;
+                print('Updated camera $cameraName connected status: ${camera.connected}');
+                break;
+              case 'disconnected':
+                camera.disconnected = value.toString();
+                break;
+              case 'last_seen_at':
+                camera.lastSeenAt = value.toString();
+                break;
+              case 'recording':
+                camera.recording = value == true || value == 1;
+                break;
+            }
+          }
+          break;
       }
-      
-      print('-----------------------');
     }
   }
   
+  // Update camera properties within a device
+  void _updateCameraProperty(CameraDevice device, int cameraIndex, List<String> propertyPath, dynamic value) {
+    // Ensure we have enough cameras in the array
+    while (device.cameras.length <= cameraIndex) {
+      int nextIndex = device.cameras.length;
+      print('Creating camera at index $nextIndex because we need index $cameraIndex');
+      
+      device.cameras.add(Camera(
+        index: nextIndex,
+        name: 'Camera ${nextIndex + 1}',
+        ip: '',
+        username: '',
+        password: '',
+        brand: '',
+        mediaUri: '',
+        recordUri: '',
+        subUri: '',
+        remoteUri: '',
+        mainSnapShot: '',
+        subSnapShot: '',
+        recordWidth: 0,
+        recordHeight: 0,
+        subWidth: 0, 
+        subHeight: 0,
+        connected: false,
+        lastSeenAt: '',
+        recording: false,
+      ));
+    }
+    
+    final camera = device.cameras[cameraIndex];
+    
+    // Extract the property name after cam[X]
+    final propertyName = propertyPath.length > 1 ? propertyPath[1] : '';
+    
+    // Update the camera property based on name
+    switch (propertyName) {
+      case 'name':
+        camera.name = value.toString();
+        print('Set camera[$cameraIndex] name to: ${camera.name}');
+        break;
+      case 'cameraIp':
+        camera.ip = value.toString();
+        break;
+      case 'cameraRawIp':
+        camera.rawIp = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'username':
+        camera.username = value.toString();
+        break;
+      case 'password':
+        camera.password = value.toString();
+        break;
+      case 'brand':
+        camera.brand = value.toString();
+        break;
+      case 'hw':
+        camera.hw = value.toString();
+        break;
+      case 'manufacturer':
+        camera.manufacturer = value.toString();
+        break;
+      case 'country':
+        camera.country = value.toString();
+        break;
+      case 'xAddrs':
+        camera.xAddrs = value.toString();
+        break;
+      case 'mediaUri':
+        camera.mediaUri = value.toString();
+        break;
+      case 'recordUri':
+        camera.recordUri = value.toString();
+        break;
+      case 'subUri':
+        camera.subUri = value.toString();
+        break;
+      case 'remoteUri':
+        camera.remoteUri = value.toString();
+        break;
+      case 'mainSnapShot':
+        camera.mainSnapShot = value.toString();
+        break;
+      case 'subSnapShot':
+        camera.subSnapShot = value.toString();
+        break;
+      case 'recordPath':
+        camera.recordPath = value.toString();
+        break;
+      case 'recordcodec':
+        camera.recordCodec = value.toString();
+        break;
+      case 'recordwidth':
+        camera.recordWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'recordheight':
+        camera.recordHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'subcodec':
+        camera.subCodec = value.toString();
+        break;
+      case 'subwidth':
+        camera.subWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'subheight':
+        camera.subHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        break;
+    }
+  }
+
   // Clear all devices
   void clearDevices() {
     _devices.clear();
