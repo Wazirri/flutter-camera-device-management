@@ -1,0 +1,58 @@
+lib/screens/login_screen.dart:7:8: Error: Error when reading 'lib/widgets/custom_button.dart': No such file or directory
+import 'package:camera_device_manager/widgets/custom_button.dart';
+       ^
+lib/screens/login_screen.dart:8:8: Error: Error when reading 'lib/widgets/custom_text_field.dart': No such file or directory
+import 'package:camera_device_manager/widgets/custom_text_field.dart';
+       ^
+lib/screens/login_screen.dart:9:8: Error: Error when reading 'lib/widgets/fade_in_animation.dart': No such file or directory
+import 'package:camera_device_manager/widgets/fade_in_animation.dart';
+       ^
+lib/screens/login_screen.dart:116:56: Error: Too few positional arguments: 2 required, 0 given.
+      final connected = await webSocketProvider.connect(
+                                                       ^
+lib/screens/login_screen.dart:165:24: Error: Member not found: 'darkBackgroundColor'.
+              AppTheme.darkBackgroundColor.withOpacity(0.8),
+                       ^^^^^^^^^^^^^^^^^^^
+lib/screens/login_screen.dart:164:24: Error: Member not found: 'darkBackgroundColor'.
+              AppTheme.darkBackgroundColor,
+                       ^^^^^^^^^^^^^^^^^^^
+lib/screens/login_screen.dart:172:22: Error: The method 'FadeInAnimation' isn't defined for the class '_LoginScreenState'.
+ - '_LoginScreenState' is from 'package:camera_device_manager/screens/login_screen.dart' ('lib/screens/login_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'FadeInAnimation'.
+              child: FadeInAnimation(
+                     ^^^^^^^^^^^^^^^
+lib/screens/login_screen.dart:211:23: Error: The method 'CustomTextField' isn't defined for the class '_LoginScreenState'.
+ - '_LoginScreenState' is from 'package:camera_device_manager/screens/login_screen.dart' ('lib/screens/login_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'CustomTextField'.
+                      CustomTextField(
+                      ^^^^^^^^^^^^^^^
+lib/screens/login_screen.dart:218:23: Error: The method 'CustomTextField' isn't defined for the class '_LoginScreenState'.
+ - '_LoginScreenState' is from 'package:camera_device_manager/screens/login_screen.dart' ('lib/screens/login_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'CustomTextField'.
+                      CustomTextField(
+                      ^^^^^^^^^^^^^^^
+lib/screens/login_screen.dart:225:23: Error: The method 'CustomTextField' isn't defined for the class '_LoginScreenState'.
+ - '_LoginScreenState' is from 'package:camera_device_manager/screens/login_screen.dart' ('lib/screens/login_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'CustomTextField'.
+                      CustomTextField(
+                      ^^^^^^^^^^^^^^^
+lib/screens/login_screen.dart:231:23: Error: The method 'CustomTextField' isn't defined for the class '_LoginScreenState'.
+ - '_LoginScreenState' is from 'package:camera_device_manager/screens/login_screen.dart' ('lib/screens/login_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'CustomTextField'.
+                      CustomTextField(
+                      ^^^^^^^^^^^^^^^
+lib/screens/login_screen.dart:256:23: Error: The method 'CustomButton' isn't defined for the class '_LoginScreenState'.
+ - '_LoginScreenState' is from 'package:camera_device_manager/screens/login_screen.dart' ('lib/screens/login_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'CustomButton'.
+                      CustomButton(
+                      ^^^^^^^^^^^^
+lib/screens/login_screen.dart:195:77: Error: Constant evaluation error:
+                        errorBuilder: (context, error, stackTrace) => const Icon(
+                                                                            ^
+lib/screens/login_screen.dart:198:43: Context: The invocation of 'primaryColor' is not allowed in a constant expression.
+                          color: AppTheme.primaryColor,
+                                          ^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **

@@ -122,11 +122,9 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (connected && mounted) {
-        // Navigate to dashboard on successful connection
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const DashboardScreen()),
-        );
+        // Navigate to dashboard on successful connection using named route
+        // This ensures proper AppShell wrapping
+        Navigator.pushReplacementNamed(context, '/dashboard');
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
