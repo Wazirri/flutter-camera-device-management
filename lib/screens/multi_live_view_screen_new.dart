@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:flutter/services.dart';
 
@@ -49,7 +50,7 @@ class _MultiLiveViewScreenNewState extends State<MultiLiveViewScreenNew> with Au
   void dispose() {
     // Dispose all video controllers
     for (final controller in _videoControllers.values) {
-      controller.dispose();
+      controller.player.dispose();
     }
     _videoControllers.clear();
     super.dispose();
@@ -100,7 +101,7 @@ class _MultiLiveViewScreenNewState extends State<MultiLiveViewScreenNew> with Au
           
           // Get all cameras from all devices
           final allCameras = <Camera>[];
-          for (final device in devicesProvider.devices) {
+          for (final device in devicesProvider.devices.values) {
             allCameras.addAll(device.cameras);
           }
           
@@ -146,7 +147,7 @@ class _MultiLiveViewScreenNewState extends State<MultiLiveViewScreenNew> with Au
                             final camera = cameraId != null 
                                 ? allCameras.firstWhere(
                                     (camera) => camera.id == cameraId,
-                                    orElse: () => null,
+                                    orElse: () => Camera(),
                                   )
                                 : null;
                             
@@ -189,7 +190,7 @@ class _MultiLiveViewScreenNewState extends State<MultiLiveViewScreenNew> with Au
                                           ? ClipRect(
                                               child: Video(
                                                 controller: _videoControllers[location.cameraCode]!,
-                                                controls: NoVideoControls,
+                                                fill: true,
                                                 fit: BoxFit.cover,
                                               ),
                                             )
@@ -231,7 +232,7 @@ class _MultiLiveViewScreenNewState extends State<MultiLiveViewScreenNew> with Au
                                               borderRadius: BorderRadius.circular(4),
                                             ),
                                             child: Text(
-                                              camera.name,
+                                              camera.name ?? 'Unknown Camera',
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 12,
@@ -342,146 +343,197 @@ class _MultiLiveViewScreenNewState extends State<MultiLiveViewScreenNew> with Au
                                 ),
                                 const SizedBox(height: 8),
                                 
-                                // Get the currently assigned camera for this slot
-                                ..._buildSlotActions(_selectedSlot!, layoutProvider, allCameras),
+                                // Camera selector for the slot
+                                DropdownButton<String?>(
+                                  value: layoutProvider.getCameraForSlot(_selectedSlot!),
+                                  isExpanded: true,
+                                  dropdownColor: AppTheme.darkBackground,
+                                  style: TextStyle(
+                                    color: AppTheme.darkTextPrimary,
+                                  ),
+                                  underline: Container(
+                                    height: 1,
+                                    color: AppTheme.accentColor.withOpacity(0.5),
+                                  ),
+                                  hint: Text(
+                                    'Select a camera',
+                                    style: TextStyle(
+                                      color: AppTheme.darkTextSecondary,
+                                    ),
+                                  ),
+                                  onChanged: (value) {
+                                    // Get current camera to check if we need to dispose
+                                    final oldCameraId = layoutProvider.getCameraForSlot(_selectedSlot!);
+                                    
+                                    // Store the camera selection in the layout provider
+                                    layoutProvider.setCameraForSlot(_selectedSlot!, value);
+                                    
+                                    // If the camera selection changed, dispose the old controller
+                                    if (oldCameraId != value && _videoControllers.containsKey(_selectedSlot)) {
+                                      _videoControllers[_selectedSlot!]!.player.dispose();
+                                      _videoControllers.remove(_selectedSlot);
+                                    }
+                                    
+                                    // Initialize the new controller if a camera was selected
+                                    if (value != null) {
+                                      final camera = allCameras.firstWhere(
+                                        (camera) => camera.id == value,
+                                        orElse: () => Camera(),
+                                      );
+                                      _initializeVideoController(_selectedSlot!, camera);
+                                    }
+                                    
+                                    setState(() {});
+                                  },
+                                  items: [
+                                    // "None" option to clear the slot
+                                    DropdownMenuItem<String?>(
+                                      value: null,
+                                      child: Text(
+                                        'None (Clear Slot)',
+                                        style: TextStyle(
+                                          color: AppTheme.darkTextSecondary,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ),
+                                    ),
+                                    // All available cameras
+                                    ...allCameras.map((camera) => DropdownMenuItem<String?>(
+                                          value: camera.id,
+                                          child: Text(
+                                            camera.name ?? 'Unknown Camera',
+                                          ),
+                                        )),
+                                  ],
+                                ),
+                                
+                                const SizedBox(height: 16),
+                                
+                                // Camera swap buttons (for quick swapping)
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: [
+                                    ...currentLayout.cameraLocations.map((loc) {
+                                      // Skip the current slot
+                                      if (loc.cameraCode == _selectedSlot) {
+                                        return const SizedBox.shrink();
+                                      }
+                                      
+                                      // Get camera assigned to this slot
+                                      final cameraId = layoutProvider.getCameraForSlot(loc.cameraCode);
+                                      final camera = cameraId != null
+                                          ? allCameras.firstWhere(
+                                              (camera) => camera.id == cameraId,
+                                              orElse: () => Camera(),
+                                            )
+                                          : null;
+                                      
+                                      return GestureDetector(
+                                        onTap: () {
+                                          // Swap cameras between slots
+                                          layoutProvider.swapCameras(_selectedSlot!, loc.cameraCode);
+                                          
+                                          // Dispose controllers to reinitialize with new assignments
+                                          if (_videoControllers.containsKey(_selectedSlot)) {
+                                            _videoControllers[_selectedSlot!]!.player.dispose();
+                                            _videoControllers.remove(_selectedSlot);
+                                          }
+                                          
+                                          if (_videoControllers.containsKey(loc.cameraCode)) {
+                                            _videoControllers[loc.cameraCode]!.player.dispose();
+                                            _videoControllers.remove(loc.cameraCode);
+                                          }
+                                          
+                                          setState(() {});
+                                        },
+                                        child: Container(
+                                          width: 50,
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                            color: AppTheme.darkBackground,
+                                            borderRadius: BorderRadius.circular(4),
+                                            border: Border.all(
+                                              color: AppTheme.darkDivider,
+                                            ),
+                                          ),
+                                          child: Stack(
+                                            children: [
+                                              Center(
+                                                child: Text(
+                                                  '${loc.cameraCode}',
+                                                  style: TextStyle(
+                                                    color: AppTheme.darkTextPrimary,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (camera != null)
+                                                Positioned(
+                                                  right: 4,
+                                                  bottom: 4,
+                                                  child: Container(
+                                                    width: 8,
+                                                    height: 8,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: AppTheme.accentColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
-                          
-                        const Divider(height: 1),
                         
-                        // Global actions
+                        const Divider(),
+                        
+                        // Layout information
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Global Actions',
+                                'Layout Information',
                                 style: TextStyle(
                                   color: AppTheme.darkTextPrimary,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              
-                              // Clear all camera assignments
-                              ElevatedButton.icon(
-                                icon: const Icon(Icons.clear_all),
-                                label: const Text('Clear All Assignments'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red.shade800,
-                                  foregroundColor: Colors.white,
+                              Text(
+                                'Layout Code: ${currentLayout.layoutCode}',
+                                style: TextStyle(
+                                  color: AppTheme.darkTextSecondary,
                                 ),
-                                onPressed: () {
-                                  // Confirm with dialog
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: const Text('Clear All Assignments'),
-                                      content: const Text('Are you sure you want to clear all camera assignments?'),
-                                      actions: [
-                                        TextButton(
-                                          child: const Text('Cancel'),
-                                          onPressed: () => Navigator.of(context).pop(),
-                                        ),
-                                        TextButton(
-                                          child: const Text('Clear All'),
-                                          onPressed: () {
-                                            // Clear all assignments
-                                            layoutProvider.clearAllAssignments();
-                                            
-                                            // Dispose all controllers
-                                            for (final controller in _videoControllers.values) {
-                                              controller.dispose();
-                                            }
-                                            _videoControllers.clear();
-                                            
-                                            // Close dialog
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
+                              ),
+                              Text(
+                                'Max Cameras: ${currentLayout.maxCameraNumber}',
+                                style: TextStyle(
+                                  color: AppTheme.darkTextSecondary,
+                                ),
+                              ),
+                              Text(
+                                'Camera Slots: ${currentLayout.cameraLocations.length}',
+                                style: TextStyle(
+                                  color: AppTheme.darkTextSecondary,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Assigned Cameras: ${layoutProvider.getAssignedCameraCount()}',
+                                style: TextStyle(
+                                  color: AppTheme.darkTextSecondary,
+                                ),
                               ),
                             ],
-                          ),
-                        ),
-                        
-                        // Available Cameras List
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Available Cameras',
-                                  style: TextStyle(
-                                    color: AppTheme.darkTextPrimary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                
-                                Expanded(
-                                  child: ListView.builder(
-                                    itemCount: allCameras.length,
-                                    itemBuilder: (context, index) {
-                                      final camera = allCameras[index];
-                                      
-                                      // Check if this camera is already assigned to a slot
-                                      final isAssigned = layoutProvider.cameraAssignments.containsValue(camera.id);
-                                      
-                                      return ListTile(
-                                        leading: Icon(
-                                          isAssigned ? Icons.videocam : Icons.videocam_off,
-                                          color: isAssigned 
-                                              ? AppTheme.accentColor
-                                              : AppTheme.darkTextSecondary,
-                                        ),
-                                        title: Text(
-                                          camera.name,
-                                          style: TextStyle(
-                                            color: AppTheme.darkTextPrimary,
-                                          ),
-                                        ),
-                                        subtitle: Text(
-                                          camera.isConnected
-                                              ? 'Online - ${camera.brand}'
-                                              : 'Offline',
-                                          style: TextStyle(
-                                            color: camera.isConnected
-                                                ? Colors.green.shade300
-                                                : Colors.red.shade300,
-                                          ),
-                                        ),
-                                        trailing: isAssigned
-                                            ? Text(
-                                                'Assigned',
-                                                style: TextStyle(
-                                                  color: AppTheme.darkTextSecondary,
-                                                ),
-                                              )
-                                            : null,
-                                        onTap: () {
-                                          // If a slot is selected, assign this camera to it
-                                          if (_selectedSlot != null) {
-                                            // Assign camera to selected slot
-                                            layoutProvider.assignCamera(_selectedSlot!, camera.id);
-                                            
-                                            // Initialize or update the video controller
-                                            _initializeVideoController(_selectedSlot!, camera);
-                                          }
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
                           ),
                         ),
                       ],
@@ -495,151 +547,28 @@ class _MultiLiveViewScreenNewState extends State<MultiLiveViewScreenNew> with Au
     );
   }
   
-  // Build the actions for a selected slot
-  List<Widget> _buildSlotActions(int slotCode, MultiViewLayoutProvider layoutProvider, List<Camera> allCameras) {
-    final cameraId = layoutProvider.getCameraForSlot(slotCode);
-    final camera = cameraId != null 
-        ? allCameras.firstWhere(
-            (camera) => camera.id == cameraId,
-            orElse: () => null,
-          )
-        : null;
-    
-    return [
-      if (camera != null)
-        Card(
-          color: AppTheme.darkBackground,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Assigned Camera: ${camera.name}',
-                  style: TextStyle(
-                    color: AppTheme.accentColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'IP: ${camera.ip}',
-                  style: TextStyle(
-                    color: AppTheme.darkTextSecondary,
-                    fontSize: 12,
-                  ),
-                ),
-                Text(
-                  'Status: ${camera.isConnected ? "Online" : "Offline"}',
-                  style: TextStyle(
-                    color: camera.isConnected
-                        ? Colors.green.shade300
-                        : Colors.red.shade300,
-                    fontSize: 12,
-                  ),
-                ),
-                Text(
-                  'Stream: ${camera.subUri.isNotEmpty ? "Available" : "Not Available"}',
-                  style: TextStyle(
-                    color: camera.subUri.isNotEmpty
-                        ? Colors.green.shade300
-                        : Colors.yellow.shade700,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      
-      const SizedBox(height: 8),
-      
-      Row(
-        children: [
-          if (camera != null)
-            Expanded(
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.remove_circle),
-                label: const Text('Remove'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade800,
-                  foregroundColor: Colors.white,
-                ),
-                onPressed: () {
-                  // Remove the camera from this slot
-                  layoutProvider.removeCamera(slotCode);
-                  
-                  // Dispose the video controller
-                  if (_videoControllers.containsKey(slotCode)) {
-                    _videoControllers[slotCode]!.dispose();
-                    _videoControllers.remove(slotCode);
-                  }
-                },
-              ),
-            ),
-          
-          if (camera != null)
-            const SizedBox(width: 8),
-          
-          Expanded(
-            child: ElevatedButton.icon(
-              icon: Icon(camera != null ? Icons.swap_horiz : Icons.add),
-              label: Text(camera != null ? 'Change' : 'Assign Camera'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.accentColor,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () {
-                // The camera will be assigned when a camera is tapped in the list
-                // So no action needed here, just highlight the instructions
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      camera != null
-                          ? 'Tap on a camera from the list to replace the current assignment'
-                          : 'Tap on a camera from the list to assign it to this slot',
-                    ),
-                    backgroundColor: AppTheme.accentColor,
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    ];
-  }
-  
-  // Initialize or update a video controller for a camera slot
+  /// Initialize a video controller for a specific camera slot
   void _initializeVideoController(int slotCode, Camera camera) {
     // Dispose the existing controller if it exists
     if (_videoControllers.containsKey(slotCode)) {
-      _videoControllers[slotCode]!.dispose();
+      _videoControllers[slotCode]!.player.dispose();
       _videoControllers.remove(slotCode);
     }
     
     // Check if camera has a valid stream URI
-    if (camera.rtspUri.isEmpty) {
+    if (camera.rtspUri == null || camera.rtspUri!.isEmpty) {
       // No valid URI, don't create a controller
       print('No valid RTSP URI for camera ${camera.name}');
       return;
     }
     
-    // Create a new controller
-    final controller = VideoController(
-      configuration: const VideoControllerConfiguration(
-        // No controls, we'll use our own
-        controls: NoVideoControls,
-        // Improved buffer size for smoother playback
-        bufferSize: 50 * 1024 * 1024,
-        autoHideControls: false,
-      ),
-    );
+    // Create a new controller with a player
+    final player = Player();
+    final controller = VideoController(player);
     
     // Initialize the player with the RTSP URI
-    controller.player.open(
-      Media(camera.rtspUri),
-      play: true,
+    player.open(
+      Media(camera.rtspUri!),
     );
     
     // Store the controller
@@ -649,32 +578,35 @@ class _MultiLiveViewScreenNewState extends State<MultiLiveViewScreenNew> with Au
     setState(() {});
   }
   
-  // Dispose controllers for slots that are no longer in the layout
+  /// Dispose controllers for slots that are no longer used in the current layout
   void _disposeUnusedControllers(CameraLayout layout) {
-    // Get all slot codes in the current layout
-    final validSlotCodes = layout.cameraLocations.map((loc) => loc.cameraCode).toSet();
+    // Get all camera slot codes in the current layout
+    final activeCodes = layout.cameraLocations.map((loc) => loc.cameraCode).toList();
     
-    // Find controllers for slots that are no longer in the layout
-    final slotsToDispose = _videoControllers.keys
-        .where((slotCode) => !validSlotCodes.contains(slotCode))
-        .toList();
+    // Find controllers that don't correspond to any active slot
+    final unusedCodes = _videoControllers.keys.where((code) => !activeCodes.contains(code)).toList();
     
-    // Dispose these controllers
-    for (final slotCode in slotsToDispose) {
-      _videoControllers[slotCode]!.dispose();
+    // Dispose those controllers
+    for (final slotCode in unusedCodes) {
+      _videoControllers[slotCode]!.player.dispose();
       _videoControllers.remove(slotCode);
     }
   }
   
-  // Toggle fullscreen mode for a camera
+  /// Toggle full screen mode for a specific camera
   void _toggleFullScreen(int slotCode, Camera camera) {
-    // We can implement fullscreen mode here if needed
-    // For now, just show a message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Fullscreen view for ${camera.name} not implemented yet.'),
-        backgroundColor: AppTheme.accentColor,
-      ),
-    );
+    // Implement full screen functionality
+    // This could open a new screen or expand the current slot
+    // For now, we'll just print a debug message
+    print('Toggle full screen for camera ${camera.name} in slot $slotCode');
+    
+    // Example implementation: could navigate to a dedicated full screen view
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (context) => FullScreenCameraView(
+    //       camera: camera,
+    //     ),
+    //   ),
+    // );
   }
 }

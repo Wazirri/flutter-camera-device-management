@@ -1,0 +1,60 @@
+lib/screens/multi_live_view_screen_new.dart:52:18: Error: The method 'dispose' isn't defined for the class 'VideoController'.
+ - 'VideoController' is from 'package:media_kit_video/src/video_controller/video_controller.dart' ('../../../../.pub-cache/hosted/pub.dev/media_kit_video-1.2.4/lib/src/video_controller/video_controller.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'dispose'.
+      controller.dispose();
+                 ^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:103:48: Error: The type 'Map<String, CameraDevice>' used in the 'for' loop must implement 'Iterable<dynamic>'.
+ - 'Map' is from 'dart:core'.
+ - 'CameraDevice' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+ - 'Iterable' is from 'dart:core'.
+          for (final device in devicesProvider.devices) {
+                                               ^
+lib/screens/multi_live_view_screen_new.dart:149:51: Error: The value 'null' can't be returned from a function with return type 'Camera' because 'Camera' is not nullable.
+ - 'Camera' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+                                    orElse: () => null,
+                                                  ^
+lib/screens/multi_live_view_screen_new.dart:396:58: Error: The method 'dispose' isn't defined for the class 'VideoController'.
+ - 'VideoController' is from 'package:media_kit_video/src/video_controller/video_controller.dart' ('../../../../.pub-cache/hosted/pub.dev/media_kit_video-1.2.4/lib/src/video_controller/video_controller.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'dispose'.
+                                              controller.dispose();
+                                                         ^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:504:27: Error: The value 'null' can't be returned from a function with return type 'Camera' because 'Camera' is not nullable.
+ - 'Camera' is from 'package:camera_device_manager/models/camera_device.dart' ('lib/models/camera_device.dart').
+            orElse: () => null,
+                          ^
+lib/screens/multi_live_view_screen_new.dart:574:50: Error: The method 'dispose' isn't defined for the class 'VideoController'.
+ - 'VideoController' is from 'package:media_kit_video/src/video_controller/video_controller.dart' ('../../../../.pub-cache/hosted/pub.dev/media_kit_video-1.2.4/lib/src/video_controller/video_controller.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'dispose'.
+                    _videoControllers[slotCode]!.dispose();
+                                                 ^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:632:9: Error: No named parameter with the name 'controls'.
+        controls: NoVideoControls,
+        ^^^^^^^^
+../../../../.pub-cache/hosted/pub.dev/media_kit_video-1.2.4/lib/src/video_controller/platform_video_controller.dart:117:9: Context: Found this candidate, but the arguments don't match.
+  const VideoControllerConfiguration({
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:629:39: Error: Too few positional arguments: 1 required, 0 given.
+    final controller = VideoController(
+                                      ^
+../../../../.pub-cache/hosted/pub.dev/media_kit_video-1.2.4/lib/src/video_controller/video_controller.dart:73:3: Context: Found this candidate, but the arguments don't match.
+  VideoController(
+  ^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:617:36: Error: The method 'dispose' isn't defined for the class 'VideoController'.
+ - 'VideoController' is from 'package:media_kit_video/src/video_controller/video_controller.dart' ('../../../../.pub-cache/hosted/pub.dev/media_kit_video-1.2.4/lib/src/video_controller/video_controller.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'dispose'.
+      _videoControllers[slotCode]!.dispose();
+                                   ^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:641:7: Error: The method 'Media' isn't defined for the class '_MultiLiveViewScreenNewState'.
+ - '_MultiLiveViewScreenNewState' is from 'package:camera_device_manager/screens/multi_live_view_screen_new.dart' ('lib/screens/multi_live_view_screen_new.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'Media'.
+      Media(camera.rtspUri),
+      ^^^^^
+lib/screens/multi_live_view_screen_new.dart:664:36: Error: The method 'dispose' isn't defined for the class 'VideoController'.
+ - 'VideoController' is from 'package:media_kit_video/src/video_controller/video_controller.dart' ('../../../../.pub-cache/hosted/pub.dev/media_kit_video-1.2.4/lib/src/video_controller/video_controller.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'dispose'.
+      _videoControllers[slotCode]!.dispose();
+                                   ^^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **

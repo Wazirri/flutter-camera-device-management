@@ -1,142 +1,136 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/camera_layout.dart';
-import '../models/camera_device.dart';
 
-/// Manages the state and logic for multi-view camera layouts
+/// Manager class for camera layouts
+class CameraLayoutManager {
+  final List<CameraLayout> _layouts = [];
+  bool _isLoaded = false;
+
+  List<CameraLayout> get layouts => _layouts;
+  bool get isLoaded => _isLoaded;
+
+  /// Load camera layouts from JSON file
+  Future<void> loadLayouts() async {
+    try {
+      // Load the combined layout file with all layouts from 1 to 36 cameras
+      final jsonString = await rootBundle.loadString('assets/layouts/combined_camera_layouts_1_to_36.json');
+      final Map<String, dynamic> jsonData = jsonDecode(jsonString);
+      
+      // Parse the layouts data
+      final layoutsData = jsonData['layouts'] as List<dynamic>;
+      
+      // Clear existing layouts
+      _layouts.clear();
+      
+      // Add all layouts
+      for (final layoutData in layoutsData) {
+        _layouts.add(CameraLayout.fromJson(layoutData));
+      }
+      
+      // Sort layouts by layoutCode
+      _layouts.sort((a, b) => a.layoutCode.compareTo(b.layoutCode));
+      
+      _isLoaded = true;
+    } catch (e) {
+      debugPrint('Error loading camera layouts: $e');
+      _isLoaded = false;
+    }
+  }
+
+  /// Get a layout by its code
+  CameraLayout? getLayoutByCode(int layoutCode) {
+    try {
+      return _layouts.firstWhere((layout) => layout.layoutCode == layoutCode);
+    } catch (e) {
+      return null;
+    }
+  }
+}
+
+/// Provider for managing the multi-view layout state
 class MultiViewLayoutProvider extends ChangeNotifier {
-  // The camera layout manager instance
-  final CameraLayoutManager _layoutManager = CameraLayoutManager();
-  
-  // The currently selected layout
-  CameraLayout? _currentLayout;
-  
-  // Map to store camera assignments for each slot (cameraCode: cameraId)
-  final Map<int, String> _cameraAssignments = {};
-  
-  // Current page for multi-camera view pagination
-  int _currentPage = 0;
-
-  // Maximum number of cameras per page
-  final int _camerasPerPage = 20;
-  
-  // Flag to track loading state
+  final CameraLayoutManager layoutManager = CameraLayoutManager();
+  int _currentLayoutCode = 1; // Default to layout 1
   bool _isLoading = true;
   
-  // Getters
-  CameraLayoutManager get layoutManager => _layoutManager;
-  CameraLayout? get currentLayout => _currentLayout;
-  Map<int, String> get cameraAssignments => _cameraAssignments;
-  int get currentPage => _currentPage;
-  int get camerasPerPage => _camerasPerPage;
-  bool get isLoading => _isLoading;
+  // Map of camera assignments: slot code -> camera ID
+  final Map<int, String?> _cameraAssignments = {};
   
-  // Initialize the provider
   MultiViewLayoutProvider() {
     _init();
   }
   
-  // Initialization method
+  /// Initialize the provider
   Future<void> _init() async {
     _isLoading = true;
     notifyListeners();
     
-    try {
-      await _layoutManager.loadLayouts();
-      
-      // Set default layout (4 cameras grid layout)
-      _currentLayout = _layoutManager.getLayoutByCode(303);
-      
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      print('Error initializing MultiViewLayoutProvider: $e');
-      _isLoading = false;
-      notifyListeners();
+    await layoutManager.loadLayouts();
+    
+    // If layouts were loaded successfully, set the current layout to the first one
+    if (layoutManager.isLoaded && layoutManager.layouts.isNotEmpty) {
+      _currentLayoutCode = layoutManager.layouts.first.layoutCode;
     }
+    
+    _isLoading = false;
+    notifyListeners();
   }
   
-  // Change the current layout
+  /// Get the current layout
+  CameraLayout? get currentLayout => layoutManager.getLayoutByCode(_currentLayoutCode);
+  
+  /// Check if the provider is still loading data
+  bool get isLoading => _isLoading;
+  
+  /// Set the current layout by code
   void setLayout(int layoutCode) {
-    try {
-      final newLayout = _layoutManager.getLayoutByCode(layoutCode);
+    // Check if the layout exists
+    final layout = layoutManager.getLayoutByCode(layoutCode);
+    if (layout != null) {
+      _currentLayoutCode = layoutCode;
       
-      if (newLayout != null) {
-        _currentLayout = newLayout;
-        
-        // Clear camera assignments for slots that don't exist in the new layout
-        _cameraAssignments.removeWhere((code, _) => 
-          !newLayout.cameraLocations.any((loc) => loc.cameraCode == code)
-        );
-        
-        notifyListeners();
-      }
-    } catch (e) {
-      print('Error setting layout: $e');
+      // Clear camera assignments for slots that don't exist in the new layout
+      final validSlots = layout.cameraLocations.map((loc) => loc.cameraCode).toSet();
+      _cameraAssignments.removeWhere((slotCode, _) => !validSlots.contains(slotCode));
+      
+      notifyListeners();
     }
   }
   
-  // Assign a camera to a slot
-  void assignCamera(int slotCode, String cameraId) {
-    if (_currentLayout == null) return;
-    
-    // Check if the slot exists in the current layout
-    final slotExists = _currentLayout!.cameraLocations
-        .any((loc) => loc.cameraCode == slotCode);
-    
-    if (slotExists) {
-      // Remove camera if it's already assigned to another slot
-      _cameraAssignments.removeWhere((_, id) => id == cameraId);
-      
-      // Assign the camera to the slot
+  /// Get the camera ID assigned to a slot, or null if no camera is assigned
+  String? getCameraForSlot(int slotCode) {
+    return _cameraAssignments[slotCode];
+  }
+  
+  /// Assign a camera to a slot
+  void setCameraForSlot(int slotCode, String? cameraId) {
+    if (_cameraAssignments[slotCode] != cameraId) {
       _cameraAssignments[slotCode] = cameraId;
       notifyListeners();
     }
   }
   
-  // Remove a camera from a slot
-  void removeCamera(int slotCode) {
-    if (_cameraAssignments.containsKey(slotCode)) {
-      _cameraAssignments.remove(slotCode);
-      notifyListeners();
-    }
-  }
-  
-  // Clear all camera assignments
-  void clearAllAssignments() {
-    _cameraAssignments.clear();
+  /// Swap cameras between two slots
+  void swapCameras(int slotCode1, int slotCode2) {
+    final cam1 = _cameraAssignments[slotCode1];
+    final cam2 = _cameraAssignments[slotCode2];
+    
+    _cameraAssignments[slotCode1] = cam2;
+    _cameraAssignments[slotCode2] = cam1;
+    
     notifyListeners();
   }
   
-  // Get camera assigned to a specific slot
-  String? getCameraForSlot(int slotCode) {
-    return _cameraAssignments[slotCode];
+  /// Get the number of slots that have cameras assigned
+  int getAssignedCameraCount() {
+    return _cameraAssignments.values.where((cameraId) => cameraId != null).length;
   }
   
-  // Set the current page
-  void setPage(int page) {
-    if (page >= 0) {
-      _currentPage = page;
-      notifyListeners();
-    }
-  }
-  
-  // Get number of pages based on available cameras
-  int getPageCount(List<CameraDevice> cameras) {
-    return (cameras.length / _camerasPerPage).ceil();
-  }
-  
-  // Get cameras for the current page
-  List<CameraDevice> getCamerasForCurrentPage(List<CameraDevice> allCameras) {
-    final startIndex = _currentPage * _camerasPerPage;
-    final endIndex = startIndex + _camerasPerPage;
-    
-    if (startIndex >= allCameras.length) {
-      return [];
-    }
-    
-    return allCameras.sublist(
-      startIndex,
-      endIndex > allCameras.length ? allCameras.length : endIndex,
-    );
+  /// Clear all camera assignments
+  void clearAllAssignments() {
+    _cameraAssignments.clear();
+    notifyListeners();
   }
 }
