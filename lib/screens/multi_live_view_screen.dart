@@ -16,7 +16,8 @@ class MultiLiveViewScreen extends StatefulWidget {
 }
 
 class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
-  static const int maxCamerasPerPage = 32;
+  // Maximum number of cameras per page according to requirements
+  static const int maxCamerasPerPage = 20;
   
   // State variables
   List<Camera> _availableCameras = [];
@@ -27,7 +28,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
   final List<bool> _errorStates = List.filled(maxCamerasPerPage, false);
   int _currentPage = 0;
   int _totalPages = 1;
-  int _gridColumns = 2; // Default grid columns
+  int _gridColumns = 4; // Default grid columns for desktop
   
   @override
   void initState() {
