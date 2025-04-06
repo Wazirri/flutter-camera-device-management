@@ -27,6 +27,10 @@ class WebSocketProvider with ChangeNotifier {
   // System info stream controller
   final _systemInfoController = StreamController<SystemInfo>.broadcast();
 
+  // Message log functionality
+  final List<String> _messageLog = [];
+  bool _isLocalServerMode = false;
+
   // Connection settings
   String _serverIp = '85.104.114.145';
   int _serverPort = 1200;
@@ -50,6 +54,7 @@ class WebSocketProvider with ChangeNotifier {
       // Use local server if running on desktop
       _serverIp = 'localhost';
       _serverPort = 5000;
+      _isLocalServerMode = true;
       debugPrint('Running on desktop platform, using local server at $_serverIp:$_serverPort');
     }
   }
@@ -64,6 +69,30 @@ class WebSocketProvider with ChangeNotifier {
   String get serverIp => _serverIp;
   int get serverPort => _serverPort;
   bool get rememberMe => _rememberMe;
+  bool get isLocalServerMode => _isLocalServerMode;
+  List<String> get messageLog => List.unmodifiable(_messageLog);
+
+  // Clear message log
+  void clearLog() {
+    _messageLog.clear();
+    notifyListeners();
+  }
+
+  // Add message to log
+  void _logMessage(String message) {
+    // Add timestamp to message
+    final timestamp = DateTime.now().toString().split('.').first;
+    final logEntry = '[$timestamp] $message';
+    
+    _messageLog.add(logEntry);
+    
+    // Keep log size manageable (max 100 messages)
+    if (_messageLog.length > 100) {
+      _messageLog.removeAt(0);
+    }
+    
+    notifyListeners();
+  }
 
   // Connect to WebSocket server
   Future<bool> connect(String serverIp, int serverPort,
@@ -92,6 +121,7 @@ class WebSocketProvider with ChangeNotifier {
       final wsScheme = _isSecureConnection() ? 'wss' : 'ws';
       final url = '$wsScheme://$_serverIp:$_serverPort/ws';
       debugPrint('Connecting to WebSocket: $url');
+      _logMessage('Connecting to $url');
 
       // Connect to WebSocket server
       _socket = await WebSocket.connect(url).timeout(
@@ -111,6 +141,7 @@ class WebSocketProvider with ChangeNotifier {
 
       _isConnected = true;
       _isConnecting = false;
+      _logMessage('Connected successfully');
       notifyListeners();
 
       // Start heartbeat
@@ -136,8 +167,10 @@ class WebSocketProvider with ChangeNotifier {
     if (_socket != null) {
       try {
         await _socket!.close();
+        _logMessage('Disconnected from server');
       } catch (e) {
         debugPrint('Error closing socket: $e');
+        _logMessage('Error closing socket: $e');
       }
       _socket = null;
     }
@@ -151,6 +184,7 @@ class WebSocketProvider with ChangeNotifier {
   Future<bool> login(String username, String password, [bool rememberMe = false]) async {
     if (!_isConnected || _socket == null) {
       _errorMessage = 'Not connected to server';
+      _logMessage('Login failed: Not connected to server');
       notifyListeners();
       return false;
     }
@@ -168,12 +202,14 @@ class WebSocketProvider with ChangeNotifier {
       // Send login command
       final loginCommand = 'LOGIN "$username" "$password"';
       _socket!.add(loginCommand);
+      _logMessage('Sending login request');
 
       // Wait for login response (handled in _handleMessage)
       // We'll return true for now and let the message handler update the state
       return true;
     } catch (e) {
       _errorMessage = 'Login error: $e';
+      _logMessage('Login error: $e');
       notifyListeners();
       return false;
     }
@@ -183,6 +219,7 @@ class WebSocketProvider with ChangeNotifier {
   void startEcsMonitoring() {
     if (_isConnected && _isLoggedIn && _socket != null) {
       _socket!.add('DO MONITORECS');
+      _logMessage('Started ECS monitoring');
     }
   }
 
@@ -190,6 +227,10 @@ class WebSocketProvider with ChangeNotifier {
   void _handleMessage(dynamic message) {
     try {
       if (message is String) {
+        // Log the message (truncate if too long)
+        final logMsg = message.length > 500 ? '${message.substring(0, 500)}...' : message;
+        _logMessage('Received: $logMsg');
+        
         if (message == 'PONG') {
           // Handle heartbeat response
           return;
@@ -205,6 +246,7 @@ class WebSocketProvider with ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error handling message: $e');
+      _logMessage('Error handling message: $e');
     }
   }
 
@@ -218,6 +260,7 @@ class WebSocketProvider with ChangeNotifier {
           // Login required or failed
           _isLoggedIn = false;
           _errorMessage = jsonData['msg'] ?? 'Login required';
+          _logMessage('Login status: $_errorMessage');
           notifyListeners();
           break;
 
@@ -225,6 +268,7 @@ class WebSocketProvider with ChangeNotifier {
           // Login successful
           _isLoggedIn = true;
           _errorMessage = '';
+          _logMessage('Login successful');
           notifyListeners();
 
           // Start monitoring after successful login
@@ -235,6 +279,7 @@ class WebSocketProvider with ChangeNotifier {
           // System information update
           _systemInfo = SystemInfo.fromJson(jsonData);
           _systemInfoController.add(_systemInfo!);
+          _logMessage('Received system info update');
           notifyListeners();
           break;
 
@@ -242,11 +287,13 @@ class WebSocketProvider with ChangeNotifier {
           // Forward camera device updates to the CameraDevicesProvider
           if (_cameraDevicesProvider != null) {
             _cameraDevicesProvider!.processWebSocketMessage(jsonData);
+            _logMessage('Received camera device update');
           }
           break;
 
         default:
           debugPrint('Unknown command: $command');
+          _logMessage('Received unknown command: $command');
           break;
       }
     }
@@ -255,6 +302,7 @@ class WebSocketProvider with ChangeNotifier {
   // Handle WebSocket disconnection
   void _handleDisconnect() {
     debugPrint('WebSocket disconnected');
+    _logMessage('WebSocket disconnected');
     _isConnected = false;
     _isLoggedIn = false;
     notifyListeners();
@@ -266,6 +314,7 @@ class WebSocketProvider with ChangeNotifier {
   // Handle WebSocket errors
   void _handleError(dynamic error) {
     debugPrint('WebSocket error: $error');
+    _logMessage('WebSocket error: $error');
     _errorMessage = error.toString();
     _isConnected = false;
     _isConnecting = false;
@@ -283,8 +332,10 @@ class WebSocketProvider with ChangeNotifier {
       if (_isConnected && _socket != null) {
         try {
           _socket!.add('PING');
+          _logMessage('Sending heartbeat ping');
         } catch (e) {
           debugPrint('Error sending heartbeat: $e');
+          _logMessage('Error sending heartbeat: $e');
           _handleDisconnect();
         }
       } else {
@@ -308,6 +359,7 @@ class WebSocketProvider with ChangeNotifier {
       _reconnectTimer = Timer(const Duration(seconds: 5), () {
         if (!_isConnected && !_isConnecting) {
           debugPrint('Attempting to reconnect...');
+          _logMessage('Attempting to reconnect...');
           connect(_serverIp, _serverPort,
               username: _lastUsername,
               password: _lastPassword,
@@ -367,6 +419,7 @@ class WebSocketProvider with ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error loading settings: $e');
+      _logMessage('Error loading settings: $e');
     }
   }
 
@@ -390,6 +443,7 @@ class WebSocketProvider with ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error saving settings: $e');
+      _logMessage('Error saving settings: $e');
     }
   }
 
@@ -408,6 +462,7 @@ class WebSocketProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('Error clearing credentials: $e');
+      _logMessage('Error clearing credentials: $e');
     }
   }
 

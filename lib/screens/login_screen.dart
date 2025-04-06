@@ -444,11 +444,13 @@ class _LoginScreenState extends State<LoginScreen> {
         final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
         
         // Connect to WebSocket
+        final serverPortInt = int.tryParse(serverPort) ?? 1200;
         final connected = await webSocketProvider.connect(
           serverAddress,
-          serverPort,
-          username,
-          password,
+          serverPortInt,
+          username: username,
+          password: password,
+          rememberMe: _rememberMe,
         );
         
         if (connected) {
