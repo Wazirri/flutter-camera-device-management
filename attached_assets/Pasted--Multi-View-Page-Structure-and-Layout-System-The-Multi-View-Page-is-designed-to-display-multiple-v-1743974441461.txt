@@ -1,0 +1,53 @@
+📺 Multi View Page Structure and Layout System
+The Multi View Page is designed to display multiple video streams (camera feeds) simultaneously, using a flexible, JSON-driven layout system. Each layout defines where and how each video player (slot) is positioned on the screen.
+
+🔧 What is the JSON Layout?
+The layout configuration is defined using a JSON structure. This structure includes:
+
+layoutCode: A unique identifier for each layout template.
+
+maxCameraNumber: The total number of camera feeds that can be displayed in the layout.
+
+cameraLoc: An array of objects, where each object defines the position of a video slot using four values:
+
+x1, y1: Top-left corner of the slot (in percentage).
+
+x2, y2: Bottom-right corner of the slot (in percentage).
+
+These coordinates range from 0 to 100 and represent percentages of the container (window) size.
+
+📐 Coordinate Scaling: How to Render the Layout
+Each slot’s coordinates in the layout JSON must be scaled proportionally to the actual dimensions of the container (e.g., window or video wall size).
+This means:
+
+
+slot_pixel_x1 = (x1 / 100) * container_width
+slot_pixel_y1 = (y1 / 100) * container_height
+slot_pixel_x2 = (x2 / 100) * container_width
+slot_pixel_y2 = (y2 / 100) * container_height
+This ensures the layout is responsive and fits perfectly on any screen size or resolution.
+
+🧩 Slot Mapping and UI Rendering
+Each camera slot (video player) must be rendered based on the coordinates from the layout JSON:
+
+The number of video slots must match maxCameraNumber.
+
+Each slot must be placed according to the calculated pixel coordinates from cameraLoc.
+
+Slot positions must respect the layout exactly to maintain consistency and visual clarity.
+
+📄 Multi View Page Features
+Dynamic Layout Per Page
+The Multi View Page can contain multiple sub-pages. Each page can have a different layout template.
+
+Flexible Camera Assignment
+Cameras can be assigned to any slot on any page, depending on operational requirements.
+
+Scalability from 1 to 36 Cameras
+Layouts are available for camera counts ranging from 1 to 36, including both symmetric (grid-based) and asymmetric (custom) layouts.
+
+✅ Summary
+The Multi View system relies on layout JSON files that define how many cameras to display and where each player should be positioned. The coordinates in the JSON are percent-based, and must be scaled according to the actual window size during rendering. Each page within the Multi View interface can adopt a different layout, making the system powerful, flexible, and adaptable to various surveillance or monitoring needs.
+
+
+This part is just about UI, do not change anything at other pages, only change Multi View Page, Here are summaries;  1-  we should able to choose layout code from settings, UI should show cameras according to layout, and we should be able to 10 pagination for Multi View Camera page, and can choose layout for each, it can be same or different.  2- layout should be set according to windows size for Multi View Page.  3- Do not change any code about web socket
