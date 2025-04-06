@@ -7,6 +7,7 @@ import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
 import '../utils/responsive_helper.dart';
+import 'dart:math' as math;
 
 class MultiLiveViewScreen extends StatefulWidget {
   const MultiLiveViewScreen({Key? key}) : super(key: key);
@@ -16,7 +17,7 @@ class MultiLiveViewScreen extends StatefulWidget {
 }
 
 class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
-  // Maximum number of cameras per page according to requirements
+  // Maximum number of cameras per page (requirement: 20 per page)
   static const int maxCamerasPerPage = 20;
   
   // State variables
@@ -77,21 +78,71 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     setState(() {
       _availableCameras = cameras;
       _totalPages = (cameras.length / maxCamerasPerPage).ceil();
+      if (_totalPages == 0) _totalPages = 1; // Always have at least one page
       
-      // Initialize all slots with available cameras
-      for (int i = 0; i < maxCamerasPerPage && i < cameras.length; i++) {
-        _selectCameraForSlot(i, cameras[i]);
-      }
+      // Initialize slots with available cameras for the current page
+      _loadCamerasForCurrentPage();
     });
     
     // Adjust grid columns based on screen size
+    _updateGridColumnsBasedOnScreenSize();
+  }
+  
+  // Method to update grid columns based on screen size
+  void _updateGridColumnsBasedOnScreenSize() {
     final screenWidth = MediaQuery.of(context).size.width;
-    if (screenWidth > 1200) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    
+    // Calculate available height for the grid
+    final appBarHeight = AppBar().preferredSize.height;
+    final bottomNavHeight = 56.0; // Estimated height for bottom navigation
+    final paginationControlsHeight = 60.0; // Estimated height for pagination controls
+    
+    // Calculate available height for the grid (excluding app bar, pagination controls, and bottom nav)
+    final availableHeight = screenHeight - appBarHeight - (_totalPages > 1 ? paginationControlsHeight : 0) - bottomNavHeight;
+    
+    // Calculate optimal columns based on available space and 16:9 aspect ratio
+    if (screenWidth > 1400) {
+      _gridColumns = 5;
+    } else if (screenWidth > 1100) {
       _gridColumns = 4;
     } else if (screenWidth > 800) {
       _gridColumns = 3;
-    } else {
+    } else if (screenWidth > 500) {
       _gridColumns = 2;
+    } else {
+      _gridColumns = 1;
+    }
+    
+    // Calculate the number of rows based on maxCamerasPerPage and columns
+    final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
+    
+    // If the rows don't fit, reduce columns to ensure they fit within available height
+    final cellWidth = (screenWidth - 16) / _gridColumns; // Account for padding
+    final cellHeight = cellWidth * 9 / 16; // 16:9 aspect ratio
+    final totalGridHeight = cellHeight * rowsNeeded + (rowsNeeded - 1) * 8; // Account for spacing
+    
+    if (totalGridHeight > availableHeight && _gridColumns > 1) {
+      _gridColumns -= 1;
+    }
+  }
+  
+  // Method to load cameras for the current page
+  void _loadCamerasForCurrentPage() {
+    // Clear all slots
+    for (int i = 0; i < maxCamerasPerPage; i++) {
+      if (_selectedCameras[i] != null) {
+        _players[i].stop();
+      }
+      _selectedCameras[i] = null;
+      _errorStates[i] = false;
+      _loadingStates[i] = false;
+    }
+    
+    // Fill slots with cameras from the current page
+    final startIndex = _currentPage * maxCamerasPerPage;
+    for (int i = 0; i < maxCamerasPerPage && startIndex + i < _availableCameras.length; i++) {
+      _selectCameraForSlot(i, _availableCameras[startIndex + i]);
     }
   }
   
@@ -168,7 +219,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                     ],
                   ),
                 ),
-                Divider(),
+                const Divider(),
                 Expanded(
                   child: ListView.builder(
                     controller: scrollController,
@@ -225,7 +276,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                   ),
                 ),
                 // Option to clear the slot
-                Divider(),
+                const Divider(),
                 ListTile(
                   leading: const Icon(Icons.delete_outline),
                   title: const Text('Clear this slot'),
@@ -245,28 +296,9 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
   void _changePage(int page) {
     if (page < 0 || page >= _totalPages) return;
     
-    // Stop all current players
-    for (int i = 0; i < maxCamerasPerPage; i++) {
-      if (_selectedCameras[i] != null) {
-        _players[i].stop();
-      }
-    }
-    
     setState(() {
       _currentPage = page;
-      
-      // Clear all slots
-      for (int i = 0; i < maxCamerasPerPage; i++) {
-        _selectedCameras[i] = null;
-        _errorStates[i] = false;
-        _loadingStates[i] = false;
-      }
-      
-      // Fill slots with cameras from the new page
-      final startIndex = page * maxCamerasPerPage;
-      for (int i = 0; i < maxCamerasPerPage && startIndex + i < _availableCameras.length; i++) {
-        _selectCameraForSlot(i, _availableCameras[startIndex + i]);
-      }
+      _loadCamerasForCurrentPage();
     });
   }
   
@@ -288,6 +320,28 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = ResponsiveHelper.isDesktop(context);
+    final size = MediaQuery.of(context).size;
+    
+    // Calculate available height for the grid
+    final appBarHeight = AppBar().preferredSize.height;
+    final paginationControlsHeight = _totalPages > 1 ? 60.0 : 0.0;
+    final bottomNavHeight = 56.0;
+    
+    // Calculate available height for the grid
+    final availableHeight = size.height - appBarHeight - paginationControlsHeight - bottomNavHeight;
+    
+    // Calculate number of rows based on the number of cameras and columns
+    final displayedCameras = _availableCameras.isEmpty ? 
+        maxCamerasPerPage : 
+        math.min(maxCamerasPerPage, _availableCameras.length - (_currentPage * maxCamerasPerPage));
+    final rowCount = (displayedCameras / _gridColumns).ceil();
+    
+    // Calculate the cell height to ensure no vertical scrolling is needed
+    final gridHeight = availableHeight - 16; // Account for padding
+    final cellHeight = (gridHeight / rowCount) - 8; // Account for grid spacing
+    
+    // Calculate the cell width based on the 16:9 aspect ratio
+    final cellWidth = cellHeight * 16 / 9;
     
     return Scaffold(
       appBar: AppBar(
@@ -315,6 +369,10 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                 value: 4,
                 child: Text('4 columns'),
               ),
+              const PopupMenuItem(
+                value: 5,
+                child: Text('5 columns'),
+              ),
             ],
           ),
           
@@ -323,13 +381,16 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
       ),
       body: Column(
         children: [
-          // Grid view of cameras
-          Expanded(
+          // Fixed-height grid view of cameras (non-scrollable)
+          Container(
+            height: gridHeight,
             child: GridView.builder(
               padding: const EdgeInsets.all(8.0),
+              physics: const NeverScrollableScrollPhysics(), // Prevent scrolling
+              shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _gridColumns,
-                childAspectRatio: 16 / 9,
+                childAspectRatio: 16 / 9, // Maintain 16:9 aspect ratio
                 crossAxisSpacing: 8,
                 mainAxisSpacing: 8,
               ),
@@ -491,12 +552,57 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                         ? () => _changePage(_currentPage - 1)
                         : null,
                   ),
-                  const SizedBox(width: 16),
-                  Text(
-                    'Page ${_currentPage + 1} of $_totalPages',
-                    style: Theme.of(context).textTheme.titleMedium,
+                  
+                  // Page indicator with numbers
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (int i = 0; i < _totalPages; i++)
+                        if (i == _currentPage)
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppTheme.primaryColor,
+                            ),
+                            child: Center(
+                              child: Text(
+                                '${i + 1}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          )
+                        else
+                          InkWell(
+                            onTap: () => _changePage(i),
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppTheme.primaryColor.withOpacity(0.5),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '${i + 1}',
+                                  style: TextStyle(
+                                    color: AppTheme.primaryColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
+                  
                   IconButton(
                     icon: const Icon(Icons.arrow_forward_ios),
                     onPressed: _currentPage < _totalPages - 1
@@ -511,4 +617,3 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     );
   }
 }
-
