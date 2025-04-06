@@ -49,7 +49,7 @@ class WebSocketProvider with ChangeNotifier {
   // Detect platform and use local server if desktop
   bool _isDesktop = false;
   void _detectPlatform() {
-    _isDesktop = !kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
+    _isDesktop = Platform.isWindows || Platform.isMacOS || Platform.isLinux;
     if (_isDesktop) {
       // Use local server if running on desktop
       _serverIp = 'localhost';
