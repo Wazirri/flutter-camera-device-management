@@ -95,54 +95,62 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     
     // Calculate available height for the grid
     final appBarHeight = AppBar().preferredSize.height;
-    final bottomNavHeight = 56.0; // Estimated height for bottom navigation
+    final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0; // Only for mobile
     final paginationControlsHeight = 60.0; // Estimated height for pagination controls
     
     // Calculate available height for the grid (excluding app bar, pagination controls, and bottom nav)
-    final availableHeight = screenHeight - appBarHeight - (_totalPages > 1 ? paginationControlsHeight : 0) - bottomNavHeight;
+    final availableHeight = screenHeight - appBarHeight - (_totalPages > 1 ? paginationControlsHeight : 0) - bottomNavHeight - 32; // Add extra padding
     
-    // Calculate optimal columns based on available space and 16:9 aspect ratio
+    // First, determine max possible columns based on screen width
+    int maxColumns;
     if (screenWidth > 1400) {
-      _gridColumns = 5;
+      maxColumns = 5;
     } else if (screenWidth > 1100) {
-      _gridColumns = 4;
+      maxColumns = 4;
     } else if (screenWidth > 800) {
-      _gridColumns = 3;
+      maxColumns = 3;
     } else if (screenWidth > 500) {
-      _gridColumns = 2;
+      maxColumns = 2;
     } else {
-      _gridColumns = 1;
+      maxColumns = 1;
     }
     
-    // Calculate the number of rows based on maxCamerasPerPage and columns
-    final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
+    // Start with max columns and adjust down if needed to fit height
+    _gridColumns = maxColumns;
     
-    // If the rows don't fit, reduce columns to ensure they fit within available height
-    final cellWidth = (screenWidth - 16) / _gridColumns; // Account for padding
-    final cellHeight = cellWidth * 9 / 16; // 16:9 aspect ratio
-    final totalGridHeight = cellHeight * rowsNeeded + (rowsNeeded - 1) * 8; // Account for spacing
-    
-    if (totalGridHeight > availableHeight && _gridColumns > 1) {
-      _gridColumns -= 1;
+    // Iteratively check if all cameras fit within the available height
+    bool fitsInHeight = false;
+    while (!fitsInHeight && _gridColumns > 1) {
+      // Calculate the number of rows needed for current column count
+      final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
+      
+      // Calculate cell dimensions based on 16:9 aspect ratio
+      final cellWidth = (screenWidth - 32) / _gridColumns; // Account for padding
+      final cellHeight = cellWidth * 9 / 16; // 16:9 aspect ratio
+      
+      // Calculate total grid height including spacing between rows
+      final totalGridHeight = cellHeight * rowsNeeded + (rowsNeeded - 1) * 8;
+      
+      if (totalGridHeight <= availableHeight) {
+        fitsInHeight = true;
+      } else {
+        // Reduce columns if it doesn't fit
+        _gridColumns -= 1;
+      }
     }
   }
   
   // Method to load cameras for the current page
+  // We now only initialize empty slots, not override existing ones
   void _loadCamerasForCurrentPage() {
-    // Clear all slots
-    for (int i = 0; i < maxCamerasPerPage; i++) {
-      if (_selectedCameras[i] != null) {
-        _players[i].stop();
+    // For initial page load only
+    // No longer clears the slots automatically
+    if (_currentPage == 0 && _selectedCameras.every((camera) => camera == null)) {
+      // Only set up initial cameras for completely empty configuration
+      final startIndex = _currentPage * maxCamerasPerPage;
+      for (int i = 0; i < maxCamerasPerPage && startIndex + i < _availableCameras.length; i++) {
+        _selectCameraForSlot(i, _availableCameras[startIndex + i]);
       }
-      _selectedCameras[i] = null;
-      _errorStates[i] = false;
-      _loadingStates[i] = false;
-    }
-    
-    // Fill slots with cameras from the current page
-    final startIndex = _currentPage * maxCamerasPerPage;
-    for (int i = 0; i < maxCamerasPerPage && startIndex + i < _availableCameras.length; i++) {
-      _selectCameraForSlot(i, _availableCameras[startIndex + i]);
     }
   }
   
@@ -209,7 +217,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Slot ${slot + 1} - Select Camera',
+                        'Slot ${slot + 1} (Sayfa ${_currentPage + 1}) - Kamera Seç',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       IconButton(
@@ -220,13 +228,32 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                   ),
                 ),
                 const Divider(),
+                // Search field for cameras
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Kamera ara...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onChanged: (value) {
+                      // Burada arama fonksiyonu eklenebilir
+                    },
+                  ),
+                ),
                 Expanded(
                   child: ListView.builder(
                     controller: scrollController,
+                    // Tüm kameraları göster - sayfa kısıtlaması olmadan
                     itemCount: _availableCameras.length,
                     itemBuilder: (context, index) {
                       final camera = _availableCameras[index];
-                      final isSelected = _selectedCameras.contains(camera);
+                      // Belirli slotta bu kameranın seçili olup olmadığını kontrol et
+                      final isSelected = _selectedCameras[slot] == camera;
                       
                       return ListTile(
                         leading: Container(
@@ -260,12 +287,22 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                         title: Text(camera.name),
                         subtitle: Text(
                           camera.connected
-                              ? 'Connected (${camera.ip})'
-                              : 'Disconnected (${camera.ip})',
+                              ? 'Bağlı (${camera.ip})'
+                              : 'Bağlantı yok (${camera.ip})',
                         ),
-                        trailing: camera.connected
-                            ? const Icon(Icons.link, color: Colors.green)
-                            : const Icon(Icons.link_off, color: Colors.red),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            camera.connected
+                                ? const Icon(Icons.link, color: Colors.green)
+                                : const Icon(Icons.link_off, color: Colors.red),
+                            if (isSelected)
+                              const Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: Icon(Icons.check_circle, color: Colors.green),
+                              )
+                          ],
+                        ),
                         selected: isSelected,
                         onTap: () {
                           _selectCameraForSlot(slot, camera);
@@ -279,7 +316,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                 const Divider(),
                 ListTile(
                   leading: const Icon(Icons.delete_outline),
-                  title: const Text('Clear this slot'),
+                  title: const Text('Bu slotu temizle'),
                   onTap: () {
                     _clearSlot(slot);
                     Navigator.of(context).pop();
@@ -298,7 +335,8 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     
     setState(() {
       _currentPage = page;
-      _loadCamerasForCurrentPage();
+      // Do not load cameras automatically - we want to keep the player configuration
+      // between pages and allow manual assignment of cameras to any slot
     });
   }
   
@@ -382,6 +420,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
       body: Column(
         children: [
           // Fixed-height grid view of cameras (non-scrollable)
+          // Ensuring all players fit within the screen with proper aspect ratio
           Container(
             height: gridHeight,
             child: GridView.builder(
