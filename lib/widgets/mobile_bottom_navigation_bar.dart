@@ -239,18 +239,10 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
 
                 _buildAnimatedMoreMenuItem(
                   context,
-                  Icon(Icons.grid_3x3, color: AppTheme.accentColor),
-                  'Advanced Multi View',
-                  '/multi-live-view-new',
-                  1,
-                ),
-
-                _buildAnimatedMoreMenuItem(
-                  context,
                   Icon(Icons.settings, color: AppTheme.primaryColor),
                   'Settings',
                   '/settings',
-                  2,
+                  1,
                 ),
                 
                 _buildAnimatedMoreMenuItem(
@@ -258,7 +250,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                   Icon(Icons.feed, color: AppTheme.accentColor),
                   'WebSocket Logs',
                   '/websocket-logs',
-                  3,
+                  2,
                 ),
                 
                 const Padding(
@@ -271,7 +263,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                   Icon(Icons.logout, color: Colors.red),
                   'Logout',
                   '/login',
-                  4,
+                  3,
                   textColor: Colors.red,
                 ),
                 
