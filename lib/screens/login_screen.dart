@@ -114,10 +114,11 @@ class _LoginScreenState extends State<LoginScreen> {
       
       // Connect to WebSocket server
       final connected = await webSocketProvider.connect(
-        serverAddress: _serverAddressController.text,
-        serverPort: _serverPortController.text,
+        _serverAddressController.text,
+        int.parse(_serverPortController.text),
         username: _emailController.text,
         password: _passwordController.text,
+        rememberMe: _rememberMe,
       );
 
       if (connected && mounted) {
@@ -189,14 +190,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       // Logo or header
-                      Image.asset(
-                        'assets/images/logo.png',
-                        height: 100,
-                        errorBuilder: (context, error, stackTrace) => const Icon(
-                          Icons.camera_alt,
-                          size: 80,
-                          color: AppTheme.primaryColor,
-                        ),
+                      Icon(
+                        Icons.camera_alt,
+                        size: 80,
+                        color: AppTheme.primaryColor,
                       ),
                       const SizedBox(height: 24),
                       Text(

@@ -15,6 +15,9 @@ class AppTheme {
   static const Color darkError = Color(0xFFCF6679);
   static const Color darkBorder = Color(0xFF2A2A2A);
   
+  // Added for backward compatibility
+  static Color get darkBackgroundColor => darkBackground;
+  
   // Text colors
   static const Color darkTextPrimary = Colors.white;
   static const Color darkTextSecondary = Color(0xFFB3B3B3);
