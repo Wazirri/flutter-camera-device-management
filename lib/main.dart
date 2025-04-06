@@ -13,7 +13,8 @@ import 'screens/login_screen.dart';
 import 'screens/record_view_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
-import 'screens/multi_live_view_screen.dart';  // New multi-camera view screen
+import 'screens/multi_live_view_screen.dart';  // Original multi-camera view screen
+import 'screens/multi_live_view_screen_new.dart';  // New layout-based multi-camera view screen
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
 import 'utils/page_transitions.dart';
@@ -21,6 +22,7 @@ import 'widgets/desktop_side_menu.dart';
 import 'widgets/mobile_bottom_navigation_bar.dart';
 import 'providers/websocket_provider.dart';
 import 'providers/camera_devices_provider.dart';
+import 'providers/multi_view_layout_provider.dart';
 
 Future<void> main() async {
   // This captures errors that happen during initialization
@@ -53,6 +55,7 @@ Future<void> main() async {
     // Create providers first
     final webSocketProvider = WebSocketProvider();
     final cameraDevicesProvider = CameraDevicesProvider();
+    final multiViewLayoutProvider = MultiViewLayoutProvider();
     
     // Connect the providers
     webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
@@ -63,6 +66,7 @@ Future<void> main() async {
         providers: [
           ChangeNotifierProvider<WebSocketProvider>.value(value: webSocketProvider),
           ChangeNotifierProvider<CameraDevicesProvider>.value(value: cameraDevicesProvider),
+          ChangeNotifierProvider<MultiViewLayoutProvider>.value(value: multiViewLayoutProvider),
         ],
         child: const MyApp(),
       ),
@@ -177,10 +181,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             }
             // Slide up transition for recordings
             return AppPageTransitions.slideUp(page);
+            
           case '/multi-live-view':
             page = AppShell(
               currentRoute: settings.name ?? '/multi-live-view',
               child: const MultiLiveViewScreen(),
+            );
+            return AppPageTransitions.sharedAxisHorizontal(page);
+            
+          case '/multi-live-view-new':
+            page = AppShell(
+              currentRoute: settings.name ?? '/multi-live-view-new',
+              child: const MultiLiveViewScreenNew(),
             );
             return AppPageTransitions.sharedAxisHorizontal(page);
             

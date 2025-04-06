@@ -36,6 +36,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/layouts/
   
   # Using system fonts instead of custom fonts for simplicity
   # fonts:
