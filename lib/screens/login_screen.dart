@@ -228,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
             controller: _serverAddressController,
             keyboardType: TextInputType.text,
             decoration: const InputDecoration(
-              hintText: 'Enter server address',
+              hintText: '85.104.114.145',
               prefixIcon: Icon(Icons.dns_outlined),
             ),
             validator: (value) {
@@ -253,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
             controller: _serverPortController,
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(
-              hintText: 'Enter server port',
+              hintText: '1200',
               prefixIcon: Icon(Icons.settings_ethernet_outlined),
             ),
             validator: (value) {
@@ -282,7 +282,7 @@ class _LoginScreenState extends State<LoginScreen> {
             controller: _emailController,
             keyboardType: TextInputType.text,
             decoration: const InputDecoration(
-              hintText: 'Enter your username',
+              hintText: 'admin',
               prefixIcon: Icon(Icons.person_outline),
             ),
             validator: (value) {
