@@ -17,8 +17,8 @@ class MultiLiveViewScreen extends StatefulWidget {
 }
 
 class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
-  // Maximum number of cameras per page (increased from 20 to 36 for more flexibility)
-  static const int maxCamerasPerPage = 36;
+  // Maximum number of cameras per page (requirement: 20 per page)
+  static const int maxCamerasPerPage = 20;
   
   // State variables
   List<Camera> _availableCameras = [];
@@ -235,7 +235,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Slot ${slot + 1} (Sayfa ${_currentPage + 1}) - Kamera Seç (Aynı kamera birden fazla slotta kullanılabilir)',
+                        'Slot ${slot + 1} (Sayfa ${_currentPage + 1}) - Kamera Seç',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       IconButton(
@@ -246,15 +246,6 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                   ),
                 ),
                 const Divider(),
-                // Note about duplicating cameras
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-                  child: Text(
-                    'Not: Aynı kamera birden fazla slotta gösterilebilir.',
-                    style: TextStyle(color: Theme.of(context).hintColor, fontStyle: FontStyle.italic),
-                  ),
-                ),
-
                 // Search field for cameras
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -279,7 +270,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                     itemCount: _availableCameras.length,
                     itemBuilder: (context, index) {
                       final camera = _availableCameras[index];
-                      // Belirli slotta bu kameranın seçili olup olmadığını kontrol et (aynı kamera birden çok slotta olabilir)
+                      // Belirli slotta bu kameranın seçili olup olmadığını kontrol et
                       final isSelected = _selectedCameras[slot] == camera;
                       
                       return ListTile(
@@ -342,8 +333,8 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                 // Option to clear the slot
                 const Divider(),
                 ListTile(
-                  leading: const Icon(Icons.delete_outline, color: Colors.red),
-                  title: const Text('Bu slotu temizle', style: TextStyle(color: Colors.red)),
+                  leading: const Icon(Icons.delete_outline),
+                  title: const Text('Bu slotu temizle'),
                   onTap: () {
                     _clearSlot(slot);
                     Navigator.of(context).pop();
@@ -424,27 +415,23 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 1,
-                child: Text('1 sütun (tam ekran)'),
+                child: Text('1 column'),
               ),
               const PopupMenuItem(
                 value: 2,
-                child: Text('2 sütun'),
+                child: Text('2 columns'),
               ),
               const PopupMenuItem(
                 value: 3,
-                child: Text('3 sütun'),
+                child: Text('3 columns'),
               ),
               const PopupMenuItem(
                 value: 4,
-                child: Text('4 sütun (önerilen)'),
+                child: Text('4 columns'),
               ),
               const PopupMenuItem(
                 value: 5,
-                child: Text('5 sütun'),
-              ),
-              const PopupMenuItem(
-                value: 6,
-                child: Text('6 sütun (küçük ekranlar)'),
+                child: Text('5 columns'),
               ),
             ],
           ),
