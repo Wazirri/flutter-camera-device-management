@@ -21,6 +21,7 @@ import 'widgets/desktop_side_menu.dart';
 import 'widgets/mobile_bottom_navigation_bar.dart';
 import 'providers/websocket_provider.dart';
 import 'providers/camera_devices_provider.dart';
+import 'providers/multi_view_layout_provider.dart';
 
 Future<void> main() async {
   // This captures errors that happen during initialization
@@ -53,6 +54,7 @@ Future<void> main() async {
     // Create providers first
     final webSocketProvider = WebSocketProvider();
     final cameraDevicesProvider = CameraDevicesProvider();
+    final multiViewLayoutProvider = MultiViewLayoutProvider();
     
     // Connect the providers
     webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
@@ -63,6 +65,7 @@ Future<void> main() async {
         providers: [
           ChangeNotifierProvider<WebSocketProvider>.value(value: webSocketProvider),
           ChangeNotifierProvider<CameraDevicesProvider>.value(value: cameraDevicesProvider),
+          ChangeNotifierProvider<MultiViewLayoutProvider>.value(value: multiViewLayoutProvider),
         ],
         child: const MyApp(),
       ),

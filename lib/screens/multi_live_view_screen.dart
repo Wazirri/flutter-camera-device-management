@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import '../providers/camera_devices_provider.dart';
+import '../providers/multi_view_layout_provider.dart';
 import '../models/camera_device.dart';
+import '../models/camera_layout.dart';
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
 import '../utils/responsive_helper.dart';
@@ -30,6 +32,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
   int _currentPage = 0;
   int _totalPages = 1;
   int _gridColumns = 4; // Default grid columns for desktop
+  CameraLayout _currentLayout = CameraLayout(name: 'Default', id: 4, rows: 5, columns: 4, slots: 20, description: 'Default layout');
   
   @override
   void initState() {
@@ -75,6 +78,13 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
     final cameras = cameraProvider.cameras;
     
+    // Get layout from provider if available
+    final layoutProvider = Provider.of<MultiViewLayoutProvider>(context, listen: false);
+    if (layoutProvider.currentLayout != null) {
+      _currentLayout = layoutProvider.currentLayout!;
+      _gridColumns = _currentLayout.columns;
+    }
+    
     setState(() {
       _availableCameras = cameras;
       _totalPages = (cameras.length / maxCamerasPerPage).ceil();
@@ -87,281 +97,50 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     // Adjust grid columns based on screen size
     _updateGridColumnsBasedOnScreenSize();
   }
-  
-  // Method to update grid columns based on screen size
-  void _updateGridColumnsBasedOnScreenSize() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    
-    // Calculate available height for the grid
-    final appBarHeight = AppBar().preferredSize.height;
-    final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0; // Only for mobile
-    final paginationControlsHeight = 60.0; // Estimated height for pagination controls
-    
-    // Calculate available height for the grid (excluding app bar, pagination controls, and bottom nav)
-    // Add more padding to ensure we have enough space
-    final availableHeight = screenHeight - appBarHeight - (_totalPages > 1 ? paginationControlsHeight : 0) - bottomNavHeight - 48; 
-    
-    // First, determine max possible columns based on screen width
-    int maxColumns;
-    if (screenWidth > 1400) {
-      maxColumns = 5;
-    } else if (screenWidth > 1100) {
-      maxColumns = 4;
-    } else if (screenWidth > 800) {
-      maxColumns = 3;
-    } else if (screenWidth > 500) {
-      maxColumns = 2;
-    } else {
-      maxColumns = 1;
-    }
-    
-    // Start with max columns but now ensure reasonable row count
-    _gridColumns = maxColumns;
-    
-    // Calculate the number of rows needed for current column count
-    final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
-    
-    // Calculate ideal cell height based on available space and number of rows
-    final maxCellHeight = (availableHeight - ((rowsNeeded - 1) * 8)) / rowsNeeded;
-    
-    // Calculate necessary cell width to maintain 16:9 aspect ratio
-    final idealCellWidth = maxCellHeight * 16 / 9;
-    
-    // Calculate max columns that fit within screen width
-    final maxPossibleColumns = (screenWidth - 32) ~/ idealCellWidth;
-    
-    // Adjust columns to be the smaller of width-based or maxColumns
-    if (maxPossibleColumns < _gridColumns && maxPossibleColumns > 0) {
-      _gridColumns = maxPossibleColumns;
-    }
-    
-    // Safety check - if we still can't fit the content, reduce columns further
-    bool fitsInHeight = false;
-    while (!fitsInHeight && _gridColumns > 1) {
-      // Calculate the number of rows needed for current column count
-      final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
-      
-      // Calculate cell dimensions based on 16:9 aspect ratio
-      final cellWidth = (screenWidth - 32) / _gridColumns; // Account for padding
-      final cellHeight = cellWidth * 9 / 16; // 16:9 aspect ratio
-      
-      // Calculate total grid height including spacing between rows
-      final totalGridHeight = cellHeight * rowsNeeded + (rowsNeeded - 1) * 8;
-      
-      if (totalGridHeight <= availableHeight) {
-        fitsInHeight = true;
-      } else {
-        // Reduce columns if it doesn't fit
-        _gridColumns -= 1;
-      }
-    }
-  }
-  
-  // Method to load cameras for the current page
-  // We now only initialize empty slots, not override existing ones
+  // Load cameras for the current page
   void _loadCamerasForCurrentPage() {
-    // For initial page load only
-    // No longer clears the slots automatically
-    if (_currentPage == 0 && _selectedCameras.every((camera) => camera == null)) {
-      // Only set up initial cameras for completely empty configuration
-      final startIndex = _currentPage * maxCamerasPerPage;
-      for (int i = 0; i < maxCamerasPerPage && startIndex + i < _availableCameras.length; i++) {
-        _selectCameraForSlot(i, _availableCameras[startIndex + i]);
-      }
-    }
-  }
-  
-  void _selectCameraForSlot(int slot, Camera camera) {
-    if (slot < 0 || slot >= maxCamerasPerPage) return;
-    
-    setState(() {
-      // Stop current player if it's playing
-      if (_selectedCameras[slot] != null) {
-        _players[slot].stop();
-      }
+    // Clear all slots first
+    for (int i = 0; i < maxCamerasPerPage; i++) {
+      _selectedCameras[i] = null;
       
-      // Update selected camera for this slot
-      _selectedCameras[slot] = camera;
-      _errorStates[slot] = false;
-      _loadingStates[slot] = true;
-    });
+      // Stop any existing players
+      if (_players.isNotEmpty && i < _players.length) {
+        _players[i].stop();
+      }
+    }
     
-    // Start playing the new camera
-    try {
-      _players[slot].open(Media(camera.rtspUri));
-    } catch (e) {
-      print('Error playing camera $slot: $e');
-      setState(() {
-        _errorStates[slot] = true;
-        _loadingStates[slot] = false;
-      });
+    // Calculate start and end indexes for the current page
+    int startIndex = _currentPage * maxCamerasPerPage;
+    int endIndex = math.min(startIndex + maxCamerasPerPage, _availableCameras.length);
+    
+    // Only load cameras if we have any
+    if (_availableCameras.isNotEmpty) {
+      for (int i = startIndex, slotIndex = 0; i < endIndex; i++, slotIndex++) {
+        final camera = _availableCameras[i];
+        _selectedCameras[slotIndex] = camera;
+        
+        // Start streaming if camera is connected
+        if (camera.connected && _players.isNotEmpty && slotIndex < _players.length) {
+          _streamCamera(slotIndex, camera);
+        }
+      }
     }
   }
   
-  void _clearSlot(int slot) {
-    if (slot < 0 || slot >= maxCamerasPerPage) return;
+  // Stream camera at a specific slot
+  void _streamCamera(int slotIndex, Camera camera) {
+    _errorStates[slotIndex] = false; // Reset error state
     
-    // Stop the player
-    _players[slot].stop();
-    
-    setState(() {
-      _selectedCameras[slot] = null;
-      _errorStates[slot] = false;
-      _loadingStates[slot] = false;
-    });
-  }
-  
-  void _showCameraSelector(int slot) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppTheme.darkBackground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.6,
-          minChildSize: 0.3,
-          maxChildSize: 0.9,
-          expand: false,
-          builder: (context, scrollController) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Slot ${slot + 1} (Sayfa ${_currentPage + 1}) - Kamera Seç',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(),
-                // Search field for cameras
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Kamera ara...',
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    onChanged: (value) {
-                      // Burada arama fonksiyonu eklenebilir
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    // Tüm kameraları göster - sayfa kısıtlaması olmadan
-                    itemCount: _availableCameras.length,
-                    itemBuilder: (context, index) {
-                      final camera = _availableCameras[index];
-                      // Belirli slotta bu kameranın seçili olup olmadığını kontrol et
-                      final isSelected = _selectedCameras[slot] == camera;
-                      
-                      return ListTile(
-                        leading: Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: camera.mainSnapShot.isNotEmpty
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: Image.network(
-                                  camera.mainSnapShot,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Icon(
-                                      Icons.broken_image_outlined,
-                                      size: 24.0,
-                                      color: Colors.white54,
-                                    );
-                                  },
-                                ),
-                              )
-                            : const Icon(
-                                Icons.videocam_off,
-                                size: 24.0,
-                                color: Colors.white54,
-                              ),
-                        ),
-                        title: Text(camera.name),
-                        subtitle: Text(
-                          camera.connected
-                              ? 'Bağlı (${camera.ip})'
-                              : 'Bağlantı yok (${camera.ip})',
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            camera.connected
-                                ? const Icon(Icons.link, color: Colors.green)
-                                : const Icon(Icons.link_off, color: Colors.red),
-                            if (isSelected)
-                              const Padding(
-                                padding: EdgeInsets.only(left: 8.0),
-                                child: Icon(Icons.check_circle, color: Colors.green),
-                              )
-                          ],
-                        ),
-                        selected: isSelected,
-                        onTap: () {
-                          _selectCameraForSlot(slot, camera);
-                          Navigator.of(context).pop();
-                        },
-                      );
-                    },
-                  ),
-                ),
-                // Option to clear the slot
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.delete_outline),
-                  title: const Text('Bu slotu temizle'),
-                  onTap: () {
-                    _clearSlot(slot);
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-  
-  void _changePage(int page) {
-    if (page < 0 || page >= _totalPages) return;
-    
-    setState(() {
-      _currentPage = page;
-      // Do not load cameras automatically - we want to keep the player configuration
-      // between pages and allow manual assignment of cameras to any slot
-    });
-  }
-  
-  void _changeGridLayout(int columns) {
-    setState(() {
-      _gridColumns = columns;
-    });
+    if (slotIndex < _players.length) {
+      final player = _players[slotIndex];
+      
+      if (camera.rtspUri.isNotEmpty) {
+        player.open(Media(camera.rtspUri));
+      } else {
+        // Handle no URL available
+        _errorStates[slotIndex] = true;
+      }
+    }
   }
   
   @override
@@ -370,34 +149,46 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     for (final player in _players) {
       player.dispose();
     }
+    
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = ResponsiveHelper.isDesktop(context);
     final size = MediaQuery.of(context).size;
+    final theme = Theme.of(context);
+    final cameraProvider = Provider.of<CameraDevicesProvider>(context);
+    final layoutProvider = Provider.of<MultiViewLayoutProvider>(context);
     
-    // Calculate available height for the grid
+    // Update layout if changed in provider
+    if (layoutProvider.currentLayout != null && 
+        layoutProvider.currentLayout!.id != _currentLayout.id) {
+      _currentLayout = layoutProvider.currentLayout!;
+      _gridColumns = _currentLayout.columns;
+      _updateGridColumnsBasedOnScreenSize(); // Recalculate grid dimensions
+    }
+    
+    // Ensure cameras are loaded (defensive check)
+    if (_availableCameras.isEmpty && cameraProvider.cameras.isNotEmpty) {
+      _availableCameras = cameraProvider.cameras;
+      _loadCamerasForCurrentPage();
+    }
+    
+    // Calculate the height available for the grid
     final appBarHeight = AppBar().preferredSize.height;
-    final paginationControlsHeight = _totalPages > 1 ? 48.0 : 0.0; // Reduced from 60.0 to 48.0
     final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0;
-    final safeAreaPadding = MediaQuery.of(context).padding;
+    final paginationControlsHeight = 48.0; // Reduced height for pagination controls
+    final availableHeight = size.height - appBarHeight - bottomNavHeight - 8.0;
     
-    // Calculate available height for the grid, now using size.height from MediaQuery
-    // Subtract appBar, bottom nav bar (if mobile), and system UI insets
-    // We handle pagination controls separately to avoid duplicate calculations
-    final availableHeight = size.height - appBarHeight - bottomNavHeight - safeAreaPadding.top - safeAreaPadding.bottom - 0.1; // Subtracting an additional 0.1 to eliminate any potential floating point rounding errors
-    
-    // Filter out null cameras and create a list of only active cameras
-    final activeCameras = _selectedCameras.where((cam) => cam != null).toList();
+    // Filter out null cameras for the grid
+    final List<Camera> activeCameras = _selectedCameras.whereType<Camera>().toList();
     final activeCameraCount = activeCameras.length;
     
-    // Calculate how many actual rows we need for the active cameras
-    // This ensures we don't reserve space for empty slots
-    final activeRowsNeeded = (activeCameraCount / _gridColumns).ceil();
+    // Instead of calculating rows based on active cameras, we use a fixed number of rows
+    // This ensures the grid always fills the entire screen regardless of camera count
+    final activeRowsNeeded = 5; // Fixed number of rows to ensure grid fills the screen
     
-        // Calculate optimal aspect ratio based on the available height and active rows
+    // Calculate optimal aspect ratio based on the available height and active rows
     final double cellWidth = size.width / _gridColumns;
     // Adjust the available height by removing the pagination controls height if needed
     // Calculate cell height directly using the effective available height
@@ -405,271 +196,217 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     final double aspectRatio = cellWidth / cellHeight;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Multi Camera View'),
+        title: Text('Multi Camera View', style: theme.textTheme.headlineSmall),
+        backgroundColor: theme.appBarTheme.backgroundColor,
         actions: [
-          // Grid layout selector
-          PopupMenuButton<int>(
-            tooltip: 'Change grid layout',
-            icon: const Icon(Icons.grid_view),
-            onSelected: _changeGridLayout,
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 1,
-                child: Text('1 column'),
-              ),
-              const PopupMenuItem(
-                value: 2,
-                child: Text('2 columns'),
-              ),
-              const PopupMenuItem(
-                value: 3,
-                child: Text('3 columns'),
-              ),
-              const PopupMenuItem(
-                value: 4,
-                child: Text('4 columns'),
-              ),
-              const PopupMenuItem(
-                value: 5,
-                child: Text('5 columns'),
-              ),
-            ],
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              setState(() {
+                // Reload cameras
+                _loadCamerasForCurrentPage();
+              });
+            },
           ),
-          
-          const SizedBox(width: 8),
         ],
       ),
       body: Column(
         children: [
-          // Main grid taking all available space
-          Container(
-            width: size.width,
-            height: availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0),
+          // Main grid view that takes up most of the space
+          Expanded(
             child: GridView.builder(
-              padding: EdgeInsets.zero,
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
+              // Disable scrolling as we're handling paging ourselves
+              physics: NeverScrollableScrollPhysics(),
+              // Grid properties
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _gridColumns,
-                childAspectRatio: aspectRatio, 
+                childAspectRatio: aspectRatio,
+                // Remove all spacing between grid cells for maximum screen utilization
                 crossAxisSpacing: 0,
                 mainAxisSpacing: 0,
               ),
-              itemCount: activeCameraCount,
+              // Use zero padding to maximize viewable area
+              padding: EdgeInsets.zero,
+              itemCount: maxCamerasPerPage,
               itemBuilder: (context, index) {
-                // Find the original index of this camera in the _selectedCameras list
-                final originalIndex = _selectedCameras.indexOf(activeCameras[index]);
-                final camera = activeCameras[index];
-                final isLoading = _loadingStates[originalIndex];
-                final hasError = _errorStates[originalIndex];
+                final camera = index < _selectedCameras.length ? _selectedCameras[index] : null;
                 
-                return Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onTap: () => _showCameraSelector(index),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        // Camera slot
-                        if (camera == null)
-                          // Empty slot
-                          Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_circle_outline,
-                                  size: 48,
-                                  color: Colors.grey[400],
+                // If we have a camera and it's connected, show the video
+                if (camera != null && camera.connected) {
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Video player
+                      ClipRect(
+                        child: index < _controllers.length
+                            ? MaterialVideoControlsTheme(
+                                normal: MaterialVideoControlsThemeData(
+                                  bottomButtonBar: [
+                                    const MaterialPositionIndicator(),
+                                  ],
+                                  controlsHoverDuration: Duration(seconds: 2),
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Add Camera',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                  ),
+                                fullscreen: MaterialVideoControlsThemeData(
+                                  bottomButtonBar: [
+                                    const MaterialPositionIndicator(),
+                                  ],
+                                  controlsHoverDuration: Duration(seconds: 2),
                                 ),
-                              ],
-                            ),
-                          )
-                        else if (hasError)
-                          // Error state
-                          Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.error_outline,
-                                  size: 48,
-                                  color: Colors.red,
+                                child: Video(
+                                  controller: _controllers[index],
+                                  fill: Colors.black,
+                                  controls: NoVideoControls,
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Stream Error',
-                                  style: TextStyle(
-                                    color: Colors.red[300],
-                                  ),
+                              )
+                                  ],
+                                  // Ensure controls overlay is visible
+                                  controlsHoverDuration: Duration(seconds: 2),
+                                  // Use accent color for controls
+                                  primaryColor: theme.colorScheme.secondary,
                                 ),
-                                const SizedBox(height: 4),
-                                ElevatedButton.icon(
-                                  icon: const Icon(Icons.refresh, size: 14),
-                                  label: const Text('Retry'),
-                                  onPressed: () => _selectCameraForSlot(index, camera),
-                                  style: ElevatedButton.styleFrom(
-                                    minimumSize: const Size(80, 28),
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  ),
+                                child: Video(
+                                  controller: _controllers[index],
+                                  fill: Colors.black,
+                                  controls: NoVideoControls,
                                 ),
-                              ],
-                            ),
-                          )
-                        else
-                          // Video player
-                          Video(
-                            controller: _controllers[index],
-                            controls: null, // Simple controls or none for grid view
+                              )
+                            : Center(child: Text('No player available')),
+                      ),
+                      
+                      // Loading indicator
+                      if (_loadingStates[index])
+                        Center(
+                          child: CircularProgressIndicator(
+                            color: theme.colorScheme.secondary, // Use accent color
                           ),
-                        
-                        // Loading indicator
-                        if (isLoading && camera != null && !hasError)
-                          const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        
-                        // Camera name overlay at the top
-                        if (camera != null)
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
+                        ),
+                      
+                      // Error indicator
+                      if (_errorStates[index])
+                        Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.error_outline, color: Colors.red, size: 32),
+                              SizedBox(height: 8),
+                              Text(
+                                'Stream Error',
+                                style: TextStyle(color: Colors.red),
                               ),
-                              color: Colors.black.withOpacity(0.7),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      camera.name,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  Icon(
-                                    camera.connected ? Icons.link : Icons.link_off,
-                                    size: 14,
-                                    color: camera.connected ? Colors.green : Colors.red,
-                                  ),
-                                ],
-                              ),
+                            ],
+                          ),
+                        ),
+                      
+                      // Camera name overlay (top left)
+                      Positioned(
+                        top: 4,
+                        left: 4,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            camera.name,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
                             ),
                           ),
-                          
-                        // Change camera button at the bottom
-                        if (camera != null)
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Material(
-                              color: Colors.transparent,
-                              child: IconButton(
-                                icon: const Icon(Icons.sync),
-                                color: Colors.white,
-                                tooltip: 'Change camera',
-                                onPressed: () => _showCameraSelector(index),
-                              ),
+                        ),
+                      ),
+                      
+                      // Camera status overlay (bottom right)
+                      Positioned(
+                        bottom: 4,
+                        right: 4,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: camera.recording
+                                ? Colors.red.withOpacity(0.7)
+                                : Colors.green.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            camera.recording ? 'REC' : 'LIVE',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                      ],
+                        ),
+                      ),
+                      
+                      // Make the entire camera cell tappable
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            // Navigate to single camera view
+                            Navigator.pushNamed(
+                              context,
+                              '/live-view',
+                              arguments: camera,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Show empty slot with darker background
+                  return Container(
+                    color: Colors.black38,
+                    child: Center(
+                      child: Text(
+                        'No Camera',
+                        style: TextStyle(color: Colors.white70),
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               },
             ),
           ),
           
-          // Pagination controls at the bottom
+          // Pagination controls (only shown if we have multiple pages)
           if (_totalPages > 1)
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                border: Border(
-                  top: BorderSide(
-                    color: Theme.of(context).dividerColor,
-                  ),
-                ),
-              ),
+              height: paginationControlsHeight,
+              color: theme.colorScheme.surface.withOpacity(0.8),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios),
+                    icon: Icon(Icons.arrow_back),
                     onPressed: _currentPage > 0
-                        ? () => _changePage(_currentPage - 1)
+                        ? () {
+                            setState(() {
+                              _currentPage--;
+                              _loadCamerasForCurrentPage();
+                            });
+                          }
                         : null,
                   ),
-                  
-                  // Page indicator with numbers
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (int i = 0; i < _totalPages; i++)
-                        if (i == _currentPage)
-                          Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppTheme.primaryColor,
-                            ),
-                            child: Center(
-                              child: Text(
-                                '${i + 1}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          )
-                        else
-                          InkWell(
-                            onTap: () => _changePage(i),
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: AppTheme.primaryColor.withOpacity(0.5),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '${i + 1}',
-                                  style: TextStyle(
-                                    color: AppTheme.primaryColor,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                    ],
+                  SizedBox(width: 16),
+                  Text(
+                    'Page ${_currentPage + 1} of $_totalPages',
+                    style: theme.textTheme.bodyLarge,
                   ),
-                  
+                  SizedBox(width: 16),
                   IconButton(
-                    icon: const Icon(Icons.arrow_forward_ios),
+                    icon: Icon(Icons.arrow_forward),
                     onPressed: _currentPage < _totalPages - 1
-                        ? () => _changePage(_currentPage + 1)
+                        ? () {
+                            setState(() {
+                              _currentPage++;
+                              _loadCamerasForCurrentPage();
+                            });
+                          }
                         : null,
                   ),
                 ],
@@ -678,5 +415,31 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
         ],
       ),
     );
+  }
+  
+  // Method to update grid columns based on screen size
+  void _updateGridColumnsBasedOnScreenSize() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // Use layout columns if available, otherwise calculate based on screen width
+    if (_currentLayout.columns > 0) {
+      _gridColumns = _currentLayout.columns;
+    } else {
+      // First, determine max possible columns based on screen width
+      if (screenWidth > 1400) {
+        _gridColumns = 5;
+      } else if (screenWidth > 1100) {
+        _gridColumns = 4;
+      } else if (screenWidth > 800) {
+        _gridColumns = 3;
+      } else if (screenWidth > 500) {
+        _gridColumns = 2;
+      } else {
+        _gridColumns = 1;
+      }
+    }
+    
+    // For debugging
+    print('Setting grid columns to $_gridColumns (screen width: $screenWidth)');
   }
 }

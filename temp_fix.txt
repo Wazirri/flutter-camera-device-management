@@ -1,14 +1,3 @@
-    // Calculate available height for the grid
-    final availableHeight = size.height - appBarHeight - paginationControlsHeight - bottomNavHeight;
-    
-    // Calculate the actual number of cameras we have (max 20)
-    final activeCameraCount = _selectedCameras.where((cam) => cam != null).length;
-    
-    // Calculate how many actual rows we need for the active cameras
-    // This ensures we don't reserve space for empty slots
-    final activeRowsNeeded = (activeCameraCount / _gridColumns).ceil();
-    
-    // Calculate optimal aspect ratio based on the available height and active rows
-    final double cellWidth = size.width / _gridColumns;
-    final double cellHeight = availableHeight / activeRowsNeeded;
-    final double aspectRatio = cellWidth / cellHeight;
+    // Instead of calculating rows based on active cameras, we use a fixed number of rows
+    // This ensures the grid always fills the entire screen regardless of camera count
+    final activeRowsNeeded = 5; // Fixed number of rows to ensure grid fills the screen
