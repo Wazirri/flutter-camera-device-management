@@ -16,98 +16,151 @@ import 'screens/websocket_log_screen.dart';
 import 'screens/multi_live_view_screen.dart';  // New multi-camera view screen
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
-import 'utils/page_transitions.dart';
+import 'transitions/page_transition.dart';
 import 'widgets/desktop_side_menu.dart';
 import 'widgets/mobile_bottom_navigation_bar.dart';
 import 'providers/websocket_provider.dart';
 import 'providers/camera_devices_provider.dart';
 import 'providers/multi_view_layout_provider.dart';
 import 'providers/recording_provider.dart';
+import 'models/device_status.dart';
 
 Future<void> main() async {
   // This captures errors that happen during initialization
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     
-    // Initialize MediaKit
+    // Initialize MediaKit - required for camera display
     MediaKit.ensureInitialized();
     
-    // Set orientations (only for mobile platforms)
-    if (true) {
-      try {
-        await SystemChrome.setPreferredOrientations([
-          DeviceOrientation.portraitUp,
-          DeviceOrientation.portraitDown,
-          DeviceOrientation.landscapeLeft,
-          DeviceOrientation.landscapeRight,
-        ]);
-        
-        // Set specific platform settings
-        if (Platform.isIOS || Platform.isMacOS) {
-          // iOS/macOS specific settings if needed
-          debugPrint('Configuring iOS/macOS specific settings');
-        }
-      } catch (e) {
-        debugPrint('Error setting orientations: $e');
-      }
+    // Lock screen orientation to portrait mode for mobile
+    if (Platform.isAndroid || Platform.isIOS) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
     }
     
-    // Run the app
-    runApp(const CameraDeviceManagerApp());
-  }, (error, stackTrace) {
-    // Log any errors that occur during app initialization
-    debugPrint('Uncaught error: $error');
-    debugPrint('Stack trace: $stackTrace');
+    // Setup navigation observer
+    final routeObserver = RouteObserver<PageRoute>();
+    
+    // Apply system UI overlay style (status bar, etc.)
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        systemNavigationBarColor: AppTheme.darkBackground,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
+    );
+    
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => WebSocketProvider()),
+          ChangeNotifierProxyProvider<WebSocketProvider, CameraDevicesProvider>(
+            create: (_) => CameraDevicesProvider(),
+            update: (_, webSocketProvider, cameraDevicesProvider) => 
+              cameraDevicesProvider!..updateFromWebSocket(webSocketProvider),
+          ),
+          ChangeNotifierProvider(create: (_) => MultiViewLayoutProvider()),
+          ChangeNotifierProvider(create: (_) => RecordingProvider()),
+        ],
+        child: CameraDeviceManagerApp(routeObserver: routeObserver),
+      ),
+    );
+  }, (error, stack) {
+    print('Unhandled error: $error');
+    print('Stack trace: $stack');
   });
 }
 
-class CameraDeviceManagerApp extends StatelessWidget {
-  const CameraDeviceManagerApp({Key? key}) : super(key: key);
+class CameraDeviceManagerApp extends StatefulWidget {
+  final RouteObserver<PageRoute> routeObserver;
+  
+  const CameraDeviceManagerApp({Key? key, required this.routeObserver}) : super(key: key);
 
   @override
+  State<CameraDeviceManagerApp> createState() => _CameraDeviceManagerAppState();
+}
+
+class _CameraDeviceManagerAppState extends State<CameraDeviceManagerApp> {
+  String _currentRoute = '/login';
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  
+  @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => WebSocketProvider()),
-        ChangeNotifierProvider(create: (_) => CameraDevicesProvider()),
-        ChangeNotifierProvider(create: (_) => MultiViewLayoutProvider()),
-        ChangeNotifierProvider(create: (_) => RecordingProvider()),
-      ],
-      child: MaterialApp(
-        title: 'movita ECS',
-        theme: AppTheme.darkTheme,
-        debugShowCheckedModeBanner: false,
-        home: const LoginScreen(),
-        routes: {
-          '/login': (context) => const LoginScreen(),
-          '/dashboard': (context) => const AppShell(child: DashboardScreen()),
-          '/cameras': (context) => const AppShell(child: CamerasScreen()),
-          '/camera-devices': (context) => const AppShell(child: CameraDevicesScreen()),
-          '/devices': (context) => const AppShell(child: DevicesScreen()),
-          '/records': (context) => const AppShell(child: RecordViewScreen()),
-          '/settings': (context) => const AppShell(child: SettingsScreen()),
-          '/logs': (context) => const AppShell(child: WebSocketLogScreen()),
-          '/multi-view': (context) => const AppShell(child: MultiLiveViewScreen()),
-        },
-        onGenerateRoute: (settings) {
-          // Handle dynamic routes
-          if (settings.name == '/live-view') {
-            final camera = settings.arguments as dynamic;
-            return PageTransition(
-              child: AppShell(child: LiveViewScreen(camera: camera)),
-              type: PageTransitionType.rightToLeft,
+    return MaterialApp(
+      title: 'movita ECS',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.darkTheme,
+      navigatorKey: _navigatorKey,
+      navigatorObservers: [widget.routeObserver],
+      initialRoute: '/login',
+      onGenerateRoute: (settings) {
+        final args = settings.arguments;
+        
+        Widget page;
+        switch (settings.name) {
+          case '/login':
+            page = const LoginScreen();
+            break;
+          case '/dashboard':
+            page = const DashboardScreen();
+            break;
+          case '/live-view':
+            page = const LiveViewScreen();
+            break;
+          case '/multi-live-view':
+            page = const MultiLiveViewScreen();
+            break;
+          case '/recordings':
+            page = const RecordViewScreen();
+            break;
+          case '/cameras':
+            page = const CamerasScreen();
+            break;
+          case '/devices':
+            page = const DevicesScreen();
+            break;
+          case '/camera-devices':
+            page = const CameraDevicesScreen();
+            break;
+          case '/settings':
+            page = const SettingsScreen();
+            break;
+          case '/websocket-logs':
+            page = const WebSocketLogScreen();
+            break;
+          default:
+            return MaterialPageRoute(
+              builder: (_) => const Scaffold(
+                body: Center(child: Text('Route not found')),
+              ),
             );
-          } else if (settings.name == '/record-view') {
-            final camera = settings.arguments as dynamic;
+        }
+        
+        // Use custom page transition
+        if (settings.name == '/login') {
             return PageTransition(
-              child: AppShell(child: RecordViewScreen(camera: camera)),
-              type: PageTransitionType.rightToLeft,
+              child: page,
+              type: PageTransitionType.fade,
+              settings: settings,
             );
-          }
-          return null;
-        },
-      ),
+        } else {
+            return PageTransition(
+              child: AppShell(child: page),
+              type: PageTransitionType.rightToLeft,
+              settings: settings,
+            );
+        }
+      },
     );
+  }
+  
+  void _navigateTo(String route) {
+    setState(() => _currentRoute = route);
+    _navigatorKey.currentState?.pushReplacementNamed(route);
   }
 }
 
@@ -120,13 +173,20 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     // Check if we're on a desktop platform
     final isDesktop = ResponsiveHelper.isDesktop(context);
+    // Use Navigator.of(context).widget.defaultTitle to get current route
+    final currentRoute = ModalRoute.of(context)?.settings.name ?? '/dashboard';
     
     return Scaffold(
       // For desktop, use side menu; for mobile, use bottom navigation
       body: Row(
         children: [
           // Side menu for desktop
-          if (isDesktop) const DesktopSideMenu(),
+          if (isDesktop) DesktopSideMenu(
+            currentRoute: currentRoute,
+            onDestinationSelected: (route) {
+              Navigator.of(context).pushReplacementNamed(route);
+            },
+          ),
           
           // Main content area
           Expanded(child: child),
@@ -136,7 +196,12 @@ class AppShell extends StatelessWidget {
       // Bottom navigation for mobile/tablet
       bottomNavigationBar: isDesktop 
           ? null  // No bottom nav on desktop
-          : const MobileBottomNavigationBar(),
+          : MobileBottomNavigationBar(
+              currentRoute: currentRoute,
+              onDestinationSelected: (route) {
+                Navigator.of(context).pushReplacementNamed(route);
+              },
+            ),
     );
   }
 }

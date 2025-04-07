@@ -1,29 +1,49 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../models/camera_device.dart';
+import '../models/device_status.dart';
 
 class StatusIndicator extends StatelessWidget {
   final DeviceStatus status;
   final double size;
   final bool showLabel;
-  final EdgeInsets padding;
+  final bool animatePulse;
 
   const StatusIndicator({
-    Key? key,
+    super.key,
     required this.status,
-    this.size = 10.0,
+    this.size = 12.0,
     this.showLabel = false,
-    this.padding = const EdgeInsets.symmetric(horizontal: 8.0),
-  }) : super(key: key);
+    this.animatePulse = true,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: padding,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Animated indicator
+        _buildIndicator(),
+        
+        // Optional status label
+        if (showLabel) ...[
+          const SizedBox(width: 6),
+          Text(
+            _getLabelForStatus(status),
+            style: TextStyle(
+              fontSize: size * 1.1,
+              color: _getColorForStatus(status),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildIndicator() {
+    return animatePulse && status == DeviceStatus.online
+        ? _buildPulsingIndicator()
+        : Container(
             width: size,
             height: size,
             decoration: BoxDecoration(
@@ -31,27 +51,13 @@ class StatusIndicator extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: _getColorForStatus(status).withOpacity(0.5),
+                  color: _getColorForStatus(status).withOpacity(0.4),
                   blurRadius: 4,
                   spreadRadius: 1,
                 ),
               ],
             ),
-          ),
-          if (showLabel) ...[
-            const SizedBox(width: 6),
-            Text(
-              _getLabelForStatus(status),
-              style: TextStyle(
-                fontSize: 12,
-                color: AppTheme.darkTextSecondary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
+          );
   }
 
   String _getLabelForStatus(DeviceStatus status) {
@@ -64,9 +70,8 @@ class StatusIndicator extends StatelessWidget {
         return 'Warning';
       case DeviceStatus.error:
         return 'Error';
-      case DeviceStatus.degraded:
-        return 'Degraded';
       case DeviceStatus.unknown:
+      default:
         return 'Unknown';
     }
   }
@@ -74,17 +79,48 @@ class StatusIndicator extends StatelessWidget {
   Color _getColorForStatus(DeviceStatus status) {
     switch (status) {
       case DeviceStatus.online:
-        return AppTheme.online;
+        return AppTheme.successColor; // Green
       case DeviceStatus.offline:
-        return AppTheme.offline;
+        return Colors.grey;
       case DeviceStatus.warning:
-        return AppTheme.warning;
+        return AppTheme.primaryColor; // Orange/Amber
       case DeviceStatus.error:
-        return AppTheme.error;
-      case DeviceStatus.degraded:
-        return AppTheme.warning;
+        return AppTheme.errorColor; // Red
       case DeviceStatus.unknown:
-        return AppTheme.darkTextSecondary; // Gray for unknown status
+      default:
+        return Colors.grey.shade500;
     }
+  }
+
+  Widget _buildPulsingIndicator() {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.5, end: 1.0),
+      duration: const Duration(seconds: 1),
+      curve: Curves.easeInOut,
+      builder: (context, value, child) {
+        return Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: _getColorForStatus(status),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: _getColorForStatus(status).withOpacity(0.6 * value),
+                blurRadius: 8 * value,
+                spreadRadius: 2 * value,
+              ),
+            ],
+          ),
+        );
+      },
+      // Reset animation when complete
+      onEnd: () {
+        // This forces a rebuild when animation ends
+        if (animatePulse) {
+          (context as Element).markNeedsBuild();
+        }
+      },
+    );
   }
 }

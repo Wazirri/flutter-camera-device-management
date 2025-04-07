@@ -1,154 +1,158 @@
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
 import '../models/camera_device.dart';
+import '../models/device_status.dart';
+import '../theme/app_theme.dart';
 import 'status_indicator.dart';
 
 class DeviceListItem extends StatelessWidget {
-  final String name;
-  final String model;
-  final String ipAddress;
-  final DeviceStatus status;
-  final String lastActive;
+  final CameraDevice device;
+  final bool isSelected;
   final VoidCallback onTap;
-  final VoidCallback onActionPressed;
+  final DeviceStatus status;
 
   const DeviceListItem({
     Key? key,
-    required this.name,
-    required this.model,
-    required this.ipAddress,
-    required this.status,
-    required this.lastActive,
+    required this.device,
+    required this.isSelected,
     required this.onTap,
-    required this.onActionPressed,
+    required this.status,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      elevation: 2,
+    return Material(
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected 
+                ? AppTheme.accentColor.withOpacity(0.1)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isSelected 
+                  ? AppTheme.accentColor 
+                  : Colors.grey.withOpacity(0.2),
+              width: isSelected ? 2 : 1,
+            ),
+          ),
+          child: Row(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
+              // Status indicator
+              StatusIndicator(
+                status: status,
+                showLabel: false,
+                size: 10,
+              ),
+              
+              const SizedBox(width: 12),
+              
+              // Device details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Device name/type with truncation for long text
+                    Text(
+                      device.deviceType.isEmpty 
+                          ? 'Unknown Device'
+                          : device.deviceType,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: isSelected 
+                            ? AppTheme.accentColor 
+                            : AppTheme.darkTextPrimary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                    const SizedBox(height: 4),
+                    
+                    // Device MAC address
+                    Text(
+                      device.id.split('ecs.slave.').last,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade400,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                    const SizedBox(height: 6),
+                    
+                    // Status row
+                    Row(
                       children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: AppTheme.primaryBlue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.router_rounded,
-                            color: AppTheme.primaryBlue,
-                          ),
+                        Icon(
+                          Icons.circle,
+                          size: 8,
+                          color: device.connected 
+                              ? AppTheme.successColor 
+                              : Colors.grey,
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                name,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                model,
-                                style: TextStyle(
-                                  color: AppTheme.darkTextSecondary,
-                                  fontSize: 12,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                        const SizedBox(width: 4),
+                        Text(
+                          device.connected ? 'Online' : 'Offline',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade300,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.more_vert),
-                    color: AppTheme.darkTextSecondary,
-                    onPressed: onActionPressed,
-                  ),
-                ],
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // IP Address
-                  _buildInfoItem(
-                    Icons.wifi,
-                    ipAddress,
+              
+              // Number of cameras
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppTheme.darkSurface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.grey.withOpacity(0.3),
+                    width: 1,
                   ),
-                  // Status
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.circle,
-                        size: 8,
-                        color: AppTheme.darkTextSecondary,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.videocam,
+                      size: 14,
+                      color: AppTheme.accentColor,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${device.cameras.length}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const SizedBox(width: 8),
-                      StatusIndicator(
-                        status: status,
-                        showLabel: true,
-                      ),
-                    ],
-                  ),
-                  // Last Active
-                  _buildInfoItem(
-                    Icons.access_time,
-                    lastActive,
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
+              
+              // Chevron indicator if selected
+              if (isSelected) ...[
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right,
+                  color: AppTheme.accentColor,
+                  size: 20,
+                ),
+              ],
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildInfoItem(IconData icon, String label) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 16,
-          color: AppTheme.darkTextSecondary,
-        ),
-        const SizedBox(width: 6),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: AppTheme.darkTextSecondary,
-          ),
-        ),
-      ],
     );
   }
 }
