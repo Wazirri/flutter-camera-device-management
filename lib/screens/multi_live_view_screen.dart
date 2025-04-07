@@ -456,8 +456,6 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                 final camera = activeCameras[index];
                 final isLoading = _loadingStates[originalIndex];
                 final hasError = _errorStates[originalIndex];
-                final isLoading = _loadingStates[originalIndex];
-                final hasError = _errorStates[originalIndex];
                 
                 return Card(
                   clipBehavior: Clip.antiAlias,
