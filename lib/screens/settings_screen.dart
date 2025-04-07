@@ -150,7 +150,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: const Text('Enable Notifications'),
           subtitle: const Text('Receive alerts for important events'),
           value: _notificationsEnabled,
-          activeColor: AppTheme.primaryBlue,
+          activeColor: AppTheme.accentColor,
           onChanged: (value) {
             setState(() {
               _notificationsEnabled = value;
@@ -162,7 +162,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: const Text('Email Alerts'),
           subtitle: const Text('Receive alerts via email'),
           value: _emailAlertsEnabled,
-          activeColor: AppTheme.primaryBlue,
+          activeColor: AppTheme.accentColor,
           onChanged: (value) {
             setState(() {
               _emailAlertsEnabled = value;
@@ -179,7 +179,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChanged: (bool? value) {
                 // UI only
               },
-              activeColor: AppTheme.primaryBlue,
+              activeColor: AppTheme.accentColor,
             ),
             CheckboxListTile(
               title: const Text('Device Status Changes'),
@@ -187,7 +187,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChanged: (bool? value) {
                 // UI only
               },
-              activeColor: AppTheme.primaryBlue,
+              activeColor: AppTheme.accentColor,
             ),
             CheckboxListTile(
               title: const Text('System Updates'),
@@ -195,7 +195,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChanged: (bool? value) {
                 // UI only
               },
-              activeColor: AppTheme.primaryBlue,
+              activeColor: AppTheme.accentColor,
             ),
           ],
         ),
@@ -219,10 +219,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             backgroundColor: AppTheme.darkBackground,
             valueColor: AlwaysStoppedAnimation<Color>(
               _storageLimit > 90
-                  ? AppTheme.error
+                  ? AppTheme.errorColor
                   : _storageLimit > 70
-                      ? AppTheme.warning
-                      : AppTheme.primaryBlue,
+                      ? AppTheme.warningColor
+                      : AppTheme.accentColor,
             ),
           ),
         ),
@@ -244,7 +244,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _storageLimit = value;
                 });
               },
-              activeColor: AppTheme.primaryBlue,
+              activeColor: AppTheme.accentColor,
             ),
           ),
         ),
@@ -257,7 +257,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               // UI only
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryBlue,
+              backgroundColor: AppTheme.accentColor,
             ),
             child: const Text('Clean Up'),
           ),
@@ -322,7 +322,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: const Text('Automatic Updates'),
           subtitle: const Text('Keep system up to date automatically'),
           value: _autoUpdateEnabled,
-          activeColor: AppTheme.primaryBlue,
+          activeColor: AppTheme.accentColor,
           onChanged: (value) {
             setState(() {
               _autoUpdateEnabled = value;
@@ -387,7 +387,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _showFactoryResetDialog();
             },
             style: TextButton.styleFrom(
-              foregroundColor: AppTheme.error,
+              foregroundColor: AppTheme.errorColor,
             ),
             child: const Text('Reset'),
           ),
@@ -417,7 +417,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Icon(
                   icon,
-                  color: AppTheme.primaryBlue,
+                  color: AppTheme.accentColor,
                 ),
                 const SizedBox(width: 16),
                 Text(
@@ -484,7 +484,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // UI only
               },
               style: TextButton.styleFrom(
-                foregroundColor: AppTheme.error,
+                foregroundColor: AppTheme.errorColor,
               ),
               child: const Text('Reset'),
             ),

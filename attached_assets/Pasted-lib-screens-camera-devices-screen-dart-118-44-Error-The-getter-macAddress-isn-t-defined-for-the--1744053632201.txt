@@ -1,0 +1,284 @@
+lib/screens/camera_devices_screen.dart:118:44: Error: The getter 'macAddress' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'macAddress'.
+                        ? 'Device ${device.macAddress}' 
+                                           ^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:149:32: Error: The getter 'macAddress' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'macAddress'.
+                'MAC: ${device.macAddress}',
+                               ^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:224:46: Error: The getter 'macAddress' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'macAddress'.
+                          ? 'Device ${device.macAddress}' 
+                                             ^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:233:38: Error: The getter 'macAddress' isn't defined for the class 'CameraDevice'.
+ - 'CameraDevice' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'macAddress'.
+                      'MAC: ${device.macAddress}',
+                                     ^^^^^^^^^^
+lib/screens/dashboard_screen.dart:34:23: Error: The method 'sendMessage' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:movita_ecs/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'sendMessage'.
+    webSocketProvider.sendMessage('DO MONITORECS');
+                      ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:43:27: Error: The getter 'lastMessage' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:movita_ecs/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'lastMessage'.
+    if (webSocketProvider.lastMessage != null && 
+                          ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:44:27: Error: The getter 'lastMessage' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:movita_ecs/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'lastMessage'.
+        webSocketProvider.lastMessage!.contains('"c":"sysinfo"')) {
+                          ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:46:61: Error: The getter 'lastMessage' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:movita_ecs/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'lastMessage'.
+        _systemInfo = SystemInfo.fromJson(webSocketProvider.lastMessage!);
+                                                            ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:324:25: Error: The operator '~/' isn't defined for the class 'String'.
+Try correcting the operator to an existing operator, or defining a '~/' operator.
+    final days = uptime ~/ (24 * 60 * 60);
+                        ^^
+lib/screens/dashboard_screen.dart:325:27: Error: The operator '-' isn't defined for the class 'String'.
+Try correcting the operator to an existing operator, or defining a '-' operator.
+    final hours = (uptime - (days * 24 * 60 * 60)) ~/ 3600;
+                          ^
+lib/screens/dashboard_screen.dart:326:29: Error: The operator '-' isn't defined for the class 'String'.
+Try correcting the operator to an existing operator, or defining a '-' operator.
+    final minutes = (uptime - (days * 24 * 60 * 60) - (hours * 3600)) ~/ 60;
+                            ^
+lib/screens/live_view_screen.dart:118:42: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:movita_ecs/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+      _availableCameras = cameraProvider.cameras;
+                                         ^^^^^^^
+lib/screens/live_view_screen.dart:129:37: Error: The getter 'rtspUri' isn't defined for the class 'Camera'.
+ - 'Camera' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'rtspUri'.
+    if (_camera == null || _camera!.rtspUri.isEmpty) {
+                                    ^^^^^^^
+lib/screens/live_view_screen.dart:144:26: Error: The getter 'rtspUri' isn't defined for the class 'Camera'.
+ - 'Camera' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'rtspUri'.
+    final url = _camera!.rtspUri;
+                         ^^^^^^^
+lib/screens/live_view_screen.dart:284:64: Error: Member not found: 'primaryOrange'.
+                                  color: isSelected ? AppTheme.primaryOrange : null,
+                                                               ^^^^^^^^^^^^^
+lib/screens/live_view_screen.dart:286:61: Error: Member not found: 'primaryOrange'.
+                                selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                                            ^^^^^^^^^^^^^
+lib/screens/live_view_screen.dart:511:74: Error: Member not found: 'primaryOrange'.
+                        const Icon(Icons.info, size: 28, color: AppTheme.primaryOrange),
+                                                                         ^^^^^^^^^^^^^
+lib/screens/live_view_screen.dart:525:59: Error: The getter 'rtspUri' isn't defined for the class 'Camera'.
+ - 'Camera' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'rtspUri'.
+                    _buildDetailItem('RTSP URI', _camera!.rtspUri),
+                                                          ^^^^^^^
+lib/screens/live_view_screen.dart:526:58: Error: The getter 'country' isn't defined for the class 'Camera'.
+ - 'Camera' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'country'.
+                    _buildDetailItem('Country', _camera!.country),
+                                                         ^^^^^^^
+lib/screens/login_screen.dart:164:24: Error: Member not found: 'darkBackgroundColor'.
+              AppTheme.darkBackgroundColor.withOpacity(0.8),
+                       ^^^^^^^^^^^^^^^^^^^
+lib/screens/login_screen.dart:163:24: Error: Member not found: 'darkBackgroundColor'.
+              AppTheme.darkBackgroundColor,
+                       ^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:131:42: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:movita_ecs/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+      _availableCameras = cameraProvider.cameras;
+                                         ^^^^^^^
+lib/screens/record_view_screen.dart:158:18: Error: The getter 'rtspUri' isn't defined for the class 'Camera'.
+ - 'Camera' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'rtspUri'.
+    if (_camera!.rtspUri.isNotEmpty) {
+                 ^^^^^^^
+lib/screens/record_view_screen.dart:160:37: Error: The getter 'rtspUri' isn't defined for the class 'Camera'.
+ - 'Camera' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'rtspUri'.
+        _player.open(Media(_camera!.rtspUri));
+                                    ^^^^^^^
+lib/screens/record_view_screen.dart:310:64: Error: Member not found: 'primaryOrange'.
+                                  color: isSelected ? AppTheme.primaryOrange : null,
+                                                               ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:312:61: Error: Member not found: 'primaryOrange'.
+                                selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                                            ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:353:65: Error: Member not found: 'primaryOrange'.
+        backgroundColor: _isLiveStream ? Colors.grey : AppTheme.primaryOrange,
+                                                                ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:418:17: Error: No named parameter with the name 'onFullscreenToggle'.
+                onFullscreenToggle: _toggleFullScreen,
+                ^^^^^^^^^^^^^^^^^^
+lib/widgets/video_controls.dart:11:9: Context: Found this candidate, but the arguments don't match.
+  const VideoControls({
+        ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:531:55: Error: Member not found: 'primaryOrange'.
+                          selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                                      ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:633:39: Error: Member not found: 'primaryBlue'.
+          selectedTileColor: AppTheme.primaryBlue.withOpacity(0.1),
+                                      ^^^^^^^^^^^
+lib/screens/record_view_screen.dart:648:25: Error: Member not found: 'primaryOrange'.
+        color: AppTheme.primaryOrange,
+                        ^^^^^^^^^^^^^
+lib/screens/settings_screen.dart:36:35: Error: Member not found: 'ResponsiveHelper.responsiveWidget'.
+          child: ResponsiveHelper.responsiveWidget(
+                                  ^^^^^^^^^^^^^^^^
+lib/screens/settings_screen.dart:153:33: Error: Member not found: 'primaryBlue'.
+          activeColor: AppTheme.primaryBlue,
+                                ^^^^^^^^^^^
+lib/screens/settings_screen.dart:165:33: Error: Member not found: 'primaryBlue'.
+          activeColor: AppTheme.primaryBlue,
+                                ^^^^^^^^^^^
+lib/screens/settings_screen.dart:182:37: Error: Member not found: 'primaryBlue'.
+              activeColor: AppTheme.primaryBlue,
+                                    ^^^^^^^^^^^
+lib/screens/settings_screen.dart:190:37: Error: Member not found: 'primaryBlue'.
+              activeColor: AppTheme.primaryBlue,
+                                    ^^^^^^^^^^^
+lib/screens/settings_screen.dart:198:37: Error: Member not found: 'primaryBlue'.
+              activeColor: AppTheme.primaryBlue,
+                                    ^^^^^^^^^^^
+lib/screens/settings_screen.dart:222:30: Error: Member not found: 'error'.
+                  ? AppTheme.error
+                             ^^^^^
+lib/screens/settings_screen.dart:224:34: Error: Member not found: 'warning'.
+                      ? AppTheme.warning
+                                 ^^^^^^^
+lib/screens/settings_screen.dart:225:34: Error: Member not found: 'primaryBlue'.
+                      : AppTheme.primaryBlue,
+                                 ^^^^^^^^^^^
+lib/screens/settings_screen.dart:247:37: Error: Member not found: 'primaryBlue'.
+              activeColor: AppTheme.primaryBlue,
+                                    ^^^^^^^^^^^
+lib/screens/settings_screen.dart:260:41: Error: Member not found: 'primaryBlue'.
+              backgroundColor: AppTheme.primaryBlue,
+                                        ^^^^^^^^^^^
+lib/screens/settings_screen.dart:325:33: Error: Member not found: 'primaryBlue'.
+          activeColor: AppTheme.primaryBlue,
+                                ^^^^^^^^^^^
+lib/screens/settings_screen.dart:336:73: Error: Member not found: 'online'.
+          trailing: Text('Up to date', style: TextStyle(color: AppTheme.online)),
+                                                                        ^^^^^^
+lib/screens/settings_screen.dart:350:47: Error: Member not found: 'online'.
+                color: isConnected ? AppTheme.online : AppTheme.offline,
+                                              ^^^^^^
+lib/screens/settings_screen.dart:350:65: Error: Member not found: 'offline'.
+                color: isConnected ? AppTheme.online : AppTheme.offline,
+                                                                ^^^^^^^
+lib/screens/settings_screen.dart:390:41: Error: Member not found: 'error'.
+              foregroundColor: AppTheme.error,
+                                        ^^^^^
+lib/screens/settings_screen.dart:420:35: Error: Member not found: 'primaryBlue'.
+                  color: AppTheme.primaryBlue,
+                                  ^^^^^^^^^^^
+lib/screens/settings_screen.dart:487:43: Error: Member not found: 'error'.
+                foregroundColor: AppTheme.error,
+                                          ^^^^^
+lib/screens/multi_live_view_screen.dart:83:38: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:movita_ecs/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+      final cameras = cameraProvider.cameras;
+                                     ^^^^^^^
+lib/screens/multi_live_view_screen.dart:161:18: Error: The getter 'rtspUri' isn't defined for the class 'Camera'.
+ - 'Camera' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'rtspUri'.
+      if (camera.rtspUri.isNotEmpty) {
+                 ^^^^^^^
+lib/screens/multi_live_view_screen.dart:166:65: Error: The getter 'rtspUri' isn't defined for the class 'Camera'.
+ - 'Camera' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'rtspUri'.
+               player.state.playlist.medias.first.uri != camera.rtspUri)) {
+                                                                ^^^^^^^
+lib/screens/multi_live_view_screen.dart:170:38: Error: The getter 'rtspUri' isn't defined for the class 'Camera'.
+ - 'Camera' is from 'package:movita_ecs/models/camera_device.dart' ('lib/models/camera_device.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'rtspUri'.
+            player.open(Media(camera.rtspUri));
+                                     ^^^^^^^
+lib/screens/multi_live_view_screen.dart:221:53: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:movita_ecs/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+    if (_availableCameras.isEmpty && cameraProvider.cameras.isNotEmpty) {
+                                                    ^^^^^^^
+lib/screens/multi_live_view_screen.dart:222:42: Error: The getter 'cameras' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:movita_ecs/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'cameras'.
+      _availableCameras = cameraProvider.cameras;
+                                         ^^^^^^^
+lib/theme/app_theme.dart:62:16: Error: The argument type 'CardTheme' can't be assigned to the parameter type 'CardThemeData?'.
+ - 'CardTheme' is from 'package:flutter/src/material/card_theme.dart' ('../../../../../Flutter/flutter/packages/flutter/lib/src/material/card_theme.dart').
+ - 'CardThemeData' is from 'package:flutter/src/material/card_theme.dart' ('../../../../../Flutter/flutter/packages/flutter/lib/src/material/card_theme.dart').
+    cardTheme: CardTheme(
+               ^
+lib/theme/app_theme.dart:124:18: Error: The argument type 'TabBarTheme' can't be assigned to the parameter type 'TabBarThemeData?'.
+ - 'TabBarTheme' is from 'package:flutter/src/material/tab_bar_theme.dart' ('../../../../../Flutter/flutter/packages/flutter/lib/src/material/tab_bar_theme.dart').
+ - 'TabBarThemeData' is from 'package:flutter/src/material/tab_bar_theme.dart' ('../../../../../Flutter/flutter/packages/flutter/lib/src/material/tab_bar_theme.dart').
+    tabBarTheme: TabBarTheme(
+                 ^
+lib/theme/app_theme.dart:136:18: Error: The argument type 'DialogTheme' can't be assigned to the parameter type 'DialogThemeData?'.
+ - 'DialogTheme' is from 'package:flutter/src/material/dialog_theme.dart' ('../../../../../Flutter/flutter/packages/flutter/lib/src/material/dialog_theme.dart').
+ - 'DialogThemeData' is from 'package:flutter/src/material/dialog_theme.dart' ('../../../../../Flutter/flutter/packages/flutter/lib/src/material/dialog_theme.dart').
+    dialogTheme: DialogTheme(
+                 ^
+lib/providers/websocket_provider.dart:283:45: Error: The argument type 'Map<String, dynamic>' can't be assigned to the parameter type 'String'.
+ - 'Map' is from 'dart:core'.
+          _systemInfo = SystemInfo.fromJson(jsonData);
+                                            ^
+lib/providers/camera_devices_provider.dart:88:27: Error: The getter 'lastMessage' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:movita_ecs/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'lastMessage'.
+    if (webSocketProvider.lastMessage != null) {
+                          ^^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:90:55: Error: The getter 'lastMessage' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:movita_ecs/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'lastMessage'.
+        final message = json.decode(webSocketProvider.lastMessage!);
+                                                      ^^^^^^^^^^^
+lib/providers/camera_devices_provider.dart:98:12: Error: Can't return a value from a void function.
+    return this;
+           ^
+lib/widgets/status_indicator.dart:121:12: Error: The getter 'context' isn't defined for the class 'StatusIndicator'.
+ - 'StatusIndicator' is from 'package:movita_ecs/widgets/status_indicator.dart' ('lib/widgets/status_indicator.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'context'.
+          (context as Element).markNeedsBuild();
+           ^^^^^^^
+lib/widgets/video_controls.dart:137:45: Error: Member not found: 'primaryOrange'.
+                      activeColor: AppTheme.primaryOrange,
+                                            ^^^^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:44:59: Error: Too few positional arguments: 2 required, 1 given.
+          fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                                          ^
+lib/utils/responsive_helper.dart:64:17: Context: Found this candidate, but the arguments don't match.
+  static double getResponsiveFontSize(BuildContext context, double baseFontSize) {
+                ^^^^^^^^^^^^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:67:39: Error: Member not found: 'primaryOrange'.
+            backgroundColor: AppTheme.primaryOrange,
+                                      ^^^^^^^^^^^^^
+lib/screens/websocket_log_screen.dart:58:29: Error: Constant evaluation error:
+                    ? const Center(
+                            ^
+lib/screens/websocket_log_screen.dart:61:60: Context: The invocation of 'darkTextSecondary' is not allowed in a constant expression.
+                          style: TextStyle(color: AppTheme.darkTextSecondary),
+                                                           ^
+lib/screens/websocket_log_screen.dart:81:46: Error: Constant evaluation error:
+                                style: const TextStyle(
+                                             ^
+lib/screens/websocket_log_screen.dart:84:51: Context: The invocation of 'darkTextPrimary' is not allowed in a constant expression.
+                                  color: AppTheme.darkTextPrimary,
+                                                  ^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+
+
+
+
+

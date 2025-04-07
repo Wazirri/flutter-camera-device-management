@@ -160,8 +160,8 @@ class _LoginScreenState extends State<LoginScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppTheme.darkBackgroundColor,
-              AppTheme.darkBackgroundColor.withOpacity(0.8),
+              AppTheme.darkBackground,
+              AppTheme.darkBackground.withOpacity(0.8),
             ],
           ),
         ),

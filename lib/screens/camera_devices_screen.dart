@@ -17,7 +17,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Camera Devices'),
-        backgroundColor: AppTheme.darkBackground,
+        backgroundColor: AppTheme.darkSurface,
       ),
       body: Consumer<CameraDevicesProvider>(
         builder: (context, provider, child) {
@@ -56,7 +56,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.darkBackground,
+      backgroundColor: AppTheme.darkSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -115,7 +115,7 @@ class DeviceCard extends StatelessWidget {
                 children: [
                   Text(
                     device.deviceType.isEmpty 
-                        ? 'Device ${device.macAddress}' 
+                        ? 'Device ${device.macKey}' 
                         : device.deviceType,
                     style: const TextStyle(
                       fontSize: 18,
@@ -146,7 +146,7 @@ class DeviceCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'MAC: ${device.macAddress}',
+                'MAC: ${device.macKey}',
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
@@ -221,7 +221,7 @@ class DeviceDetailsSheet extends StatelessWidget {
                   children: [
                     Text(
                       device.deviceType.isEmpty 
-                          ? 'Device ${device.macAddress}' 
+                          ? 'Device ${device.macKey}' 
                           : device.deviceType,
                       style: const TextStyle(
                         fontSize: 20,
@@ -230,7 +230,7 @@ class DeviceDetailsSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'MAC: ${device.macAddress}',
+                      'MAC: ${device.macKey}',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade400,
@@ -499,37 +499,23 @@ class CameraCard extends StatelessWidget {
                   color: Colors.grey,
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                'Model: ${camera.brand} ${camera.hw}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
+              if (camera.username.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  'User: ${camera.username}',
+                  style: const TextStyle(fontSize: 14),
                 ),
-              ),
+              ],
               const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(
-                    Icons.videocam,
-                    size: 16,
-                    color: AppTheme.accentColor,
+              if (camera.subUri.isNotEmpty)
+                Text(
+                  'RTSP: ${camera.subUri}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade400,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Resolution: ${camera.recordWidth}x${camera.recordHeight}',
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Last seen: ${camera.lastSeenAt}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade400,
                 ),
-              ),
             ],
           ),
         ),

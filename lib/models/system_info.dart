@@ -17,7 +17,7 @@ class SystemInfo {
   final String diskFree;
   
   // System info
-  final String upTime;
+  final int upTime;
   final String version;
   final String hostname;
   
@@ -42,33 +42,41 @@ class SystemInfo {
     required this.recordingCount,
   });
   
-  factory SystemInfo.fromJson(String jsonString) {
-    final Map<String, dynamic> json = jsonDecode(jsonString);
+  factory SystemInfo.fromJson(dynamic json) {
+    // Handle both Map and String inputs
+    Map<String, dynamic> jsonMap;
+    if (json is String) {
+      jsonMap = jsonDecode(json);
+    } else if (json is Map<String, dynamic>) {
+      jsonMap = json;
+    } else {
+      throw FormatException("Invalid JSON format for SystemInfo");
+    }
     
     return SystemInfo(
       // CPU information
-      cpuTemp: json['cpuTemp'] ?? '0',
-      cpuModel: json['cpuModel'] ?? 'Unknown CPU',
-      cpuCores: json['cpuCores'] ?? '0',
+      cpuTemp: jsonMap['cpuTemp'] ?? '0',
+      cpuModel: jsonMap['cpuModel'] ?? 'Unknown CPU',
+      cpuCores: jsonMap['cpuCores'] ?? '0',
       
       // Memory information (convert to MB if needed)
-      memTotal: json['memTotal'] ?? '0',
-      memUsed: json['memUsed'] ?? '0',
-      memFree: json['memFree'] ?? '0',
+      memTotal: jsonMap['memTotal'] ?? '0',
+      memUsed: jsonMap['memUsed'] ?? '0',
+      memFree: jsonMap['memFree'] ?? '0',
       
       // Disk information (convert to GB if needed)
-      diskTotal: json['diskTotal'] ?? '0',
-      diskUsed: json['diskUsed'] ?? '0',
-      diskFree: json['diskFree'] ?? '0',
+      diskTotal: jsonMap['diskTotal'] ?? '0',
+      diskUsed: jsonMap['diskUsed'] ?? '0',
+      diskFree: jsonMap['diskFree'] ?? '0',
       
-      // System information
-      upTime: json['upTime'] ?? '0',
-      version: json['version'] ?? 'Unknown',
-      hostname: json['hostname'] ?? 'Unknown',
+      // System information - convert upTime to int
+      upTime: int.tryParse(jsonMap['upTime'] ?? '0') ?? 0,
+      version: jsonMap['version'] ?? 'Unknown',
+      hostname: jsonMap['hostname'] ?? 'Unknown',
       
-      // Additional stats (mock data if not available)
-      cameraCount: int.tryParse(json['cameraCount'] ?? '0') ?? 0,
-      recordingCount: int.tryParse(json['recordingCount'] ?? '0') ?? 0,
+      // Additional stats
+      cameraCount: int.tryParse(jsonMap['cameraCount'] ?? '0') ?? 0,
+      recordingCount: int.tryParse(jsonMap['recordingCount'] ?? '0') ?? 0,
     );
   }
 }

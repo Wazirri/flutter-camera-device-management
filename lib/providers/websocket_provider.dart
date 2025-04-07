@@ -32,7 +32,9 @@ class WebSocketProvider with ChangeNotifier {
   bool _isLocalServerMode = false;
   
   // Store last received message for other providers to access
-  dynamic _lastMessage;
+  String? _lastMessage;
+  // Getter for lastMessage
+  String? get lastMessage => _lastMessage;
   
   // Connection settings
   String _serverIp = '85.104.114.145';
@@ -95,6 +97,24 @@ class WebSocketProvider with ChangeNotifier {
     }
     
     notifyListeners();
+  }
+
+  // Send a message to the WebSocket server
+  void sendMessage(String message) {
+    if (_isConnected && _socket != null) {
+      try {
+        _socket!.add(message);
+        _logMessage('Sent: $message');
+      } catch (e) {
+        debugPrint('Error sending message: $e');
+        _logMessage('Error sending message: $e');
+        _handleError(e);
+      }
+    } else {
+      _errorMessage = 'Cannot send message: Not connected';
+      _logMessage(_errorMessage);
+      notifyListeners();
+    }
   }
 
   // Connect to WebSocket server
@@ -233,6 +253,9 @@ class WebSocketProvider with ChangeNotifier {
         // Log the message (truncate if too long)
         final logMsg = message.length > 500 ? '${message.substring(0, 500)}...' : message;
         _logMessage('Received: $logMsg');
+        
+        // Store the last message for other providers to access
+        _lastMessage = message;
         
         if (message == 'PONG') {
           // Handle heartbeat response

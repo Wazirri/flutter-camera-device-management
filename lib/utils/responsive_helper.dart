@@ -70,4 +70,20 @@ class ResponsiveHelper {
       return baseFontSize;
     }
   }
+  
+  // Widget builder for responsive layouts
+  static Widget responsiveWidget({
+    required BuildContext context,
+    required Widget mobile,
+    Widget? tablet,
+    Widget? desktop,
+  }) {
+    if (isDesktop(context) && desktop != null) {
+      return desktop;
+    } else if (isTablet(context) && tablet != null) {
+      return tablet;
+    } else {
+      return mobile;
+    }
+  }
 }

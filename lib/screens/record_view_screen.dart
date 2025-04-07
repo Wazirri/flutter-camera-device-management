@@ -307,9 +307,9 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                                 selected: isSelected,
                                 leading: Icon(
                                   Icons.videocam,
-                                  color: isSelected ? AppTheme.primaryOrange : null,
+                                  color: isSelected ? AppTheme.primaryColor : null,
                                 ),
-                                selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                selectedTileColor: AppTheme.primaryColor.withOpacity(0.1),
                                 onTap: () => _selectCamera(index),
                               ),
                             ),
@@ -350,7 +350,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(_isLiveStream ? Icons.fiber_manual_record : Icons.live_tv),
-        backgroundColor: _isLiveStream ? Colors.grey : AppTheme.primaryOrange,
+        backgroundColor: _isLiveStream ? Colors.grey : AppTheme.primaryColor,
         onPressed: _isLiveStream ? null : _playLiveStream,
         tooltip: _isLiveStream ? 'Currently live' : 'Switch to live stream',
       ),
@@ -413,7 +413,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
           // Video controls
           if (_isPlaying && !_isBuffering && !_hasError)
             Positioned.fill(
-              child: VideoControls(
+              child: VideoControls(isPlaying: _player.state.playing, isMuted: _isMuted, isFullscreen: _isFullscreen, onPlayPause: () { _player.state.playing ? _player.pause() : _player.play(); }, onMuteToggle: _toggleMute, onFullscreenToggle: _toggleFullscreen,
                 player: _player,
                 onFullscreenToggle: _toggleFullScreen,
               ),
@@ -528,7 +528,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                             DateFormat('EEEE').format(day.date),
                           ),
                           selected: isSelected,
-                          selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                          selectedTileColor: AppTheme.primaryColor.withOpacity(0.1),
                           onTap: () => recordingProvider.selectDay(day),
                         );
                       },
@@ -630,7 +630,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
               ? Text(recording.durationFormatted)
               : null,
           selected: isSelected,
-          selectedTileColor: AppTheme.primaryBlue.withOpacity(0.1),
+          selectedTileColor: AppTheme.accentColor.withOpacity(0.1),
           onTap: () {
             recordingProvider.selectRecording(recording);
             _playRecording(recording);
@@ -645,7 +645,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     return Container(
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
-        color: AppTheme.primaryOrange,
+        color: AppTheme.primaryColor,
       ),
       width: 16,
       height: 16,

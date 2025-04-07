@@ -26,6 +26,9 @@ class CameraDevicesProvider with ChangeNotifier {
     return camerasList;
   }
   
+  // Get cameras for use in live view and similar screens
+  List<Camera> get cameras => getAllCameras();
+  
   // Get devices grouped by MAC address (for UI display and filtering)
   Map<String, List<Camera>> getCamerasByMacAddress() {
     Map<String, List<Camera>> result = {};
@@ -84,7 +87,7 @@ class CameraDevicesProvider with ChangeNotifier {
   }
 
   // Update provider from WebSocket messages
-  void updateFromWebSocket(WebSocketProvider webSocketProvider) {
+  CameraDevicesProvider updateFromWebSocket(WebSocketProvider webSocketProvider) {
     if (webSocketProvider.lastMessage != null) {
       try {
         final message = json.decode(webSocketProvider.lastMessage!);
