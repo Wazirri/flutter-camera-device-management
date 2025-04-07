@@ -30,6 +30,7 @@ class WebSocketProvider with ChangeNotifier {
   // Message log functionality
   final List<String> _messageLog = [];
   bool _isLocalServerMode = false;
+  dynamic _lastMessage;
   
   // Store last received message for other providers to access
   dynamic _lastMessage;
@@ -69,6 +70,7 @@ class WebSocketProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
   SystemInfo? get systemInfo => _systemInfo;
   Stream<SystemInfo> get onSystemInfoUpdate => _systemInfoController.stream;
+  dynamic get lastMessage => _lastMessage;
   String get serverIp => _serverIp;
   int get serverPort => _serverPort;
   bool get rememberMe => _rememberMe;
@@ -252,6 +254,7 @@ class WebSocketProvider with ChangeNotifier {
       _logMessage('Error handling message: $e');
     }
   }
+      _lastMessage = jsonData;
 
   // Process JSON messages
   void _processJsonMessage(dynamic jsonData) {
