@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:camera_device_manager/server/server.dart';
+import 'package:movita_ecs/server/server.dart';
 
 void main() async {
   print('Starting WebSocket Server on port 5000...');

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:camera_device_manager/theme/app_theme.dart';
+import 'package:movita_ecs/theme/app_theme.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;

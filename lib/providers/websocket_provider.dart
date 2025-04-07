@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:camera_device_manager/models/system_info.dart';
+import 'package:movita_ecs/models/system_info.dart';
 import 'camera_devices_provider.dart';
 
 class WebSocketProvider with ChangeNotifier {

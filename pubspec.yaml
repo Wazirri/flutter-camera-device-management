@@ -1,5 +1,5 @@
-name: camera_device_manager
-description: A cross-platform Flutter app for camera and device management with dark theme.
+name: movita_ecs
+description: A cross-platform Flutter app for camera and device management with Movita ECS branding.
 publish_to: 'none'
 version: 1.0.0+1
 
