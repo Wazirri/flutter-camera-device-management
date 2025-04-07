@@ -1,0 +1,181 @@
+ECS.slaves Altındaki Alanların Açıklamaları (MAC Bazlı Cihaz Verileri)
+
+Alan Adı
+
+Anlamı / Açıklaması
+
+firsttime
+
+Cihazın sisteme ilk bağlandığı tarih ve saat.
+
+connected
+
+Cihaz şu anda sisteme bağlı mı? (1=bağlı, 0=değil)
+
+ipv4
+
+Cihazın IPv4 adresi.
+
+ipv6
+
+Cihazın IPv6 adresi.
+
+last_seen_at
+
+Sistemin cihazdan en son bilgi aldığı zaman.
+
+test.uptime
+
+Cihazın açık kaldığı toplam süre.
+
+test.kamera_kayit.count
+
+Kamera kaydı yapılan toplam olay sayısı.
+
+test.kamera_kayit.last_update
+
+En son kaydın alındığı zaman.
+
+test.kamera_kayit.error
+
+Kayıt işleminde hata olup olmadığı (0=hata yok).
+
+test.is_error
+
+Cihazda genel hata durumu (1=hata var, 0=yok).
+
+test.ignition.count
+
+Kontağın açılma sayısı.
+
+test.ignition.last_update
+
+Kontağın en son ne zaman açıldığı.
+
+test.ignition.error
+
+Kontak sisteminde hata olup olmadığı.
+
+test.kamera_baglanti.count
+
+Kamera ile sağlanan bağlantı sayısı.
+
+test.kamera_baglanti.last_update
+
+Son bağlantının zamanı.
+
+test.kamera_baglanti.error
+
+Kamera bağlantısında hata olup olmadığı.
+
+cam[n].name
+
+Kameranın sistemdeki adı.
+
+cam[n].cameraIp
+
+Kameranın IP adresi.
+
+cam[n].xAddrs
+
+ONVIF endpoint adresi.
+
+cam[n].mediaUri
+
+Kameranın asıl RTSP yayını.
+
+cam[n].subUri
+
+Alt seviye RTSP yayını.
+
+cam[n].recordUri
+
+Kayıt yapılan RTSP yayını.
+
+cam[n].recordwidth/height
+
+Kayıt çözünürlüğü.
+
+cam[n].subwidth/height
+
+Alt çözünürlüğü.
+
+cam[n].brand
+
+Kamera markası.
+
+cam[n].hw
+
+Kamera donanım modeli.
+
+camreports.KAMERAx.connected
+
+Belirli kameranın bağlı olduğu bilgisi.
+
+camreports.KAMERAx.last_seen_at
+
+En son ne zaman erişildi.
+
+camreports.KAMERAx.recording
+
+Kayıt yapıyor mu?
+
+app.deviceType
+
+Cihaz model tipi.
+
+app.recordPath
+
+Kayıtların saklandığı dizin yolu.
+
+app.firmware_version
+
+Cihaza yüklenmiş yazılım sürümü.
+
+app.autorecord
+
+Otomatik kayıt ayar seviyesi. (0=off, 1=manuel, 2=otomatik)
+
+system.voltage
+
+Cihazın algıladığı voltaj (aku voltajı vb.).
+
+system.awake
+
+Cihaz aktif mi? (1=aktif, 0=değil)
+
+system.uykumodu
+
+Uyku modunda mı? (1=evet, 0=hayır)
+
+system.datetime
+
+Cihazın sistem saati.
+
+system.recording
+
+Kaç kanal kayıt yapıyor.
+
+system.diskfree
+
+Boş alan bilgisi (GB).
+
+system.gpsOk
+
+GPS sinyali alınabiliyor mu?
+
+system.internetExists
+
+Cihaz internet erişimi sağlayabiliyor mu?
+
+system.mac
+
+Fiziksel MAC adresi.
+
+system.uname.*
+
+Sistem bilgisini içerir: OS, kernel sürümü vb.
+
+system.pins.*
+
+GPIO pinlerinin konfigürasyon bilgileri.

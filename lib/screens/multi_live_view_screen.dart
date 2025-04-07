@@ -382,12 +382,9 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     final appBarHeight = AppBar().preferredSize.height;
     final paginationControlsHeight = _totalPages > 1 ? 60.0 : 0.0;
     final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0;
-    final safeAreaPadding = MediaQuery.of(context).padding;
     
-    // Calculate available height for the grid, now using size.height from MediaQuery
-    // Subtract appBar, bottom nav bar (if mobile), and system UI insets
-    // Do NOT subtract pagination controls here, we'll handle them separately
-    final availableHeight = size.height - appBarHeight - bottomNavHeight - safeAreaPadding.top - safeAreaPadding.bottom;
+    // Calculate available height for the grid
+    final availableHeight = size.height - appBarHeight - paginationControlsHeight - bottomNavHeight;
     
     // Filter out null cameras and create a list of only active cameras
     final activeCameras = _selectedCameras.where((cam) => cam != null).toList();
@@ -399,9 +396,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     
     // Calculate optimal aspect ratio based on the available height and active rows
     final double cellWidth = size.width / _gridColumns;
-    // Adjust the available height by removing the pagination controls height if needed
-    final double adjustedAvailableHeight = availableHeight; // Not subtracting pagination again
-    final double cellHeight = adjustedAvailableHeight / activeRowsNeeded;
+    final double cellHeight = availableHeight / activeRowsNeeded;
     final double aspectRatio = cellWidth / cellHeight;
     return Scaffold(
       appBar: AppBar(
@@ -439,19 +434,18 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: Column(
+      body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisAlignment: MainAxisAlignment.start, 
         children: [
-          // Main grid taking all available space
-          Container(
-            width: size.width,
-            height: availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0),
+          // Fixed-height grid view of cameras (non-scrollable)
+          // Ensuring all players fit within the screen with proper aspect ratio
+          Expanded(
             child: GridView.builder(
               padding: EdgeInsets.zero,
-              physics: const NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(), // Disable scrolling to fit all slots
               shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _gridColumns,
-                childAspectRatio: aspectRatio, 
+                childAspectRatio: aspectRatio, // Custom aspect ratio to fit all slots perfectly
                 crossAxisSpacing: 0,
                 mainAxisSpacing: 0,
               ),

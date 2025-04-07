@@ -1,0 +1,1284 @@
+{"c":"changed", "data":"ecs.isMaster", "val": 1}
+{"c":"changed", "data":"ecs.test.is_cam_shared", "val": 1}
+{"c":"changed", "data":"ecs.test.last_slave_count", "val": 4}
+{"c":"changed", "data":"ecs.test.test_started", "val": "2025-04-02 - 12:24:27"}
+{"c":"changed", "data":"ecs.test.control_status", "val": 1}
+{"c":"changed", "data":"ecs.test.control_timer", "val": 3}
+{"c":"changed", "data":"ecs.test.ign_timer", "val": 60}
+{"c":"changed", "data":"ecs.test.aku_timer", "val": 240}
+{"c":"changed", "data":"ecs.test.wifi_timer", "val": 120}
+{"c":"changed", "data":"ecs.test.wifi_status", "val": 1}
+{"c":"changed", "data":"ecs.test.last_cam_count", "val": 9}
+{"c":"changed", "data":"ecs.test.last_cam_shared_at", "val": "2025-04-02 - 12:10:16"}
+{"c":"changed", "data":"ecs.test.ignition_count", "val": 47}
+{"c":"changed", "data":"ecs.test.energy_count", "val": 12}
+{"c":"changed", "data":"ecs.test.wifi_count", "val": 0}
+{"c":"changed", "data":"ecs.test.update_file_path", "val": "http://192.168.1.202:8080/ecs/MXVRv1.tar.gz"}
+{"c":"changed", "data":"ecs.test.total_ignition_control_time", "val": 672}
+{"c":"changed", "data":"ecs.test.total_aku_control_time", "val": 168}
+{"c":"changed", "data":"ecs.test.total_wifi_control_time", "val": 168}
+{"c":"changed", "data":"ecs.test.total_control_time", "val": 48}
+{"c":"changed", "data":"ecs.test.all_led_status", "val": 0}
+{"c":"changed", "data":"ecs.test.flag_handler", "val": 0}
+{"c":"changed", "data":"ecs.test.flag", "val": 0}
+{"c":"changed", "data":"ecs.test.is_cam_sharing", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.firsttime", "val": "2025-03-31 - 13:20:11"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.ipv4", "val": "192.168.1.211"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.ipv6", "val": "fe80::88f5:bfff:fe5f:bcba"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.last_seen_at", "val": "2025-04-02 - 12:29:22"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.test.uptime", "val": "47 Saat 9 Dakika"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.test.kamera_kayit.count", "val": 23}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.test.kamera_kayit.last_update", "val": "2025-04-02 - 00:00:38"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.test.kamera_kayit.error", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.test.is_error", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.test.ignition.count", "val": 47}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.test.ignition.last_update", "val": "2025-04-02 - 11:44:16"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.test.ignition.error", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.test.kamera_baglanti.count", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.test.kamera_baglanti.last_update", "val": "2025-04-02 - 11:52:25"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.test.kamera_baglanti.error", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].xAddrs", "val": "http://192.168.1.20:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].name", "val": "KAMERA1"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].cameraIp", "val": "192.168.1.20"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].hw", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].brand", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].subUri", "val": "rtsp://192.168.1.20:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].remoteUri", "val": "rtsp://192.168.1.20:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].mediaUri", "val": "rtsp://192.168.1.20:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].recordUri", "val": "rtsp://192.168.1.20:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].subSnapShot", "val": "http://192.168.1.20:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].mainSnapShot", "val": "http://192.168.1.20:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].cameraRawIp", "val": 335653056}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].recordwidth", "val": 1920}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].recordheight", "val": 1080}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[0].xAddr", "val": "192.168.1.20:80"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].xAddrs", "val": "http://192.168.1.21:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].name", "val": "KAMERA2"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].cameraIp", "val": "192.168.1.21"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].hw", "val": "H42"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].brand", "val": "H42"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].subUri", "val": "rtsp://192.168.1.21:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].remoteUri", "val": "rtsp://192.168.1.21:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].mediaUri", "val": "rtsp://192.168.1.21:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].recordUri", "val": "rtsp://192.168.1.21:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].subSnapShot", "val": "http://192.168.1.21:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].mainSnapShot", "val": "http://192.168.1.21:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].cameraRawIp", "val": 352430272}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].recordheight", "val": 720}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.cam[1].xAddr", "val": "192.168.1.21:80"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.camreports.KAMERA1.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.camreports.KAMERA1.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.camreports.KAMERA1.last_seen_at", "val": "2025-04-02 - 12:29:01"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.camreports.KAMERA1.recording", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.camreports.KAMERA2.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.camreports.KAMERA2.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.camreports.KAMERA2.last_seen_at", "val": "2025-04-02 - 12:29:01"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.camreports.KAMERA2.recording", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.GUIMenu", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.adbDoNotRun", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.cameraMode", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.deviceType", "val": "MXVR6_v1"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.group", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.intConnection", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.libPath", "val": "/usr/local/lib"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.logPath", "val": "/mnt/sda/Log"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.macAddressPath", "val": "/sys/class/net/eth0/address"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.maxRecordDuration", "val": 15}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.minSpaceInMBytes", "val": 30608}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.movitabinPath", "val": "/root/Movita"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.movitarecPath", "val": "/root/Movita"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.pinCode", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.recordOverTcp", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.recordPath", "val": "/mnt/sda/Rec"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.recording", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.recordingCameras", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.restartPlayerTimeout", "val": 60}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.rxPacketPath", "val": "/sys/class/net/wwan0/statistics/rx_packets"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.seatMode", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.seatPosition", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.simStatus", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.templateId", "val": 9}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.txPacketPath", "val": "/sys/class/net/wwan0/statistics/tx_packets"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.updatePath", "val": "/mnt/sda/Update"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.videoOutput", "val": "AV"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.smartos.card", "val": "/dev/dri/card0"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.smartos.screens.HDMI.mode", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.smartos.screens.HDMI.cameralayout", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.smartos.screens.HDMI.cameralayot", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.netdev", "val": "br0"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.useai", "val": "0"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.gpsDataFlowStatus", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.ppp", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.autorecord", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.isai", "val": "0"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.firmware_version", "val": "3_06.09.20204"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.analogs.analog8.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.analogs.analog8.res", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.analogs.tester", "val": "nobody"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.analogs.analog9.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.analogs.analog9.res", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.analogs.analog10.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.analogs.analog10.res", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.analogs.analog11.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.analogs.analog11.res", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.wifiHotSpotName", "val": "movita1f19"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.wifiHotSpotPass", "val": "movita1f19"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.rp2040version", "val": "16_18_3_2025"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.version", "val": 275}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.app.password", "val": "1111"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.app.filename", "val": "/root/conf/app.js"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.app.at", "val": "2025-03-30 - 03:00:32"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.cam.filename", "val": "/root/conf/cam.js"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.cam.at", "val": "2025-04-02 - 12:10:15"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.analogs.filename", "val": "/root/conf/analogs.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.analogs.at", "val": "2025-03-30 - 03:00:21"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.cameraLayout.filename", "val": "/root/conf/cameraLayout.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.cameraLayout.at", "val": "2025-03-30 - 03:00:26"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.seatingLayout.filename", "val": "/root/conf/seatingLayout.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.seatingLayout.at", "val": "2025-03-30 - 03:00:22"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.info.filename", "val": "/root/conf/info.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.info.at", "val": "2025-03-30 - 03:00:21"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.configuration.filename", "val": "/root/conf/configuration.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.configuration.at", "val": "2025-04-02 - 12:29:00"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.function.filename", "val": "/root/conf/function.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.function.at", "val": "2025-03-30 - 03:00:26"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.gpio.filename", "val": "/root/conf/gpio.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.gpio.at", "val": "2025-03-30 - 03:00:26"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.gpios.filename", "val": "/root/conf/gpios.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.gpios.at", "val": "2025-03-30 - 03:00:26"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.sensors.filename", "val": "/root/conf/sensors.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.sensors.at", "val": "2025-03-30 - 03:00:26"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.events.filename", "val": "/root/conf/events.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.events.at", "val": "2025-03-30 - 03:00:26"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.lists.filename", "val": "/root/conf/lists.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.lists.at", "val": "2025-03-30 - 03:00:26"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.scripts.filename", "val": "/root/conf/scripts.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.scripts.at", "val": "2025-03-30 - 03:00:26"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.ai.filename", "val": "/root/conf/ai.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.ai.at", "val": "2025-03-30 - 03:00:26"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.jlists.filename", "val": "/root/conf/jlists.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.jlists.at", "val": "2025-03-30 - 03:00:26"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.camreports.filename", "val": "/root/conf/camreports.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.camreports.at", "val": "2025-04-02 - 12:29:01"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.movita.filename", "val": "/root/conf/movita.cfg"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.movita.at", "val": "2025-03-30 - 03:00:28"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.diskerror.filename", "val": "/root/conf/diskerror.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.diskerror.at", "val": "2025-03-30 - 03:00:28"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.ecs.filename", "val": "/root/conf/ecs.json"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.files.ecs.at", "val": "2025-03-30 - 03:00:32"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.programs.smartos.started_at", "val": "2025-03-30 - 03:00:22"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.programs.smartcomm.started_at", "val": "2025-03-30 - 03:00:26"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.programs.smartweb.started_at", "val": "2025-03-30 - 03:00:26"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.programs.smartecs.started_at", "val": "2025-03-30 - 03:00:32"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.progstate", "val": "EVENT_PROGRAM_TIMER"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.flash.pin", "val": 7}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.flash.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.flash.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.flash.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.flash.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.flash.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.horn.pin", "val": 8}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.horn.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.horn.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.horn.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.horn.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.horn.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.ignition.pin", "val": 3}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.ignition.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.ignition.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.ignition.pullupdown", "val": "pulldown"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.ignition.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.panicButton.pin", "val": 25}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.panicButton.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.panicButton.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.panicButton.pullupdown", "val": "pulldown"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.diskLed.pin", "val": 14}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.diskLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.diskLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.diskLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.diskLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.diskLed.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.kayitLed.pin", "val": 13}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.kayitLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.kayitLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.kayitLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.kayitLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.kayitLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.gpsLed.pin", "val": 9}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.gpsLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.gpsLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.gpsLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.gpsLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.gpsLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.akuLed.pin", "val": 11}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.akuLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.akuLed.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.akuLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.kontakLed.pin", "val": 10}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.kontakLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.kontakLed.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.kontakLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.simLed.pin", "val": 6}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.simLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.simLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.simLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.simLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.simLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.gsmReg.pin", "val": 21}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.gsmReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.gsmReg.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.gsmReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.gsmReg.set", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.gsmReg.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.networkReg.pin", "val": 19}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.networkReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.networkReg.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.networkReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.networkReg.set", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.networkReg.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.camReg.pin", "val": 23}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.camReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.camReg.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.camReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.camReg.set", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.pins.camReg.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.ip", "val": "192.168.1.1"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.gateway", "val": "192.168.1.2"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.uname.str", "val": "Linux movita-master 5.10.198 #10 SMP Tue Mar 11 14:37:52 UTC 2025 aarch64"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.uname.sysname", "val": "Linux"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.uname.nodename", "val": "movita-master"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.uname.release", "val": "5.10.198"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.uname.machine", "val": "aarch64"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.uname.version", "val": "#10 SMP Tue Mar 11 14:37:52 UTC 2025"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.ignition", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.bootcount", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.awake", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.uykumodu", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.timeset", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.mac", "val": "26:C1:7A:0B:1F:19"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.gpsOk", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.voltage", "val": "11.967033"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.datetime", "val": "2025-04-02 - 12:29:19"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.recording", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.cameras", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.movitaDnsState", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.internetExists", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.movitaServerExists", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.diskrunning", "val": "Evet"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.emptySize", "val": 82}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.recordSize", "val": 119}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.diskfree", "val": "82/119 GB"}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.gsmmodulstatus", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.gpsmodulstatus", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.manuf", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.model", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.revision", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_26_C1_7A_0B_1F_19.system.cihaz_tipi", "val": "MXVR6_v1"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.firsttime", "val": "2025-04-02 - 11:48:19"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.connected", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.ipv4", "val": "192.168.1.126"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.ipv6", "val": "fe80::2c7b:a3ff:fe06:bd5c"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.last_seen_at", "val": "2025-04-02 - 11:52:23"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.test.uptime", "val": "3 Dakika"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.test.kamera_baglanti.count", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.test.kamera_baglanti.last_update", "val": "2025-04-02 - 11:50:20"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.test.kamera_baglanti.error", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.test.is_error", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.test.connection.count", "val": 35}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.test.connection.last_update", "val": "2025-04-02 - 12:29:12"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.test.connection.error", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].xAddrs", "val": "http://192.168.1.27:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].name", "val": "KAMERA8"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].cameraIp", "val": "192.168.1.27"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].hw", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].brand", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].subUri", "val": "rtsp://192.168.1.27:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].remoteUri", "val": "rtsp://192.168.1.27:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].mediaUri", "val": "rtsp://192.168.1.27:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].recordUri", "val": "rtsp://192.168.1.27:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].subSnapShot", "val": "http://192.168.1.27:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].mainSnapShot", "val": "http://192.168.1.27:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].cameraRawIp", "val": 453093568}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].recordheight", "val": 720}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[0].xAddr", "val": "192.168.1.27:80"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].xAddrs", "val": "http://192.168.1.28:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].name", "val": "KAMERA9"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].cameraIp", "val": "192.168.1.28"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].hw", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].brand", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].subUri", "val": "rtsp://192.168.1.28:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].remoteUri", "val": "rtsp://192.168.1.28:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].mediaUri", "val": "rtsp://192.168.1.28:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].recordUri", "val": "rtsp://192.168.1.28:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].subSnapShot", "val": "http://192.168.1.28:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].mainSnapShot", "val": "http://192.168.1.28:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].cameraRawIp", "val": 469870784}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].recordwidth", "val": 1920}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].recordheight", "val": 1080}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.cam[1].xAddr", "val": "192.168.1.28:80"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.GUIMenu", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.adbDoNotRun", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.cameraMode", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.deviceType", "val": "MXVR6_v1"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.group", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.intConnection", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.libPath", "val": "/usr/local/lib"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.logPath", "val": "/mnt/sda/Log"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.macAddressPath", "val": "/sys/class/net/eth0/address"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.maxRecordDuration", "val": 15}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.minSpaceInMBytes", "val": 30608}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.movitabinPath", "val": "/root/Movita"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.movitarecPath", "val": "/root/Movita"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.pinCode", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.recordOverTcp", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.recordPath", "val": "/mnt/sda/Rec"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.recording", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.recordingCameras", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.restartPlayerTimeout", "val": 60}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.rxPacketPath", "val": "/sys/class/net/wwan0/statistics/rx_packets"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.seatMode", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.seatPosition", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.simStatus", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.templateId", "val": 9}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.txPacketPath", "val": "/sys/class/net/wwan0/statistics/tx_packets"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.updatePath", "val": "/mnt/sda/Update"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.videoOutput", "val": "AV"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.smartos.card", "val": "/dev/dri/card0"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.smartos.screens.HDMI.mode", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.smartos.screens.HDMI.cameralayout", "val": 5}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.netdev", "val": "br0"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.useai", "val": "0"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.gpsDataFlowStatus", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.ppp", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.autorecord", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.isai", "val": "0"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.firmware_version", "val": "6"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.firmware_date", "val": "15_03_2025"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.analogs.analog8.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.analogs.analog8.res", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.analogs.tester", "val": "nobody"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.analogs.analog9.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.analogs.analog9.res", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.analogs.analog10.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.analogs.analog10.res", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.analogs.analog11.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.analogs.analog11.res", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.wifiHotSpotName", "val": "movitabd5c"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.wifiHotSpotPass", "val": "movitabd5c"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.rp2040version", "val": "16_18_3_2025"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.app.version", "val": 275}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.camreports.KAMERA8.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.camreports.KAMERA8.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.camreports.KAMERA8.last_seen_at", "val": "2025-04-02 - 11:51:20"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.camreports.KAMERA8.recording", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.camreports.KAMERA9.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.camreports.KAMERA9.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.camreports.KAMERA9.last_seen_at", "val": "2025-04-02 - 11:51:20"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.camreports.KAMERA9.recording", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.app.filename", "val": "/root/conf/app.js"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.app.at", "val": "2025-04-02 - 11:52:02"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.cam.filename", "val": "/root/conf/cam.js"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.cam.at", "val": "2025-04-02 - 11:51:57"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.analogs.filename", "val": "/root/conf/analogs.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.analogs.at", "val": "2025-04-02 - 11:51:51"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.cameraLayout.filename", "val": "/root/conf/cameraLayout.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.cameraLayout.at", "val": "2025-04-02 - 11:51:57"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.seatingLayout.filename", "val": "/root/conf/seatingLayout.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.seatingLayout.at", "val": "2025-04-02 - 11:51:52"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.info.filename", "val": "/root/conf/info.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.info.at", "val": "2025-04-02 - 11:51:51"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.configuration.filename", "val": "/root/conf/configuration.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.configuration.at", "val": "2025-04-02 - 11:51:57"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.function.filename", "val": "/root/conf/function.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.function.at", "val": "2025-04-02 - 11:51:56"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.gpio.filename", "val": "/root/conf/gpio.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.gpio.at", "val": "2025-04-02 - 11:51:56"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.gpios.filename", "val": "/root/conf/gpios.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.gpios.at", "val": "2025-04-02 - 11:51:56"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.sensors.filename", "val": "/root/conf/sensors.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.sensors.at", "val": "2025-04-02 - 11:51:57"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.events.filename", "val": "/root/conf/events.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.events.at", "val": "2025-04-02 - 11:51:57"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.lists.filename", "val": "/root/conf/lists.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.lists.at", "val": "2025-04-02 - 11:51:57"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.scripts.filename", "val": "/root/conf/scripts.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.scripts.at", "val": "2025-04-02 - 11:51:57"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.ai.filename", "val": "/root/conf/ai.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.ai.at", "val": "2025-04-02 - 11:51:57"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.jlists.filename", "val": "/root/conf/jlists.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.jlists.at", "val": "2025-04-02 - 11:51:57"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.camreports.filename", "val": "/root/conf/camreports.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.camreports.at", "val": "2025-04-02 - 11:52:09"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.movita.filename", "val": "/root/conf/movita.cfg"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.movita.at", "val": "2025-04-02 - 11:51:58"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.diskerror.filename", "val": "/root/conf/diskerror.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.diskerror.at", "val": "2025-04-02 - 11:51:58"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.ecs.filename", "val": "/root/conf/ecs.json"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.files.ecs.at", "val": "2025-04-02 - 11:52:02"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.programs.smartos.started_at", "val": "2025-04-02 - 11:51:52"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.programs.smartcomm.started_at", "val": "2025-04-02 - 11:51:56"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.programs.smartweb.started_at", "val": "2025-04-02 - 11:51:57"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.programs.smartecs.started_at", "val": "2025-04-02 - 11:52:02"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.progstate", "val": "EVENT_PROGRAM_TIMER"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.flash.pin", "val": 7}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.flash.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.flash.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.flash.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.flash.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.flash.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.horn.pin", "val": 8}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.horn.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.horn.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.horn.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.horn.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.horn.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.ignition.pin", "val": 3}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.ignition.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.ignition.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.ignition.pullupdown", "val": "pulldown"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.ignition.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.panicButton.pin", "val": 25}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.panicButton.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.panicButton.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.panicButton.pullupdown", "val": "pulldown"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.diskLed.pin", "val": 14}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.diskLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.diskLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.diskLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.diskLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.diskLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.kayitLed.pin", "val": 13}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.kayitLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.kayitLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.kayitLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.kayitLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.kayitLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.gpsLed.pin", "val": 9}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.gpsLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.gpsLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.gpsLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.gpsLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.gpsLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.akuLed.pin", "val": 11}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.akuLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.akuLed.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.akuLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.kontakLed.pin", "val": 10}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.kontakLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.kontakLed.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.kontakLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.simLed.pin", "val": 6}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.simLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.simLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.simLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.simLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.simLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.gsmReg.pin", "val": 21}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.gsmReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.gsmReg.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.gsmReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.gsmReg.set", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.gsmReg.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.networkReg.pin", "val": 19}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.networkReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.networkReg.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.networkReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.networkReg.set", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.networkReg.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.camReg.pin", "val": 23}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.camReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.camReg.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.camReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.camReg.set", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.pins.camReg.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.ip", "val": "192.168.1.1"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.gateway", "val": "192.168.1.1"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.uname.str", "val": "Linux movita 5.10.198 #10 SMP Tue Mar 11 14:37:52 UTC 2025 aarch64"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.uname.sysname", "val": "Linux"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.uname.nodename", "val": "movita"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.uname.release", "val": "5.10.198"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.uname.machine", "val": "aarch64"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.uname.version", "val": "#10 SMP Tue Mar 11 14:37:52 UTC 2025"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.ignition", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.bootcount", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.awake", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.uykumodu", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.timeset", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.mac", "val": "2E:7B:A3:06:BD:5C"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.gpsOk", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.voltage", "val": "12.764835"}
+{"c":"changed", "data":"ecs.slaves.m_2E_7B_A3_06_BD_5C.system.datetime", "val": "2025-04-02 - 11:52:12"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.firsttime", "val": "2025-04-02 - 11:58:42"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.ipv4", "val": "192.168.1.206"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.ipv6", "val": "fe80::94a6:bff:fe19:63d4"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.last_seen_at", "val": "2025-04-02 - 12:29:22"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.test.uptime", "val": "30 Dakika"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].xAddrs", "val": "http://192.168.1.27:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].name", "val": "KAMERA8"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].cameraIp", "val": "192.168.1.27"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].hw", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].brand", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].subUri", "val": "rtsp://192.168.1.27:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].remoteUri", "val": "rtsp://192.168.1.27:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].mediaUri", "val": "rtsp://192.168.1.27:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].recordUri", "val": "rtsp://192.168.1.27:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].subSnapShot", "val": "http://192.168.1.27:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].mainSnapShot", "val": "http://192.168.1.27:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].cameraRawIp", "val": 453093568}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].recordheight", "val": 720}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[0].xAddr", "val": "192.168.1.27:80"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].xAddrs", "val": "http://192.168.1.28:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].name", "val": "KAMERA9"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].cameraIp", "val": "192.168.1.28"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].hw", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].brand", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].subUri", "val": "rtsp://192.168.1.28:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].remoteUri", "val": "rtsp://192.168.1.28:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].mediaUri", "val": "rtsp://192.168.1.28:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].recordUri", "val": "rtsp://192.168.1.28:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].subSnapShot", "val": "http://192.168.1.28:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].mainSnapShot", "val": "http://192.168.1.28:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].cameraRawIp", "val": 469870784}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].recordwidth", "val": 1920}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].recordheight", "val": 1080}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.cam[1].xAddr", "val": "192.168.1.28:80"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.camreports.KAMERA8.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.camreports.KAMERA8.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.camreports.KAMERA8.last_seen_at", "val": "2025-04-02 - 12:29:04"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.camreports.KAMERA8.recording", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.camreports.KAMERA9.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.camreports.KAMERA9.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.camreports.KAMERA9.last_seen_at", "val": "2025-04-02 - 12:29:04"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.camreports.KAMERA9.recording", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.GUIMenu", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.adbDoNotRun", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.cameraMode", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.deviceType", "val": "MXVR6_v1"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.group", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.intConnection", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.libPath", "val": "/usr/local/lib"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.logPath", "val": "/mnt/sda/Log"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.macAddressPath", "val": "/sys/class/net/eth0/address"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.maxRecordDuration", "val": 15}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.minSpaceInMBytes", "val": 30608}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.movitabinPath", "val": "/root/Movita"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.movitarecPath", "val": "/root/Movita"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.pinCode", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.recordOverTcp", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.recordPath", "val": "/mnt/sda/Rec"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.recording", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.recordingCameras", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.restartPlayerTimeout", "val": 60}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.rxPacketPath", "val": "/sys/class/net/wwan0/statistics/rx_packets"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.seatMode", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.seatPosition", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.simStatus", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.templateId", "val": 9}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.txPacketPath", "val": "/sys/class/net/wwan0/statistics/tx_packets"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.updatePath", "val": "/mnt/sda/Update"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.videoOutput", "val": "AV"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.smartos.card", "val": "/dev/dri/card0"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.smartos.screens.HDMI.mode", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.smartos.screens.HDMI.cameralayout", "val": 5}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.netdev", "val": "br0"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.useai", "val": "0"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.gpsDataFlowStatus", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.ppp", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.autorecord", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.isai", "val": "0"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.firmware_version", "val": "6"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.firmware_date", "val": "15_03_2025"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.analogs.analog8.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.analogs.analog8.res", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.analogs.tester", "val": "nobody"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.analogs.analog9.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.analogs.analog9.res", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.analogs.analog10.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.analogs.analog10.res", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.analogs.analog11.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.analogs.analog11.res", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.wifiHotSpotName", "val": "movita63d4"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.wifiHotSpotPass", "val": "movita63d4"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.rp2040version", "val": "16_18_3_2025"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.app.version", "val": 275}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.app.filename", "val": "/root/conf/app.js"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.app.at", "val": "2025-04-02 - 11:54:26"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.cam.filename", "val": "/root/conf/cam.js"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.cam.at", "val": "2025-04-02 - 12:10:15"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.analogs.filename", "val": "/root/conf/analogs.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.analogs.at", "val": "2025-04-02 - 11:54:14"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.cameraLayout.filename", "val": "/root/conf/cameraLayout.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.cameraLayout.at", "val": "2025-04-02 - 11:54:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.seatingLayout.filename", "val": "/root/conf/seatingLayout.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.seatingLayout.at", "val": "2025-04-02 - 11:54:14"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.info.filename", "val": "/root/conf/info.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.info.at", "val": "2025-04-02 - 11:54:14"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.configuration.filename", "val": "/root/conf/configuration.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.configuration.at", "val": "2025-04-02 - 12:28:23"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.function.filename", "val": "/root/conf/function.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.function.at", "val": "2025-04-02 - 11:54:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.gpio.filename", "val": "/root/conf/gpio.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.gpio.at", "val": "2025-04-02 - 11:54:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.gpios.filename", "val": "/root/conf/gpios.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.gpios.at", "val": "2025-04-02 - 11:54:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.sensors.filename", "val": "/root/conf/sensors.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.sensors.at", "val": "2025-04-02 - 11:54:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.events.filename", "val": "/root/conf/events.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.events.at", "val": "2025-04-02 - 11:54:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.lists.filename", "val": "/root/conf/lists.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.lists.at", "val": "2025-04-02 - 11:54:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.scripts.filename", "val": "/root/conf/scripts.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.scripts.at", "val": "2025-04-02 - 11:54:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.ai.filename", "val": "/root/conf/ai.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.ai.at", "val": "2025-04-02 - 11:54:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.jlists.filename", "val": "/root/conf/jlists.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.jlists.at", "val": "2025-04-02 - 11:54:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.camreports.filename", "val": "/root/conf/camreports.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.camreports.at", "val": "2025-04-02 - 12:29:05"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.movita.filename", "val": "/root/conf/movita.cfg"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.movita.at", "val": "2025-04-02 - 11:54:20"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.diskerror.filename", "val": "/root/conf/diskerror.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.diskerror.at", "val": "2025-04-02 - 11:54:20"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.ecs.filename", "val": "/root/conf/ecs.json"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.files.ecs.at", "val": "2025-04-02 - 11:58:41"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.programs.smartos.started_at", "val": "2025-04-02 - 11:54:14"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.programs.smartcomm.started_at", "val": "2025-04-02 - 11:54:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.programs.smartweb.started_at", "val": "2025-04-02 - 11:54:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.programs.smartecs.started_at", "val": "2025-04-02 - 11:54:26"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.progstate", "val": "EVENT_PROGRAM_TIMER"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.flash.pin", "val": 7}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.flash.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.flash.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.flash.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.flash.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.flash.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.horn.pin", "val": 8}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.horn.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.horn.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.horn.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.horn.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.horn.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.ignition.pin", "val": 3}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.ignition.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.ignition.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.ignition.pullupdown", "val": "pulldown"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.ignition.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.panicButton.pin", "val": 25}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.panicButton.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.panicButton.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.panicButton.pullupdown", "val": "pulldown"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.diskLed.pin", "val": 14}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.diskLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.diskLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.diskLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.diskLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.diskLed.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.kayitLed.pin", "val": 13}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.kayitLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.kayitLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.kayitLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.kayitLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.kayitLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.gpsLed.pin", "val": 9}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.gpsLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.gpsLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.gpsLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.gpsLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.gpsLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.akuLed.pin", "val": 11}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.akuLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.akuLed.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.akuLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.kontakLed.pin", "val": 10}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.kontakLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.kontakLed.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.kontakLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.simLed.pin", "val": 6}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.simLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.simLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.simLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.simLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.simLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.gsmReg.pin", "val": 21}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.gsmReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.gsmReg.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.gsmReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.gsmReg.set", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.gsmReg.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.networkReg.pin", "val": 19}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.networkReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.networkReg.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.networkReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.networkReg.set", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.networkReg.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.camReg.pin", "val": 23}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.camReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.camReg.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.camReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.camReg.set", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.pins.camReg.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.ip", "val": "192.168.1.1"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.gateway", "val": "192.168.1.1"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.uname.str", "val": "Linux movita 5.10.198 #10 SMP Tue Mar 11 14:37:52 UTC 2025 aarch64"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.uname.sysname", "val": "Linux"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.uname.nodename", "val": "movita"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.uname.release", "val": "5.10.198"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.uname.machine", "val": "aarch64"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.uname.version", "val": "#10 SMP Tue Mar 11 14:37:52 UTC 2025"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.awake", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.uykumodu", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.timeset", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.ignition", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.bootcount", "val": 900}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.mac", "val": "96:A6:0B:19:63:D4"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.gpsOk", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.recording", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.cameras", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.movitaDnsState", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.internetExists", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.movitaServerExists", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.diskrunning", "val": "Evet"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.emptySize", "val": 120}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.recordSize", "val": 124}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.diskfree", "val": "120/124 GB"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.gsmmodulstatus", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.gpsmodulstatus", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.manuf", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.model", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.revision", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.cihaz_tipi", "val": "MXVR6_v1"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.voltage", "val": "11.967033"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.datetime", "val": "2025-04-02 - 12:29:19"}
+{"c":"changed", "data":"ecs.slaves.m_96_A6_0B_19_63_D4.system.restartrec", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.isMaster", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.GUIMenu", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.adbDoNotRun", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.cameraMode", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.deviceType", "val": "MXVR6_v1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.group", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.intConnection", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.libPath", "val": "/usr/local/lib"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.logPath", "val": "/mnt/sda/Log"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.macAddressPath", "val": "/sys/class/net/eth0/address"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.maxRecordDuration", "val": 15}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.minSpaceInMBytes", "val": 30608}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.movitabinPath", "val": "/root/Movita"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.movitarecPath", "val": "/root/Movita"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.pinCode", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.recordOverTcp", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.recordPath", "val": "/mnt/sda/Rec"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.recording", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.recordingCameras", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.restartPlayerTimeout", "val": 60}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.rxPacketPath", "val": "/sys/class/net/wwan0/statistics/rx_packets"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.seatMode", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.seatPosition", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.simStatus", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.templateId", "val": 9}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.txPacketPath", "val": "/sys/class/net/wwan0/statistics/tx_packets"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.updatePath", "val": "/mnt/sda/Update"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.videoOutput", "val": "AV"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.smartos.card", "val": "/dev/dri/card0"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.smartos.screens.HDMI.mode", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.smartos.screens.HDMI.cameralayout", "val": 5}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.netdev", "val": "br0"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.useai", "val": "0"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.gpsDataFlowStatus", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.ppp", "val": true}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.autorecord", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.isai", "val": "0"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.firmware_version", "val": "6"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.firmware_date", "val": "15_03_2025"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.analogs.analog8.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.analogs.analog8.res", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.analogs.tester", "val": "nobody"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.analogs.analog9.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.analogs.analog9.res", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.analogs.analog10.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.analogs.analog10.res", "val": 2}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.analogs.analog11.ok", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.analogs.analog11.res", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.wifiHotSpotName", "val": "movita0e16"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.wifiHotSpotPass", "val": "movita0e16"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.rp2040version", "val": "16_18_3_2025"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.version", "val": 271}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.app.password", "val": "1111"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].xAddrs", "val": "http://192.168.1.20:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].name", "val": "KAMERA1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].cameraIp", "val": "192.168.1.20"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].hw", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].brand", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].subUri", "val": "rtsp://192.168.1.20:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].remoteUri", "val": "rtsp://192.168.1.20:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].mediaUri", "val": "rtsp://192.168.1.20:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].recordUri", "val": "rtsp://192.168.1.20:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].subSnapShot", "val": "http://192.168.1.20:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].mainSnapShot", "val": "http://192.168.1.20:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].cameraRawIp", "val": 335653056}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].recordwidth", "val": 1920}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].recordheight", "val": 1080}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[0].xAddr", "val": "192.168.1.20:80"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].xAddrs", "val": "http://192.168.1.21:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].name", "val": "KAMERA2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].cameraIp", "val": "192.168.1.21"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].hw", "val": "H42"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].brand", "val": "H42"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].subUri", "val": "rtsp://192.168.1.21:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].remoteUri", "val": "rtsp://192.168.1.21:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].mediaUri", "val": "rtsp://192.168.1.21:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].recordUri", "val": "rtsp://192.168.1.21:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].subSnapShot", "val": "http://192.168.1.21:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].mainSnapShot", "val": "http://192.168.1.21:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].cameraRawIp", "val": 352430272}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].recordheight", "val": 720}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[1].xAddr", "val": "192.168.1.21:80"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].xAddrs", "val": "http://192.168.1.27:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].name", "val": "KAMERA8"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].cameraIp", "val": "192.168.1.27"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].hw", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].brand", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].subUri", "val": "rtsp://192.168.1.27:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].remoteUri", "val": "rtsp://192.168.1.27:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].mediaUri", "val": "rtsp://192.168.1.27:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].recordUri", "val": "rtsp://192.168.1.27:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].subSnapShot", "val": "http://192.168.1.27:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].mainSnapShot", "val": "http://192.168.1.27:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].cameraRawIp", "val": 453093568}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].recordheight", "val": 720}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[2].xAddr", "val": "192.168.1.27:80"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].xAddrs", "val": "http://192.168.1.28:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].name", "val": "KAMERA9"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].cameraIp", "val": "192.168.1.28"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].hw", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].brand", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].subUri", "val": "rtsp://192.168.1.28:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].remoteUri", "val": "rtsp://192.168.1.28:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].mediaUri", "val": "rtsp://192.168.1.28:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].recordUri", "val": "rtsp://192.168.1.28:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].subSnapShot", "val": "http://192.168.1.28:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].mainSnapShot", "val": "http://192.168.1.28:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].cameraRawIp", "val": 469870784}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].recordwidth", "val": 1920}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].recordheight", "val": 1080}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[3].xAddr", "val": "192.168.1.28:80"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].xAddrs", "val": "http://192.168.1.30:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].name", "val": "KAMERA30"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].cameraIp", "val": "192.168.1.30"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].hw", "val": "H42"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].brand", "val": "H42"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].subUri", "val": "rtsp://192.168.1.30:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].remoteUri", "val": "rtsp://192.168.1.30:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].mediaUri", "val": "rtsp://192.168.1.30:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].recordUri", "val": "rtsp://192.168.1.30:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].subSnapShot", "val": "http://192.168.1.30:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].mainSnapShot", "val": "http://192.168.1.30:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].cameraRawIp", "val": 503425216}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].recordheight", "val": 720}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].subwidth", "val": 640}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].subheight", "val": 480}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[4].xAddr", "val": "192.168.1.30:80"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].xAddrs", "val": "http://192.168.1.32:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].name", "val": "KAMERA32"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].cameraIp", "val": "192.168.1.32"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].hw", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].brand", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].subUri", "val": "rtsp://192.168.1.32:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].remoteUri", "val": "rtsp://192.168.1.32:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].mediaUri", "val": "rtsp://192.168.1.32:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].recordUri", "val": "rtsp://192.168.1.32:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].subSnapShot", "val": "http://192.168.1.32:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].mainSnapShot", "val": "http://192.168.1.32:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].cameraRawIp", "val": 536979648}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].recordheight", "val": 720}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].subwidth", "val": 640}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].subheight", "val": 480}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[5].xAddr", "val": "192.168.1.32:80"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].xAddrs", "val": "http://192.168.1.34:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].name", "val": "KAMERA34"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].cameraIp", "val": "192.168.1.34"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].hw", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].brand", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].subUri", "val": "rtsp://192.168.1.34:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].remoteUri", "val": "rtsp://192.168.1.34:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].mediaUri", "val": "rtsp://192.168.1.34:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].recordUri", "val": "rtsp://192.168.1.34:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].subSnapShot", "val": "http://192.168.1.34:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].mainSnapShot", "val": "http://192.168.1.34:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].cameraRawIp", "val": 570534080}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].recordheight", "val": 720}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[6].xAddr", "val": "192.168.1.34:80"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].xAddrs", "val": "http://192.168.1.35:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].name", "val": "KAMERA35"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].cameraIp", "val": "192.168.1.35"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].hw", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].brand", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].subUri", "val": "rtsp://192.168.1.35:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].remoteUri", "val": "rtsp://192.168.1.35:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].mediaUri", "val": "rtsp://192.168.1.35:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].recordUri", "val": "rtsp://192.168.1.35:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].subSnapShot", "val": "http://192.168.1.35:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].mainSnapShot", "val": "http://192.168.1.35:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].cameraRawIp", "val": 587311296}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].recordheight", "val": 720}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[7].xAddr", "val": "192.168.1.35:80"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].xAddrs", "val": "http://192.168.1.40:80/onvif/device_service"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].name", "val": "KAMERA40"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].username", "val": "admin"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].cameraIp", "val": "192.168.1.40"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].password", "val": "admin123"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].hw", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].brand", "val": "H41"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].country", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].subUri", "val": "rtsp://192.168.1.40:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].remoteUri", "val": "rtsp://192.168.1.40:554/stream2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].mediaUri", "val": "rtsp://192.168.1.40:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].recordUri", "val": "rtsp://192.168.1.40:554/stream1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].subSnapShot", "val": "http://192.168.1.40:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].mainSnapShot", "val": "http://192.168.1.40:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].cameraRawIp", "val": 671197376}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].recordPath", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].recordwidth", "val": 1920}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].recordheight", "val": 1080}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].subwidth", "val": 800}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].subheight", "val": 448}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.cam[8].xAddr", "val": "192.168.1.40:80"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.app.filename", "val": "/root/conf/app.js"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.app.at", "val": "2025-04-02 - 12:24:27"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.cam.filename", "val": "/root/conf/cam.js"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.cam.at", "val": "2025-04-02 - 12:08:56"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.analogs.filename", "val": "/root/conf/analogs.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.analogs.at", "val": "2025-03-30 - 11:39:03"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.cameraLayout.filename", "val": "/root/conf/cameraLayout.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.cameraLayout.at", "val": "2025-04-02 - 12:08:56"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.seatingLayout.filename", "val": "/root/conf/seatingLayout.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.seatingLayout.at", "val": "2025-03-30 - 11:39:03"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.info.filename", "val": "/root/conf/info.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.info.at", "val": "2025-03-30 - 11:39:03"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.configuration.filename", "val": "/root/conf/configuration.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.configuration.at", "val": "2025-04-02 - 12:23:47"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.function.filename", "val": "/root/conf/function.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.function.at", "val": "2025-04-02 - 10:42:29"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.gpio.filename", "val": "/root/conf/gpio.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.gpio.at", "val": "2025-04-02 - 10:42:29"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.gpios.filename", "val": "/root/conf/gpios.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.gpios.at", "val": "2025-04-02 - 10:42:29"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.sensors.filename", "val": "/root/conf/sensors.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.sensors.at", "val": "2025-04-02 - 12:08:56"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.events.filename", "val": "/root/conf/events.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.events.at", "val": "2025-04-02 - 12:08:56"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.lists.filename", "val": "/root/conf/lists.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.lists.at", "val": "2025-04-02 - 12:08:56"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.scripts.filename", "val": "/root/conf/scripts.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.scripts.at", "val": "2025-04-02 - 12:08:56"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.ai.filename", "val": "/root/conf/ai.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.ai.at", "val": "2025-04-02 - 12:08:56"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.jlists.filename", "val": "/root/conf/jlists.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.jlists.at", "val": "2025-04-02 - 12:08:56"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.camreports.filename", "val": "/root/conf/camreports.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.camreports.at", "val": "2025-04-02 - 12:24:08"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.movita.filename", "val": "/root/conf/movita.cfg"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.movita.at", "val": "2025-03-30 - 01:57:12"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.diskerror.filename", "val": "/root/conf/diskerror.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.diskerror.at", "val": "2025-03-30 - 01:57:12"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.ecs.filename", "val": "/root/conf/ecs.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.ecs.at", "val": "2025-04-02 - 12:24:37"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.beacons.filename", "val": "/usr/share/beacons.json"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.files.beacons.at", "val": "2025-04-02 - 10:42:29"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.programs.smartos.started_at", "val": "2025-03-30 - 11:39:03"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.programs.smartcomm.started_at", "val": "2025-03-30 - 01:57:10"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.programs.smartweb.started_at", "val": "2025-04-02 - 12:08:56"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.programs.smartecs.started_at", "val": "2025-04-02 - 12:24:27"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.progstate", "val": "EVENT_PROGRAM_TIMER"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.flash.pin", "val": 7}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.flash.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.flash.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.flash.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.flash.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.flash.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.horn.pin", "val": 8}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.horn.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.horn.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.horn.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.horn.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.horn.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.ignition.pin", "val": 3}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.ignition.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.ignition.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.ignition.pullupdown", "val": "pulldown"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.ignition.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.panicButton.pin", "val": 25}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.panicButton.is_static", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.panicButton.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.panicButton.pullupdown", "val": "pulldown"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.diskLed.pin", "val": 14}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.diskLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.diskLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.diskLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.diskLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.diskLed.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.kayitLed.pin", "val": 13}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.kayitLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.kayitLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.kayitLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.kayitLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.kayitLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.gpsLed.pin", "val": 9}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.gpsLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.gpsLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.gpsLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.gpsLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.gpsLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.akuLed.pin", "val": 11}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.akuLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.akuLed.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.akuLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.kontakLed.pin", "val": 10}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.kontakLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.kontakLed.type", "val": "input"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.kontakLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.simLed.pin", "val": 6}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.simLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.simLed.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.simLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.simLed.set", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.simLed.status", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.networkReg.pin", "val": 19}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.networkReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.networkReg.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.networkReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.networkReg.set", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.networkReg.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.camReg.pin", "val": 23}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.camReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.camReg.type", "val": "output"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.camReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.camReg.set", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.pins.camReg.status", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.ip", "val": "192.168.1.202"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.gateway", "val": "192.168.1.2"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.uname.str", "val": "Linux movita 5.10.198 #10 SMP Tue Mar 11 14:37:52 UTC 2025 aarch64"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.uname.sysname", "val": "Linux"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.uname.nodename", "val": "movita"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.uname.release", "val": "5.10.198"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.uname.machine", "val": "aarch64"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.uname.version", "val": "#10 SMP Tue Mar 11 14:37:52 UTC 2025"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.awake", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.uykumodu", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.timeset", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.ignition", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.bootcount", "val": 900}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.mac", "val": "6A:59:8C:F3:0E:16"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.gpsOk", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.recording", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.cameras", "val": 9}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.movitaServerIp", "val": "161.97.107.99"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.internetExists", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.movitaDnsState", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.movitaServerExists", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.diskrunning", "val": "Evet"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.emptySize", "val": 115}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.recordSize", "val": 123}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.diskfree", "val": "115/123 GB"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.gsmmodulstatus", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.gpsmodulstatus", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.manuf", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.model", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.revision", "val": ""}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.cihaz_tipi", "val": "MXVR6_v1"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.restartrec", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.running.change_wifi_timer", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.running.change_ign_timer", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.system.running.change_aku_timer", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA1.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA1.recording", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA1.reported", "val": "error: 1000"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA1.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA1.last_seen_at", "val": "2025-04-02 - 12:29:12"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA1.last_restart_time", "val": "2025-03-30 - 03:00:54"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA2.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA2.recording", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA2.reported", "val": "error: 1000"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA2.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA2.last_seen_at", "val": "2025-04-02 - 12:29:12"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA2.last_restart_time", "val": "2025-03-30 - 03:00:55"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA3.connected", "val": 0}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA3.recording", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA3.reported", "val": "error: 1000"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA3.disconnected", "val": "2025-03-21 - 11:28:51"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA3.last_seen_at", "val": "2025-03-21 - 11:28:19"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA3.last_restart_time", "val": "2025-03-21 - 11:28:51"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA8.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA8.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA8.last_seen_at", "val": "2025-04-02 - 12:29:12"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA8.recording", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA8.reported", "val": "error: 1000"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA8.last_restart_time", "val": "2025-03-30 - 03:00:56"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA9.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA9.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA9.last_seen_at", "val": "2025-04-02 - 12:29:12"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA9.recording", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA9.last_restart_time", "val": "2025-03-30 - 02:59:21"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA32.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA32.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA32.last_seen_at", "val": "2025-04-02 - 12:29:12"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA32.recording", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA32.reported", "val": "error: 1000"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA32.last_restart_time", "val": "2025-04-02 - 11:51:06"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA34.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA34.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA34.last_seen_at", "val": "2025-04-02 - 12:29:12"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA34.recording", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA34.reported", "val": "error: 1000"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA34.last_restart_time", "val": "2025-03-30 - 03:00:59"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA35.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA35.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA35.last_seen_at", "val": "2025-04-02 - 12:29:12"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA35.recording", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA35.last_restart_time", "val": "2025-03-30 - 03:01:00"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA40.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA40.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA40.last_seen_at", "val": "2025-04-02 - 12:29:12"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA40.recording", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA40.last_restart_time", "val": "2025-03-30 - 03:01:01"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA30.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA30.connected", "val": 1}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA30.last_seen_at", "val": "2025-04-02 - 12:29:12"}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA30.recording", "val": false}
+{"c":"changed", "data":"ecs.slaves.m_6A_59_8C_F3_0E_16.camreports.KAMERA30.last_restart_time", "val": "2025-03-30 - 03:00:57"}
+{"c":"changed", "data":"ecs.my_mac", "val": "m_6A_59_8C_F3_0E_16"}
