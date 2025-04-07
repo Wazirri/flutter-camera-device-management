@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart'; // Import for MediaKit
+
+import 'utils/keyboard_fix.dart'; // Import keyboard fix utilities
+import 'utils/keyboard_fix.dart'; // Import keyboard fix utilities
 import 'screens/cameras_screen.dart';
 import 'screens/camera_devices_screen.dart';
 import 'screens/dashboard_screen.dart';
@@ -85,18 +88,44 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  // Klavye olaylarını takip etmek için HardwareKeyboard'u kullanacağız
+  final HardwareKeyboard _hardwareKeyboard = HardwareKeyboard.instance;
+  final Set<PhysicalKeyboardKey> _physicalKeysPressed = <PhysicalKeyboardKey>{};
+  
   @override
   void initState() {
     super.initState();
     // Register observer for app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
+    
+    // Klavye olay dinleyicisini ekle
+    _hardwareKeyboard.addHandler(_handleKeyEvent);
   }
 
   @override
   void dispose() {
+    // Klavye olay dinleyicisini kaldır
+    _hardwareKeyboard.removeHandler(_handleKeyEvent);
+    
     // Remove observer when app is disposed
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+  
+  // Klavye olaylarını işleyen fonksiyon
+  bool _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      // Eğer tuş zaten basılı olarak işaretliyse, bu tuşun basılmasını yoksay
+      if (_physicalKeysPressed.contains(event.physicalKey)) {
+        return true; // Olayı tükettik ve uygulamaya gitmesini engelledik
+      }
+      // Değilse, tuşu basılı olarak işaretle
+      _physicalKeysPressed.add(event.physicalKey);
+    } else if (event is KeyUpEvent) {
+      // Tuşun bırakıldığını işaretle
+      _physicalKeysPressed.remove(event.physicalKey);
+    }
+    return false; // Olayı normal şekilde işle
   }
 
   @override
@@ -125,7 +154,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return KeyboardFixWrapper(
+      child: MaterialApp(
       title: 'movita ECS',
       theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
@@ -233,6 +263,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             return AppPageTransitions.fade(page);
         }
       },
+    ),
+    ),
     );
   }
 }
