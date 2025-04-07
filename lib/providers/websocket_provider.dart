@@ -30,7 +30,10 @@ class WebSocketProvider with ChangeNotifier {
   // Message log functionality
   final List<String> _messageLog = [];
   bool _isLocalServerMode = false;
-
+  
+  // Store last received message for other providers to access
+  dynamic _lastMessage;
+  
   // Connection settings
   String _serverIp = '85.104.114.145';
   int _serverPort = 1200;

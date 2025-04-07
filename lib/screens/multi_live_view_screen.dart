@@ -383,15 +383,16 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     final paginationControlsHeight = _totalPages > 1 ? 60.0 : 0.0;
     final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0;
     
-    // Calculate available height for the grid with more generous padding
-    final availableHeight = size.height - appBarHeight - paginationControlsHeight - bottomNavHeight - 48;
+    // Calculate available height for the grid with proper padding
+    final availableHeight = size.height - appBarHeight - paginationControlsHeight - bottomNavHeight - 16;
     
     // Calculate number of rows needed based on the current grid columns
     final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
     
-    // Calculate the optimal grid height to ensure all rows are visible
-    // This is crucial for making sure all camera slots fit without scrolling
-    final gridHeight = availableHeight; 
+    // Calculate optimal aspect ratio based on the available height and number of rows needed
+    final double cellWidth = (size.width - (16 + (_gridColumns - 1) * 8)) / _gridColumns;
+    final double cellHeight = (availableHeight - ((rowsNeeded - 1) * 8)) / rowsNeeded;
+    final double aspectRatio = cellWidth / cellHeight;
     
     return Scaffold(
       appBar: AppBar(
@@ -436,11 +437,11 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(8.0),
-              physics: const AlwaysScrollableScrollPhysics(), // Allow scrolling if needed
+              physics: const NeverScrollableScrollPhysics(), // Disable scrolling to fit all slots
               shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _gridColumns,
-                childAspectRatio: 16 / 9, // Maintain 16:9 aspect ratio
+                childAspectRatio: aspectRatio, // Custom aspect ratio to fit all slots perfectly
                 crossAxisSpacing: 8,
                 mainAxisSpacing: 8,
               ),
