@@ -145,15 +145,22 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
   }
   
   // Stream camera at a specific slot
+  // Stream camera at a specific slot
   void _streamCamera(int slotIndex, Camera camera) {
     _errorStates[slotIndex] = false; // Reset error state
     
     if (slotIndex < _players.length) {
       final player = _players[slotIndex];
       
-      if (camera.rtspUri.isNotEmpty) {
+      // Skip if already playing the same URL
+      if (camera.rtspUri.isNotEmpty && player.state.playlist.isEmpty) {
         player.open(Media(camera.rtspUri));
-      } else {
+      } else if (camera.rtspUri.isEmpty) {
+        // Handle no URL available
+        _errorStates[slotIndex] = true;
+      }
+    }
+  }
         // Handle no URL available
         _errorStates[slotIndex] = true;
       }
@@ -195,7 +202,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     final appBarHeight = AppBar().preferredSize.height;
     final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0;
     final paginationControlsHeight = 48.0; // Reduced height for pagination controls
-    final availableHeight = size.height - appBarHeight - bottomNavHeight - 8.0;
+    final availableHeight = size.height - appBarHeight - bottomNavHeight;
     
     // Filter out null cameras for the grid
     final List<Camera> activeCameras = _selectedCameras.whereType<Camera>().toList();
@@ -203,13 +210,13 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     
     // Instead of calculating rows based on active cameras, we use a fixed number of rows
     // This ensures the grid always fills the entire screen regardless of camera count
-    final activeRowsNeeded = 5; // Fixed number of rows to ensure grid fills the screen
+    final int activeRowsNeeded = math.max(1, math.min(5, (activeCameraCount + _gridColumns - 1) / _gridColumns).ceil()); // Dynamic rows based on camera count to ensure grid fills the screen
     
     // Calculate optimal aspect ratio based on the available height and active rows
     final double cellWidth = size.width / _gridColumns;
     // Adjust the available height by removing the pagination controls height if needed
     // Calculate cell height directly using the effective available height
-    final double cellHeight = (availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0)) / activeRowsNeeded;
+    final double cellHeight = (availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0)) / activeRowsNeeded - 0.1;
     final double aspectRatio = cellWidth / cellHeight;
     
     return Scaffold(
