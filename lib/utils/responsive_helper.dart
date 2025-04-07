@@ -1,100 +1,93 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ResponsiveHelper {
-  // Breakpoints
   static const double mobileBreakpoint = 600;
   static const double tabletBreakpoint = 900;
   static const double desktopBreakpoint = 1200;
 
-  // Device type detection
+  // Device type checkers
   static bool isMobile(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    return width < mobileBreakpoint;
+    return MediaQuery.of(context).size.width < mobileBreakpoint;
   }
 
   static bool isTablet(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    return width >= mobileBreakpoint && width < tabletBreakpoint;
+    final width = MediaQuery.of(context).size.width;
+    return width >= mobileBreakpoint && width < desktopBreakpoint;
   }
 
   static bool isDesktop(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    return width >= tabletBreakpoint;
+    return MediaQuery.of(context).size.width >= desktopBreakpoint;
   }
 
-  // Platform detection
-  static bool get isAndroid => !kIsWeb && Platform.isAndroid;
-  
-  static bool get isIOS => !kIsWeb && Platform.isIOS;
-  
-  static bool get isMacOS => !kIsWeb && Platform.isMacOS;
-  
-  static bool get isWindows => !kIsWeb && Platform.isWindows;
-  
-  static bool get isLinux => !kIsWeb && Platform.isLinux;
-  
-  static bool get isWeb => kIsWeb;
-
-  // Platform-specific UI decisions
-  static bool get useMobileLayout => isAndroid || isIOS;
-  
-  static bool get useDesktopLayout => isMacOS || isWindows || isLinux;
-
-  // Responsive spacing based on screen size
-  static double getResponsiveSpacing(BuildContext context, {
-    double mobile = 8.0,
-    double tablet = 16.0,
-    double desktop = 24.0,
-  }) {
-    if (isDesktop(context)) return desktop;
-    if (isTablet(context)) return tablet;
-    return mobile;
+  // Screen size utilities
+  static double screenWidth(BuildContext context) {
+    return MediaQuery.of(context).size.width;
   }
 
-  // Responsive font size based on screen size
-  static double getResponsiveFontSize(BuildContext context, {
-    double mobile = 14.0,
-    double tablet = 16.0,
-    double desktop = 18.0,
-  }) {
-    if (isDesktop(context)) return desktop;
-    if (isTablet(context)) return tablet;
-    return mobile;
+  static double screenHeight(BuildContext context) {
+    return MediaQuery.of(context).size.height;
   }
 
-  // Responsive widget based on screen size
-  static Widget responsiveWidget({
+  // Responsive value based on screen width
+  static double value({
     required BuildContext context,
-    required Widget mobile,
-    Widget? tablet,
-    Widget? desktop,
+    required double mobile,
+    double? tablet,
+    double? desktop,
   }) {
-    if (isDesktop(context) && desktop != null) return desktop;
-    if (isTablet(context) && tablet != null) return tablet;
+    final width = MediaQuery.of(context).size.width;
+
+    // Return the appropriate value based on screen width
+    if (width >= desktopBreakpoint) {
+      return desktop ?? tablet ?? mobile;
+    }
+    if (width >= tabletBreakpoint) {
+      return tablet ?? mobile;
+    }
     return mobile;
   }
 
-  // Responsive grid item count based on screen size
-  static int getResponsiveGridCount(BuildContext context, {
-    int mobile = 1,
-    int tablet = 2,
-    int desktop = 4,
-  }) {
-    if (isDesktop(context)) return desktop;
-    if (isTablet(context)) return tablet;
-    return mobile;
+  // Get column count for grid layouts based on screen width
+  static int getColumnCount(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    
+    if (width >= desktopBreakpoint) {
+      return 4; // 4 columns for desktop
+    } else if (width >= tabletBreakpoint) {
+      return 3; // 3 columns for tablet
+    } else if (width >= mobileBreakpoint) {
+      return 2; // 2 columns for large phones
+    } else {
+      return 1; // 1 column for small phones
+    }
   }
 
-  // Responsive padding based on screen size
-  static EdgeInsets getResponsivePadding(BuildContext context, {
-    EdgeInsets mobile = const EdgeInsets.all(8.0),
-    EdgeInsets tablet = const EdgeInsets.all(16.0),
-    EdgeInsets desktop = const EdgeInsets.all(24.0),
-  }) {
-    if (isDesktop(context)) return desktop;
-    if (isTablet(context)) return tablet;
-    return mobile;
+  // Get the appropriate padding based on screen size
+  static EdgeInsetsGeometry getPadding(BuildContext context) {
+    if (isDesktop(context)) {
+      return const EdgeInsets.all(24.0);
+    } else if (isTablet(context)) {
+      return const EdgeInsets.all(16.0);
+    } else {
+      return const EdgeInsets.all(12.0);
+    }
+  }
+
+  // Determine if we should use expanded or compact UI elements
+  static bool useCompactUI(BuildContext context) {
+    return MediaQuery.of(context).size.width < 480;
+  }
+
+  // Calculate responsive font size
+  static double responsiveFontSize(BuildContext context, double baseFontSize) {
+    final width = MediaQuery.of(context).size.width;
+    
+    if (width >= desktopBreakpoint) {
+      return baseFontSize * 1.2; // Larger font for desktop
+    } else if (width >= tabletBreakpoint) {
+      return baseFontSize * 1.1; // Slightly larger for tablet
+    } else {
+      return baseFontSize; // Base size for mobile
+    }
   }
 }

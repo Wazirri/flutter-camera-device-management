@@ -31,6 +31,7 @@ class WebSocketProvider with ChangeNotifier {
   final List<String> _messageLog = [];
   bool _isLocalServerMode = false;
   
+  dynamic _lastMessage;
   // Store last received message for other providers to access
   dynamic _lastMessage;
   
@@ -58,6 +59,7 @@ class WebSocketProvider with ChangeNotifier {
       _serverIp = 'localhost';
       _serverPort = 5000;
       _isLocalServerMode = true;
+  dynamic _lastMessage;
       debugPrint('Running on desktop platform, using local server at $_serverIp:$_serverPort');
     }
   }
@@ -70,6 +72,8 @@ class WebSocketProvider with ChangeNotifier {
   SystemInfo? get systemInfo => _systemInfo;
   Stream<SystemInfo> get onSystemInfoUpdate => _systemInfoController.stream;
   String get serverIp => _serverIp;
+  dynamic get lastMessage => _lastMessage;
+  dynamic get lastMessage => _lastMessage;
   int get serverPort => _serverPort;
   bool get rememberMe => _rememberMe;
   bool get isLocalServerMode => _isLocalServerMode;
@@ -237,7 +241,8 @@ class WebSocketProvider with ChangeNotifier {
         if (message == 'PONG') {
           // Handle heartbeat response
           return;
-        }
+          _lastMessage = jsonData;
+          _processJsonMessage(jsonData);
 
         // Try to parse JSON message
         try {
