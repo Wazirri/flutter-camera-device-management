@@ -1,2 +1,0 @@
-// Modify only the one line in the _openLiveView method
-sed -i 's/LiveViewScreen(camera: camera)/LiveViewScreen(initialCamera: camera)/g' lib/screens/cameras_screen.dart

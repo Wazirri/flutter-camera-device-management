@@ -34,7 +34,7 @@ class DesktopSideMenu extends StatelessWidget {
                     Icon(
                       Icons.video_camera_back_rounded,
                       size: 48,
-                      color: AppTheme.primaryColor,
+                      color: AppTheme.primaryOrange,
                     ),
                     const SizedBox(height: 16),
                     const Text(
@@ -58,14 +58,14 @@ class DesktopSideMenu extends StatelessWidget {
                     leading: Icon(
                       item.icon,
                       color: item.isSelected
-                          ? AppTheme.accentColor
+                          ? AppTheme.primaryBlue
                           : AppTheme.darkTextSecondary,
                     ),
                     title: Text(
                       item.title,
                       style: TextStyle(
                         color: item.isSelected
-                            ? AppTheme.accentColor
+                            ? AppTheme.primaryBlue
                             : AppTheme.darkTextPrimary,
                         fontWeight: item.isSelected
                             ? FontWeight.w600
@@ -73,7 +73,7 @@ class DesktopSideMenu extends StatelessWidget {
                       ),
                     ),
                     selected: item.isSelected,
-                    selectedColor: AppTheme.accentColor,
+                    selectedColor: AppTheme.primaryBlue,
                     hoverColor: Colors.white.withOpacity(0.05),
                     onTap: () => onDestinationSelected(item.route),
                   );

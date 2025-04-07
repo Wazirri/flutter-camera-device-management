@@ -1,66 +1,102 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import '../models/camera_device.dart';
 import '../providers/camera_devices_provider.dart';
+import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
+import '../utils/responsive_helper.dart';
+import '../utils/page_transitions.dart';
 
 class LiveViewScreen extends StatefulWidget {
-  final Camera? initialCamera;
-  
-  const LiveViewScreen({Key? key, this.initialCamera}) : super(key: key);
+  final Camera? camera; // Make camera optional so the route can work without a parameter
+
+  const LiveViewScreen({Key? key, this.camera}) : super(key: key);
 
   @override
   State<LiveViewScreen> createState() => _LiveViewScreenState();
 }
 
 class _LiveViewScreenState extends State<LiveViewScreen> with SingleTickerProviderStateMixin {
-  // Video player
+  int _selectedCameraIndex = 0;
+  Camera? _camera;
+  bool _isFullScreen = false;
   late final Player _player;
   late final VideoController _controller;
-  
-  // Animation controller for page transitions
-  late AnimationController _pageAnimationController;
-  late Animation<double> _pageAnimation;
-  
-  // State variables
-  Camera? _camera;
-  List<Camera> _availableCameras = [];
-  int _selectedCameraIndex = -1;
-  bool _isFullscreen = false;
+  bool _isPlaying = false;
+  bool _isBuffering = false;
   bool _hasError = false;
   String _errorMessage = '';
-  bool _showDetails = false;
-  bool _isMuted = false;
+  List<Camera> _availableCameras = [];
+  
+  // Animation controllers
+  late AnimationController _pageAnimationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
   
   @override
   void initState() {
     super.initState();
+    _initializeAnimations();
+    _initializePlayer();
+  }
+  
+  void _initializeAnimations() {
+    // Setup animations
+    _pageAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
     
-    // Initialize video player
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _pageAnimationController,
+      curve: Curves.easeIn,
+    ));
+    
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, 0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _pageAnimationController,
+      curve: Curves.easeOutQuint,
+    ));
+    
+    // Start the entrance animation
+    _pageAnimationController.forward();
+  }
+  
+  void _initializePlayer() {
+    // Create a media kit player
     _player = Player();
     _controller = VideoController(_player);
     
-    // Set up animations
-    _pageAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    
-    _pageAnimation = CurvedAnimation(
-      parent: _pageAnimationController,
-      curve: Curves.easeInOut,
-    );
-    
-    // Use initial camera if provided
-    if (widget.initialCamera != null) {
-      _camera = widget.initialCamera;
+    // Set initial camera if provided
+    if (widget.camera != null) {
+      _camera = widget.camera;
+      _loadCameraStream();
     }
     
-    // Set up player listener for errors
+    // Add event listeners
+    _player.stream.playing.listen((playing) {
+      if (mounted) {
+        setState(() {
+          _isPlaying = playing;
+        });
+      }
+    });
+    
+    _player.stream.buffering.listen((buffering) {
+      if (mounted) {
+        setState(() {
+          _isBuffering = buffering;
+        });
+      }
+    });
+    
     _player.stream.error.listen((error) {
       print('Player error: $error');
       if (mounted) {
@@ -79,26 +115,18 @@ class _LiveViewScreenState extends State<LiveViewScreen> with SingleTickerProvid
     // Get the list of available cameras from provider
     final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
     setState(() {
-      _availableCameras = cameraProvider.getAllCameras();
+      _availableCameras = cameraProvider.cameras;
       
       // If no camera was provided and there are available cameras, use the first one
       if (_camera == null && _availableCameras.isNotEmpty) {
         _camera = _availableCameras[0];
-        _selectedCameraIndex = 0;
-      } else if (_camera != null) {
-        // Find index of initial camera
-        _selectedCameraIndex = _availableCameras.indexWhere((c) => c.id == _camera!.id);
-      }
-      
-      // Load the camera stream if we have a valid camera
-      if (_camera != null) {
         _loadCameraStream();
       }
     });
   }
   
   void _loadCameraStream() {
-    if (_camera == null || _camera!.subUri.isEmpty) {
+    if (_camera == null || _camera!.rtspUri.isEmpty) {
       setState(() {
         _hasError = true;
         _errorMessage = 'No valid RTSP stream URL available for this camera';
@@ -113,7 +141,7 @@ class _LiveViewScreenState extends State<LiveViewScreen> with SingleTickerProvid
     });
     
     // Format RTSP URL if needed (sometimes RTSP URLs need adjustments)
-    final url = _camera!.subUri;
+    final url = _camera!.rtspUri;
     
     // Try to play the stream
     try {
@@ -130,40 +158,39 @@ class _LiveViewScreenState extends State<LiveViewScreen> with SingleTickerProvid
     if (index >= 0 && index < _availableCameras.length && index != _selectedCameraIndex) {
       // Start a transition animation when changing cameras
       _pageAnimationController.reset();
-      _pageAnimationController.forward();
       
       setState(() {
         _selectedCameraIndex = index;
         _camera = _availableCameras[index];
-        
-        // Play the new stream
-        _loadCameraStream();
       });
       
-      // Update the selected camera in the provider
-      Provider.of<CameraDevicesProvider>(context, listen: false)
-        .setSelectedCameraIndex(index);
+      // Load the newly selected camera
+      _loadCameraStream();
+      
+      // Start the animation for the new camera
+      _pageAnimationController.forward();
     }
   }
   
-  void _toggleFullscreen() {
+  void _toggleFullScreen() {
     setState(() {
-      _isFullscreen = !_isFullscreen;
+      _isFullScreen = !_isFullScreen;
     });
   }
   
-  void _toggleMute() {
-    final newValue = !_isMuted;
-    setState(() {
-      _isMuted = newValue;
-    });
-    _player.setVolume(newValue ? 0 : 100);
-  }
-  
-  void _toggleDetails() {
-    setState(() {
-      _showDetails = !_showDetails;
-    });
+  Future<void> _showCameraDetails() async {
+    // Show a smooth animated modal sheet
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _buildFullCameraDetails(),
+      // Use animation settings
+      transitionAnimationController: AnimationController(
+        duration: const Duration(milliseconds: 400),
+        vsync: Navigator.of(context).overlay!,
+      ),
+    );
   }
   
   @override
@@ -172,163 +199,161 @@ class _LiveViewScreenState extends State<LiveViewScreen> with SingleTickerProvid
     _player.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
+    final isDesktop = ResponsiveHelper.isDesktop(context);
+    
+    if (_isFullScreen) {
+      return Scaffold(
+        body: _buildPlayer(),
+        floatingActionButton: FloatingActionButton(
+          child: const Icon(Icons.fullscreen_exit),
+          mini: true,
+          onPressed: _toggleFullScreen,
+        ),
+      );
+    }
+    
     return Scaffold(
-      appBar: _isFullscreen 
-          ? null 
-          : AppBar(
-              title: Text(_camera?.name ?? 'Live View'),
-              actions: [
-                IconButton(
-                  icon: Icon(_showDetails ? Icons.info : Icons.info_outline),
-                  tooltip: 'Camera Details',
-                  onPressed: _toggleDetails,
-                ),
-              ],
-            ),
-      body: Column(
-        children: [
-          // Video Player Area
-          Expanded(
-            child: Stack(
-              children: [
-                // Video player
-                _buildVideoPlayer(),
-                
-                // Camera selection drawer handle (if not in fullscreen)
-                if (!_isFullscreen && _availableCameras.length > 1)
-                  Positioned(
-                    top: 16,
-                    left: 0,
-                    child: _buildCameraDrawerHandle(),
-                  ),
-                
-                // Video controls overlay
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: _buildVideoControls(),
-                ),
-                
-                // Error message overlay
-                if (_hasError)
-                  _buildErrorOverlay(),
-                
-                // Camera details panel
-                if (_showDetails && !_isFullscreen)
-                  _buildCameraDetails(),
-              ],
-            ),
+      appBar: AppBar(
+        title: Text(_camera != null 
+          ? 'Live View: ${_camera!.name}' 
+          : 'Live View'
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.fullscreen),
+            onPressed: _toggleFullScreen,
+            tooltip: 'Fullscreen',
           ),
-          
-          // Camera selection tabs (if not in fullscreen)
-          if (!_isFullscreen && _availableCameras.length > 1)
-            _buildCameraSelectionTabs(),
         ],
+      ),
+      body: SafeArea(
+        child: Row(
+          children: [
+            // Left side panel with camera list
+            if (_availableCameras.length > 1)
+              Container(
+                width: isDesktop ? 250 : 180,
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      color: Theme.of(context).dividerColor,
+                      width: 1,
+                    ),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Text(
+                        'Camera Devices',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    Expanded(
+                      child: AnimatedList(
+                        initialItemCount: _availableCameras.length,
+                        itemBuilder: (context, index, animation) {
+                          final camera = _availableCameras[index];
+                          final isSelected = index == _selectedCameraIndex;
+                          
+                          // Animated list item for each camera
+                          return SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(-1, 0),
+                              end: Offset.zero,
+                            ).animate(CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOutQuad,
+                            )),
+                            child: FadeTransition(
+                              opacity: animation,
+                              child: ListTile(
+                                title: Text(
+                                  camera.name,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                selected: isSelected,
+                                leading: Icon(
+                                  Icons.videocam,
+                                  color: isSelected ? AppTheme.primaryOrange : null,
+                                ),
+                                selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                onTap: () => _selectCamera(index),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            
+            // Right side with player and details
+            Expanded(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Column(
+                    children: [
+                      // Player section
+                      Expanded(
+                        child: _buildPlayer(),
+                      ),
+                      
+                      // Camera details at the bottom
+                      if (_camera != null)
+                        _buildCameraDetails(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
   
-  Widget _buildVideoPlayer() {
-    return Container(
-      color: Colors.black,
-      child: _hasError
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    color: Colors.red,
-                    size: 48,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    _errorMessage,
-                    style: const TextStyle(color: Colors.white),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Retry'),
-                    onPressed: _loadCameraStream,
-                  ),
-                ],
-              ),
-            )
-          : Center(
-              child: AspectRatio(
-                aspectRatio: 16 / 9, // Default aspect ratio, should be updated with actual camera info
-                child: Material(
-                  color: Colors.black,
-                  child: InkWell(
-                    onTap: () {
-                      // Toggle UI visibility on tap
-                    },
-                    child: Stack(
-                      children: [
-                        // Actual video
-                        Video(
-                          controller: _controller,
-                          controls: NoVideoControls,
-                          fit: BoxFit.contain,
-                        ),
-                        
-                        // Fade animation for camera transitions
-                        FadeTransition(
-                          opacity: _pageAnimation,
-                          child: Container(color: Colors.black),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-    );
-  }
-  
-  Widget _buildVideoControls() {
-    return VideoControls(
-      isPlaying: _player.state.playing,
-      isMuted: _isMuted,
-      isFullscreen: _isFullscreen,
-      onPlayPause: () {
-        if (_player.state.playing) {
-          _player.pause();
-        } else {
-          _player.play();
-        }
-        setState(() {});
-      },
-      onMuteToggle: _toggleMute,
-      onFullscreenToggle: _toggleFullscreen,
-    );
-  }
-  
-  Widget _buildErrorOverlay() {
-    return Container(
-      color: Colors.black.withOpacity(0.7),
-      child: Center(
+  Widget _buildPlayer() {
+    if (_camera == null) {
+      return const Center(
+        child: Text('No camera selected'),
+      );
+    }
+    
+    if (_hasError) {
+      return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(
               Icons.error_outline,
+              size: 64,
               color: Colors.red,
-              size: 48,
             ),
             const SizedBox(height: 16),
             Text(
-              _errorMessage,
-              style: const TextStyle(color: Colors.white),
-              textAlign: TextAlign.center,
+              'Error playing stream',
+              style: Theme.of(context).textTheme.titleLarge,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Text(
+                _errorMessage,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+            const SizedBox(height: 24),
             ElevatedButton.icon(
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),
@@ -336,175 +361,226 @@ class _LiveViewScreenState extends State<LiveViewScreen> with SingleTickerProvid
             ),
           ],
         ),
-      ),
-    );
-  }
-  
-  Widget _buildCameraSelectionTabs() {
-    return Container(
-      height: 60,
-      color: AppTheme.darkSurface,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _availableCameras.length,
-        itemBuilder: (context, index) {
-          final camera = _availableCameras[index];
-          final isSelected = index == _selectedCameraIndex;
-          
-          return Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => _selectCamera(index),
-              child: Container(
-                width: 150,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: isSelected ? AppTheme.accentColor : Colors.transparent,
-                      width: 3,
-                    ),
-                  ),
-                  color: isSelected ? AppTheme.accentColor.withOpacity(0.1) : null,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      camera.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected ? AppTheme.accentColor : null,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      camera.ip,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
+      );
+    }
+    
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Video player with HeroMode activated for smooth transitions
+        Hero(
+          tag: 'player_${_camera!.id}',
+          child: Material(
+            type: MaterialType.transparency,
+            child: Video(
+              controller: _controller,
+              controls: (_) => VideoControls(player: _player),
             ),
-          );
-        },
-      ),
-    );
-  }
-  
-  Widget _buildCameraDrawerHandle() {
-    return GestureDetector(
-      onTap: () {
-        // TODO: Implement a drawer that slides in with camera list
-      },
-      child: Container(
-        width: 24,
-        height: 100,
-        decoration: BoxDecoration(
-          color: AppTheme.accentColor,
-          borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(12),
-            bottomRight: Radius.circular(12),
           ),
         ),
-        child: const Center(
-          child: Icon(
-            Icons.chevron_right,
-            color: Colors.white,
-            size: 20,
-          ),
-        ),
-      ),
+        
+        // Buffering indicator (show when buffering and not playing yet)
+        if (_isBuffering && !_isPlaying)
+          const CircularProgressIndicator(),
+      ],
     );
   }
   
   Widget _buildCameraDetails() {
-    if (_camera == null) return const SizedBox.shrink();
-    
-    return Positioned(
-      top: 0,
-      right: 0,
-      bottom: 0,
-      width: 300,
-      child: Container(
-        color: AppTheme.darkSurface.withOpacity(0.9),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Camera Details',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              IconButton(
+                icon: const Icon(Icons.info_outline),
+                onPressed: _showCameraDetails,
+                tooltip: 'More Info',
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, animation) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.2),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: FadeTransition(
+                  opacity: animation,
+                  child: child,
+                ),
+              );
+            },
+            // Wrap with ValueKey to trigger animation when camera changes
+            child: Wrap(
+              key: ValueKey<String>(_camera!.id),
+              spacing: 16,
+              runSpacing: 8,
               children: [
-                const Text(
-                  'Camera Details',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => setState(() => _showDetails = false),
-                ),
+                _buildInfoChip(Icons.camera_alt, 'Name: ${_camera!.name}'),
+                _buildInfoChip(Icons.language, 'IP: ${_camera!.ip}'),
+                if (_camera!.manufacturer.isNotEmpty)
+                  _buildInfoChip(Icons.business, 'Manufacturer: ${_camera!.manufacturer}'),
+                if (_camera!.brand.isNotEmpty)
+                  _buildInfoChip(Icons.category, 'Brand: ${_camera!.brand}'),
               ],
             ),
-            const Divider(),
-            Expanded(
-              child: ListView(
-                children: [
-                  const Icon(Icons.info, size: 28, color: AppTheme.accentColor),
-                  const SizedBox(height: 16),
-                  _buildDetailItem('Name', _camera!.name),
-                  _buildDetailItem('IP Address', _camera!.ip),
-                  _buildDetailItem('Model', _camera!.model),
-                  _buildDetailItem('Brand', _camera!.brand),
-                  _buildDetailItem('RTSP URI', _camera!.subUri),
-                  // // _buildDetailItem('Country', _camera!.country),
-                  _buildDetailItem('Username', _camera!.username),
-                  _buildDetailItem('Resolution', 
-                    _camera!.subWidth > 0 
-                        ? '${_camera!.subWidth}x${_camera!.subHeight}'
-                        : 'Unknown'
-                  ),
-                  _buildDetailItem('Status', _camera!.connected ? 'Connected' : 'Disconnected'),
-                  _buildDetailItem('Recording', _camera!.recording ? 'Yes' : 'No'),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
   
-  Widget _buildDetailItem(String label, String value) {
-    if (value.isEmpty) return const SizedBox.shrink();
-    
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade400,
+  Widget _buildInfoChip(IconData icon, String label) {
+    return Chip(
+      avatar: Icon(icon, size: 16),
+      label: Text(label),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      elevation: 2,
+      shadowColor: Colors.black45,
+    );
+  }
+  
+  Widget _buildFullCameraDetails() {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.6,
+      maxChildSize: 0.9,
+      minChildSize: 0.4,
+      builder: (_, controller) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, -2),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16),
+          child: Column(
+            children: [
+              // Draggable handle indicator
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                height: 4,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              // Content
+              Expanded(
+                child: ListView(
+                  controller: controller,
+                  padding: const EdgeInsets.all(24),
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.info, size: 28, color: AppTheme.primaryOrange),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Camera Details',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 32),
+                    _buildDetailItem('Name', _camera!.name),
+                    _buildDetailItem('IP Address', _camera!.ip),
+                    _buildDetailItem('ID', _camera!.id), // Using ID instead of MAC address
+                    _buildDetailItem('Manufacturer', _camera!.manufacturer),
+                    _buildDetailItem('Brand', _camera!.brand), // Using Brand instead of Model
+                    _buildDetailItem('RTSP URI', _camera!.rtspUri),
+                    _buildDetailItem('Country', _camera!.country),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Close'),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
+        );
+      },
+    );
+  }
+  
+  Widget _buildDetailItem(String title, String value) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutQuint,
+      builder: (context, opacity, child) {
+        return Opacity(
+          opacity: opacity,
+          child: Transform.translate(
+            offset: Offset(0, 20 * (1 - opacity)),
+            child: child,
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 120,
+              child: Text(
+                '$title:',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Text(
+                value.isEmpty ? 'Not available' : value,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

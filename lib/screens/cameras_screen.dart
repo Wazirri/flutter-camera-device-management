@@ -1,621 +1,550 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/camera_devices_provider.dart';
 import '../models/camera_device.dart';
+import '../widgets/camera_grid_item.dart';
+import '../providers/camera_devices_provider.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
-import '../utils/responsive_helper.dart';
 import 'live_view_screen.dart';
+import 'record_view_screen.dart';
+import "../widgets/camera_details_bottom_sheet.dart";
 
 class CamerasScreen extends StatefulWidget {
   const CamerasScreen({Key? key}) : super(key: key);
 
   @override
-  State<CamerasScreen> createState() => _CamerasScreenState();
+  _CamerasScreenState createState() => _CamerasScreenState();
 }
 
-class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProviderStateMixin {
+class _CamerasScreenState extends State<CamerasScreen> {
   Camera? selectedCamera;
-  bool isDetailViewExpanded = false;
-  late AnimationController _animationController;
-  late Animation<double> _expandAnimation;
-  
+  String searchQuery = '';
+  bool showOnlyActive = false;
+  bool isGridView = true;
+  String? selectedMacAddress;
+
   @override
   void initState() {
     super.initState();
-    
-    // Animation controller for expanding/collapsing the detail panel
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    
-    _expandAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
+    // Initial data load is handled by provider
   }
   
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Access the camera devices provider
-    final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context);
-    final allCameras = cameraDevicesProvider.getAllCameras();
-    final isDesktop = ResponsiveHelper.isDesktop(context);
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cameras'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // TODO: Implement search functionality
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              // Refresh camera list
-              cameraDevicesProvider.refreshDevices();
-            },
-          ),
-        ],
-      ),
-      body: allCameras.isEmpty 
-          ? _buildEmptyState()
-          : isDesktop
-              ? _buildDesktopLayout(allCameras)
-              : _buildMobileLayout(allCameras),
-    );
-  }
-  
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.videocam_off,
-            size: 80,
-            color: Colors.grey.shade700,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No Cameras Found',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade300,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Connect to devices to discover cameras',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade500,
-            ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.refresh),
-            label: const Text('Refresh'),
-            onPressed: () {
-              // Refresh camera list
-              Provider.of<CameraDevicesProvider>(context, listen: false)
-                .refreshDevices();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildDesktopLayout(List<Camera> cameras) {
-    return Row(
-      children: [
-        // Camera list (1/3 of the screen width)
-        SizedBox(
-          width: 350,
-          child: _buildCameraList(cameras),
-        ),
-        
-        // Vertical divider
-        VerticalDivider(
-          width: 1,
-          color: Colors.grey.shade800,
-        ),
-        
-        // Detail view (2/3 of the screen width)
-        Expanded(
-          child: selectedCamera != null
-              ? _buildCameraDetail(selectedCamera!)
-              : _buildNoSelectionView(),
-        ),
-      ],
-    );
-  }
-  
-  Widget _buildMobileLayout(List<Camera> cameras) {
-    // For mobile, we'll use a collapsible bottom sheet for details
-    return Stack(
-      children: [
-        // Camera list
-        _buildCameraList(cameras),
-        
-        // Animated detail panel from bottom
-        if (selectedCamera != null) ...[
-          // Semi-transparent overlay when panel is expanded
-          if (isDetailViewExpanded)
-            GestureDetector(
-              onTap: _toggleDetailPanel,
-              child: AnimatedOpacity(
-                opacity: isDetailViewExpanded ? 0.5 : 0.0,
-                duration: const Duration(milliseconds: 300),
-                child: Container(
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          
-          // Bottom sheet with camera details
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: AnimatedBuilder(
-              animation: _expandAnimation,
-              builder: (context, child) {
-                return Container(
-                  height: isDetailViewExpanded
-                      ? MediaQuery.of(context).size.height * 0.7 * _expandAnimation.value
-                      : 72 + (8 * _expandAnimation.value),
-                  decoration: BoxDecoration(
-                    color: AppTheme.darkSurface,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16 * _expandAnimation.value),
-                      topRight: Radius.circular(16 * _expandAnimation.value),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2 * _expandAnimation.value),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: child,
-                );
-              },
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Handle for expanding/collapsing
-                  GestureDetector(
-                    onTap: _toggleDetailPanel,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Center(
-                        child: Container(
-                          width: 40,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade700,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  
-                  // Camera name and view button
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            selectedCamera!.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.play_arrow),
-                          label: const Text('View'),
-                          onPressed: () => _openLiveView(selectedCamera!),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
-                  // Only show details if expanded
-                  if (isDetailViewExpanded) ...[
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(16),
-                        child: _buildCameraDetailContent(selectedCamera!),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-  
-  void _toggleDetailPanel() {
+  void _selectCamera(Camera camera) {
     setState(() {
-      isDetailViewExpanded = !isDetailViewExpanded;
-      if (isDetailViewExpanded) {
-        _animationController.forward();
-      } else {
-        _animationController.reverse();
-      }
+      selectedCamera = camera;
     });
+    
+    // Kamera detaylarını BottomSheet olarak göster
+    _showCameraDetails(camera);
   }
   
-  Widget _buildCameraList(List<Camera> cameras) {
-    return Column(
-      children: [
-        // Search and filter bar
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search cameras...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-              filled: true,
-              fillColor: AppTheme.darkInput,
-            ),
-            onChanged: (value) {
-              // TODO: Implement search filtering
-            },
-          ),
-        ),
-        
-        // Camera count indicator
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            children: [
-              Text(
-                '${cameras.length} Cameras',
-                style: TextStyle(
-                  color: Colors.grey.shade400,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const Spacer(),
-              // TODO: Add filter button here if needed
-            ],
-          ),
-        ),
-        
-        // Camera list
-        Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: cameras.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              final camera = cameras[index];
-              return _buildCameraListItem(camera);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-  
-  Widget _buildCameraListItem(Camera camera) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          setState(() {
-            selectedCamera = camera;
-            if (!isDetailViewExpanded && !ResponsiveHelper.isDesktop(context)) {
-              _toggleDetailPanel();
-            }
-          });
-        },
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: selectedCamera?.name == camera.name
-                ? AppTheme.accentColor.withOpacity(0.1)
-                : AppTheme.darkSurface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: selectedCamera?.name == camera.name
-                  ? AppTheme.accentColor
-                  : Colors.transparent,
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              // Camera icon or thumbnail
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: AppTheme.darkBackground,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.videocam,
-                  size: 30,
-                  color: selectedCamera?.name == camera.name
-                      ? AppTheme.accentColor
-                      : Colors.grey,
-                ),
-              ),
-              
-              const SizedBox(width: 12),
-              
-              // Camera details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      camera.name,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: selectedCamera?.name == camera.name
-                            ? AppTheme.accentColor
-                            : Colors.white,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'IP: ${camera.ip}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade400,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Brand: ${camera.brand.isNotEmpty ? camera.brand : "Unknown"}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              
-              // View button
-              IconButton(
-                icon: const Icon(Icons.play_circle_outline),
-                color: AppTheme.accentColor,
-                onPressed: () => _openLiveView(camera),
-              ),
-            ],
-          ),
-        ),
+  void _showCameraDetails(Camera camera) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppTheme.darkBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.3,
+          maxChildSize: 0.95,
+          expand: false,
+          builder: (context, scrollController) {
+            return CameraDetailsBottomSheet(
+              camera: camera,
+              scrollController: scrollController,
+            );
+          },
+        );
+      },
     );
   }
   
   void _openLiveView(Camera camera) {
     Navigator.push(
-      context,
+      context, 
       MaterialPageRoute(
-        builder: (context) => LiveViewScreen(initialCamera: camera),
+        builder: (context) => LiveViewScreen(camera: camera),
       ),
     );
   }
   
-  Widget _buildNoSelectionView() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.videocam,
-            size: 80,
-            color: Colors.grey.shade700,
+  void _openRecordView(Camera camera) {
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => RecordViewScreen(camera: camera),
+      ),
+    );
+  }
+  
+  void _updateSearchQuery(String query) {
+    setState(() {
+      searchQuery = query;
+    });
+  }
+  
+  void _toggleActiveFilter() {
+    setState(() {
+      showOnlyActive = !showOnlyActive;
+    });
+  }
+  
+  void _toggleViewMode() {
+    setState(() {
+      isGridView = !isGridView;
+    });
+  }
+  
+  void _selectMacAddress(String? macAddress) {
+    setState(() {
+      if (selectedMacAddress == macAddress) {
+        // Tapping the same filter toggles it off
+        selectedMacAddress = null;
+      } else {
+        selectedMacAddress = macAddress;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Cameras'),
+        actions: [
+          // Search button
+          IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: 'Search Cameras',
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: CameraSearchDelegate(
+                  onCameraSelected: (camera) {
+                    _selectCamera(camera);
+                    // Optionally navigate to camera details
+                  },
+                ),
+              );
+            },
           ),
-          const SizedBox(height: 16),
-          const Text(
-            'Select a camera to view details',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white70,
+          
+          // Filter toggle
+          IconButton(
+            icon: Icon(
+              showOnlyActive 
+                ? Icons.filter_alt
+                : Icons.filter_alt_outlined,
             ),
+            tooltip: 'Filter Active Cameras',
+            onPressed: _toggleActiveFilter,
+          ),
+          
+          // View mode toggle
+          IconButton(
+            icon: Icon(
+              isGridView 
+                ? Icons.grid_view 
+                : Icons.list,
+            ),
+            tooltip: isGridView 
+              ? 'Switch to List View' 
+              : 'Switch to Grid View',
+            onPressed: _toggleViewMode,
           ),
         ],
       ),
-    );
-  }
-  
-  Widget _buildCameraDetail(Camera camera) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Camera header with name and actions
-        Padding(
-          padding: const EdgeInsets.all(24),
-          child: Row(
-            children: [
-              Icon(
-                Icons.videocam,
-                size: 36,
-                color: AppTheme.accentColor,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      camera.name,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+      body: Consumer<CameraDevicesProvider>(
+        builder: (context, provider, child) {
+          // If loading, show a spinner
+          if (provider.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          
+          // If there are no cameras, show empty state
+          if (provider.cameras.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.videocam_off_outlined,
+                    size: 64.0,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(height: 16.0),
+                  const Text(
+                    'No cameras found',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Text(
-                      'IP: ${camera.ip}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade400,
-                      ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    'Connect to your network to discover cameras',
+                    style: TextStyle(
+                      color: Colors.grey[600],
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 24.0),
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Refresh'),
+                    onPressed: () {
+                      provider.refreshCameras();
+                    },
+                  ),
+                ],
               ),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.play_arrow),
-                label: const Text('View Live'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  backgroundColor: AppTheme.accentColor,
-                ),
-                onPressed: () => _openLiveView(camera),
+            );
+          }
+          
+          // Group cameras by MAC address
+          final groupedCameras = provider.getCamerasByMacAddress();
+          
+          // Build the MAC address filter chips
+          final macAddressFilters = Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  // "All" filter chip
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: FilterChip(
+                      label: const Text('All Devices'),
+                      selected: selectedMacAddress == null,
+                      onSelected: (_) => _selectMacAddress(null),
+                      backgroundColor: Theme.of(context).cardColor,
+                      selectedColor: AppTheme.primaryOrange.withOpacity(0.2),
+                    ),
+                  ),
+                  
+                  // MAC address filter chips
+                  ...groupedCameras.keys.map((macAddress) {
+                    final deviceCount = groupedCameras[macAddress]?.length ?? 0;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: FilterChip(
+                        label: Text('Device ${macAddress.substring(0, 8)}... ($deviceCount)'),
+                        selected: selectedMacAddress == macAddress,
+                        onSelected: (_) => _selectMacAddress(macAddress),
+                        backgroundColor: Theme.of(context).cardColor,
+                        selectedColor: AppTheme.primaryOrange.withOpacity(0.2),
+                      ),
+                    );
+                  }).toList(),
+                ],
               ),
-            ],
-          ),
-        ),
-        
-        const Divider(height: 1),
-        
-        // Camera details in scrollable area
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: _buildCameraDetailContent(camera),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCameraDetailContent(Camera camera) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Camera information section
-        _buildDetailSection(
-          title: 'Camera Information',
-          icon: Icons.info_outline,
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildDetailRow('Name', camera.name),
-              _buildDetailRow('IP Address', camera.ip),
-              _buildDetailRow('Brand', camera.brand.isNotEmpty ? camera.brand : 'Unknown'),
-              _buildDetailRow('Model', camera.model.isNotEmpty ? camera.model : 'Unknown'),
-              _buildDetailRow('Manufacturer', camera.manufacturer.isNotEmpty ? camera.manufacturer : 'Unknown'),
-              _buildDetailRow('Hardware ID', camera.hw),
-            ],
-          ),
-        ),
-        
-        const SizedBox(height: 24),
-        
-        // Stream details section
-        _buildDetailSection(
-          title: 'Stream Information',
-          icon: Icons.stream,
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildDetailRow('Main Stream', camera.mediaUri),
-              _buildDetailRow('Main Resolution', '${camera.mediaWidth}x${camera.mediaHeight}'),
-              _buildDetailRow('Sub Stream', camera.subUri),
-              _buildDetailRow('Sub Resolution', '${camera.subWidth}x${camera.subHeight}'),
-              _buildDetailRow('Sub Codec', camera.subCodec),
-            ],
-          ),
-        ),
-        
-        const SizedBox(height: 24),
-        
-        // Authentication details section
-        _buildDetailSection(
-          title: 'Authentication',
-          icon: Icons.lock_outline,
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildDetailRow('Username', camera.username),
-              _buildDetailRow('Password', '********'),
-            ],
-          ),
-        ),
-        
-        const SizedBox(height: 24),
-        
-        // Additional information section
-        _buildDetailSection(
-          title: 'Additional Information',
-          icon: Icons.more_horiz,
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildDetailRow('Web Services', camera.xAddrs),
-              _buildDetailRow('Record URI', camera.recordUri),
-              _buildDetailRow('Record Resolution', '${camera.recordWidth}x${camera.recordHeight}'),
-              _buildDetailRow('Remote URI', camera.remoteUri),
-              _buildDetailRow('Remote Resolution', '${camera.remoteWidth}x${camera.remoteHeight}'),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-  
-  Widget _buildDetailSection({
-    required String title,
-    required IconData icon,
-    required Widget content,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section header
-        Row(
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: AppTheme.accentColor,
             ),
-            const SizedBox(width: 8),
+          );
+          
+          // Filter cameras based on selected MAC address and active status
+          List<Camera> displayCameras = [];
+          
+          if (selectedMacAddress != null) {
+            // Filter by selected MAC address
+            displayCameras = groupedCameras[selectedMacAddress] ?? [];
+          } else {
+            // Show all cameras
+            displayCameras = provider.cameras;
+          }
+          
+          // Apply active filter if needed
+          if (showOnlyActive) {
+            displayCameras = displayCameras.where((camera) => camera.connected).toList();
+          }
+          
+          // Content section with filtered cameras
+          final cameraContent = Expanded(
+            child: isGridView
+                ? GridView.builder(
+                    padding: const EdgeInsets.all(16.0),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 1,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                    ),
+                    itemCount: displayCameras.length,
+                    itemBuilder: (context, index) {
+                      final camera = displayCameras[index];
+                      
+                      return CameraGridItem(
+                        camera: camera,
+                        index: index,
+                        isSelected: selectedCamera?.id == camera.id,
+                        onTap: () => _selectCamera(camera),
+                        onLiveView: () => _openLiveView(camera),
+                        onPlayback: () => _openRecordView(camera),
+                      );
+                    },
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16.0),
+                    itemCount: displayCameras.length,
+                    itemBuilder: (context, index) {
+                      final camera = displayCameras[index];
+                      
+                      // List item
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12.0),
+                        clipBehavior: Clip.antiAlias,
+                        child: InkWell(
+                          onTap: () => _selectCamera(camera),
+                          child: Row(
+                            children: [
+                              // Camera preview/thumbnail
+                              SizedBox(
+                                width: 120,
+                                height: 80,
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    // Camera image
+                                    Container(
+                                      color: Colors.black,
+                                      child: camera.mainSnapShot.isNotEmpty
+                                        ? Image.network(
+                                            camera.mainSnapShot,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) {
+                                              return const Icon(
+                                                Icons.broken_image_outlined,
+                                                size: 36.0,
+                                                color: Colors.white54,
+                                              );
+                                            },
+                                          )
+                                        : const Icon(
+                                            Icons.videocam_off,
+                                            size: 36.0,
+                                            color: Colors.white54,
+                                          ),
+                                    ),
+                                    
+                                    // Status indicator
+                                    if (camera.connected)
+                                      Positioned(
+                                        top: 4,
+                                        left: 4,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6.0,
+                                            vertical: 2.0,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.black.withOpacity(0.6),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.fiber_manual_record,
+                                                color: Colors.red,
+                                                size: 10,
+                                              ),
+                                              SizedBox(width: 2),
+                                              Text(
+                                                'LIVE',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              
+                              // Camera details
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        camera.name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16.0,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            camera.connected ? Icons.link : Icons.link_off,
+                                            size: 14.0,
+                                            color: camera.connected
+                                              ? Colors.green
+                                              : Colors.red,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            camera.connected ? 'Connected' : 'Disconnected',
+                                            style: TextStyle(
+                                              fontSize: 12.0,
+                                              color: camera.connected
+                                                ? Colors.green
+                                                : Colors.red,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        camera.ip,
+                                        style: TextStyle(
+                                          fontSize: 12.0,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              
+                              // Actions
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.videocam),
+                                    onPressed: () => _openLiveView(camera),
+                                    tooltip: 'Live View',
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.video_library),
+                                    onPressed: () => _openRecordView(camera),
+                                    tooltip: 'Recordings',
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          );
+          
+          // Combine filters with content
+          return Column(
+            children: [
+              macAddressFilters,
+              cameraContent,
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// Camera Search Delegate for searching cameras
+class CameraSearchDelegate extends SearchDelegate<Camera> {
+  final Function(Camera) onCameraSelected;
+  
+  CameraSearchDelegate({required this.onCameraSelected});
+  
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+  
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, Camera(
+          index: -1, 
+          name: '', 
+          ip: '', 
+          username: '', 
+          password: '', 
+          brand: '', 
+          mediaUri: '', 
+          recordUri: '', 
+          subUri: '', 
+          remoteUri: '', 
+          mainSnapShot: '', 
+          subSnapShot: '', 
+          recordWidth: 0, 
+          recordHeight: 0, 
+          subWidth: 0, 
+          subHeight: 0, 
+          connected: false, 
+          lastSeenAt: '', 
+          recording: false,
+        ));
+      },
+    );
+  }
+  
+  @override
+  Widget buildResults(BuildContext context) {
+    return _buildSearchResults(context);
+  }
+  
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return _buildSearchResults(context);
+  }
+  
+  Widget _buildSearchResults(BuildContext context) {
+    final provider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    final cameras = provider.cameras;
+    
+    if (query.isEmpty) {
+      return const Center(
+        child: Text('Type to search cameras...'),
+      );
+    }
+    
+    final lowercaseQuery = query.toLowerCase();
+    final filteredCameras = cameras.where((camera) {
+      return camera.name.toLowerCase().contains(lowercaseQuery) || 
+             camera.ip.toLowerCase().contains(lowercaseQuery) ||
+             camera.brand.toLowerCase().contains(lowercaseQuery);
+    }).toList();
+    
+    if (filteredCameras.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.search_off,
+              size: 64,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 16),
             Text(
-              title,
+              'No results found for "$query"',
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -623,52 +552,55 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
             ),
           ],
         ),
+      );
+    }
+    
+    return ListView.builder(
+      itemCount: filteredCameras.length,
+      itemBuilder: (context, index) {
+        final camera = filteredCameras[index];
         
-        const SizedBox(height: 12),
-        
-        // Section content
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppTheme.darkSurface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.grey.shade800,
-              width: 1,
+        return ListTile(
+          leading: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(4),
             ),
+            child: camera.mainSnapShot.isNotEmpty
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Image.network(
+                    camera.mainSnapShot,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Icon(
+                        Icons.broken_image_outlined,
+                        size: 24.0,
+                        color: Colors.white54,
+                      );
+                    },
+                  ),
+                )
+              : const Icon(
+                  Icons.videocam_off,
+                  size: 24.0,
+                  color: Colors.white54,
+                ),
           ),
-          child: content,
-        ),
-      ],
-    );
-  }
-  
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.grey.shade400,
-              ),
-            ),
+          title: Text(camera.name),
+          subtitle: Text(camera.ip),
+          trailing: Icon(
+            camera.connected ? Icons.link : Icons.link_off,
+            color: camera.connected ? Colors.green : Colors.red,
           ),
-          Expanded(
-            child: SelectableText(
-              value,
-              style: const TextStyle(
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
+          onTap: () {
+            onCameraSelected(camera);
+            close(context, camera);
+          },
+        );
+      },
     );
   }
 }

@@ -1,8 +1,6 @@
 name: movita_ecs
-description: Sophisticated Flutter-based cross-platform device management application for system monitoring and device interaction
-
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-
+description: A cross-platform Flutter app for camera and device management with Movita ECS branding.
+publish_to: 'none'
 version: 1.0.0+1
 
 environment:
@@ -11,25 +9,27 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^1.0.5
   provider: ^6.0.5
-  web_socket_channel: ^2.4.0
-  shared_preferences: ^2.2.1
-  intl: ^0.18.1
-  media_kit: ^1.1.10
-  media_kit_video: ^1.2.4
-  media_kit_native_event_loop: ^1.0.8
-  flutter_svg: ^2.0.7
-  percent_indicator: ^4.2.3
-  table_calendar: ^3.0.9
-  path_provider: ^2.1.1
+  shared_preferences: ^2.2.0
   http: ^1.1.0
+  intl: ^0.18.1
+  flutter_svg: ^2.0.7
+  web_socket_channel: ^2.4.0
+  vector_math: ^2.1.4                        # For Matrix4 and Vector3 types
+  table_calendar: ^3.0.9                     # For displaying a calendar widget
+  # Media Kit for video playback
+  media_kit: ^1.1.10                         # Primary package
+  media_kit_video: 1.2.4                     # For video rendering (pinned version)
+  media_kit_libs_android_video: ^1.3.6       # Android package
+  media_kit_libs_ios_video: ^1.1.4           # iOS package
+  media_kit_libs_macos_video: ^1.1.4         # macOS package
+  media_kit_libs_windows_video: ^1.0.9       # Windows package
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_lints: ^2.0.2
 
 flutter:
   uses-material-design: true
@@ -37,11 +37,13 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/layouts/
-
-flutter_icons:
-  android: true
-  ios: true
-  remove_alpha_ios: true
-  image_path: "assets/images/movita_logo.png"
-  adaptive_icon_background: "#000000"
-  adaptive_icon_foreground: "assets/images/movita_logo.png"
+  
+  # Using system fonts instead of custom fonts for simplicity
+  # fonts:
+  #   - family: Roboto
+  #     fonts:
+  #       - asset: assets/fonts/Roboto-Regular.ttf
+  #       - asset: assets/fonts/Roboto-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Roboto-Bold.ttf
+  #         weight: 700

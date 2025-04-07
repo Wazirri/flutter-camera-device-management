@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/camera_device.dart';
-import '../models/device_status.dart';
-import '../providers/camera_devices_provider.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
+import '../widgets/custom_app_bar.dart';
 import '../widgets/device_list_item.dart';
 import '../widgets/status_indicator.dart';
+import '../models/camera_device.dart';
+import '../providers/camera_devices_provider.dart';
 
 class DevicesScreen extends StatefulWidget {
   const DevicesScreen({Key? key}) : super(key: key);
@@ -16,536 +16,571 @@ class DevicesScreen extends StatefulWidget {
 }
 
 class _DevicesScreenState extends State<DevicesScreen> {
-  String _searchQuery = '';
-  CameraDevice? _selectedDevice;
-  String _sortBy = 'name'; // 'name', 'status', 'type'
-  bool _showOfflineDevices = true;
+  final _searchController = TextEditingController();
+  String _selectedFilter = 'All';
+  final List<String> _filterOptions = ['All', 'Online', 'Offline', 'Warning'];
+  final List<String> _sortOptions = ['Name', 'Status', 'Last Active', 'Type'];
+  String _selectedSort = 'Name';
   
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context);
-    final devices = cameraDevicesProvider.devicesList;
-    
-    // Filter and sort devices
-    List<CameraDevice> filteredDevices = _filterDevices(devices);
-    _sortDevices(filteredDevices);
+    final isDesktop = ResponsiveHelper.isDesktop(context);
     
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Devices'),
+      backgroundColor: AppTheme.darkBackground,
+      appBar: CustomAppBar(
+        title: 'Devices',
+        isDesktop: isDesktop,
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () => _showSearchDialog(context),
+            icon: const Icon(Icons.filter_list),
+            onPressed: _showFilterOptions,
           ),
           IconButton(
             icon: const Icon(Icons.sort),
-            onPressed: () => _showSortingDialog(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              cameraDevicesProvider.refreshDevices();
-            },
+            onPressed: _showSortOptions,
           ),
         ],
       ),
-      body: devices.isEmpty
-          ? _buildEmptyState()
-          : ResponsiveHelper.isDesktop(context)
-              ? _buildDesktopLayout(filteredDevices)
-              : _buildMobileLayout(filteredDevices),
-    );
-  }
-  
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppTheme.primaryOrange,
+        foregroundColor: Colors.white,
+        onPressed: () {
+          _showAddDeviceDialog();
+        },
+        child: const Icon(Icons.add),
+      ),
+      body: Column(
         children: [
-          Icon(
-            Icons.devices,
-            size: 80,
-            color: Colors.grey.shade700,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No Devices Found',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade300,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Connect to devices via WebSocket',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.grey.shade500,
-            ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.refresh),
-            label: const Text('Refresh'),
-            onPressed: () {
-              Provider.of<CameraDevicesProvider>(context, listen: false)
-                .refreshDevices();
-            },
+          _buildSearchBar(),
+          _buildFilterChips(),
+          Expanded(
+            child: _buildDevicesList(),
           ),
         ],
       ),
     );
   }
-  
-  Widget _buildDesktopLayout(List<CameraDevice> devices) {
-    return Row(
-      children: [
-        // Left panel with device list
-        Expanded(
-          flex: 1,
-          child: _buildDeviceList(devices),
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Search devices',
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              _searchController.clear();
+            },
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: AppTheme.darkSurface,
+          contentPadding: const EdgeInsets.symmetric(vertical: 0),
         ),
-        
-        // Vertical divider
-        VerticalDivider(
-          width: 1,
-          color: Colors.grey.shade800,
-        ),
-        
-        // Right panel with device details
-        Expanded(
-          flex: 2,
-          child: _selectedDevice != null
-              ? _buildDeviceDetailPanel(_selectedDevice!)
-              : _buildNoDeviceSelectedMessage(),
-        ),
-      ],
+      ),
     );
   }
-  
-  Widget _buildMobileLayout(List<CameraDevice> devices) {
-    return _buildDeviceList(devices);
-  }
-  
-  Widget _buildDeviceList(List<CameraDevice> devices) {
-    return Column(
-      children: [
-        // Filter controls
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Text(
-                '${devices.length} Devices',
-                style: TextStyle(
-                  color: Colors.grey.shade300,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const Spacer(),
-              // Filter toggle for offline devices
-              Row(
-                children: [
-                  Text(
-                    'Show Offline',
-                    style: TextStyle(
-                      color: Colors.grey.shade300,
-                      fontSize: 14,
-                    ),
-                  ),
-                  Switch(
-                    value: _showOfflineDevices,
-                    activeColor: AppTheme.accentColor,
-                    onChanged: (value) {
-                      setState(() {
-                        _showOfflineDevices = value;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        
-        // Status filter pills
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              _buildStatusFilterChip('All', null),
-              const SizedBox(width: 8),
-              _buildStatusFilterChip(
-                'Online',
-                DeviceStatus.online,
-                icon: Icons.circle,
-                color: AppTheme.successColor,
-              ),
-              const SizedBox(width: 8),
-              _buildStatusFilterChip(
-                'Offline',
-                DeviceStatus.offline,
-                icon: Icons.circle,
-                color: Colors.grey,
-              ),
-              const SizedBox(width: 8),
-              _buildStatusFilterChip(
-                'Warning',
-                DeviceStatus.warning,
-                icon: Icons.warning,
-                color: AppTheme.primaryColor,
-              ),
-              const SizedBox(width: 8),
-              _buildStatusFilterChip(
-                'Error',
-                DeviceStatus.error,
-                icon: Icons.error,
-                color: AppTheme.errorColor,
-              ),
-            ],
-          ),
-        ),
-        
-        const SizedBox(height: 8),
-        const Divider(height: 1),
-        
-        // Device list
-        Expanded(
-          child: devices.isEmpty
-              ? Center(
-                  child: Text(
-                    'No devices match your filters',
-                    style: TextStyle(
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: devices.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    final device = devices[index];
-                    return _buildDeviceListItem(device);
-                  },
-                ),
-        ),
-      ],
+
+  Widget _buildFilterChips() {
+    return Container(
+      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          _buildFilterChip('All', _selectedFilter == 'All'),
+          _buildFilterChip('Online', _selectedFilter == 'Online',
+              leadingIcon: StatusIndicator(
+                status: DeviceStatus.online,
+                size: 10,
+                padding: EdgeInsets.zero,
+              )),
+          _buildFilterChip('Offline', _selectedFilter == 'Offline',
+              leadingIcon: StatusIndicator(
+                status: DeviceStatus.offline,
+                size: 10,
+                padding: EdgeInsets.zero,
+              )),
+          _buildFilterChip('Warning', _selectedFilter == 'Warning',
+              leadingIcon: StatusIndicator(
+                status: DeviceStatus.warning,
+                size: 10,
+                padding: EdgeInsets.zero,
+              )),
+          _buildFilterChip('Error', _selectedFilter == 'Error',
+              leadingIcon: StatusIndicator(
+                status: DeviceStatus.error,
+                size: 10,
+                padding: EdgeInsets.zero,
+              )),
+        ],
+      ),
     );
   }
-  
-  Widget _buildStatusFilterChip(
-    String label,
-    DeviceStatus? status, {
-    IconData? icon,
-    Color? color,
-  }) {
-    final isSelected = (status == null && _searchQuery.isEmpty) ||
-        (_searchQuery == label.toLowerCase());
+
+  Widget _buildFilterChip(String label, bool isSelected, {Widget? leadingIcon}) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: FilterChip(
+        avatar: leadingIcon,
+        label: Text(label),
+        selected: isSelected,
+        showCheckmark: false,
+        selectedColor: AppTheme.primaryBlue.withOpacity(0.2),
+        backgroundColor: AppTheme.darkSurface,
+        labelStyle: TextStyle(
+          color: isSelected ? AppTheme.primaryBlue : AppTheme.darkTextPrimary,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+        onSelected: (selected) {
+          setState(() {
+            _selectedFilter = label;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildDevicesList() {
+    final devicesProvider = Provider.of<CameraDevicesProvider>(context);
+    final devicesByMac = devicesProvider.devicesByMacAddress;
+    final devicesList = devicesByMac.values.toList();
     
-    return FilterChip(
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
+    if (devicesList.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
             Icon(
-              icon,
-              size: 14,
-              color: isSelected ? Colors.white : color,
+              Icons.devices_other,
+              size: 64,
+              color: AppTheme.darkTextSecondary,
             ),
-            const SizedBox(width: 4),
+            const SizedBox(height: 16),
+            Text(
+              'No devices found',
+              style: TextStyle(
+                fontSize: 18,
+                color: AppTheme.darkTextSecondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Connect to the server to discover devices',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppTheme.darkTextSecondary,
+              ),
+            ),
           ],
-          Text(label),
-        ],
-      ),
-      selected: isSelected,
-      onSelected: (selected) {
-        setState(() {
-          _searchQuery = selected ? (status == null ? '' : label.toLowerCase()) : '';
-        });
-      },
-      backgroundColor: AppTheme.darkSurface,
-      selectedColor: AppTheme.accentColor,
-      showCheckmark: false,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-    );
-  }
-  
-  Widget _buildDeviceListItem(CameraDevice device) {
-    DeviceStatus status = device.connected 
+        ),
+      );
+    }
+    
+    // Filter the devices based on _selectedFilter
+    List<CameraDevice> filteredDevices = devicesList;
+    if (_selectedFilter != 'All') {
+      filteredDevices = devicesList.where((device) {
+        switch (_selectedFilter) {
+          case 'Online':
+            return device.connected;
+          case 'Offline':
+            return !device.connected;
+          // For 'Warning' and 'Error', we'd need more sophisticated logic based on device status
+          // For now, just showing all devices for these filters
+          default:
+            return true;
+        }
+      }).toList();
+    }
+    
+    // Sort the devices based on _selectedSort
+    filteredDevices.sort((a, b) {
+      switch (_selectedSort) {
+        case 'Name':
+          return a.macAddress.compareTo(b.macAddress);
+        case 'Status':
+          return a.connected == b.connected ? 0 : (a.connected ? -1 : 1);
+        case 'Last Active':
+          return a.lastSeenAt.compareTo(b.lastSeenAt);
+        case 'Type':
+          return a.deviceType.compareTo(b.deviceType);
+        default:
+          return 0;
+      }
+    });
+    
+    // Apply search filter if there's text in the search field
+    final searchQuery = _searchController.text.toLowerCase();
+    if (searchQuery.isNotEmpty) {
+      filteredDevices = filteredDevices.where((device) {
+        return device.macAddress.toLowerCase().contains(searchQuery) ||
+               device.ipv4.toLowerCase().contains(searchQuery) ||
+               device.deviceType.toLowerCase().contains(searchQuery);
+      }).toList();
+    }
+    
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: filteredDevices.length,
+      itemBuilder: (context, index) {
+        final device = filteredDevices[index];
+        
+        // Determine device status
+        DeviceStatus status = device.connected 
           ? DeviceStatus.online 
           : DeviceStatus.offline;
-    
-    return DeviceListItem(
-      device: device,
-      status: status,
-      isSelected: _selectedDevice?.id == device.id,
-      onTap: () {
-        setState(() {
-          _selectedDevice = device;
-        });
         
-        // On mobile, navigate to detail screen
-        if (!ResponsiveHelper.isDesktop(context)) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => _buildDeviceDetailScreen(device),
-            ),
-          );
-        }
+        // For more sophisticated status logic, we could look at other device properties
+        // such as warning conditions, errors, etc.
+        
+        return DeviceListItem(
+          name: 'Device ${device.macAddress}',
+          model: device.deviceType.isEmpty ? 'Unknown' : device.deviceType,
+          ipAddress: device.ipv4,
+          status: status,
+          lastActive: device.lastSeenAt,
+          onTap: () {
+            _showDeviceDetails(index, device);
+          },
+          onActionPressed: () {
+            _showDeviceOptions(context, index, device);
+          },
+        );
       },
     );
   }
-  
-  Widget _buildDeviceDetailPanel(CameraDevice device) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Device header
-          Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: AppTheme.darkSurface,
-                radius: 32,
-                child: Icon(
-                  Icons.devices,
-                  size: 32,
-                  color: device.connected
-                      ? AppTheme.accentColor
-                      : Colors.grey,
+
+  void _showFilterOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.darkSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              alignment: Alignment.centerLeft,
+              child: const Text(
+                'Filter Devices',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Device ${device.macKey}',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+            ),
+            const Divider(height: 1),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: _filterOptions.length,
+              itemBuilder: (context, index) {
+                final option = _filterOptions[index];
+                return ListTile(
+                  leading: _getFilterIcon(option),
+                  title: Text(option),
+                  selected: _selectedFilter == option,
+                  selectedTileColor: AppTheme.primaryBlue.withOpacity(0.15),
+                  trailing: _selectedFilter == option
+                      ? const Icon(Icons.check, color: AppTheme.primaryBlue)
+                      : null,
+                  onTap: () {
+                    setState(() {
+                      _selectedFilter = option;
+                    });
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _getFilterIcon(String filter) {
+    switch (filter) {
+      case 'All':
+        return const Icon(Icons.all_inclusive);
+      case 'Online':
+        return StatusIndicator(
+          status: DeviceStatus.online,
+          size: 12,
+          padding: EdgeInsets.zero,
+        );
+      case 'Offline':
+        return StatusIndicator(
+          status: DeviceStatus.offline,
+          size: 12,
+          padding: EdgeInsets.zero,
+        );
+      case 'Warning':
+        return StatusIndicator(
+          status: DeviceStatus.warning,
+          size: 12,
+          padding: EdgeInsets.zero,
+        );
+      case 'Error':
+        return StatusIndicator(
+          status: DeviceStatus.error,
+          size: 12,
+          padding: EdgeInsets.zero,
+        );
+      default:
+        return const Icon(Icons.filter_list);
+    }
+  }
+
+  void _showSortOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.darkSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              alignment: Alignment.centerLeft,
+              child: const Text(
+                'Sort Devices',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: _sortOptions.length,
+              itemBuilder: (context, index) {
+                final option = _sortOptions[index];
+                return ListTile(
+                  title: Text(option),
+                  selected: _selectedSort == option,
+                  selectedTileColor: AppTheme.primaryBlue.withOpacity(0.15),
+                  trailing: _selectedSort == option
+                      ? const Icon(Icons.check, color: AppTheme.primaryBlue)
+                      : null,
+                  onTap: () {
+                    setState(() {
+                      _selectedSort = option;
+                    });
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeviceOptions(BuildContext context, int deviceIndex, CameraDevice device) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.darkSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryBlue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Type: ${device.deviceType.isNotEmpty ? device.deviceType : "Unknown Device"}',
-                      style: TextStyle(
-                        color: Colors.grey.shade400,
-                      ),
+                    child: Icon(
+                      Icons.router_rounded,
+                      color: AppTheme.primaryBlue,
                     ),
-                    const SizedBox(height: 8),
-                    Row(
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        StatusIndicator(
-                          status: device.connected
-                              ? DeviceStatus.online
-                              : DeviceStatus.offline,
-                          showLabel: true,
+                        Text(
+                          device.deviceType.isEmpty ? 'Device ${device.macAddress}' : device.deviceType,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'MAC: ${device.macAddress}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.darkTextSecondary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 32),
-          
-          // Device info sections
-          _buildInfoSection(
-            title: 'Device Information',
-            icon: Icons.info_outline,
-            children: [
-              _buildInfoRow('MAC Address', device.macKey),
-              _buildInfoRow('IP Address', device.ipv4),
-              _buildInfoRow('Last Seen', device.lastSeenAt),
-              _buildInfoRow('Uptime', device.uptime),
-              _buildInfoRow('Firmware', device.firmwareVersion),
-              _buildInfoRow('Recording Path', device.recordPath),
-            ],
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Cameras section
-          _buildInfoSection(
-            title: 'Connected Cameras',
-            icon: Icons.videocam,
-            children: device.cameras.isEmpty
-                ? [
-                    const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Text('No cameras found on this device'),
-                      ),
-                    ),
-                  ]
-                : device.cameras
-                    .map((camera) => _buildCameraListItem(camera))
-                    .toList(),
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Action buttons
-          Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Refresh Device'),
-                  onPressed: () {
-                    // Refresh this device
-                    Provider.of<CameraDevicesProvider>(context, listen: false)
-                      .refreshDevices();
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: Icon(
-                    Icons.power_settings_new,
-                    color: device.connected
-                        ? Colors.red
-                        : AppTheme.accentColor,
                   ),
-                  label: Text(
-                    device.connected ? 'Disconnect' : 'Connect',
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: device.connected
-                        ? Colors.red
-                        : AppTheme.accentColor,
-                  ),
-                  onPressed: () {
-                    // TODO: Implement connect/disconnect functionality
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildDeviceDetailScreen(CameraDevice device) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Device ${device.macKey}'),
-      ),
-      body: _buildDeviceDetailPanel(device),
-    );
-  }
-  
-  Widget _buildNoDeviceSelectedMessage() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.devices,
-            size: 80,
-            color: Colors.grey.shade700,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'No Device Selected',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Select a device from the list to view details',
-            style: TextStyle(
-              color: Colors.grey.shade500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildInfoSection({
-    required String title,
-    required IconData icon,
-    required List<Widget> children,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(
-              icon,
-              color: AppTheme.accentColor,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+                ],
               ),
             ),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('Device Info'),
+              onTap: () {
+                Navigator.pop(context);
+                _showDeviceDetails(deviceIndex, device);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () {
+                Navigator.pop(context);
+                // UI only
+              },
+            ),
+            if (device.cameras.isNotEmpty)
+              ListTile(
+                leading: const Icon(Icons.videocam),
+                title: Text('Cameras (${device.cameras.length})'),
+                onTap: () {
+                  final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                  devicesProvider.setSelectedDevice(device.macKey);
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/cameras');
+                },
+              ),
+            ListTile(
+              leading: const Icon(Icons.restart_alt),
+              title: const Text('Restart Device'),
+              onTap: () {
+                Navigator.pop(context);
+                // UI only
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.delete_outline,
+                color: AppTheme.error,
+              ),
+              title: const Text('Remove Device'),
+              onTap: () {
+                Navigator.pop(context);
+                _showRemoveDeviceDialog(deviceIndex, device);
+              },
+            ),
+            const SizedBox(height: 8),
           ],
-        ),
-        const SizedBox(height: 16),
-        Container(
-          decoration: BoxDecoration(
-            color: AppTheme.darkSurface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.grey.shade800,
-              width: 1,
-            ),
-          ),
-          child: Column(
-            children: children,
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
-  
-  Widget _buildInfoRow(String label, String value) {
-    // Don't show empty values
-    if (value.isEmpty) {
-      return const SizedBox.shrink();
-    }
+
+  void _showDeviceDetails(int deviceIndex, CameraDevice device) {
+    final statusText = device.connected ? 'Online' : 'Offline';
     
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.darkSurface,
+          title: Text(device.deviceType.isEmpty ? 'Device Details' : '${device.deviceType} Details'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildDetailRow('Device Type', device.deviceType.isEmpty ? 'Unknown' : device.deviceType),
+                _buildDetailRow('IP Address', device.ipv4.isEmpty ? 'Unknown' : device.ipv4),
+                _buildDetailRow('MAC Address', device.macAddress),
+                _buildDetailRow('Firmware', device.firmwareVersion.isEmpty ? 'Unknown' : device.firmwareVersion),
+                _buildDetailRow('Last Active', device.lastSeenAt.isEmpty ? 'Unknown' : device.lastSeenAt),
+                _buildDetailRow('Status', statusText),
+                _buildDetailRow('Uptime', device.uptime.isEmpty ? 'Unknown' : device.uptime),
+                _buildDetailRow('Cameras', '${device.cameras.length}'),
+                if (device.recordPath.isNotEmpty)
+                  _buildDetailRow('Recording Path', device.recordPath),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Close'),
+            ),
+            if (device.cameras.isNotEmpty)
+              TextButton(
+                onPressed: () {
+                  final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                  devicesProvider.setSelectedDevice(device.macKey);
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, '/cameras');
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: AppTheme.primaryBlue,
+                ),
+                child: const Text('View Cameras'),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 120,
+          Expanded(
+            flex: 2,
             child: Text(
               label,
               style: TextStyle(
+                color: AppTheme.darkTextSecondary,
                 fontWeight: FontWeight.w500,
-                color: Colors.grey.shade400,
               ),
             ),
           ),
           Expanded(
+            flex: 3,
             child: Text(
               value,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppTheme.darkTextPrimary,
               ),
             ),
           ),
@@ -553,291 +588,125 @@ class _DevicesScreenState extends State<DevicesScreen> {
       ),
     );
   }
-  
-  Widget _buildCameraListItem(Camera camera) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          // TODO: Navigate to camera detail screen
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              // Camera thumbnail/icon
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: AppTheme.darkBackground,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: camera.connected
-                        ? AppTheme.accentColor
-                        : Colors.grey.shade800,
-                    width: 1,
-                  ),
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.videocam,
-                    size: 30,
-                    color: camera.connected
-                        ? AppTheme.accentColor
-                        : Colors.grey,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              
-              // Camera details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      camera.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'IP: ${camera.ip}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade400,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        StatusIndicator(
-                          status: camera.connected
-                              ? DeviceStatus.online
-                              : DeviceStatus.offline,
-                          size: 10,
-                          showLabel: true,
-                        ),
-                        if (camera.recording) ...[
-                          const SizedBox(width: 12),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.fiber_manual_record,
-                                size: 10,
-                                color: Colors.red,
-                              ),
-                              const SizedBox(width: 4),
-                              const Text(
-                                'Recording',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Action buttons
-              IconButton(
-                icon: const Icon(Icons.play_circle_outline),
-                color: AppTheme.accentColor,
-                onPressed: () {
-                  // TODO: Navigate to live view
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-  
-  void _showSearchDialog(BuildContext context) {
+
+  void _showAddDeviceDialog() {
     showDialog(
       context: context,
       builder: (context) {
-        String query = _searchQuery;
-        
         return AlertDialog(
-          title: const Text('Search Devices'),
-          content: TextField(
-            autofocus: true,
-            decoration: InputDecoration(
-              hintText: 'Enter device name, type, or IP...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-              filled: true,
-              fillColor: AppTheme.darkInput,
-            ),
-            onChanged: (value) {
-              query = value.toLowerCase();
-            },
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              child: const Text('Search'),
-              onPressed: () {
-                setState(() {
-                  _searchQuery = query;
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-  
-  void _showSortingDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        String sortBy = _sortBy;
-        
-        return AlertDialog(
-          title: const Text('Sort Devices'),
+          backgroundColor: AppTheme.darkSurface,
+          title: const Text('Add Device'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildSortOption(
-                'Sort by Name',
-                'name',
-                sortBy,
-                (value) {
-                  sortBy = value;
+              DropdownButtonFormField<String>(
+                decoration: const InputDecoration(
+                  labelText: 'Device Type',
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'camera', child: Text('IP Camera')),
+                  DropdownMenuItem(value: 'nvr', child: Text('NVR')),
+                  DropdownMenuItem(value: 'gateway', child: Text('Gateway')),
+                  DropdownMenuItem(value: 'other', child: Text('Other')),
+                ],
+                onChanged: (value) {
+                  // UI only
                 },
               ),
-              _buildSortOption(
-                'Sort by Status',
-                'status',
-                sortBy,
-                (value) {
-                  sortBy = value;
-                },
+              const SizedBox(height: 16),
+              const TextField(
+                decoration: InputDecoration(
+                  labelText: 'Device Name',
+                  hintText: 'Enter device name',
+                ),
               ),
-              _buildSortOption(
-                'Sort by Type',
-                'type',
-                sortBy,
-                (value) {
-                  sortBy = value;
-                },
+              const SizedBox(height: 16),
+              const TextField(
+                decoration: InputDecoration(
+                  labelText: 'IP Address',
+                  hintText: 'Enter IP address',
+                ),
+              ),
+              const SizedBox(height: 16),
+              const TextField(
+                decoration: InputDecoration(
+                  labelText: 'Username (Optional)',
+                  hintText: 'Enter username',
+                ),
+              ),
+              const SizedBox(height: 16),
+              const TextField(
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password (Optional)',
+                  hintText: 'Enter password',
+                ),
               ),
             ],
           ),
           actions: [
             TextButton(
-              child: const Text('Cancel'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.pop(context);
               },
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
-              child: const Text('Apply'),
               onPressed: () {
-                setState(() {
-                  _sortBy = sortBy;
-                });
-                Navigator.of(context).pop();
+                Navigator.pop(context);
+                // UI only
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+              ),
+              child: const Text('Add Device'),
             ),
           ],
         );
       },
     );
   }
-  
-  Widget _buildSortOption(
-    String label,
-    String value,
-    String groupValue,
-    Function(String) onChanged,
-  ) {
-    return RadioListTile<String>(
-      title: Text(label),
-      value: value,
-      groupValue: groupValue,
-      onChanged: (newValue) {
-        if (newValue != null) {
-          onChanged(newValue);
-        }
+
+  void _showRemoveDeviceDialog(int deviceIndex, CameraDevice device) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.darkSurface,
+          title: const Text('Remove Device'),
+          content: Text(
+            'Are you sure you want to remove ${device.deviceType.isEmpty ? 'Device ' + device.macAddress : device.deviceType}? This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                // In a real app, we would remove from the backend first
+                // For now, just remove from the local state
+                // devicesProvider.removeDevice(device.macKey);
+                Navigator.pop(context);
+                // UI only for now - show a snackbar to indicate action
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Device removal is disabled in this version'),
+                    backgroundColor: AppTheme.primaryBlue,
+                  ),
+                );
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: AppTheme.error,
+              ),
+              child: const Text('Remove'),
+            ),
+          ],
+        );
       },
-      activeColor: AppTheme.accentColor,
-      dense: true,
     );
-  }
-  
-  List<CameraDevice> _filterDevices(List<CameraDevice> devices) {
-    return devices.where((device) {
-      // Filter by status
-      if (!_showOfflineDevices && !device.connected) {
-        return false;
-      }
-      
-      // Filter by search query
-      if (_searchQuery.isEmpty) {
-        return true;
-      }
-      
-      // Filter by status keywords
-      if (_searchQuery == 'online') {
-        return device.connected;
-      } else if (_searchQuery == 'offline') {
-        return !device.connected;
-      } else if (_searchQuery == 'warning') {
-        return device.status == DeviceStatus.warning;
-      } else if (_searchQuery == 'error') {
-        return device.status == DeviceStatus.error;
-      }
-      
-      // Filter by device properties
-      return device.macKey.toLowerCase().contains(_searchQuery) ||
-          device.deviceType.toLowerCase().contains(_searchQuery) ||
-          device.ipv4.toLowerCase().contains(_searchQuery);
-    }).toList();
-  }
-  
-  void _sortDevices(List<CameraDevice> devices) {
-    switch (_sortBy) {
-      case 'name':
-        devices.sort((a, b) => a.macKey.compareTo(b.macKey));
-        break;
-      case 'status':
-        devices.sort((a, b) {
-          if (a.connected && !b.connected) return -1;
-          if (!a.connected && b.connected) return 1;
-          return a.macKey.compareTo(b.macKey);
-        });
-        break;
-      case 'type':
-        devices.sort((a, b) {
-          if (a.deviceType.isEmpty && b.deviceType.isNotEmpty) return 1;
-          if (a.deviceType.isNotEmpty && b.deviceType.isEmpty) return -1;
-          int typeCompare = a.deviceType.compareTo(b.deviceType);
-          return typeCompare != 0 ? typeCompare : a.macKey.compareTo(b.macKey);
-        });
-        break;
-    }
   }
 }

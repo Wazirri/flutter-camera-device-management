@@ -32,15 +32,7 @@ class WebSocketProvider with ChangeNotifier {
   bool _isLocalServerMode = false;
   
   // Store last received message for other providers to access
-  String? _lastMessage;
-
-  // Log tracking
-  final List<String> _logs = [];
-  int _sentCount = 0;
-  int _receivedCount = 0;
-  final List<Function(List<String>)> _logListeners = [];
-  // Getter for lastMessage
-  String? get lastMessage => _lastMessage;
+  dynamic _lastMessage;
   
   // Connection settings
   String _serverIp = '85.104.114.145';
@@ -103,55 +95,6 @@ class WebSocketProvider with ChangeNotifier {
     }
     
     notifyListeners();
-  }
-
-  // Send a message to the WebSocket server
-  void sendMessage(String message) {
-    if (_isConnected && _socket != null) {
-      try {
-        _socket!.add(message);
-        _sentCount++;
-        _logs.add("➡️ $message");
-        _notifyLogListeners();
-        _logMessage('Sent: $message');
-      } catch (e) {
-
-  // Clear logs
-  void clearLogs() {
-    _logs.clear();
-    _notifyLogListeners();
-    notifyListeners();
-  }
-
-  // Add a log listener
-  void addLogListener(Function(List<String>) listener) {
-    _logListeners.add(listener);
-  }
-
-  // Remove a log listener
-  void removeLogListener(Function(List<String>) listener) {
-    _logListeners.remove(listener);
-  }
-
-  // Notify log listeners
-  void _notifyLogListeners() {
-    for (var listener in _logListeners) {
-      listener(_logs);
-    }
-  }
-
-  // Getters for log counts
-  int get sentCount => _sentCount;
-  int get receivedCount => _receivedCount;
-        debugPrint('Error sending message: $e');
-        _logMessage('Error sending message: $e');
-        _handleError(e);
-      }
-    } else {
-      _errorMessage = 'Cannot send message: Not connected';
-      _logMessage(_errorMessage);
-      notifyListeners();
-    }
   }
 
   // Connect to WebSocket server
@@ -290,9 +233,6 @@ class WebSocketProvider with ChangeNotifier {
         // Log the message (truncate if too long)
         final logMsg = message.length > 500 ? '${message.substring(0, 500)}...' : message;
         _logMessage('Received: $logMsg');
-        
-        // Store the last message for other providers to access
-        _lastMessage = message;
         
         if (message == 'PONG') {
           // Handle heartbeat response
