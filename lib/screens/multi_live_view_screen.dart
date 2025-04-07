@@ -96,7 +96,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     // Calculate available height for the grid
     final appBarHeight = AppBar().preferredSize.height;
     final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0; // Only for mobile
-    final paginationControlsHeight = _totalPages > 1 ? 56.0 : 0.0; // Updated to match actual height
+    final paginationControlsHeight = 60.0; // Estimated height for pagination controls
     
     // Calculate available height for the grid (excluding app bar, pagination controls, and bottom nav)
     // Add more padding to ensure we have enough space
@@ -380,7 +380,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     
     // Calculate available height for the grid
     final appBarHeight = AppBar().preferredSize.height;
-    final paginationControlsHeight = _totalPages > 1 ? 56.0 : 0.0; // Updated to match actual height
+    final paginationControlsHeight = _totalPages > 1 ? 60.0 : 0.0;
     final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0;
     final safeAreaPadding = MediaQuery.of(context).padding;
     
@@ -395,14 +395,14 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     
     // Calculate how many actual rows we need for the active cameras
     // This ensures we don't reserve space for empty slots
-    final activeRowsNeeded = math.max(1, (activeCameraCount / _gridColumns).ceil());
+    final activeRowsNeeded = (activeCameraCount / _gridColumns).ceil();
     
     // Calculate optimal aspect ratio based on the available height and active rows
     final double cellWidth = size.width / _gridColumns;
     // Adjust the available height by removing the pagination controls height if needed
     final double adjustedAvailableHeight = availableHeight; // Not subtracting pagination again
     final double cellHeight = adjustedAvailableHeight / activeRowsNeeded;
-    final double aspectRatio = math.min(cellWidth / cellHeight, 16/9);  // Limit to 16:9 max
+    final double aspectRatio = cellWidth / cellHeight;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Multi Camera View'),
@@ -445,12 +445,10 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           Container(
             width: size.width,
             height: availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0),
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(color: Colors.black),
             child: GridView.builder(
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: false,
+              shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _gridColumns,
                 childAspectRatio: aspectRatio, 
@@ -599,7 +597,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           // Pagination controls at the bottom
           if (_totalPages > 1)
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 4.0), // Reduced padding
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 border: Border(
