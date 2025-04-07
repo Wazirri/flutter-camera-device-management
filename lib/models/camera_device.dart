@@ -1,129 +1,103 @@
+import 'package:flutter/material.dart';
 import 'dart:convert';
 
-enum DeviceStatus {
-  online,
-  offline,
-  degraded,
-  warning,
-  error,
-  unknown,
-}
-
+// CameraDevice Model for parsing camera devices from JSON
 class CameraDevice {
-  final String macAddress; // The actual MAC address in standard format (e.g., 26:C1:7A:0B:1F:19)
-  final String macKey;     // The key used in the WebSocket messages (e.g., m_26_C1_7A_0B_1F_19)
-  String ipv4;
-  String lastSeenAt;
-  bool connected;
-  String uptime;
-  String deviceType;
-  String firmwareVersion;
-  String recordPath;
-  List<Camera> cameras;
+  final String id;      // Unique identifier for the device (MAC address)
+  final String type;    // Type of device (e.g., Onvif, RTSP)
+  final String status;  // Connection status (e.g., Online, Offline)
+  final List<Camera> cameras; // Cameras associated with this device
+  final Map<String, dynamic> properties; // Raw device properties
+  
+  // Calculated fields
+  final String name;    // User-friendly name derived from MAC
+  final String macAddress; // MAC address
   
   CameraDevice({
-    required this.macAddress,
-    required this.macKey,
-    required this.ipv4,
-    required this.lastSeenAt,
-    required this.connected,
-    required this.uptime,
-    required this.deviceType,
-    required this.firmwareVersion,
-    required this.recordPath,
+    required this.id,
+    required this.type,
+    required this.status,
     required this.cameras,
+    required this.properties,
+    required this.name,
+    required this.macAddress,
   });
   
-  // Copy with method for immutable updates
-  CameraDevice copyWith({
-    String? ipv4,
-    String? lastSeenAt,
-    bool? connected,
-    String? uptime,
-    String? deviceType,
-    String? firmwareVersion,
-    String? recordPath,
-    List<Camera>? cameras,
-  }) {
-    return CameraDevice(
-      macAddress: this.macAddress,
-      macKey: this.macKey,
-      ipv4: ipv4 ?? this.ipv4,
-      lastSeenAt: lastSeenAt ?? this.lastSeenAt,
-      connected: connected ?? this.connected,
-      uptime: uptime ?? this.uptime,
-      deviceType: deviceType ?? this.deviceType,
-      firmwareVersion: firmwareVersion ?? this.firmwareVersion,
-      recordPath: recordPath ?? this.recordPath,
-      cameras: cameras ?? this.cameras,
-    );
-  }
+  // Check if the device is currently connected
+  bool get isConnected => status.toLowerCase() == 'online';
   
-  // Convert from JSON
-  factory CameraDevice.fromJson(Map<String, dynamic> json) {
-    return CameraDevice(
-      macAddress: json['macAddress'],
-      macKey: json['macKey'],
-      ipv4: json['ipv4'] ?? '',
-      lastSeenAt: json['lastSeenAt'] ?? '',
-      connected: json['connected'] ?? false,
-      uptime: json['uptime'] ?? '',
-      deviceType: json['deviceType'] ?? '',
-      firmwareVersion: json['firmwareVersion'] ?? '',
-      recordPath: json['recordPath'] ?? '',
-      cameras: (json['cameras'] as List<dynamic>?)
-          ?.map((e) => Camera.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [],
-    );
-  }
+  // Check if device has any cameras
+  bool get hasCameras => cameras.isNotEmpty;
   
-  // Convert to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'macAddress': macAddress,
-      'macKey': macKey,
-      'ipv4': ipv4,
-      'lastSeenAt': lastSeenAt,
-      'connected': connected,
-      'uptime': uptime,
-      'deviceType': deviceType,
-      'firmwareVersion': firmwareVersion,
-      'recordPath': recordPath,
-      'cameras': cameras.map((e) => e.toJson()).toList(),
-    };
-  }
-  
-  // Get the device status
-  DeviceStatus get status {
-    if (!connected) {
-      return DeviceStatus.offline;
+  // Get a camera by its index
+  Camera? getCamera(int index) {
+    if (index >= 0 && index < cameras.length) {
+      return cameras[index];
     }
+    return null;
+  }
+  
+  // Factory method to create CameraDevice from JSON
+  static CameraDevice fromJson(Map<String, dynamic> json) {
+    // Extract fields
+    String deviceId = json['id'] ?? '';
+    String deviceType = json['type'] ?? '';
+    String deviceStatus = json['status'] ?? '';
+    Map<String, dynamic> deviceProperties = json['properties'] ?? {};
     
-    // Check if any cameras have issues
-    bool hasWarning = false;
-    bool hasError = false;
+    // Extract MAC address (usually in id field after ecs.slave.)
+    String rawId = deviceId;
+    String macAddress = '';
+    String deviceName = '';
     
-    for (final camera in cameras) {
-      if (!camera.connected) {
-        hasWarning = true;
+    if (rawId.contains('.')) {
+      final parts = rawId.split('.');
+      if (parts.length >= 3) {
+        // For format like "ecs.slave.m_AA_BB_CC_DD_EE_FF"
+        String lastPart = parts.last;
+        if (lastPart.startsWith('m_')) {
+          // Convert m_AA_BB_CC_DD_EE_FF to AA:BB:CC:DD:EE:FF
+          macAddress = lastPart.substring(2).replaceAll('_', ':');
+          deviceName = 'Device ${macAddress.split(':').last}'; // Use last part of MAC as name
+        }
       }
     }
     
-    if (hasError) {
-      return DeviceStatus.error;
-    } else if (hasWarning) {
-      return DeviceStatus.warning;
-    } else {
-      return DeviceStatus.online;
+    // Create a list for all cameras associated with this device
+    final List<Camera> deviceCameras = [];
+    
+    // Extract camera data from properties
+    if (deviceProperties.containsKey('cameras') && deviceProperties['cameras'] is List) {
+      final List<dynamic> camerasJson = deviceProperties['cameras'];
+      
+      for (int i = 0; i < camerasJson.length; i++) {
+        if (camerasJson[i] is Map<String, dynamic>) {
+          // Create Camera object and add to list
+          final camera = Camera.fromJson(camerasJson[i], i, macAddress);
+          deviceCameras.add(camera);
+        }
+      }
     }
+    
+    return CameraDevice(
+      id: deviceId,
+      type: deviceType,
+      status: deviceStatus,
+      cameras: deviceCameras,
+      properties: deviceProperties,
+      name: deviceName,
+      macAddress: macAddress,
+    );
   }
-
+  
+  // Create a string representation of the device
   @override
   String toString() {
-    return 'CameraDevice{macAddress: $macAddress, ipv4: $ipv4, connected: $connected, cameras: ${cameras.length}}';
+    return 'CameraDevice { id: $id, type: $type, status: $status, cameras: ${cameras.length} }';
   }
 }
 
+// Camera Model representing an individual camera
 class Camera {
   final int index;            // Index of the camera in the device's cameras array
   String name;                // User-friendly name (e.g., KAMERA1)
@@ -179,158 +153,86 @@ class Camera {
     this.recordCodec = '',
     required this.recordWidth,
     required this.recordHeight,
-    this.subCodec = '',
+    required this.subCodec,
     required this.subWidth,
     required this.subHeight,
-    required this.connected,
-    this.disconnected = '-',
-    required this.lastSeenAt,
-    required this.recording,
+    this.connected = false,
+    this.disconnected = '',
+    this.lastSeenAt = '',
+    this.recording = false,
     this.soundRec = false,
     this.xAddr = '',
   });
   
-  // Added id getter to uniquely identify cameras
-  // Using a combination of name and index as id
-  String get id => "${name}_$index";
-  
-  // Copy with method for immutable updates
-  Camera copyWith({
-    String? name,
-    String? ip,
-    int? rawIp,
-    String? username,
-    String? password,
-    String? brand,
-    String? hw,
-    String? manufacturer,
-    String? country,
-    String? xAddrs,
-    String? mediaUri,
-    String? recordUri,
-    String? subUri,
-    String? remoteUri,
-    String? mainSnapShot,
-    String? subSnapShot,
-    String? recordPath,
-    String? recordCodec,
-    int? recordWidth,
-    int? recordHeight,
-    String? subCodec,
-    int? subWidth,
-    int? subHeight,
-    bool? connected,
-    String? disconnected,
-    String? lastSeenAt,
-    bool? recording,
-  }) {
+  // Factory method to create a Camera from JSON
+  factory Camera.fromJson(Map<String, dynamic> json, int index, String deviceMac) {
+    // Helper function to safely get string value
+    String getString(dynamic value) {
+      return value != null ? value.toString() : '';
+    }
+    
+    // Helper function to safely get int value
+    int getInt(dynamic value) {
+      if (value == null) return 0;
+      if (value is int) return value;
+      try {
+        return int.parse(value.toString());
+      } catch (e) {
+        return 0;
+      }
+    }
+    
+    // Helper function to safely get bool value
+    bool getBool(dynamic value) {
+      if (value == null) return false;
+      if (value is bool) return value;
+      if (value is String) {
+        return value.toLowerCase() == 'true' || value == '1';
+      }
+      return false;
+    }
+    
+    // Extract camera details from JSON
     return Camera(
-      index: this.index,
-      name: name ?? this.name,
-      ip: ip ?? this.ip,
-      rawIp: rawIp ?? this.rawIp,
-      username: username ?? this.username,
-      password: password ?? this.password,
-      brand: brand ?? this.brand,
-      hw: hw ?? this.hw,
-      manufacturer: manufacturer ?? this.manufacturer,
-      country: country ?? this.country,
-      xAddrs: xAddrs ?? this.xAddrs,
-      mediaUri: mediaUri ?? this.mediaUri,
-      recordUri: recordUri ?? this.recordUri,
-      subUri: subUri ?? this.subUri,
-      remoteUri: remoteUri ?? this.remoteUri,
-      mainSnapShot: mainSnapShot ?? this.mainSnapShot,
-      subSnapShot: subSnapShot ?? this.subSnapShot,
-      recordPath: recordPath ?? this.recordPath,
-      recordCodec: recordCodec ?? this.recordCodec,
-      recordWidth: recordWidth ?? this.recordWidth,
-      recordHeight: recordHeight ?? this.recordHeight,
-      subCodec: subCodec ?? this.subCodec,
-      subWidth: subWidth ?? this.subWidth,
-      subHeight: subHeight ?? this.subHeight,
-      connected: connected ?? this.connected,
-      disconnected: disconnected ?? this.disconnected,
-      lastSeenAt: lastSeenAt ?? this.lastSeenAt,
-      recording: recording ?? this.recording,
-      soundRec: this.soundRec,
-      xAddr: this.xAddr,
+      index: index,
+      name: getString(json['name']),
+      ip: getString(json['cameraIp']),
+      rawIp: getInt(json['cameraRawIp']),
+      username: getString(json['username']),
+      password: getString(json['password']),
+      brand: getString(json['brand']),
+      hw: getString(json['hw']),
+      manufacturer: getString(json['manufacturer']),
+      country: getString(json['country']),
+      xAddrs: getString(json['xAddrs']),
+      mediaUri: getString(json['mediaUri']),
+      recordUri: getString(json['recordUri']),
+      subUri: getString(json['subUri']),
+      remoteUri: getString(json['remoteUri']),
+      mainSnapShot: getString(json['mainSnapShot']),
+      subSnapShot: getString(json['subSnapShot']),
+      recordPath: getString(json['recordPath']),
+      recordCodec: getString(json['recordCodec']),
+      recordWidth: getInt(json['recordWidth']),
+      recordHeight: getInt(json['recordHeight']),
+      subCodec: getString(json['subCodec']),
+      subWidth: getInt(json['subWidth']),
+      subHeight: getInt(json['subHeight']),
+      connected: getBool(json['connected']),
+      disconnected: getString(json['disconnected']),
+      lastSeenAt: getString(json['lastSeenAt']),
+      recording: getBool(json['recording']),
+      soundRec: getBool(json['soundRec']),
+      xAddr: getString(json['xAddr']),
     );
   }
   
-  // Convert from JSON
-  factory Camera.fromJson(Map<String, dynamic> json) {
-    return Camera(
-      index: json['index'] ?? 0,
-      name: json['name'] ?? '',
-      ip: json['ip'] ?? '',
-      rawIp: json['rawIp'] ?? 0,
-      username: json['username'] ?? '',
-      password: json['password'] ?? '',
-      brand: json['brand'] ?? '',
-      hw: json['hw'] ?? '',
-      manufacturer: json['manufacturer'] ?? '',
-      country: json['country'] ?? '',
-      xAddrs: json['xAddrs'] ?? '',
-      mediaUri: json['mediaUri'] ?? '',
-      recordUri: json['recordUri'] ?? '',
-      subUri: json['subUri'] ?? '',
-      remoteUri: json['remoteUri'] ?? '',
-      mainSnapShot: json['mainSnapShot'] ?? '',
-      subSnapShot: json['subSnapShot'] ?? '',
-      recordPath: json['recordPath'] ?? '',
-      recordCodec: json['recordCodec'] ?? '',
-      recordWidth: json['recordWidth'] ?? 0,
-      recordHeight: json['recordHeight'] ?? 0,
-      subCodec: json['subCodec'] ?? '',
-      subWidth: json['subWidth'] ?? 0,
-      subHeight: json['subHeight'] ?? 0,
-      connected: json['connected'] ?? false,
-      disconnected: json['disconnected'] ?? '-',
-      lastSeenAt: json['lastSeenAt'] ?? '',
-      recording: json['recording'] ?? false,
-      soundRec: json['soundRec'] ?? false,
-      xAddr: json['xAddr'] ?? '',
-    );
+  @override
+  String toString() {
+    return 'Camera{name: $name, connected: $connected, recording: $recording}';
   }
   
-  // Convert to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'index': index,
-      'name': name,
-      'ip': ip,
-      'rawIp': rawIp,
-      'username': username,
-      'password': password,
-      'brand': brand,
-      'hw': hw,
-      'manufacturer': manufacturer,
-      'country': country,
-      'xAddrs': xAddrs,
-      'mediaUri': mediaUri,
-      'recordUri': recordUri,
-      'subUri': subUri,
-      'remoteUri': remoteUri,
-      'mainSnapShot': mainSnapShot,
-      'subSnapShot': subSnapShot,
-      'recordPath': recordPath,
-      'recordCodec': recordCodec,
-      'recordWidth': recordWidth,
-      'recordHeight': recordHeight,
-      'subCodec': subCodec,
-      'subWidth': subWidth,
-      'subHeight': subHeight,
-      'connected': connected,
-      'disconnected': disconnected,
-      'lastSeenAt': lastSeenAt,
-      'recording': recording,
-      'soundRec': soundRec,
-      'xAddr': xAddr,
-    };
-  }
-  
-  // Get the appropriate RTSP URI for streaming
+  // Get RTSP URI with credentials if available
   String get rtspUri {
     // Öncelikle sadece subUri'yi kullan (talep üzerine değiştirildi)
     if (subUri.isNotEmpty) {
@@ -339,10 +241,19 @@ class Camera {
       return _addCredentialsToUrl(mediaUri);
     } else if (remoteUri.isNotEmpty) {
       return _addCredentialsToUrl(remoteUri);
-    } else if (recordUri.isNotEmpty) {
-      return _addCredentialsToUrl(recordUri);
     }
+    
     return ""; // Return empty string if no URI is available
+  }
+  
+  // Get base URL for recordings HTTP access
+  String get recordingsBaseUrl {
+    return "http://${ip}:8080/Rec/${name}";
+  }
+  
+  // Get URL for a specific recording day
+  String getRecordingDayUrl(String formattedDate) {
+    return "${recordingsBaseUrl}/${formattedDate}";
   }
   
   // Add username and password to RTSP URL
@@ -356,34 +267,21 @@ class Camera {
       return url;
     }
     
-    // Kullanıcı adı veya şifre boşsa, URL'i olduğu gibi döndür
-    if (username.isEmpty || password.isEmpty) {
-      return url;
+    // Add credentials to RTSP URL
+    if (username.isNotEmpty && password.isNotEmpty) {
+      final uri = Uri.parse(url);
+      final userInfo = '$username:$password';
+      final credentialsUri = Uri(
+        scheme: uri.scheme,
+        userInfo: userInfo,
+        host: uri.host,
+        port: uri.port,
+        path: uri.path,
+        query: uri.query,
+      );
+      return credentialsUri.toString();
     }
     
-    // rtsp:// kısmını çıkar
-    final urlWithoutProtocol = url.substring(7);
-    
-    // Kullanıcı adı ve şifreyi URL'e ekle
-    return 'rtsp://$username:$password@$urlWithoutProtocol';
-  }
-  
-  // Added getter for compatibility
-  bool get isConnected => connected;
-  
-  // Added getter for compatibility
-  bool get isRecording => recording;
-  
-  // Get the camera status
-  DeviceStatus get status {
-    if (!connected) {
-      return DeviceStatus.offline;
-    }
-    return DeviceStatus.online;
-  }
-  
-  @override
-  String toString() {
-    return 'Camera{name: $name, ip: $ip, connected: $connected, recording: $recording}';
+    return url;
   }
 }
