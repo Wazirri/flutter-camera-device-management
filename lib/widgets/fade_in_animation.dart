@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 
 class FadeInAnimation extends StatefulWidget {
   final Widget child;
-  final Duration delay;
   final Duration duration;
   final Curve curve;
-  final double startOpacity;
+  final double begin;
+  final double end;
 
   const FadeInAnimation({
     Key? key,
     required this.child,
-    this.delay = Duration.zero,
     this.duration = const Duration(milliseconds: 500),
     this.curve = Curves.easeInOut,
-    this.startOpacity = 0.0,
+    this.begin = 0.0,
+    this.end = 1.0,
   }) : super(key: key);
 
   @override
@@ -23,7 +23,7 @@ class FadeInAnimation extends StatefulWidget {
 class _FadeInAnimationState extends State<FadeInAnimation>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _opacityAnimation;
+  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -32,24 +32,16 @@ class _FadeInAnimationState extends State<FadeInAnimation>
       vsync: this,
       duration: widget.duration,
     );
-
-    _opacityAnimation = Tween<double>(
-      begin: widget.startOpacity,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: widget.curve,
-    ));
-
-    if (widget.delay == Duration.zero) {
-      _controller.forward();
-    } else {
-      Future.delayed(widget.delay, () {
-        if (mounted) {
-          _controller.forward();
-        }
-      });
-    }
+    _animation = Tween<double>(
+      begin: widget.begin,
+      end: widget.end,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: widget.curve,
+      ),
+    );
+    _controller.forward();
   }
 
   @override
@@ -61,7 +53,7 @@ class _FadeInAnimationState extends State<FadeInAnimation>
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
-      opacity: _opacityAnimation,
+      opacity: _animation,
       child: widget.child,
     );
   }
