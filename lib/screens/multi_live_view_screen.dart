@@ -424,23 +424,27 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 1,
-                child: Text('1 column'),
+                child: Text('1 sütun (tam ekran)'),
               ),
               const PopupMenuItem(
                 value: 2,
-                child: Text('2 columns'),
+                child: Text('2 sütun'),
               ),
               const PopupMenuItem(
                 value: 3,
-                child: Text('3 columns'),
+                child: Text('3 sütun'),
               ),
               const PopupMenuItem(
                 value: 4,
-                child: Text('4 columns'),
+                child: Text('4 sütun (önerilen)'),
               ),
               const PopupMenuItem(
                 value: 5,
-                child: Text('5 columns'),
+                child: Text('5 sütun'),
+              ),
+              const PopupMenuItem(
+                value: 6,
+                child: Text('6 sütun (küçük ekranlar)'),
               ),
             ],
           ),
@@ -592,10 +596,6 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                               child: IconButton(
                                 icon: const Icon(Icons.sync),
                                 color: Colors.white,
-              const PopupMenuItem(
-                value: 6,
-                child: Text('6 sütun (küçük ekranlar)'),
-              ),
                                 tooltip: 'Change camera',
                                 onPressed: () => _showCameraSelector(index),
                               ),
