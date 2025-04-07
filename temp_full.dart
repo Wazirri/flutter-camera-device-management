@@ -396,11 +396,9 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     // This ensures we don't reserve space for empty slots
     final activeRowsNeeded = (activeCameraCount / _gridColumns).ceil();
     
-        // Calculate optimal aspect ratio based on the available height and active rows
+    // Calculate optimal aspect ratio based on the available height and active rows
     final double cellWidth = size.width / _gridColumns;
-    // Adjust the available height by removing the pagination controls height if needed
-    final double adjustedAvailableHeight = availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0);
-    final double cellHeight = adjustedAvailableHeight / activeRowsNeeded;
+    final double cellHeight = availableHeight / activeRowsNeeded;
     final double aspectRatio = cellWidth / cellHeight;
     return Scaffold(
       appBar: AppBar(
@@ -438,22 +436,19 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: Column(
-        children: [
-          // Main grid taking all available space
-          Container(
-            width: size.width,
-            height: availableHeight,
-            child: GridView.builder(
-              padding: EdgeInsets.zero,
-              physics: const NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: _gridColumns,
-                childAspectRatio: aspectRatio, 
-                crossAxisSpacing: 0,
-                mainAxisSpacing: 0,
-              ),
+      body: Container(
+        width: size.width,
+        height: availableHeight,
+        child: GridView.builder(
+          padding: EdgeInsets.zero,
+          physics: const NeverScrollableScrollPhysics(), // Disable scrolling to fit all slots
+          shrinkWrap: true,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: _gridColumns,
+            childAspectRatio: aspectRatio, // Custom aspect ratio to fit all slots perfectly
+            crossAxisSpacing: 0,
+            mainAxisSpacing: 0,
+          ),
               itemCount: activeCameraCount,
               itemBuilder: (context, index) {
                 // Find the original index of this camera in the _selectedCameras list
