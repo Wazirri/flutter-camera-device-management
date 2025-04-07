@@ -801,20 +801,8 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
         if (_camera != null)
           VideoControls(
             player: _player,
-            isPlaying: _isPlaying,
-            isRecording: _camera!.recording,
-            onPlayPause: () {
-              if (_isPlaying) {
-                _player.pause();
-              } else {
-                _player.play();
-              }
-            },
-            onStop: () {
-              _player.stop();
-            },
-            onFullscreen: _toggleFullScreen,
-            onGoLive: () => _loadRecording(_camera!.rtspUri),
+            showFullScreenButton: true,
+            onFullScreenToggle: _toggleFullScreen,
           ),
       ],
     );
