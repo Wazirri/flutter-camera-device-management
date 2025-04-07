@@ -32,6 +32,9 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
   int _gridColumns = 4; // Default grid columns for desktop
   CameraLayout _currentLayout = CameraLayout(name: 'Default', id: 4, rows: 5, columns: 4, slots: 20, description: 'Default layout');
   
+  // Pagination controls height (reduced to save space)
+  final double paginationControlsHeight = 40.0;
+  
   @override
   void initState() {
     super.initState();
@@ -196,15 +199,16 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     // Calculate the height available for the grid
     final appBarHeight = AppBar().preferredSize.height;
     final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0;
-    final paginationControlsHeight = 40.0; // Reduced height for pagination controls
-    final availableHeight = size.height - appBarHeight - bottomNavHeight - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom;
+    final statusBarHeight = MediaQuery.of(context).padding.top;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final availableHeight = size.height - appBarHeight - bottomNavHeight - statusBarHeight - bottomPadding;
     
     // Filter out null cameras for the grid
     final List<Camera> activeCameras = _selectedCameras.whereType<Camera>().toList();
     final activeCameraCount = activeCameras.length;
     
-    // Calculate how many rows we need based on camera count
-    final int activeRowsNeeded = 5; // Fixed number of rows 
+    // Use fixed 5 rows for consistent layout
+    const int activeRowsNeeded = 5;
     
     // Calculate optimal aspect ratio based on the available height and active rows
     final double cellWidth = size.width / _gridColumns;
@@ -228,18 +232,13 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           ),
         ],
       ),
-      body: SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(0),
-        child: Column(
+      body: Column(
         children: [
           // Main grid view that takes up most of the space
           Expanded(
             child: GridView.builder(
               // Disable scrolling as we're handling paging ourselves
               physics: const NeverScrollableScrollPhysics(),
-      ),
-    )
               // Grid properties
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _gridColumns,
