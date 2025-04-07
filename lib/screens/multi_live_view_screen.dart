@@ -378,23 +378,20 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     final isDesktop = ResponsiveHelper.isDesktop(context);
     final size = MediaQuery.of(context).size;
     
-    // Get the exact MediaQuery size to ensure we have accurate measurements
-    final mediaQuery = MediaQuery.of(context);
-    final viewPadding = mediaQuery.viewPadding;
-    
-    // Calculate available height for the grid with precise measurements
+    // Calculate available height for the grid
     final appBarHeight = AppBar().preferredSize.height;
-    final paginationControlsHeight = _totalPages > 1 ? 48.0 : 0.0; // Reduced from 60
+    final paginationControlsHeight = _totalPages > 1 ? 60.0 : 0.0;
     final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0;
-    final statusBarHeight = viewPadding.top;
     
-    // Calculate exact available height, removing all padding
-    final availableHeight = size.height - appBarHeight - paginationControlsHeight - 
-                           bottomNavHeight - statusBarHeight - 8; // Minimum padding
+    // Calculate available height for the grid with proper padding
+    final availableHeight = size.height - appBarHeight - paginationControlsHeight - bottomNavHeight - 16;
     
-    // Calculate optimal aspect ratio with minimal spacing
-    final double cellWidth = (size.width - 2) / _gridColumns; // Almost no horizontal spacing
-    final double cellHeight = availableHeight / rowsNeeded;   // No vertical spacing between rows
+    // Calculate number of rows needed based on the current grid columns
+    final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
+    
+    // Calculate optimal aspect ratio based on the available height and number of rows needed
+    final double cellWidth = (size.width - (16 + (_gridColumns - 1) * 8)) / _gridColumns;
+    final double cellHeight = (availableHeight - ((rowsNeeded - 1) * 8)) / rowsNeeded;
     final double aspectRatio = cellWidth / cellHeight;
     
     return Scaffold(
@@ -439,14 +436,14 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           // Ensuring all players fit within the screen with proper aspect ratio
           Expanded(
             child: GridView.builder(
-              padding: const EdgeInsets.all(1.0),
+              padding: const EdgeInsets.all(8.0),
               physics: const NeverScrollableScrollPhysics(), // Disable scrolling to fit all slots
               shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _gridColumns,
                 childAspectRatio: aspectRatio, // Custom aspect ratio to fit all slots perfectly
-                crossAxisSpacing: 1,
-                mainAxisSpacing: 1,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
               ),
               itemCount: maxCamerasPerPage,
               itemBuilder: (context, index) {
@@ -455,10 +452,10 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                 final hasError = _errorStates[index];
                 
                 return Card(
-                  margin: EdgeInsets.zero, // Remove card margin
                   clipBehavior: Clip.antiAlias,
-                  elevation: 0, // Remove shadow
                   child: InkWell(
+                    onTap: () => _showCameraSelector(index),
+                    child: Stack(
                       fit: StackFit.expand,
                       children: [
                         // Camera slot

@@ -1,0 +1,172 @@
+      Preparing
+
+    Analyzing dependencies
+
+    Inspecting targets to integrate
+      Using `ARCHS` setting to build architectures of target `Pods-Runner`: (``)
+
+    Fetching external sources
+    -> Fetching podspec for `FlutterMacOS` from `Flutter/ephemeral`
+    -> Fetching podspec for `media_kit_libs_macos_video` from `Flutter/ephemeral/.symlinks/plugins/media_kit_libs_macos_video/macos`
+    make: Nothing to be done for `all'.
+    -> Fetching podspec for `media_kit_video` from `Flutter/ephemeral/.symlinks/plugins/media_kit_video/macos`
+    make: Nothing to be done for `all'.
+    media_kit: INFO: package:media_kit_libs_macos_video found
+    -> Fetching podspec for `package_info_plus` from `Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos`
+    -> Fetching podspec for `screen_brightness_macos` from `Flutter/ephemeral/.symlinks/plugins/screen_brightness_macos/macos`
+    -> Fetching podspec for `shared_preferences_foundation` from `Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin`
+    -> Fetching podspec for `wakelock_plus` from `Flutter/ephemeral/.symlinks/plugins/wakelock_plus/macos`
+
+    Resolving dependencies of `Podfile`
+      CDN: trunk Relative path: CocoaPods-version.yml exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: all_pods_versions_c_0_4.txt exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/3.13.0/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/3.13.0/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/3.0.0/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/2.10.2/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/2.5/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/2.0.2/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/2.0.1/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/2.0.0/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/1.22.4/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/1.20.0/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/1.17.0/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/1.12.1309/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/1.12.1307/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/1.12.1303/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/1.9.102/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/1.3.300/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/1.3.200/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/1.3.1/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/1.2.1/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+      CDN: trunk Relative path: Specs/c/0/4/Flutter/1.0.0/Flutter.podspec.json exists! Returning local because checking is only performed in repo update
+
+    Comparing resolved specification to the sandbox manifest
+      A FlutterMacOS
+      A media_kit_libs_macos_video
+      A media_kit_video
+      A package_info_plus
+      A screen_brightness_macos
+      A shared_preferences_foundation
+      A wakelock_plus
+
+    Downloading dependencies
+
+    -> Installing FlutterMacOS (1.0.0)
+
+    -> Installing media_kit_libs_macos_video (1.0.4)
+
+    -> Installing media_kit_video (0.0.1)
+
+    -> Installing package_info_plus (0.0.1)
+
+    -> Installing screen_brightness_macos (0.1.0)
+
+    -> Installing shared_preferences_foundation (0.0.1)
+
+    -> Installing wakelock_plus (0.0.1)
+      - Running pre install hooks
+      - Running pre integrate hooks
+
+    Generating Pods project
+      - Creating Pods project
+      - Installing files into Pods project
+        - Adding source files
+        - Adding frameworks
+        - Adding libraries
+        - Adding resources
+        - Adding development pod helper files
+        - Linking headers
+      - Installing Pod Targets
+        - Installing target `FlutterMacOS` macOS 10.14
+        - Installing target `media_kit_libs_macos_video` macOS 10.9
+          - Generating module map file at `Pods/Target Support Files/media_kit_libs_macos_video/media_kit_libs_macos_video.modulemap`
+          - Generating umbrella header at `Pods/Target Support Files/media_kit_libs_macos_video/media_kit_libs_macos_video-umbrella.h`
+          - Generating Info.plist file at `Pods/Target Support Files/media_kit_libs_macos_video/media_kit_libs_macos_video-Info.plist`
+          - Generating dummy source at `Pods/Target Support Files/media_kit_libs_macos_video/media_kit_libs_macos_video-dummy.m`
+        - Installing target `media_kit_video` macOS 10.9
+          - Generating module map file at `Pods/Target Support Files/media_kit_video/media_kit_video.modulemap`
+          - Generating umbrella header at `Pods/Target Support Files/media_kit_video/media_kit_video-umbrella.h`
+          - Generating Info.plist file at `Pods/Target Support Files/media_kit_video/media_kit_video-Info.plist`
+          - Generating dummy source at `Pods/Target Support Files/media_kit_video/media_kit_video-dummy.m`
+        - Installing target `package_info_plus` macOS 10.14
+          - Generating Info.plist file at `Pods/Target Support Files/package_info_plus/ResourceBundle-package_info_plus_privacy-package_info_plus-Info.plist`
+          - Generating module map file at `Pods/Target Support Files/package_info_plus/package_info_plus.modulemap`
+          - Generating umbrella header at `Pods/Target Support Files/package_info_plus/package_info_plus-umbrella.h`
+          - Generating Info.plist file at `Pods/Target Support Files/package_info_plus/package_info_plus-Info.plist`
+          - Generating dummy source at `Pods/Target Support Files/package_info_plus/package_info_plus-dummy.m`
+        - Installing target `screen_brightness_macos` macOS 10.11
+          - Generating module map file at `Pods/Target Support Files/screen_brightness_macos/screen_brightness_macos.modulemap`
+          - Generating umbrella header at `Pods/Target Support Files/screen_brightness_macos/screen_brightness_macos-umbrella.h`
+          - Generating Info.plist file at `Pods/Target Support Files/screen_brightness_macos/screen_brightness_macos-Info.plist`
+          - Generating dummy source at `Pods/Target Support Files/screen_brightness_macos/screen_brightness_macos-dummy.m`
+        - Installing target `shared_preferences_foundation` macOS 10.14
+          - Generating Info.plist file at `Pods/Target Support Files/shared_preferences_foundation/ResourceBundle-shared_preferences_foundation_privacy-shared_preferences_foundation-Info.plist`
+          - Generating module map file at `Pods/Target Support Files/shared_preferences_foundation/shared_preferences_foundation.modulemap`
+          - Generating umbrella header at `Pods/Target Support Files/shared_preferences_foundation/shared_preferences_foundation-umbrella.h`
+          - Generating Info.plist file at `Pods/Target Support Files/shared_preferences_foundation/shared_preferences_foundation-Info.plist`
+          - Generating dummy source at `Pods/Target Support Files/shared_preferences_foundation/shared_preferences_foundation-dummy.m`
+        - Installing target `wakelock_plus` macOS 10.11
+          - Generating module map file at `Pods/Target Support Files/wakelock_plus/wakelock_plus.modulemap`
+          - Generating umbrella header at `Pods/Target Support Files/wakelock_plus/wakelock_plus-umbrella.h`
+          - Generating Info.plist file at `Pods/Target Support Files/wakelock_plus/wakelock_plus-Info.plist`
+          - Generating dummy source at `Pods/Target Support Files/wakelock_plus/wakelock_plus-dummy.m`
+      - Installing Aggregate Targets
+        - Installing target `Pods-Runner` macOS 10.14
+          - Generating Info.plist file at `Pods/Target Support Files/Pods-Runner/Pods-Runner-Info.plist`
+          - Generating module map file at `Pods/Target Support Files/Pods-Runner/Pods-Runner.modulemap`
+          - Generating umbrella header at `Pods/Target Support Files/Pods-Runner/Pods-Runner-umbrella.h`
+          - Generating dummy source at `Pods/Target Support Files/Pods-Runner/Pods-Runner-dummy.m`
+      - Integrating targets
+
+    Integrating target `media_kit_libs_macos_video`
+        Adding Build Phase '[CP] Copy XCFrameworks' to project.
+      - Generating deterministic UUIDs
+      - Stabilizing target UUIDs
+      - Running post install hooks
+    [!] An error occurred while processing the post-install hook of the Podfile.
+
+    undefined method 'platform_name' for an instance of Pod::Installer
+
+    /Users/smarteq/Flutter/flutter/packages/flutter_tools/bin/podhelper.rb:121:in 'Object#flutter_additional_macos_build_settings'
+    /Users/smarteq/Desktop/Projects/Flutter/flutter-camera-device-management/macos/Podfile:54:in 'block (3 levels) in Pod::Podfile.from_ruby'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-core-1.16.2/lib/cocoapods-core/podfile.rb:196:in 'Pod::Podfile#post_install!'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:1013:in 'Pod::Installer#run_podfile_post_install_hook'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:1001:in 'block in Pod::Installer#run_podfile_post_install_hooks'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/user_interface.rb:149:in 'Pod::UserInterface.message'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:1000:in 'Pod::Installer#run_podfile_post_install_hooks'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:337:in 'block (2 levels) in Pod::Installer#create_and_save_projects'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer/xcode/pods_project_generator/pods_project_writer.rb:61:in 'Pod::Installer::Xcode::PodsProjectWriter#write!'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:336:in 'block in Pod::Installer#create_and_save_projects'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/user_interface.rb:64:in 'Pod::UserInterface.section'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:315:in 'Pod::Installer#create_and_save_projects'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:307:in 'Pod::Installer#generate_pods_project'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:183:in 'Pod::Installer#integrate'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:170:in 'Pod::Installer#install!'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/command/install.rb:52:in 'Pod::Command::Install#run'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/claide-1.1.0/lib/claide/command.rb:334:in 'CLAide::Command.run'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/command.rb:52:in 'Pod::Command.run'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/bin/pod:55:in '<top (required)>'
+    /Users/smarteq/.gem/ruby/3.4.2/bin/pod:25:in 'Kernel#load'
+    /Users/smarteq/.gem/ruby/3.4.2/bin/pod:25:in '<main>'
+
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:1015:in 'Pod::Installer#run_podfile_post_install_hook'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:1001:in 'block in Pod::Installer#run_podfile_post_install_hooks'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/user_interface.rb:149:in 'Pod::UserInterface.message'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:1000:in 'Pod::Installer#run_podfile_post_install_hooks'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:337:in 'block (2 levels) in Pod::Installer#create_and_save_projects'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer/xcode/pods_project_generator/pods_project_writer.rb:61:in 'Pod::Installer::Xcode::PodsProjectWriter#write!'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:336:in 'block in Pod::Installer#create_and_save_projects'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/user_interface.rb:64:in 'Pod::UserInterface.section'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:315:in 'Pod::Installer#create_and_save_projects'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:307:in 'Pod::Installer#generate_pods_project'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:183:in 'Pod::Installer#integrate'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/installer.rb:170:in 'Pod::Installer#install!'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/command/install.rb:52:in 'Pod::Command::Install#run'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/claide-1.1.0/lib/claide/command.rb:334:in 'CLAide::Command.run'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/lib/cocoapods/command.rb:52:in 'Pod::Command.run'
+    /Users/smarteq/.gem/ruby/3.4.2/gems/cocoapods-1.16.2/bin/pod:55:in '<top (required)>'
+    /Users/smarteq/.gem/ruby/3.4.2/bin/pod:25:in 'Kernel#load'
+    /Users/smarteq/.gem/ruby/3.4.2/bin/pod:25:in '<main>'
+
+Error: Error running pod install
