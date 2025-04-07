@@ -138,6 +138,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildOverviewCards(BuildContext context) {
     final isSmallScreen = ResponsiveHelper.isMobile(context);
+    
+    return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: isSmallScreen ? 2 : 4,
@@ -527,269 +529,124 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           Expanded(
             flex: 1,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.more_vert),
-                  onPressed: () {
-                    // No implementation, UI only
-                  },
-                  color: AppTheme.darkTextSecondary,
-                  iconSize: 20,
-                ),
-              ],
+            child: IconButton(
+              icon: const Icon(Icons.more_vert),
+              onPressed: () {
+                // No implementation, UI only
+              },
             ),
           ),
         ],
       ),
     );
   }
-  
-  Widget _buildSystemInfoSection(BuildContext context, WebSocketProvider provider) {
-    // SystemInfo'yu Consumer ile dinleyerek her değişiklikte yenilenecek
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+  Widget _buildSystemInfoSection(BuildContext context, WebSocketProvider websocketProvider) {
+    // Get system info from websocket provider
+    final systemInfo = websocketProvider.systemInfo;
+    
+    return Card(
+      color: AppTheme.darkSurface,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'System Information',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.darkTextPrimary,
-              ),
+            const Row(
+              children: [
+                Icon(Icons.computer_rounded, color: AppTheme.primaryBlue),
+                SizedBox(width: 8),
+                Text(
+                  'System Information',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Card(
-          color: AppTheme.darkSurface,
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            // Consumer widget kullanarak WebSocketProvider'daki her değişikliği dinliyoruz
-            child: Consumer<WebSocketProvider>(
-              builder: (context, wsProvider, child) {
-                final sysInfo = wsProvider.systemInfo;
-                final isSmallScreen = ResponsiveHelper.isMobile(context);
+            const SizedBox(height: 16),
+            // Wrap in Consumer to rebuild when system info changes
+            Consumer<WebSocketProvider>(
+              builder: (context, provider, child) {
+                final systemInfo = provider.systemInfo;
                 
-                if (sysInfo == null) {
-                  return const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircularProgressIndicator(),
-                          SizedBox(height: 16),
-                          Text(
-                            'Waiting for system information...',
-                            style: TextStyle(color: AppTheme.darkTextPrimary),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-                
-                return Column(
+                return Wrap(
+                  spacing: 24,
+                  runSpacing: 16,
                   children: [
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: isSmallScreen ? 3 : 5,
-                      childAspectRatio: isSmallScreen ? 1.5 : 2.0,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      children: [
-                        _buildSystemInfoCard(
-                          title: 'CPU Temperature',
-                          value: sysInfo.formattedCpuTemp,
-                          icon: Icons.thermostat_outlined,
-                          color: _getTemperatureColor(double.tryParse(sysInfo.cpuTemp) ?? 0),
-                        ),
-                        _buildSystemInfoCard(
-                          title: 'Uptime',
-                          value: sysInfo.formattedUpTime,
-                          icon: Icons.timer_outlined,
-                          color: AppTheme.primaryBlue,
-                        ),
-                        _buildSystemInfoCard(
-                          title: 'Server Time',
-                          value: sysInfo.formattedSrvTime,
-                          icon: Icons.access_time,
-                          color: AppTheme.online,
-                        ),
-                        _buildSystemInfoCard(
-                          title: 'Network Connections',
-                          value: sysInfo.totalConns,
-                          icon: Icons.lan_outlined,
-                          color: AppTheme.primaryOrange,
-                        ),
-                        _buildSystemInfoCard(
-                          title: 'Firmware Version',
-                          value: sysInfo.version,
-                          icon: Icons.system_update_alt,
-                          color: AppTheme.primaryBlue,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    _buildRamUsageCard(context, sysInfo),
-                    const SizedBox(height: 16),
-                    _buildThermalAndNetworkCard(context, sysInfo),
-                    if (sysInfo.gps['lat'] != '0.000000' || sysInfo.gps['lon'] != '0.000000')
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: _buildGpsCard(context, sysInfo),
-                      ),
+                    _buildSystemInfoItem('RAM Usage', 
+                      systemInfo != null 
+                        ? '${systemInfo.ramUsagePercentage.toStringAsFixed(1)}%' 
+                        : 'N/A',
+                      Icons.memory_rounded),
+                    _buildSystemInfoItem('CPU Temp', 
+                      systemInfo != null 
+                        ? systemInfo.formattedCpuTemp
+                        : 'N/A',
+                      Icons.thermostat_rounded),
+                    _buildSystemInfoItem('RAM', 
+                      systemInfo != null 
+                        ? systemInfo.formattedFreeRam
+                        : 'N/A',
+                      Icons.storage_rounded),
+                    _buildSystemInfoItem('Uptime', 
+                      systemInfo != null 
+                        ? systemInfo.formattedUpTime
+                        : 'N/A',
+                      Icons.access_time_rounded),
+                    _buildSystemInfoItem('GPU Temp', 
+                      systemInfo != null 
+                        ? systemInfo.gpuThermal
+                        : 'N/A',
+                      Icons.disc_full_rounded),
                   ],
                 );
               },
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
-  
-  Widget _buildSystemInfoCard({
-    required String title,
-    required String value,
-    required IconData icon,
-    required Color color,
-  }) {
+
+  Widget _buildSystemInfoItem(String label, String value, IconData icon) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.darkBackground.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.darkBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+      width: 180,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.darkTextSecondary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.darkTextPrimary,
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryBlue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: AppTheme.primaryBlue,
+              size: 20,
             ),
           ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildRamUsageCard(BuildContext context, SystemInfo sysInfo) {
-    final double usagePercentage = sysInfo.ramUsagePercentage;
-    
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.darkBackground.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.darkBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryOrange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.memory_rounded,
-                  color: AppTheme.primaryOrange,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'RAM Usage',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.darkTextPrimary,
-                ),
-              ),
-              const Spacer(),
               Text(
-                '${usagePercentage.toStringAsFixed(1)}%',
+                label,
                 style: TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.darkTextSecondary,
+                ),
+              ),
+              Text(
+                value,
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: _getRamUsageColor(usagePercentage),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: usagePercentage / 100,
-              backgroundColor: AppTheme.darkBackground,
-              valueColor: AlwaysStoppedAnimation<Color>(_getRamUsageColor(usagePercentage)),
-              minHeight: 8,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Free: ${sysInfo.formattedFreeRam}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppTheme.darkTextSecondary,
-                ),
-              ),
-              Text(
-                'Total: ${sysInfo.formattedTotalRam}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppTheme.darkTextSecondary,
                 ),
               ),
             ],
@@ -798,454 +655,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
-  
-  Widget _buildThermalAndNetworkCard(BuildContext context, SystemInfo sysInfo) {
-    final isSmallScreen = ResponsiveHelper.isMobile(context);
-    
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.darkBackground.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.darkBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppTheme.warning.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.thermostat_rounded,
-                            color: AppTheme.warning,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        const Text(
-                          'Thermal Sensors',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppTheme.darkTextPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    ...sysInfo.thermal.map((sensor) {
-                      final entry = sensor.entries.first;
-                      final name = entry.key;
-                      final temp = entry.value;
-                      
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              name.replaceAll('-thermal', '').toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: AppTheme.darkTextPrimary,
-                              ),
-                            ),
-                            Text(
-                              '${temp.toStringAsFixed(1)}°C',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: _getTemperatureColor(temp),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ],
-                ),
-              ),
-              if (!isSmallScreen) const SizedBox(width: 24),
-              if (!isSmallScreen)
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryBlue.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              Icons.wifi_rounded,
-                              color: AppTheme.primaryBlue,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          const Text(
-                            'Network Interfaces',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppTheme.darkTextPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'eth0',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppTheme.darkTextPrimary,
-                            ),
-                          ),
-                          Text(
-                            sysInfo.eth0 != 'Yok' ? sysInfo.eth0 : 'Disconnected',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: sysInfo.eth0 != 'Yok' ? AppTheme.online : AppTheme.offline,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'ppp0',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppTheme.darkTextPrimary,
-                            ),
-                          ),
-                          Text(
-                            sysInfo.ppp0 != 'Yok' ? sysInfo.ppp0 : 'Disconnected',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: sysInfo.ppp0 != 'Yok' ? AppTheme.online : AppTheme.offline,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Active Sessions',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppTheme.darkTextPrimary,
-                            ),
-                          ),
-                          Text(
-                            sysInfo.sessions,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.darkTextPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          if (isSmallScreen) const SizedBox(height: 24),
-          if (isSmallScreen)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryBlue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.wifi_rounded,
-                        color: AppTheme.primaryBlue,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Network Interfaces',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppTheme.darkTextPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'eth0',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppTheme.darkTextPrimary,
-                      ),
-                    ),
-                    Text(
-                      sysInfo.eth0 != 'Yok' ? sysInfo.eth0 : 'Disconnected',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: sysInfo.eth0 != 'Yok' ? AppTheme.online : AppTheme.offline,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'ppp0',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppTheme.darkTextPrimary,
-                      ),
-                    ),
-                    Text(
-                      sysInfo.ppp0 != 'Yok' ? sysInfo.ppp0 : 'Disconnected',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: sysInfo.ppp0 != 'Yok' ? AppTheme.online : AppTheme.offline,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Active Sessions',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppTheme.darkTextPrimary,
-                      ),
-                    ),
-                    Text(
-                      sysInfo.sessions,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.darkTextPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-        ],
-      ),
-    );
-  }
-  
-  Widget _buildGpsCard(BuildContext context, SystemInfo sysInfo) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.darkBackground.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.darkBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryOrange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.location_on_rounded,
-                  color: AppTheme.primaryOrange,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'GPS Location',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.darkTextPrimary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Coordinates',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppTheme.darkTextSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${sysInfo.gps['lat']}, ${sysInfo.gps['lon']}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.darkTextPrimary,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text(
-                    'Speed',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppTheme.darkTextSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${sysInfo.gps['speed']} km/h',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.darkTextPrimary,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-  
-  Color _getTemperatureColor(double temperature) {
-    if (temperature < 50) {
-      return AppTheme.online;
-    } else if (temperature < 70) {
-      return AppTheme.warning;
-    } else {
-      return AppTheme.error;
-    }
-  }
-  
-  Color _getRamUsageColor(double percentage) {
-    if (percentage < 50) {
-      return AppTheme.online;
-    } else if (percentage < 80) {
-      return AppTheme.warning;
-    } else {
-      return AppTheme.error;
-    }
-  }
-}
 
-enum DeviceStatus { online, offline, warning }
-
-class StatusIndicator extends StatelessWidget {
-  final DeviceStatus status;
-  final bool showLabel;
-  
-  const StatusIndicator({
-    Key? key,
-    required this.status,
-    this.showLabel = false,
-  }) : super(key: key);
-  
-  @override
-  Widget build(BuildContext context) {
-    final Color statusColor = _getStatusColor();
-    final String statusText = _getStatusText();
+  String _formatUptime(int seconds) {
+    final days = seconds ~/ 86400;
+    final hours = (seconds % 86400) ~/ 3600;
+    final minutes = (seconds % 3600) ~/ 60;
     
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: statusColor,
-            shape: BoxShape.circle,
-          ),
-        ),
-        if (showLabel) ...[
-          const SizedBox(width: 6),
-          Text(
-            statusText,
-            style: TextStyle(
-              fontSize: 14,
-              color: statusColor,
-            ),
-          ),
-        ],
-      ],
-    );
-  }
-  
-  Color _getStatusColor() {
-    switch (status) {
-      case DeviceStatus.online:
-        return AppTheme.online;
-      case DeviceStatus.offline:
-        return AppTheme.offline;
-      case DeviceStatus.warning:
-        return AppTheme.warning;
-    }
-  }
-  
-  String _getStatusText() {
-    switch (status) {
-      case DeviceStatus.online:
-        return 'Online';
-      case DeviceStatus.offline:
-        return 'Offline';
-      case DeviceStatus.warning:
-        return 'Warning';
+    if (days > 0) {
+      return '$days d ${hours}h';
+    } else if (hours > 0) {
+      return '${hours}h ${minutes}m';
+    } else {
+      return '${minutes}m';
     }
   }
 }
