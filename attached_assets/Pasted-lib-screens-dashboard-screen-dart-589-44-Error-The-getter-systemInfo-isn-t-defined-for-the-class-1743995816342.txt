@@ -1,0 +1,291 @@
+lib/screens/dashboard_screen.dart:589:44: Error: The getter 'systemInfo' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:camera_device_manager/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'systemInfo'.
+                final sysInfo = wsProvider.systemInfo;
+                                           ^^^^^^^^^^
+lib/screens/login_screen.dart:116:56: Error: Too many positional arguments: 0 allowed, but 2 found.
+Try removing the extra positional arguments.
+      final connected = await webSocketProvider.connect(
+                                                       ^
+lib/screens/websocket_log_screen.dart:20:70: Error: The method 'clearLog' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:camera_device_manager/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'clearLog'.
+              Provider.of<WebSocketProvider>(context, listen: false).clearLog();
+                                                                     ^^^^^^^^
+lib/screens/websocket_log_screen.dart:29:33: Error: The getter 'messageLog' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:camera_device_manager/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'messageLog'.
+          final logs = provider.messageLog;
+                                ^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:40:25: Error: The getter 'maxCamerasPerPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+    for (int i = 0; i < maxCamerasPerPage; i++) {
+                        ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:78:39: Error: The getter 'maxCamerasPerPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+      _totalPages = (cameras.length / maxCamerasPerPage).ceil();
+                                      ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:78:7: Error: The setter '_totalPages' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing setter, or defining a setter or field named '_totalPages'.
+      _totalPages = (cameras.length / maxCamerasPerPage).ceil();
+      ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:79:11: Error: The getter '_totalPages' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_totalPages'.
+      if (_totalPages == 0) _totalPages = 1; // Always have at least one page
+          ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:79:29: Error: The setter '_totalPages' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing setter, or defining a setter or field named '_totalPages'.
+      if (_totalPages == 0) _totalPages = 1; // Always have at least one page
+                            ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:100:60: Error: The getter '_totalPages' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_totalPages'.
+    final availableHeight = screenHeight - appBarHeight - (_totalPages > 1 ? paginationControlsHeight : 0) - bottomNavHeight - 32; // Add extra padding
+                                                           ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:123:27: Error: The getter 'maxCamerasPerPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+      final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
+                          ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:146:9: Error: The getter '_currentPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_currentPage'.
+    if (_currentPage == 0 && _selectedCameras.every((camera) => camera == null)) {
+        ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:148:26: Error: The getter '_currentPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_currentPage'.
+      final startIndex = _currentPage * maxCamerasPerPage;
+                         ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:148:41: Error: The getter 'maxCamerasPerPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+      final startIndex = _currentPage * maxCamerasPerPage;
+                                        ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:149:27: Error: The getter 'maxCamerasPerPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+      for (int i = 0; i < maxCamerasPerPage && startIndex + i < _availableCameras.length; i++) {
+                          ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:156:29: Error: The getter 'maxCamerasPerPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+    if (slot < 0 || slot >= maxCamerasPerPage) return;
+                            ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:183:29: Error: The getter 'maxCamerasPerPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+    if (slot < 0 || slot >= maxCamerasPerPage) return;
+                            ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:218:52: Error: The getter '_currentPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_currentPage'.
+                        'Slot ${slot + 1} (Sayfa ${_currentPage + 1}) - Kamera Seç',
+                                                   ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:332:29: Error: The getter '_totalPages' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_totalPages'.
+    if (page < 0 || page >= _totalPages) return;
+                            ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:335:7: Error: The setter '_currentPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing setter, or defining a setter or field named '_currentPage'.
+      _currentPage = page;
+      ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:363:38: Error: The getter '_totalPages' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_totalPages'.
+    final paginationControlsHeight = _totalPages > 1 ? 60.0 : 0.0;
+                                     ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:371:9: Error: The getter 'maxCamerasPerPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+        maxCamerasPerPage : 
+        ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:372:18: Error: The getter 'maxCamerasPerPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+        math.min(maxCamerasPerPage, _availableCameras.length - (_currentPage * maxCamerasPerPage));
+                 ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:372:65: Error: The getter '_currentPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_currentPage'.
+        math.min(maxCamerasPerPage, _availableCameras.length - (_currentPage * maxCamerasPerPage));
+                                                                ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:372:80: Error: The getter 'maxCamerasPerPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+        math.min(maxCamerasPerPage, _availableCameras.length - (_currentPage * maxCamerasPerPage));
+                                                                               ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:372:14: Error: Inferred type argument 'dynamic' doesn't conform to the bound 'num' of the type variable 'T' on 'min'.
+Try specifying type arguments explicitly so that they conform to the bounds.
+        math.min(maxCamerasPerPage, _availableCameras.length - (_currentPage * maxCamerasPerPage));
+             ^
+org-dartlang-sdk:///flutter/third_party/dart/sdk/lib/_internal/vm/lib/math_patch.dart: Context: This is the type variable whose bound isn't conformed to.
+lib/screens/multi_live_view_screen.dart:434:26: Error: The getter 'maxCamerasPerPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+              itemCount: maxCamerasPerPage,
+                         ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:572:15: Error: The getter '_totalPages' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_totalPages'.
+          if (_totalPages > 1)
+              ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:588:32: Error: The getter '_currentPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_currentPage'.
+                    onPressed: _currentPage > 0
+                               ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:589:45: Error: The getter '_currentPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_currentPage'.
+                        ? () => _changePage(_currentPage - 1)
+                                            ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:597:43: Error: The getter '_totalPages' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_totalPages'.
+                      for (int i = 0; i < _totalPages; i++)
+                                          ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:598:34: Error: The getter '_currentPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_currentPage'.
+                        if (i == _currentPage)
+                                 ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:645:32: Error: The getter '_currentPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_currentPage'.
+                    onPressed: _currentPage < _totalPages - 1
+                               ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:645:47: Error: The getter '_totalPages' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_totalPages'.
+                    onPressed: _currentPage < _totalPages - 1
+                                              ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:646:45: Error: The getter '_currentPage' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_currentPage'.
+                        ? () => _changePage(_currentPage + 1)
+                                            ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:41:47: Error: The getter 'maxCamerasPerPage' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+    final maxCamerasPerPage = _layoutProvider.maxCamerasPerPage;
+                                              ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:91:41: Error: The getter 'currentPage' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'currentPage'.
+    final currentPage = _layoutProvider.currentPage;
+                                        ^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:92:41: Error: The method 'getCurrentPageAssignments' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'getCurrentPageAssignments'.
+    final assignments = _layoutProvider.getCurrentPageAssignments();
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:101:52: Error: The getter 'maxCamerasPerPage' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+      _loadingStates = List.filled(_layoutProvider.maxCamerasPerPage, false);
+                                                   ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:102:50: Error: The getter 'maxCamerasPerPage' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+      _errorStates = List.filled(_layoutProvider.maxCamerasPerPage, false);
+                                                 ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:146:21: Error: The method 'assignCameraToSlot' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'assignCameraToSlot'.
+    _layoutProvider.assignCameraToSlot(slot, camera.id);
+                    ^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:164:23: Error: The method 'clearSlot' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'clearSlot'.
+      _layoutProvider.clearSlot(slot);
+                      ^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:192:68: Error: The getter 'currentPage' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'currentPage'.
+                        'Slot ${slot + 1} (Sayfa ${_layoutProvider.currentPage + 1}) - Kamera Seç',
+                                                                   ^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:228:63: Error: The method 'getCameraIdForSlot' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'getCameraIdForSlot'.
+                      final currentCameraId = _layoutProvider.getCameraIdForSlot(slot);
+                                                              ^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:308:45: Error: The getter 'totalPages' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'totalPages'.
+    if (page >= 0 && page < _layoutProvider.totalPages) {
+                                            ^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:309:23: Error: The method 'changePage' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'changePage'.
+      _layoutProvider.changePage(page);
+                      ^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:630:46: Error: Member not found: 'secondaryColor'.
+                                  : AppTheme.secondaryColor,
+                                             ^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:333:40: Error: The getter 'currentPage' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'currentPage'.
+    final currentPage = layoutProvider.currentPage;
+                                       ^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:334:39: Error: The getter 'totalPages' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'totalPages'.
+    final totalPages = layoutProvider.totalPages;
+                                      ^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:337:40: Error: The method 'calculateOptimalGridColumns' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'calculateOptimalGridColumns'.
+    final gridColumns = layoutProvider.calculateOptimalGridColumns(context, size);
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:348:38: Error: The getter 'maxCamerasPerPage' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+    final rowCount = (layoutProvider.maxCamerasPerPage / gridColumns).ceil();
+                                     ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:368:28: Error: The method 'setGridColumns' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'setGridColumns'.
+                  provider.setGridColumns(columns);
+                           ^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:399:28: Error: The method 'clearCurrentPage' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'clearCurrentPage'.
+                  provider.clearCurrentPage();
+                           ^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:407:65: Error: The getter 'maxCamerasPerPage' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+                    _loadingStates = List.filled(layoutProvider.maxCamerasPerPage, false);
+                                                                ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:408:63: Error: The getter 'maxCamerasPerPage' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+                    _errorStates = List.filled(layoutProvider.maxCamerasPerPage, false);
+                                                              ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:430:45: Error: The getter 'maxCamerasPerPage' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'maxCamerasPerPage'.
+                  itemCount: layoutProvider.maxCamerasPerPage,
+                                            ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen_new.dart:433:47: Error: The method 'getCameraIdForSlot' isn't defined for the class 'MultiViewLayoutProvider'.
+ - 'MultiViewLayoutProvider' is from 'package:camera_device_manager/providers/multi_view_layout_provider.dart' ('lib/providers/multi_view_layout_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'getCameraIdForSlot'.
+                    final cameraId = provider.getCameraIdForSlot(index);
+                                              ^^^^^^^^^^^^^^^^^^
+lib/providers/websocket_provider.dart:359:33: Error: The method 'handleCameraDeviceUpdate' isn't defined for the class 'CameraDevicesProvider'.
+ - 'CameraDevicesProvider' is from 'package:camera_device_manager/providers/camera_devices_provider.dart' ('lib/providers/camera_devices_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'handleCameraDeviceUpdate'.
+        _cameraDevicesProvider!.handleCameraDeviceUpdate(dataPath, value);
+                                ^^^^^^^^^^^^^^^^^^^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **
