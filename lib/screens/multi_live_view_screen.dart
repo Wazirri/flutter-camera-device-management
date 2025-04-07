@@ -1,15 +1,22 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:provider/provider.dart';
+import '../models/camera.dart';
 import '../providers/camera_devices_provider.dart';
-import '../models/camera_device.dart';
-import '../theme/app_theme.dart';
-import '../widgets/video_controls.dart';
+import '../providers/multi_view_layout_provider.dart';
 import '../utils/responsive_helper.dart';
-import 'dart:math' as math;
+import '../widgets/desktop_side_menu.dart';
+import '../widgets/mobile_bottom_navigation_bar.dart';
+import '../widgets/mobile_menu.dart';
+import '../widgets/video_controls_new.dart';
 
 class MultiLiveViewScreen extends StatefulWidget {
+  static const String routeName = '/multi-live-view';
+
   const MultiLiveViewScreen({Key? key}) : super(key: key);
 
   @override
@@ -17,356 +24,183 @@ class MultiLiveViewScreen extends StatefulWidget {
 }
 
 class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
-  // Maximum number of cameras per page (requirement: 20 per page)
-  static const int maxCamerasPerPage = 20;
-  
-  // State variables
-  List<Camera> _availableCameras = [];
-  final List<Camera?> _selectedCameras = List.filled(maxCamerasPerPage, null);
   final List<Player> _players = [];
   final List<VideoController> _controllers = [];
-  final List<bool> _loadingStates = List.filled(maxCamerasPerPage, false);
-  final List<bool> _errorStates = List.filled(maxCamerasPerPage, false);
+  List<Camera?> _allCameras = [];
+  List<Camera?> _selectedCameras = [];
+  List<int?> _cameraIndexes = []; // Store original indexes
+  int _currentLayout = 4; // Default layout showing 4 cameras
+  int _gridColumns = 2; // Initial column count
   int _currentPage = 0;
   int _totalPages = 1;
-  int _gridColumns = 4; // Default grid columns for desktop
+  int _camerasPerPage = 4;
+
+  late ScrollController _scrollController;
+  bool _showControls = false;
+  int? _activePlayerIndex;
+  Timer? _controlsTimer;
+
+  // Track camera-to-player assignments
+  Map<int, int> _cameraSlotMap = {}; // Maps camera index to grid slot
+  Map<int, int> _slotCameraMap = {}; // Maps grid slot to camera index
   
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initCameras();
+    });
+  }
+
+  void _initCameras() {
+    final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    final layoutProvider = Provider.of<MultiViewLayoutProvider>(context, listen: false);
+    
+    // Load all available cameras from the provider
+    _allCameras = cameraProvider.cameras;
+    
+    // Load the layout configuration
+    _initializeLayoutConfiguration(layoutProvider);
+    
+    // Update camera selections based on the current configuration
+    _updateCameraSelections();
+  }
+  
+  void _initializeLayoutConfiguration(MultiViewLayoutProvider layoutProvider) {
+    // Get the current layout configuration or initialize with defaults
+    final layoutConfig = layoutProvider.getCurrentLayoutConfig();
+    
+    setState(() {
+      _currentLayout = layoutConfig.slotsCount; // Number of camera slots in the layout
+      _gridColumns = layoutConfig.columns; // Number of columns in the grid
+      _camerasPerPage = _currentLayout; // Number of cameras to show per page
+    
+      // Initialize the mapping between cameras and slots
+      _cameraSlotMap = layoutProvider.cameraSlotMap;
+      _slotCameraMap = layoutProvider.slotCameraMap;
+    });
+    
+    // Create and initialize players for each slot in the layout
     _initializePlayers();
   }
   
   void _initializePlayers() {
-    // Initialize players for all camera slots
-    for (int i = 0; i < maxCamerasPerPage; i++) {
+    // Clear existing players and controllers
+    for (final player in _players) {
+      player.dispose();
+    }
+    _players.clear();
+    _controllers.clear();
+    
+    // Create new players for the current layout
+    for (int i = 0; i < _currentLayout; i++) {
       final player = Player();
       final controller = VideoController(player);
       
       _players.add(player);
       _controllers.add(controller);
+    }
+  }
+  
+  void _updateCameraSelections() {
+    // This updates the cameras shown in the grid based on:
+    // 1. The current page
+    // 2. The camera slot mapping
+    // 3. Available cameras from the provider
+    
+    setState(() {
+      _selectedCameras = List.filled(_currentLayout, null);
+      _cameraIndexes = List.filled(_currentLayout, null);
       
-      // Set up error listeners
-      player.stream.error.listen((error) {
-        if (mounted) {
-          setState(() {
-            _errorStates[i] = true;
-          });
-          print('Player $i error: $error');
+      // For each slot in the current layout
+      for (int slotIndex = 0; slotIndex < _currentLayout; slotIndex++) {
+        // Check if there's a camera assigned to this slot via the mapping
+        if (_slotCameraMap.containsKey(slotIndex)) {
+          final cameraIndex = _slotCameraMap[slotIndex];
+          if (cameraIndex != null && cameraIndex < _allCameras.length) {
+            _selectedCameras[slotIndex] = _allCameras[cameraIndex];
+            _cameraIndexes[slotIndex] = cameraIndex;
+          }
         }
-      });
+      }
       
-      // Set up buffering listeners
-      player.stream.buffering.listen((buffering) {
-        if (mounted) {
-          setState(() {
-            _loadingStates[i] = buffering;
-          });
+      // Calculate total pages (not used now but might be needed for pagination)
+      _totalPages = (_allCameras.length / _camerasPerPage).ceil();
+    });
+    
+    // Start streaming for the cameras in the current view
+    _startStreaming();
+  }
+  
+  void _startStreaming() {
+    // Start streaming for all cameras in the current view
+    for (int i = 0; i < _selectedCameras.length; i++) {
+      final camera = _selectedCameras[i];
+      final player = i < _players.length ? _players[i] : null;
+      
+      if (camera != null && player != null) {
+        // Get the appropriate URI based on platform and preferences
+        String streamUri = '';
+        
+        // Use the appropriate URI based on what's available
+        // Preference order: subUri (for live streaming) > mediaUri > others
+        if (camera.subUri != null && camera.subUri!.isNotEmpty) {
+          streamUri = camera.subUri!;
+        } else if (camera.mediaUri != null && camera.mediaUri!.isNotEmpty) {
+          streamUri = camera.mediaUri!;
+        } else if (camera.remoteUri != null && camera.remoteUri!.isNotEmpty) {
+          streamUri = camera.remoteUri!;
         }
-      });
+        
+        if (streamUri.isNotEmpty) {
+          Map<String, dynamic> extraParams = {};
+          
+          // Add authentication if credentials are available
+          if (camera.username != null && camera.username!.isNotEmpty &&
+              camera.password != null && camera.password!.isNotEmpty) {
+            // For RTSP URLs, embed credentials in the URL format rtsp://username:password@host:port/...
+            final rtspRegex = RegExp(r'^rtsp://');
+            if (rtspRegex.hasMatch(streamUri)) {
+              final uri = Uri.parse(streamUri);
+              final authority = uri.authority;
+              
+              // Check if the URL already has credentials
+              if (!authority.contains('@')) {
+                final uriWithAuth = streamUri.replaceFirst(
+                  'rtsp://$authority', 
+                  'rtsp://${camera.username}:${camera.password}@$authority'
+                );
+                streamUri = uriWithAuth;
+              }
+            } else {
+              // For other protocols, use the credentials parameter
+              extraParams = {
+                'user-agent': 'Flutter MediaKit Player',
+                'username': camera.username,
+                'password': camera.password,
+              };
+            }
+          }
+          
+          // Configure and start streaming
+          player.open(
+            Media(
+              streamUri,
+              httpHeaders: {},
+              extras: extraParams,
+            ),
+            play: true,
+          );
+        }
+      }
     }
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    
-    // Get available cameras from provider
-    final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
-    final cameras = cameraProvider.cameras;
-    
-    setState(() {
-      _availableCameras = cameras;
-      _totalPages = (cameras.length / maxCamerasPerPage).ceil();
-      if (_totalPages == 0) _totalPages = 1; // Always have at least one page
-      
-      // Initialize slots with available cameras for the current page
-      _loadCamerasForCurrentPage();
-    });
-    
-    // Adjust grid columns based on screen size
-    _updateGridColumnsBasedOnScreenSize();
-  }
-  
-  // Method to update grid columns based on screen size
-  void _updateGridColumnsBasedOnScreenSize() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    
-    // Calculate available height for the grid
-    final appBarHeight = AppBar().preferredSize.height;
-    final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0; // Only for mobile
-    final paginationControlsHeight = 60.0; // Estimated height for pagination controls
-    
-    // Calculate available height for the grid (excluding app bar, pagination controls, and bottom nav)
-    // Add more padding to ensure we have enough space
-    final availableHeight = screenHeight - appBarHeight - (_totalPages > 1 ? paginationControlsHeight : 0) - bottomNavHeight - 48; 
-    
-    // First, determine max possible columns based on screen width
-    int maxColumns;
-    if (screenWidth > 1400) {
-      maxColumns = 5;
-    } else if (screenWidth > 1100) {
-      maxColumns = 4;
-    } else if (screenWidth > 800) {
-      maxColumns = 3;
-    } else if (screenWidth > 500) {
-      maxColumns = 2;
-    } else {
-      maxColumns = 1;
-    }
-    
-    // Start with max columns but now ensure reasonable row count
-    _gridColumns = maxColumns;
-    
-    // Calculate the number of rows needed for current column count
-    final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
-    
-    // Calculate ideal cell height based on available space and number of rows
-    final maxCellHeight = (availableHeight - ((rowsNeeded - 1) * 8)) / rowsNeeded;
-    
-    // Calculate necessary cell width to maintain 16:9 aspect ratio
-    final idealCellWidth = maxCellHeight * 16 / 9;
-    
-    // Calculate max columns that fit within screen width
-    final maxPossibleColumns = (screenWidth - 32) ~/ idealCellWidth;
-    
-    // Adjust columns to be the smaller of width-based or maxColumns
-    if (maxPossibleColumns < _gridColumns && maxPossibleColumns > 0) {
-      _gridColumns = maxPossibleColumns;
-    }
-    
-    // Safety check - if we still can't fit the content, reduce columns further
-    bool fitsInHeight = false;
-    while (!fitsInHeight && _gridColumns > 1) {
-      // Calculate the number of rows needed for current column count
-      final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
-      
-      // Calculate cell dimensions based on 16:9 aspect ratio
-      final cellWidth = (screenWidth - 32) / _gridColumns; // Account for padding
-      final cellHeight = cellWidth * 9 / 16; // 16:9 aspect ratio
-      
-      // Calculate total grid height including spacing between rows
-      final totalGridHeight = cellHeight * rowsNeeded + (rowsNeeded - 1) * 8;
-      
-      if (totalGridHeight <= availableHeight) {
-        fitsInHeight = true;
-      } else {
-        // Reduce columns if it doesn't fit
-        _gridColumns -= 1;
-      }
-    }
-  }
-  
-  // Method to load cameras for the current page
-  // We now only initialize empty slots, not override existing ones
-  void _loadCamerasForCurrentPage() {
-    // For initial page load only
-    // No longer clears the slots automatically
-    if (_currentPage == 0 && _selectedCameras.every((camera) => camera == null)) {
-      // Only set up initial cameras for completely empty configuration
-      final startIndex = _currentPage * maxCamerasPerPage;
-      for (int i = 0; i < maxCamerasPerPage && startIndex + i < _availableCameras.length; i++) {
-        _selectCameraForSlot(i, _availableCameras[startIndex + i]);
-      }
-    }
-  }
-  
-  void _selectCameraForSlot(int slot, Camera camera) {
-    if (slot < 0 || slot >= maxCamerasPerPage) return;
-    
-    setState(() {
-      // Stop current player if it's playing
-      if (_selectedCameras[slot] != null) {
-        _players[slot].stop();
-      }
-      
-      // Update selected camera for this slot
-      _selectedCameras[slot] = camera;
-      _errorStates[slot] = false;
-      _loadingStates[slot] = true;
-    });
-    
-    // Start playing the new camera
-    try {
-      _players[slot].open(Media(camera.rtspUri));
-    } catch (e) {
-      print('Error playing camera $slot: $e');
-      setState(() {
-        _errorStates[slot] = true;
-        _loadingStates[slot] = false;
-      });
-    }
-  }
-  
-  void _clearSlot(int slot) {
-    if (slot < 0 || slot >= maxCamerasPerPage) return;
-    
-    // Stop the player
-    _players[slot].stop();
-    
-    setState(() {
-      _selectedCameras[slot] = null;
-      _errorStates[slot] = false;
-      _loadingStates[slot] = false;
-    });
-  }
-  
-  void _showCameraSelector(int slot) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppTheme.darkBackground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.6,
-          minChildSize: 0.3,
-          maxChildSize: 0.9,
-          expand: false,
-          builder: (context, scrollController) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Slot ${slot + 1} (Sayfa ${_currentPage + 1}) - Kamera Seç',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  ),
-                ),
-                const Divider(),
-                // Search field for cameras
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Kamera ara...',
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    onChanged: (value) {
-                      // Burada arama fonksiyonu eklenebilir
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    controller: scrollController,
-                    // Tüm kameraları göster - sayfa kısıtlaması olmadan
-                    itemCount: _availableCameras.length,
-                    itemBuilder: (context, index) {
-                      final camera = _availableCameras[index];
-                      // Belirli slotta bu kameranın seçili olup olmadığını kontrol et
-                      final isSelected = _selectedCameras[slot] == camera;
-                      
-                      return ListTile(
-                        leading: Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: camera.mainSnapShot.isNotEmpty
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: Image.network(
-                                  camera.mainSnapShot,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Icon(
-                                      Icons.broken_image_outlined,
-                                      size: 24.0,
-                                      color: Colors.white54,
-                                    );
-                                  },
-                                ),
-                              )
-                            : const Icon(
-                                Icons.videocam_off,
-                                size: 24.0,
-                                color: Colors.white54,
-                              ),
-                        ),
-                        title: Text(camera.name),
-                        subtitle: Text(
-                          camera.connected
-                              ? 'Bağlı (${camera.ip})'
-                              : 'Bağlantı yok (${camera.ip})',
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            camera.connected
-                                ? const Icon(Icons.link, color: Colors.green)
-                                : const Icon(Icons.link_off, color: Colors.red),
-                            if (isSelected)
-                              const Padding(
-                                padding: EdgeInsets.only(left: 8.0),
-                                child: Icon(Icons.check_circle, color: Colors.green),
-                              )
-                          ],
-                        ),
-                        selected: isSelected,
-                        onTap: () {
-                          _selectCameraForSlot(slot, camera);
-                          Navigator.of(context).pop();
-                        },
-                      );
-                    },
-                  ),
-                ),
-                // Option to clear the slot
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.delete_outline),
-                  title: const Text('Bu slotu temizle'),
-                  onTap: () {
-                    _clearSlot(slot);
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-  
-  void _changePage(int page) {
-    if (page < 0 || page >= _totalPages) return;
-    
-    setState(() {
-      _currentPage = page;
-      // Do not load cameras automatically - we want to keep the player configuration
-      // between pages and allow manual assignment of cameras to any slot
-    });
-  }
-  
-  void _changeGridLayout(int columns) {
-    setState(() {
-      _gridColumns = columns;
-    });
-  }
-  
-  @override
   void dispose() {
-    // Dispose all players
+    _controlsTimer?.cancel();
+    _scrollController.dispose();
     for (final player in _players) {
       player.dispose();
     }
@@ -398,47 +232,34 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     final double cellWidth = size.width / _gridColumns;
     final double cellHeight = availableHeight / activeRowsNeeded;
     final double aspectRatio = cellWidth / cellHeight;
+
     return Scaffold(
+      drawer: ResponsiveHelper.isMobile(context) ? const MobileMenu() : null,
       appBar: AppBar(
-        title: const Text('Multi Camera View'),
-        actions: [
-          // Grid layout selector
-          PopupMenuButton<int>(
-            tooltip: 'Change grid layout',
-            icon: const Icon(Icons.grid_view),
-            onSelected: _changeGridLayout,
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 1,
-                child: Text('1 column'),
-              ),
-              const PopupMenuItem(
-                value: 2,
-                child: Text('2 columns'),
-              ),
-              const PopupMenuItem(
-                value: 3,
-                child: Text('3 columns'),
-              ),
-              const PopupMenuItem(
-                value: 4,
-                child: Text('4 columns'),
-              ),
-              const PopupMenuItem(
-                value: 5,
-                child: Text('5 columns'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Kamera Canlı İzleme'),
+            const Spacer(),
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: () {
+                    // Show layout settings dialog
+                    _showLayoutSettingsDialog();
+                  },
+                ),
               ),
             ],
           ),
-          
-          const SizedBox(width: 8),
-        ],
+        ),
       ),
       body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisAlignment: MainAxisAlignment.start, 
         children: [
           // Fixed-height grid view of cameras (non-scrollable)
-          // Ensuring all players fit within the screen with proper aspect ratio
-          Expanded(
+          SizedBox(
+            height: availableHeight,
             child: GridView.builder(
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(), // Disable scrolling to fit all slots
@@ -449,228 +270,493 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                 crossAxisSpacing: 0,
                 mainAxisSpacing: 0,
               ),
-              itemCount: activeCameraCount,
+              itemCount: _selectedCameras.length,
               itemBuilder: (context, index) {
-                // Find the original index of this camera in the _selectedCameras list
-                final originalIndex = _selectedCameras.indexOf(activeCameras[index]);
-                final camera = activeCameras[index];
-                final isLoading = _loadingStates[originalIndex];
-                final hasError = _errorStates[originalIndex];
+                final camera = _selectedCameras[index];
+                final originalIndex = _cameraIndexes[index];
                 
-                return Card(
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onTap: () => _showCameraSelector(index),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        // Camera slot
-                        if (camera == null)
-                          // Empty slot
-                          Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_circle_outline,
-                                  size: 48,
-                                  color: Colors.grey[400],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Add Camera',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        else if (hasError)
-                          // Error state
-                          Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.error_outline,
-                                  size: 48,
-                                  color: Colors.red,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Stream Error',
-                                  style: TextStyle(
-                                    color: Colors.red[300],
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                ElevatedButton.icon(
-                                  icon: const Icon(Icons.refresh, size: 14),
-                                  label: const Text('Retry'),
-                                  onPressed: () => _selectCameraForSlot(index, camera),
-                                  style: ElevatedButton.styleFrom(
-                                    minimumSize: const Size(80, 28),
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        else
-                          // Video player
-                          Video(
-                            controller: _controllers[index],
-                            controls: null, // Simple controls or none for grid view
-                          ),
-                        
-                        // Loading indicator
-                        if (isLoading && camera != null && !hasError)
-                          const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        
-                        // Camera name overlay at the top
-                        if (camera != null)
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              color: Colors.black.withOpacity(0.7),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      camera.name,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  Icon(
-                                    camera.connected ? Icons.link : Icons.link_off,
-                                    size: 14,
-                                    color: camera.connected ? Colors.green : Colors.red,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          
-                        // Change camera button at the bottom
-                        if (camera != null)
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Material(
-                              color: Colors.transparent,
-                              child: IconButton(
-                                icon: const Icon(Icons.sync),
-                                color: Colors.white,
-                                tooltip: 'Change camera',
-                                onPressed: () => _showCameraSelector(index),
-                              ),
-                            ),
-                          ),
-                      ],
+                if (camera == null) {
+                  // Empty slot - show placeholder with plus icon for adding camera
+                  return GestureDetector(
+                    onTap: () {
+                      _showCameraSelectionDialog(index);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        border: Border.all(color: Colors.grey[800]!, width: 1),
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.add_circle_outline, size: 48, color: Colors.grey),
+                      ),
                     ),
+                  );
+                }
+                
+                // Use original index to get the right camera info
+                // This prevents issues when reordering cameras
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _activePlayerIndex = index;
+                      _showControls = true;
+                      _resetControlsTimer();
+                    });
+                  },
+                  child: Stack(
+                    children: [
+                      // Video player
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: _activePlayerIndex == index 
+                              ? Theme.of(context).primaryColor 
+                              : Colors.grey[900]!,
+                            width: _activePlayerIndex == index ? 2 : 1,
+                          ),
+                        ),
+                        child: index < _controllers.length 
+                          ? Video(controller: _controllers[index])
+                          : const Center(child: CircularProgressIndicator()),
+                      ),
+                      
+                      // Camera name overlay
+                      Positioned(
+                        top: 5,
+                        left: 5,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            camera.name ?? 'Camera ${originalIndex ?? index}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      
+                      // Controls overlay (only shown for active player)
+                      if (_showControls && _activePlayerIndex == index)
+                        Positioned.fill(
+                          child: Container(
+                            color: Colors.black.withOpacity(0.2),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Top row with camera info and close button
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          camera.name ?? 'Camera ${originalIndex ?? index}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.close, color: Colors.white),
+                                      onPressed: () {
+                                        setState(() {
+                                          _showControls = false;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                
+                                // Bottom row with controls
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      // Full screen button
+                                      IconButton(
+                                        icon: const Icon(Icons.fullscreen, color: Colors.white),
+                                        onPressed: () {
+                                          _openFullScreenView(camera, originalIndex ?? index);
+                                        },
+                                      ),
+                                      // Remove camera button
+                                      IconButton(
+                                        icon: const Icon(Icons.remove_circle_outline, color: Colors.white),
+                                        onPressed: () {
+                                          _removeCameraFromSlot(index);
+                                        },
+                                      ),
+                                      // Change camera button
+                                      IconButton(
+                                        icon: const Icon(Icons.swap_horiz, color: Colors.white),
+                                        onPressed: () {
+                                          _showCameraSelectionDialog(index);
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 );
               },
             ),
           ),
           
-          // Pagination controls at the bottom
+          // Bottom pagination controls (if we have multiple pages)
           if (_totalPages > 1)
             Container(
+              height: paginationControlsHeight,
               padding: const EdgeInsets.symmetric(vertical: 8.0),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                border: Border(
-                  top: BorderSide(
-                    color: Theme.of(context).dividerColor,
-                  ),
-                ),
-              ),
+              color: Colors.grey[900],
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back_ios),
-                    onPressed: _currentPage > 0
-                        ? () => _changePage(_currentPage - 1)
-                        : null,
+                    onPressed: _currentPage > 0 
+                      ? () {
+                          setState(() {
+                            _currentPage--;
+                            _updateCameraSelections();
+                          });
+                        }
+                      : null,
                   ),
-                  
-                  // Page indicator with numbers
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      for (int i = 0; i < _totalPages; i++)
-                        if (i == _currentPage)
-                          Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: 30,
-                            height: 30,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppTheme.primaryColor,
-                            ),
-                            child: Center(
-                              child: Text(
-                                '${i + 1}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          )
-                        else
-                          InkWell(
-                            onTap: () => _changePage(i),
-                            child: Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              width: 30,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: AppTheme.primaryColor.withOpacity(0.5),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  '${i + 1}',
-                                  style: TextStyle(
-                                    color: AppTheme.primaryColor,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                    ],
+                  Text(
+                    'Page ${_currentPage + 1} of $_totalPages',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  
                   IconButton(
                     icon: const Icon(Icons.arrow_forward_ios),
-                    onPressed: _currentPage < _totalPages - 1
-                        ? () => _changePage(_currentPage + 1)
-                        : null,
+                    onPressed: _currentPage < _totalPages - 1 
+                      ? () {
+                          setState(() {
+                            _currentPage++;
+                            _updateCameraSelections();
+                          });
+                        }
+                      : null,
                   ),
                 ],
               ),
             ),
         ],
       ),
+      // Mobile bottom navigation
+      bottomNavigationBar: ResponsiveHelper.isMobile(context)
+        ? const MobileBottomNavigationBar(currentIndex: 1)
+        : null,
+      // Desktop side menu
+      endDrawer: isDesktop ? const DesktopSideMenu() : null,
+    );
+  }
+
+  void _resetControlsTimer() {
+    _controlsTimer?.cancel();
+    _controlsTimer = Timer(const Duration(seconds: 5), () {
+      if (mounted) {
+        setState(() {
+          _showControls = false;
+        });
+      }
+    });
+  }
+
+  void _openFullScreenView(Camera camera, int cameraIndex) {
+    // Navigate to single camera view with the selected camera
+    Navigator.pushNamed(
+      context,
+      '/live-view',
+      arguments: {'camera': camera, 'index': cameraIndex},
+    );
+  }
+
+  void _removeCameraFromSlot(int slotIndex) {
+    final layoutProvider = Provider.of<MultiViewLayoutProvider>(context, listen: false);
+    
+    // Update our internal state
+    setState(() {
+      _selectedCameras[slotIndex] = null;
+      _cameraIndexes[slotIndex] = null;
+      
+      // Update the mappings
+      final originalCameraIndex = _slotCameraMap[slotIndex];
+      if (originalCameraIndex != null) {
+        _cameraSlotMap.remove(originalCameraIndex);
+      }
+      _slotCameraMap.remove(slotIndex);
+    });
+    
+    // Stop the player for this slot
+    if (slotIndex < _players.length) {
+      _players[slotIndex].stop();
+    }
+    
+    // Update the provider's state
+    layoutProvider.updateCameraSlotMapping(_cameraSlotMap, _slotCameraMap);
+  }
+
+  void _showCameraSelectionDialog(int slotIndex) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Kamera Seçin'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: _allCameras.length,
+              itemBuilder: (context, index) {
+                final camera = _allCameras[index];
+                if (camera == null) return const SizedBox.shrink();
+                
+                return ListTile(
+                  title: Text(camera.name ?? 'Camera $index'),
+                  subtitle: Text(camera.cameraIp ?? 'Unknown IP'),
+                  onTap: () {
+                    _assignCameraToSlot(index, slotIndex);
+                    Navigator.of(context).pop();
+                  },
+                );
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('İptal'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _assignCameraToSlot(int cameraIndex, int slotIndex) {
+    final layoutProvider = Provider.of<MultiViewLayoutProvider>(context, listen: false);
+    
+    // Check if this camera is already assigned to another slot
+    int? existingSlot;
+    _cameraSlotMap.forEach((camIdx, slot) {
+      if (camIdx == cameraIndex) {
+        existingSlot = slot;
+      }
+    });
+    
+    // If the camera is already assigned to another slot, remove it from there
+    if (existingSlot != null) {
+      setState(() {
+        _selectedCameras[existingSlot!] = null;
+        _cameraIndexes[existingSlot!] = null;
+        _slotCameraMap.remove(existingSlot);
+      });
+      
+      // Stop the player for the previous slot
+      if (existingSlot! < _players.length) {
+        _players[existingSlot!].stop();
+      }
+    }
+    
+    // If there's already a camera in this slot, clear it
+    final existingCamera = _slotCameraMap[slotIndex];
+    if (existingCamera != null) {
+      _cameraSlotMap.remove(existingCamera);
+    }
+    
+    // Assign the new camera to this slot
+    setState(() {
+      _selectedCameras[slotIndex] = _allCameras[cameraIndex];
+      _cameraIndexes[slotIndex] = cameraIndex;
+      
+      // Update the mappings
+      _cameraSlotMap[cameraIndex] = slotIndex;
+      _slotCameraMap[slotIndex] = cameraIndex;
+    });
+    
+    // Start streaming for this camera
+    if (slotIndex < _players.length) {
+      final camera = _allCameras[cameraIndex];
+      if (camera != null) {
+        final player = _players[slotIndex];
+        
+        // Same streaming logic as in _startStreaming method
+        String streamUri = '';
+        
+        if (camera.subUri != null && camera.subUri!.isNotEmpty) {
+          streamUri = camera.subUri!;
+        } else if (camera.mediaUri != null && camera.mediaUri!.isNotEmpty) {
+          streamUri = camera.mediaUri!;
+        } else if (camera.remoteUri != null && camera.remoteUri!.isNotEmpty) {
+          streamUri = camera.remoteUri!;
+        }
+        
+        if (streamUri.isNotEmpty) {
+          Map<String, dynamic> extraParams = {};
+          
+          if (camera.username != null && camera.username!.isNotEmpty &&
+              camera.password != null && camera.password!.isNotEmpty) {
+            final rtspRegex = RegExp(r'^rtsp://');
+            if (rtspRegex.hasMatch(streamUri)) {
+              final uri = Uri.parse(streamUri);
+              final authority = uri.authority;
+              
+              if (!authority.contains('@')) {
+                final uriWithAuth = streamUri.replaceFirst(
+                  'rtsp://$authority', 
+                  'rtsp://${camera.username}:${camera.password}@$authority'
+                );
+                streamUri = uriWithAuth;
+              }
+            } else {
+              extraParams = {
+                'user-agent': 'Flutter MediaKit Player',
+                'username': camera.username,
+                'password': camera.password,
+              };
+            }
+          }
+          
+          player.open(
+            Media(
+              streamUri,
+              httpHeaders: {},
+              extras: extraParams,
+            ),
+            play: true,
+          );
+        }
+      }
+    }
+    
+    // Update the provider's state
+    layoutProvider.updateCameraSlotMapping(_cameraSlotMap, _slotCameraMap);
+  }
+
+  void _showLayoutSettingsDialog() {
+    final layoutProvider = Provider.of<MultiViewLayoutProvider>(context, listen: false);
+    final layouts = layoutProvider.getAvailableLayouts();
+    
+    int tempSelectedLayout = _currentLayout;
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Kamera Düzeni Ayarları'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Kamera Sayısı ve Düzen Seçimi:'),
+                  const SizedBox(height: 10),
+                  
+                  // Layout selection grid
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: layouts.map((layout) {
+                      final isSelected = tempSelectedLayout == layout.slotsCount;
+                      
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            tempSelectedLayout = layout.slotsCount;
+                          });
+                        },
+                        child: Container(
+                          width: 80,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: isSelected 
+                                ? Theme.of(context).primaryColor 
+                                : Colors.grey,
+                              width: isSelected ? 2 : 1,
+                            ),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '${layout.slotsCount}',
+                                style: TextStyle(
+                                  fontWeight: isSelected 
+                                    ? FontWeight.bold 
+                                    : FontWeight.normal,
+                                  color: isSelected 
+                                    ? Theme.of(context).primaryColor 
+                                    : Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${layout.columns}x${layout.rows}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isSelected 
+                                    ? Theme.of(context).primaryColor 
+                                    : Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('İptal'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text('Uygula'),
+                  onPressed: () {
+                    // Apply the new layout
+                    if (tempSelectedLayout != _currentLayout) {
+                      layoutProvider.changeLayout(tempSelectedLayout);
+                      
+                      // Reinitialize everything with the new layout
+                      _initializeLayoutConfiguration(layoutProvider);
+                      _updateCameraSelections();
+                    }
+                    
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

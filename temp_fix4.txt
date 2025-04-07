@@ -1,0 +1,18 @@
+      body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisAlignment: MainAxisAlignment.start, 
+        children: [
+          // Fixed-height grid view of cameras (non-scrollable)
+          // Ensuring all players fit within the screen with proper aspect ratio
+          Expanded(
+            child: Container(
+              width: size.width,
+              height: availableHeight,
+              child: GridView.builder(
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(), // Disable scrolling to fit all slots
+                shrinkWrap: true,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: _gridColumns,
+                  childAspectRatio: aspectRatio, // Custom aspect ratio to fit all slots perfectly
+                  crossAxisSpacing: 0,
+                  mainAxisSpacing: 0,
+                ),

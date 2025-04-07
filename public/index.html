@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .connection-status {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .connecting {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .message-form {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .messages-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        .message {
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .sent {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196F3;
+        }
+        .received {
+            background-color: #f1f8e9;
+            border-left: 4px solid #8bc34a;
+        }
+        .system {
+            background-color: #f5f5f5;
+            border-left: 4px solid #9e9e9e;
+            font-style: italic;
+        }
+        .timestamp {
+            font-size: 11px;
+            color: #777;
+            margin-top: 5px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebSocket Test Client</h1>
+        
+        <div id="connectionStatus" class="connection-status disconnected">
+            Not Connected
+        </div>
+        
+        <div class="message-form">
+            <div class="form-group">
+                <label for="messageType">Message Type:</label>
+                <select id="messageType">
+                    <option value="text">Text Message</option>
+                    <option value="json">JSON Message</option>
+                    <option value="broadcast">Broadcast Message</option>
+                    <option value="device_status">Device Status Update</option>
+                </select>
+            </div>
+            
+            <div id="jsonFields" style="display: none;">
+                <div class="form-group">
+                    <label for="jsonMessage">JSON Message:</label>
+                    <textarea id="jsonMessage" rows="4" placeholder='{"key": "value", "example": 123}'></textarea>
+                </div>
+            </div>
+            
+            <div id="textField">
+                <div class="form-group">
+                    <label for="textMessage">Message:</label>
+                    <input type="text" id="textMessage" placeholder="Type a message...">
+                </div>
+            </div>
+            
+            <div id="broadcastFields" style="display: none;">
+                <div class="form-group">
+                    <label for="senderName">Your Name:</label>
+                    <input type="text" id="senderName" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label for="broadcastMessage">Broadcast Message:</label>
+                    <input type="text" id="broadcastMessage" placeholder="Message to broadcast...">
+                </div>
+            </div>
+            
+            <div id="deviceStatusFields" style="display: none;">
+                <div class="form-group">
+                    <label for="deviceId">Device ID:</label>
+                    <select id="deviceId">
+                        <option value="1">Camera 1</option>
+                        <option value="2">Camera 2</option>
+                        <option value="3">Camera 3</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="deviceStatus">Status:</label>
+                    <select id="deviceStatus">
+                        <option value="online">Online</option>
+                        <option value="offline">Offline</option>
+                        <option value="error">Error</option>
+                        <option value="maintenance">Maintenance</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button id="sendButton" disabled>Send Message</button>
+            <button id="connectButton">Connect</button>
+            <button id="disconnectButton" disabled>Disconnect</button>
+        </div>
+        
+        <h3>Messages:</h3>
+        <div id="messagesContainer" class="messages-container">
+            <div class="message system">
+                Waiting for connection...
+                <div class="timestamp">
+                    Just now
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Elements
+        const connectionStatus = document.getElementById('connectionStatus');
+        const messageType = document.getElementById('messageType');
+        const jsonFields = document.getElementById('jsonFields');
+        const textField = document.getElementById('textField');
+        const broadcastFields = document.getElementById('broadcastFields');
+        const deviceStatusFields = document.getElementById('deviceStatusFields');
+        const jsonMessage = document.getElementById('jsonMessage');
+        const textMessage = document.getElementById('textMessage');
+        const senderName = document.getElementById('senderName');
+        const broadcastMessage = document.getElementById('broadcastMessage');
+        const deviceId = document.getElementById('deviceId');
+        const deviceStatus = document.getElementById('deviceStatus');
+        const sendButton = document.getElementById('sendButton');
+        const connectButton = document.getElementById('connectButton');
+        const disconnectButton = document.getElementById('disconnectButton');
+        const messagesContainer = document.getElementById('messagesContainer');
+        
+        // WebSocket connection
+        let socket = null;
+        
+        // Toggle input fields based on message type
+        messageType.addEventListener('change', () => {
+            jsonFields.style.display = 'none';
+            textField.style.display = 'none';
+            broadcastFields.style.display = 'none';
+            deviceStatusFields.style.display = 'none';
+            
+            switch (messageType.value) {
+                case 'json':
+                    jsonFields.style.display = 'block';
+                    break;
+                case 'text':
+                    textField.style.display = 'block';
+                    break;
+                case 'broadcast':
+                    broadcastFields.style.display = 'block';
+                    break;
+                case 'device_status':
+                    deviceStatusFields.style.display = 'block';
+                    break;
+            }
+        });
+        
+        // Connect to WebSocket server
+        connectButton.addEventListener('click', () => {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                addMessage("Already connected", "system");
+                return;
+            }
+            
+            connectionStatus.className = "connection-status connecting";
+            connectionStatus.textContent = "Connecting...";
+            
+            // Correctly determine the WebSocket URL based on the current page location
+            const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            try {
+                socket = new WebSocket(wsUrl);
+                
+                socket.onopen = () => {
+                    connectionStatus.className = "connection-status connected";
+                    connectionStatus.textContent = "Connected";
+                    addMessage("Connected to server", "system");
+                    
+                    sendButton.disabled = false;
+                    connectButton.disabled = true;
+                    disconnectButton.disabled = false;
+                };
+                
+                socket.onmessage = (event) => {
+                    try {
+                        const message = JSON.parse(event.data);
+                        let formattedMessage = "";
+                        
+                        if (message.type === 'echo') {
+                            formattedMessage = `Server echo: ${JSON.stringify(message.data)}`;
+                        } else if (message.type === 'broadcast') {
+                            formattedMessage = `${message.from}: ${message.message}`;
+                        } else if (message.type === 'device_update') {
+                            formattedMessage = `Device update - ${message.device.name} is now ${message.device.status}`;
+                        } else if (message.type === 'server_status') {
+                            formattedMessage = `Server status: Uptime ${Math.round(message.uptime)}s, Clients: ${message.clientCount}`;
+                        } else if (message.type === 'info') {
+                            formattedMessage = `Server info: ${message.message}`;
+                        } else {
+                            formattedMessage = JSON.stringify(message);
+                        }
+                        
+                        addMessage(formattedMessage, "received", message.timestamp);
+                    } catch (e) {
+                        // If it's not JSON, just display the raw message
+                        addMessage(`Received: ${event.data}`, "received");
+                    }
+                };
+                
+                socket.onclose = (event) => {
+                    connectionStatus.className = "connection-status disconnected";
+                    connectionStatus.textContent = `Disconnected (Code: ${event.code})`;
+                    addMessage(`Connection closed (Code: ${event.code}, Reason: ${event.reason || "No reason provided"})`, "system");
+                    
+                    sendButton.disabled = true;
+                    connectButton.disabled = false;
+                    disconnectButton.disabled = true;
+                };
+                
+                socket.onerror = (error) => {
+                    connectionStatus.className = "connection-status disconnected";
+                    connectionStatus.textContent = "Connection Error";
+                    addMessage("Connection error", "system");
+                    console.error("WebSocket error:", error);
+                    
+                    sendButton.disabled = true;
+                    connectButton.disabled = false;
+                    disconnectButton.disabled = true;
+                };
+                
+            } catch (error) {
+                connectionStatus.className = "connection-status disconnected";
+                connectionStatus.textContent = "Connection Failed";
+                addMessage(`Connection failed: ${error.message}`, "system");
+                console.error("WebSocket initialization error:", error);
+                
+                sendButton.disabled = true;
+                connectButton.disabled = false;
+                disconnectButton.disabled = true;
+            }
+        });
+        
+        // Disconnect from WebSocket server
+        disconnectButton.addEventListener('click', () => {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.close();
+                addMessage("Disconnected from server", "system");
+            }
+        });
+        
+        // Send message
+        sendButton.addEventListener('click', () => {
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                addMessage("Not connected to server", "system");
+                return;
+            }
+            
+            let message;
+            let messageToDisplay = "";
+            
+            switch (messageType.value) {
+                case 'json':
+                    try {
+                        message = JSON.parse(jsonMessage.value);
+                        messageToDisplay = JSON.stringify(message);
+                    } catch (e) {
+                        addMessage(`Invalid JSON: ${e.message}`, "system");
+                        return;
+                    }
+                    break;
+                    
+                case 'text':
+                    message = textMessage.value;
+                    messageToDisplay = message;
+                    textMessage.value = '';
+                    break;
+                    
+                case 'broadcast':
+                    message = {
+                        type: 'broadcast',
+                        from: senderName.value || 'Anonymous',
+                        message: broadcastMessage.value
+                    };
+                    messageToDisplay = `Broadcast from ${message.from}: ${message.message}`;
+                    broadcastMessage.value = '';
+                    break;
+                    
+                case 'device_status':
+                    message = {
+                        type: 'device_status',
+                        deviceId: parseInt(deviceId.value),
+                        status: deviceStatus.value
+                    };
+                    messageToDisplay = `Device status update for ID ${message.deviceId}: ${message.status}`;
+                    break;
+            }
+            
+            if (message) {
+                socket.send(typeof message === 'string' ? message : JSON.stringify(message));
+                addMessage(messageToDisplay, "sent");
+            }
+        });
+        
+        // Add message to display
+        function addMessage(text, type, timestamp = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+            
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'timestamp';
+            timestampDiv.textContent = timestamp ? new Date(timestamp).toLocaleTimeString() : new Date().toLocaleTimeString();
+            
+            messageDiv.appendChild(timestampDiv);
+            messagesContainer.appendChild(messageDiv);
+            
+            // Auto-scroll to the bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>
