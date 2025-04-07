@@ -64,7 +64,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Welcome back, Admin',
+                    'movita ECS - Dashboard',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -125,18 +125,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             if (ResponsiveHelper.isDesktop(context) || ResponsiveHelper.isTablet(context))
-              Container(
+              Image.asset(
+                'assets/images/movita_logo.png',
                 width: 150,
                 height: 150,
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryBlue.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.video_camera_back_rounded,
-                  size: 80,
-                  color: AppTheme.primaryBlue,
-                ),
               ),
           ],
         ),
@@ -146,8 +138,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildOverviewCards(BuildContext context) {
     final isSmallScreen = ResponsiveHelper.isMobile(context);
-    
-    return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: isSmallScreen ? 2 : 4,

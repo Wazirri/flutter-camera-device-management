@@ -111,14 +111,14 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.camera_enhance,
-                    color: AppTheme.accentColor,
-                    size: 32,
+                  Image.asset(
+                    'assets/images/movita_logo.png',
+                    height: 36,
+                    width: 36,
                   ),
                   const SizedBox(width: 10),
                   const Text(
-                    'Camera Device Manager',
+                    'movita ECS',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

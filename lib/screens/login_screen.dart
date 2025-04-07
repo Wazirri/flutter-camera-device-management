@@ -255,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Camera Device Management System',
+                        'movita ECS - Camera Management System',
                         style: TextStyle(
                           color: Colors.grey.shade500,
                           fontSize: 12,
