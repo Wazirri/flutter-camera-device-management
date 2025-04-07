@@ -36,12 +36,12 @@ class CameraDetailsBottomSheet extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryBlue.withOpacity(0.1),
+                  color: AppTheme.accentColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.videocam,
-                  color: AppTheme.primaryBlue,
+                  color: AppTheme.accentColor,
                   size: 24,
                 ),
               ),
@@ -160,7 +160,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                         icon: const Icon(Icons.play_arrow),
                         label: const Text('Live View'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryBlue,
+                          backgroundColor: AppTheme.accentColor,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         onPressed: () {
@@ -175,7 +175,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                         icon: const Icon(Icons.history),
                         label: const Text('Recordings'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.primaryOrange,
+                          foregroundColor: AppTheme.primaryColor,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         onPressed: () {
@@ -210,7 +210,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: AppTheme.primaryOrange,
+            color: AppTheme.primaryColor,
           ),
         ),
         const SizedBox(height: 8),

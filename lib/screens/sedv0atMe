@@ -1,0 +1,2011 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:intl/intl.dart';
+import '../providers/camera_devices_provider.dart';
+import '../providers/recording_provider.dart';
+import '../models/camera_device.dart';
+import '../models/recording.dart';
+import '../theme/app_theme.dart';
+import '../widgets/video_controls.dart';
+import '../utils/responsive_helper.dart';
+import '../utils/page_transitions.dart';
+
+class RecordViewScreen extends StatefulWidget {
+  final Camera? camera; // Make camera optional so the route can work without a parameter
+
+  const RecordViewScreen({Key? key, this.camera}) : super(key: key);
+
+  @override
+  State<RecordViewScreen> createState() => _RecordViewScreenState();
+}
+
+class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerProviderStateMixin {
+  int _selectedCameraIndex = 0;
+  Camera? _camera;
+  bool _isFullScreen = false;
+  late final Player _player;
+  late final VideoController _controller;
+  bool _isPlaying = false;
+  bool _isBuffering = false;
+  bool _hasError = false;
+  String _errorMessage = '';
+  List<Camera> _availableCameras = [];
+  bool _isLiveStream = true; // Track if showing live stream or recording
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
+  
+  // Animation controllers
+  late AnimationController _animationController;
+  late Animation<double> _fadeInAnimation;
+  late Animation<Offset> _calendarSlideAnimation;
+  late Animation<Offset> _playerSlideAnimation;
+  
+  @override
+  void initState() {
+    super.initState();
+    _initializeAnimations();
+    _initializePlayer();
+  }
+  
+  void _initializeAnimations() {
+    // Setup animations
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    
+    _fadeInAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.3, 1.0, curve: Curves.easeIn),
+    ));
+    
+    _calendarSlideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, -0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.0, 0.7, curve: Curves.easeOutQuint),
+    ));
+    
+    _playerSlideAnimation = Tween<Offset>(
+      begin: const Offset(0.0, 0.2),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: const Interval(0.3, 1.0, curve: Curves.easeOutCubic),
+    ));
+    
+    // Start the entrance animation
+    _animationController.forward();
+  }
+  
+  void _initializePlayer() {
+    // Create a media kit player
+    _player = Player();
+    _controller = VideoController(_player);
+    
+    // Set initial camera if provided
+    if (widget.camera != null) {
+      _camera = widget.camera;
+    }
+    
+    // Add event listeners
+    _player.stream.playing.listen((playing) {
+      if (mounted) {
+        setState(() {
+          _isPlaying = playing;
+        });
+      }
+    });
+    
+    _player.stream.buffering.listen((buffering) {
+      if (mounted) {
+        setState(() {
+          _isBuffering = buffering;
+        });
+      }
+    });
+    
+    _player.stream.error.listen((error) {
+      print('Player error: $error');
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = 'Failed to play video: $error';
+        });
+      }
+    });
+  }
+  
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Get the list of available cameras from provider
+    final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    setState(() {
+      _availableCameras = cameraProvider.cameras;
+      
+      // If no camera was provided and there are available cameras, use the first one
+      if (_camera == null && _availableCameras.isNotEmpty) {
+        _camera = _availableCameras[0];
+      }
+    });
+    
+    // Initialize the recording provider with the current camera
+    if (_camera != null) {
+      final recordingProvider = Provider.of<RecordingProvider>(context, listen: false);
+      recordingProvider.selectCamera(_camera!);
+      
+      // Start playing live stream
+      _playLiveStream();
+    }
+  }
+  
+  void _playLiveStream() {
+    if (_camera == null || !mounted) return;
+    
+    setState(() {
+      _hasError = false;
+      _errorMessage = '';
+      _isLiveStream = true;
+    });
+    
+    if (_camera!.rtspUri.isNotEmpty) {
+      try {
+        _player.open(Media(_camera!.rtspUri));
+      } catch (e) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = 'Failed to play live stream: $e';
+        });
+      }
+    } else {
+      setState(() {
+        _hasError = true;
+        _errorMessage = 'No live stream URL available';
+      });
+    }
+  }
+  
+  void _playRecording(Recording recording) {
+    if (!mounted) return;
+    
+    setState(() {
+      _hasError = false;
+      _errorMessage = '';
+      _isLiveStream = false;
+    });
+    
+    try {
+      _player.open(Media(recording.url));
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+        _errorMessage = 'Failed to play recording: $e';
+      });
+    }
+  }
+  
+  void _selectCamera(int index) {
+    if (index >= 0 && index < _availableCameras.length && index != _selectedCameraIndex) {
+      // Reset animations for transition
+      _animationController.reset();
+      
+      setState(() {
+        _selectedCameraIndex = index;
+        _camera = _availableCameras[index];
+      });
+      
+      // Update recording provider
+      final recordingProvider = Provider.of<RecordingProvider>(context, listen: false);
+      recordingProvider.selectCamera(_camera!);
+      
+      // Play live stream for newly selected camera
+      _playLiveStream();
+      
+      // Start animations for the new data
+      _animationController.forward();
+    }
+  }
+  
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullScreen = !_isFullScreen;
+    });
+  }
+  
+  @override
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState((

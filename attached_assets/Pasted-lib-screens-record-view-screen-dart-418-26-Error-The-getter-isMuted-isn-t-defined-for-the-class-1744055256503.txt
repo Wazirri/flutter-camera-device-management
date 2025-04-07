@@ -1,0 +1,71 @@
+lib/screens/record_view_screen.dart:418:26: Error: The getter '_isMuted' isn't defined for the class '_RecordViewScreenState'.
+ - '_RecordViewScreenState' is from 'package:movita_ecs/screens/record_view_screen.dart' ('lib/screens/record_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_isMuted'.
+                isMuted: _isMuted,
+                         ^^^^^^^^
+lib/screens/record_view_screen.dart:419:31: Error: The getter '_isFullscreen' isn't defined for the class '_RecordViewScreenState'.
+ - '_RecordViewScreenState' is from 'package:movita_ecs/screens/record_view_screen.dart' ('lib/screens/record_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_isFullscreen'.
+                isFullscreen: _isFullscreen,
+                              ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:421:31: Error: The getter '_toggleMute' isn't defined for the class '_RecordViewScreenState'.
+ - '_RecordViewScreenState' is from 'package:movita_ecs/screens/record_view_screen.dart' ('lib/screens/record_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named '_toggleMute'.
+                onMuteToggle: _toggleMute,
+                              ^^^^^^^^^^^
+lib/screens/websocket_log_screen.dart:29:24: Error: The method 'addLogListener' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:movita_ecs/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'addLogListener'.
+    _webSocketProvider.addLogListener(_updateLogs);
+                       ^^^^^^^^^^^^^^
+lib/screens/websocket_log_screen.dart:34:24: Error: The method 'removeLogListener' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:movita_ecs/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'removeLogListener'.
+    _webSocketProvider.removeLogListener(_updateLogs);
+                       ^^^^^^^^^^^^^^^^^
+lib/screens/websocket_log_screen.dart:77:55: Error: Required named parameter 'currentRoute' must be provided.
+      drawer: isDesktop ? null : const DesktopSideMenu(),
+                                                      ^
+lib/widgets/desktop_side_menu.dart:8:9: Context: Found this candidate, but the arguments don't match.
+  const DesktopSideMenu({
+        ^^^^^^^^^^^^^^^
+lib/screens/websocket_log_screen.dart:80:47: Error: Required named parameter 'currentRoute' must be provided.
+          if (isDesktop) const DesktopSideMenu(),
+                                              ^
+lib/widgets/desktop_side_menu.dart:8:9: Context: Found this candidate, but the arguments don't match.
+  const DesktopSideMenu({
+        ^^^^^^^^^^^^^^^
+lib/screens/websocket_log_screen.dart:57:36: Error: The method 'clearLogs' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:movita_ecs/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'clearLogs'.
+                _webSocketProvider.clearLogs();
+                                   ^^^^^^^^^
+lib/screens/websocket_log_screen.dart:91:64: Error: The getter 'sentCount' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:movita_ecs/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'sentCount'.
+                      _buildCounter('Sent', _webSocketProvider.sentCount),
+                                                               ^^^^^^^^^
+lib/screens/websocket_log_screen.dart:92:68: Error: The getter 'receivedCount' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:movita_ecs/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'receivedCount'.
+                      _buildCounter('Received', _webSocketProvider.receivedCount),
+                                                                   ^^^^^^^^^^^^^
+lib/theme/app_theme.dart:67:22: Error: The argument type 'CardTheme' can't be assigned to the parameter type 'CardThemeData?'.
+ - 'CardTheme' is from 'package:flutter/src/material/card_theme.dart' ('../../../../../Flutter/flutter/packages/flutter/lib/src/material/card_theme.dart').
+ - 'CardThemeData' is from 'package:flutter/src/material/card_theme.dart' ('../../../../../Flutter/flutter/packages/flutter/lib/src/material/card_theme.dart').
+    cardTheme: const CardTheme(
+                     ^
+lib/theme/app_theme.dart:129:24: Error: The argument type 'TabBarTheme' can't be assigned to the parameter type 'TabBarThemeData?'.
+ - 'TabBarTheme' is from 'package:flutter/src/material/tab_bar_theme.dart' ('../../../../../Flutter/flutter/packages/flutter/lib/src/material/tab_bar_theme.dart').
+ - 'TabBarThemeData' is from 'package:flutter/src/material/tab_bar_theme.dart' ('../../../../../Flutter/flutter/packages/flutter/lib/src/material/tab_bar_theme.dart').
+    tabBarTheme: const TabBarTheme(
+                       ^
+lib/theme/app_theme.dart:141:24: Error: The argument type 'DialogTheme' can't be assigned to the parameter type 'DialogThemeData?'.
+ - 'DialogTheme' is from 'package:flutter/src/material/dialog_theme.dart' ('../../../../../Flutter/flutter/packages/flutter/lib/src/material/dialog_theme.dart').
+ - 'DialogThemeData' is from 'package:flutter/src/material/dialog_theme.dart' ('../../../../../Flutter/flutter/packages/flutter/lib/src/material/dialog_theme.dart').
+    dialogTheme: const DialogTheme(
+                       ^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **

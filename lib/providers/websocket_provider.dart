@@ -33,6 +33,12 @@ class WebSocketProvider with ChangeNotifier {
   
   // Store last received message for other providers to access
   String? _lastMessage;
+
+  // Log tracking
+  final List<String> _logs = [];
+  int _sentCount = 0;
+  int _receivedCount = 0;
+  final List<Function(List<String>)> _logListeners = [];
   // Getter for lastMessage
   String? get lastMessage => _lastMessage;
   
@@ -104,8 +110,39 @@ class WebSocketProvider with ChangeNotifier {
     if (_isConnected && _socket != null) {
       try {
         _socket!.add(message);
+        _sentCount++;
+        _logs.add("➡️ $message");
+        _notifyLogListeners();
         _logMessage('Sent: $message');
       } catch (e) {
+
+  // Clear logs
+  void clearLogs() {
+    _logs.clear();
+    _notifyLogListeners();
+    notifyListeners();
+  }
+
+  // Add a log listener
+  void addLogListener(Function(List<String>) listener) {
+    _logListeners.add(listener);
+  }
+
+  // Remove a log listener
+  void removeLogListener(Function(List<String>) listener) {
+    _logListeners.remove(listener);
+  }
+
+  // Notify log listeners
+  void _notifyLogListeners() {
+    for (var listener in _logListeners) {
+      listener(_logs);
+    }
+  }
+
+  // Getters for log counts
+  int get sentCount => _sentCount;
+  int get receivedCount => _receivedCount;
         debugPrint('Error sending message: $e');
         _logMessage('Error sending message: $e');
         _handleError(e);

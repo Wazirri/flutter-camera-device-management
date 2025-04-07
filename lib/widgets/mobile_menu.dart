@@ -34,7 +34,7 @@ class MobileBottomNavigationBar extends StatelessWidget {
       return BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: AppTheme.darkSurface,
-        selectedItemColor: AppTheme.primaryBlue,
+        selectedItemColor: AppTheme.accentColor,
         unselectedItemColor: AppTheme.darkTextSecondary,
         currentIndex: _getCurrentIndex(mobileMenuItems),
         onTap: (index) {

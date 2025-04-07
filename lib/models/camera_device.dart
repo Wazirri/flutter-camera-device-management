@@ -17,7 +17,11 @@ class CameraDevice {
   bool connected;
   final String macKey;  // The MAC key extracted from device path
   
-  CameraDevice({
+  
+  // For backward compatibility with existing code
+  String get macAddress => macKey;
+  
+CameraDevice({
     required this.id,
     required this.type,
     this.status = DeviceStatus.unknown,
@@ -116,6 +120,7 @@ class Camera {
   bool connected = false;     // Is camera currently connected
   bool recording = false;     // Is camera currently recording
   String lastSeenAt = '';     // When camera was last seen
+  String country = '';     // Camera country location
   
   // Getter for the RTSP URI (using subUri by default as requested by the user)
   String get rtspUri => subUri;

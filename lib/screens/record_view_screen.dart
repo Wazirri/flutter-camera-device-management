@@ -34,6 +34,8 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   String _errorMessage = '';
   List<Camera> _availableCameras = [];
   bool _isLiveStream = true; // Track if showing live stream or recording
+  bool _isMuted = false;     // Track if audio is muted
+  bool _isFullscreen = false; // Track if in fullscreen mode
   
   // Animation controllers
   late AnimationController _animationController;
@@ -220,9 +222,37137 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   }
   
   @override
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
   void dispose() {
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
     _animationController.dispose();
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
     _player.dispose();
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
+  void _toggleMute() {
+    setState(() {
+      _isMuted = !_isMuted;
+      if (_isMuted) {
+        _player.setVolume(0);
+      } else {
+        _player.setVolume(100);
+      }
+    });
+  }
+
+  void _toggleFullScreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
+
     super.dispose();
   }
 
@@ -414,10 +37544,10 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
           if (_isPlaying && !_isBuffering && !_hasError)
             Positioned.fill(
               child: VideoControls(
-                isPlaying: _player.state.playing,
+                isPlaying: _isPlaying,
                 isMuted: _isMuted,
                 isFullscreen: _isFullscreen,
-                onPlayPause: () { _player.state.playing ? _player.pause() : _player.play(); },
+                onPlayPause: _togglePlayPause,
                 onMuteToggle: _toggleMute,
                 onFullscreenToggle: _toggleFullScreen,
               ),

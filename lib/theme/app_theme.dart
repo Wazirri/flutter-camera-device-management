@@ -64,7 +64,7 @@ class AppTheme {
         color: darkTextPrimary,
       ),
     ),
-    cardTheme: const CardTheme(
+    cardTheme: CardTheme(
       color: darkSurface,
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -126,7 +126,7 @@ class AppTheme {
       type: BottomNavigationBarType.fixed,
       elevation: 8,
     ),
-    tabBarTheme: const TabBarTheme(
+    tabBarTheme: TabBarTheme(
       labelColor: accentColor,
       unselectedLabelColor: Colors.white70,
       indicator: BoxDecoration(
@@ -138,7 +138,7 @@ class AppTheme {
         ),
       ),
     ),
-    dialogTheme: const DialogTheme(
+    dialogTheme: DialogTheme(
       backgroundColor: darkSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(16)),
