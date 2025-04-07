@@ -4,6 +4,8 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../providers/camera_devices_provider.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
@@ -40,8 +42,16 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   final kFirstDay = DateTime(DateTime.now().year - 1, 1, 1);
   final kLastDay = DateTime(DateTime.now().year + 1, 12, 31);
   
-  // Map to store recordings by date for the calendar (sample data for demonstration)
+  // Map to store recordings by date for the calendar
   final Map<DateTime, List<String>> _recordingsByDate = {};
+  
+  // API URL for recordings
+  String? _recordingsUrl;
+  
+  // Hata durumlarını izlemek için
+  bool _isLoadingDates = false;
+  bool _isLoadingRecordings = false;
+  String _loadingError = '';
   
   // Animation controllers
   late AnimationController _animationController;
@@ -54,7 +64,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     super.initState();
     _initializeAnimations();
     _initializePlayer();
-    _initializeSampleData(); // This would be replaced with actual data from your backend
+    _initializeData();
   }
   
   void _initializeAnimations() {
@@ -133,25 +143,10 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     _fetchRecordings();
   }
   
-  // Initialize sample recording data for demonstration
-  void _initializeSampleData() {
-    final now = DateTime.now();
-    
-    // Create recordings for the past week
-    for (int i = 0; i < 7; i++) {
-      final date = DateTime(now.year, now.month, now.day - i);
-      final day = DateFormat('yyyy-MM-dd').format(date);
-      
-      // Each day has 2-3 recordings
-      _recordingsByDate[date] = [
-        'Morning Recording - $day (8:00 AM)',
-        'Afternoon Recording - $day (2:30 PM)',
-        if (i % 2 == 0) 'Evening Recording - $day (7:15 PM)',
-      ];
-    }
-    
-    // Set selected day to today
-    _selectedDay = now;
+  // Initialize data with current date selection
+  void _initializeData() {
+    // Set selected day to today 
+    _selectedDay = DateTime.now();
     _updateRecordingsForSelectedDay();
   }
   
@@ -172,54 +167,162 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     });
   }
   
-  // This would typically fetch recordings from a backend based on selected date
-  void _fetchRecordings() {
+  // Fetch available recording dates for the selected camera
+  void _fetchRecordings() async {
     if (_camera == null) {
       setState(() {
         _availableRecordings = [];
+        _recordingsByDate.clear();
       });
       return;
     }
     
-    _updateRecordingsForSelectedDay();
+    setState(() {
+      _isLoadingDates = true;
+      _loadingError = '';
+    });
+    
+    try {
+      // Construct the recordings base URL using the device IP
+      final deviceIp = _camera!.ip;
+      if (deviceIp.isEmpty) {
+        throw Exception('Camera device IP is not available');
+      }
+      
+      _recordingsUrl = 'http://$deviceIp:8080/Rec/${_camera!.name}/';
+      
+      // Fetch the recordings directory listing
+      final response = await http.get(Uri.parse(_recordingsUrl!));
+      
+      if (response.statusCode == 200) {
+        // Parse the directory listing (this is simplified and would need to be adjusted 
+        // based on actual server response format)
+        
+        // For demo purposes, let's assume response contains a basic HTML directory listing
+        // In reality, you might need to use a regex or HTML parser to extract folders
+        final dateRegex = RegExp(r'(\d{4}_\d{2}_\d{2})');
+        final matches = dateRegex.allMatches(response.body);
+        
+        final Map<DateTime, List<String>> newRecordings = {};
+        
+        // Extract dates
+        for (final match in matches) {
+          final dateStr = match.group(1)!;
+          final dateParts = dateStr.split('_');
+          if (dateParts.length == 3) {
+            final year = int.parse(dateParts[0]);
+            final month = int.parse(dateParts[1]);
+            final day = int.parse(dateParts[2]);
+            
+            final date = DateTime(year, month, day);
+            // Add the date to map with empty recordings list, will be populated when selected
+            newRecordings[date] = [];
+          }
+        }
+        
+        if (mounted) {
+          setState(() {
+            _recordingsByDate.clear();
+            _recordingsByDate.addAll(newRecordings);
+            _isLoadingDates = false;
+          });
+        }
+        
+        // Update recordings for selected day
+        _updateRecordingsForSelectedDay();
+      } else {
+        throw Exception('Failed to load recordings: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching recordings: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingDates = false;
+          _loadingError = 'Failed to load recordings: $e';
+        });
+      }
+    }
   }
   
   // Update available recordings based on the selected day
-  void _updateRecordingsForSelectedDay() {
-    if (_selectedDay == null || _camera == null) {
+  void _updateRecordingsForSelectedDay() async {
+    if (_selectedDay == null || _camera == null || _recordingsUrl == null) {
       setState(() {
         _availableRecordings = [];
         _selectedRecording = null;
+        _isLoadingRecordings = false;
       });
       return;
     }
     
-    // Reset animations for new data
-    _animationController.reset();
-    
-    // Find recordings for the selected day
-    final recordings = _recordingsByDate[DateTime(
-      _selectedDay!.year,
-      _selectedDay!.month,
-      _selectedDay!.day,
-    )] ?? [];
+    // Format date for URL
+    final dateStr = DateFormat('yyyy_MM_dd').format(_selectedDay!);
+    final dayUrl = '$_recordingsUrl$dateStr/';
     
     setState(() {
-      _availableRecordings = recordings;
-      
-      // Auto-select first recording if available
-      if (_availableRecordings.isNotEmpty) {
-        _selectedRecording = _availableRecordings[0];
-        // In a real app, this URL would come from your backend based on the recording
-        // Kullanıcı adı ve şifre eklenmiş RTSP URL'ini kullan
-        _loadRecording(_camera!.rtspUri);
-      } else {
-        _selectedRecording = null;
-      }
+      _isLoadingRecordings = true;
+      _loadingError = '';
     });
     
-    // Start animations for updated data
-    _animationController.forward();
+    try {
+      // Fetch recordings for the selected day
+      final response = await http.get(Uri.parse(dayUrl));
+      
+      if (response.statusCode == 200) {
+        // Reset animations for new data
+        _animationController.reset();
+        
+        // Parse recording files from the response
+        // This is simplified - adjust according to actual server response format
+        final recordingRegex = RegExp(r'href="([^"]+\.mp4)"');
+        final matches = recordingRegex.allMatches(response.body);
+        
+        final List<String> recordings = [];
+        
+        for (final match in matches) {
+          final fileName = match.group(1)!;
+          recordings.add(fileName);
+        }
+        
+        if (mounted) {
+          setState(() {
+            _availableRecordings = recordings;
+            _isLoadingRecordings = false;
+            
+            // Auto-select first recording if available
+            if (_availableRecordings.isNotEmpty) {
+              _selectedRecording = _availableRecordings[0];
+              _loadRecording('$dayUrl${_selectedRecording!}');
+            } else {
+              _selectedRecording = null;
+              // Show live view if no recordings
+              if (_camera != null) {
+                _loadRecording(_camera!.rtspUri);
+              }
+            }
+          });
+        }
+        
+        // Start animations for updated data
+        _animationController.forward();
+      } else {
+        throw Exception('Failed to load recordings for selected day: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching recordings for day: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingRecordings = false;
+          _loadingError = 'Failed to load recordings for selected day: $e';
+          _availableRecordings = [];
+          
+          // Show live view if fetching recordings fails
+          if (_camera != null) {
+            _loadRecording(_camera!.rtspUri);
+          }
+        });
+      }
+    }
   }
   
   void _loadRecording(String url) {
@@ -276,11 +379,12 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
         _selectedRecording = recording;
       });
       
-      // In a real app, you'd fetch the recording URL from your backend
-      // For demo, we'll use the camera's record URI
-      if (_camera != null) {
-        _loadRecording(_camera!.rtspUri);
-      }
+      // Format date for URL
+      final dateStr = DateFormat('yyyy_MM_dd').format(_selectedDay!);
+      final dayUrl = '$_recordingsUrl$dateStr/';
+      
+      // Load the selected recording
+      _loadRecording('$dayUrl$recording');
       
       _animationController.forward();
     });
@@ -474,75 +578,87 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                     ),
                   ),
                   
+                  // Loading indicator for dates
+                  if (_isLoadingDates)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const CircularProgressIndicator(strokeWidth: 2),
+                          const SizedBox(width: 12),
+                          Text('Loading recording dates...', 
+                            style: Theme.of(context).textTheme.bodyMedium),
+                        ],
+                      ),
+                    ),
+                  
+                  // Error message
+                  if (_loadingError.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        color: Colors.red.shade50,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.error_outline, color: Colors.red),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(_loadingError, 
+                                  style: TextStyle(color: Colors.red.shade900)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  
                   // Recordings list for selected day
                   if (_availableRecordings.isNotEmpty)
                     FadeTransition(
                       opacity: _fadeInAnimation,
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Card(
-                          elevation: 4,
-                          shadowColor: Colors.black26,
+                          elevation: 2,
+                          shadowColor: Colors.black12,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(12.0),
                                 child: Text(
-                                  'Recordings for ${DateFormat('MMMM d, yyyy').format(_selectedDay!)}',
-                                  style: Theme.of(context).textTheme.titleSmall,
+                                  'Recordings for ${_selectedDay != null ? DateFormat('MMMM d, yyyy').format(_selectedDay!) : "Today"}',
+                                  style: Theme.of(context).textTheme.titleMedium,
                                 ),
                               ),
                               const Divider(height: 1),
-                              // Animated recordings list
-                              AnimatedSize(
-                                duration: const Duration(milliseconds: 300),
+                              ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  maxHeight: 200,
+                                ),
                                 child: ListView.builder(
                                   shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
                                   itemCount: _availableRecordings.length,
                                   itemBuilder: (context, index) {
                                     final recording = _availableRecordings[index];
                                     final isSelected = recording == _selectedRecording;
                                     
-                                    // Create a staggered animation effect for list items
-                                    return TweenAnimationBuilder<double>(
-                                      tween: Tween<double>(begin: 0.0, end: 1.0),
-                                      duration: Duration(milliseconds: 200 + (index * 50)),
-                                      curve: Curves.easeOutQuad,
-                                      builder: (context, value, child) {
-                                        return Transform.translate(
-                                          offset: Offset(20 * (1 - value), 0),
-                                          child: Opacity(
-                                            opacity: value,
-                                            child: child,
-                                          ),
-                                        );
-                                      },
-                                      child: ListTile(
-                                        title: Text(recording),
-                                        leading: AnimatedSwitcher(
-                                          duration: const Duration(milliseconds: 300),
-                                          child: isSelected
-                                            ? const Icon(Icons.play_circle_filled, 
-                                                key: ValueKey('playing'),
-                                                color: AppTheme.primaryOrange)
-                                            : const Icon(Icons.video_library, 
-                                                key: ValueKey('not_playing')),
-                                          transitionBuilder: (child, animation) {
-                                            return ScaleTransition(
-                                              scale: animation,
-                                              child: child,
-                                            );
-                                          },
-                                        ),
-                                        selected: isSelected,
-                                        selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
-                                        onTap: () => _selectRecording(recording),
+                                    return ListTile(
+                                      title: Text(recording),
+                                      selected: isSelected,
+                                      leading: Icon(
+                                        Icons.video_library,
+                                        color: isSelected ? AppTheme.primaryOrange : null,
                                       ),
+                                      selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                      onTap: () => _selectRecording(recording),
                                     );
                                   },
                                 ),
@@ -552,8 +668,23 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                         ),
                       ),
                     ),
+                    
+                  // Loading indicator for recordings
+                  if (_isLoadingRecordings)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const CircularProgressIndicator(strokeWidth: 2),
+                          const SizedBox(width: 12),
+                          Text('Loading recordings...', 
+                            style: Theme.of(context).textTheme.bodyMedium),
+                        ],
+                      ),
+                    ),
                   
-                  // Player section with slide-up animation
+                  // Video player with controls
                   Expanded(
                     child: SlideTransition(
                       position: _playerSlideAnimation,
@@ -563,6 +694,37 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                       ),
                     ),
                   ),
+                  
+                  // Controls for when no recordings are available
+                  if (_availableRecordings.isEmpty && _camera != null && !_isLoadingRecordings)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        elevation: 2,
+                        shadowColor: Colors.black12,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              const Text('No recordings available for selected date'),
+                              const SizedBox(height: 8),
+                              ElevatedButton.icon(
+                                icon: const Icon(Icons.live_tv),
+                                label: const Text('Watch Live Stream'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppTheme.primaryOrange,
+                                  foregroundColor: Colors.white,
+                                ),
+                                onPressed: () => _loadRecording(_camera!.rtspUri),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -572,135 +734,101 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     );
   }
   
-  Widget _buildMarker(int count) {
-    return Container(
-      width: 16,
-      height: 16,
-      decoration: const BoxDecoration(
-        color: AppTheme.primaryOrange,
-        shape: BoxShape.circle,
-      ),
-      child: Center(
-        child: Text(
-          count.toString(),
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 10.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-  
+  // Build the player section
   Widget _buildPlayer() {
-    if (_camera == null) {
-      return const Center(
-        child: Text('No camera selected'),
-      );
-    }
-    
-    if (_selectedRecording == null) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.video_library,
-              size: 64,
-              color: Colors.grey,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _availableRecordings.isEmpty
-                ? 'No recordings available for this date'
-                : 'Select a recording to play',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ],
-        ),
-      );
-    }
-    
-    if (_hasError) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Error playing recording',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Text(
-                _errorMessage,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
-              onPressed: () => _loadRecording(_camera!.recordUri),
-            ),
-          ],
-        ),
-      );
-    }
-    
-    return Stack(
-      alignment: Alignment.center,
+    return Column(
       children: [
-        // Video player with Hero
-        Hero(
-          tag: 'player_${_camera!.id}_recording',
-          child: Material(
-            type: MaterialType.transparency,
-            child: Video(
-              controller: _controller,
-              controls: (_) => VideoControls(player: _player),
+        // Expanded video section
+        Expanded(
+          child: Container(
+            color: Colors.black,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Video player
+                Center(
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Video(
+                      controller: _controller,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                
+                // Loading indicator
+                if (_isBuffering)
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                
+                // Error display
+                if (_hasError)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 48,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            _errorMessage,
+                            style: const TextStyle(color: Colors.white),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          if (_camera != null)
+                            ElevatedButton.icon(
+                              icon: const Icon(Icons.live_tv),
+                              label: const Text('Switch to Live View'),
+                              onPressed: () => _loadRecording(_camera!.rtspUri),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         ),
         
-        // Buffering indicator (show when buffering and not playing yet)
-        if (_isBuffering && !_isPlaying)
-          const CircularProgressIndicator(),
-          
-        // Show overlay with recording info
-        if (!_isBuffering && _isPlaying && !_isFullScreen)
-          Positioned(
-            top: 8,
-            right: 8,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.black54,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.fiber_manual_record, color: Colors.red, size: 12),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Recording: $_selectedRecording',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
+        // Video controls at the bottom
+        if (_camera != null)
+          VideoControls(
+            player: _player,
+            isPlaying: _isPlaying,
+            isRecording: _camera!.recording,
+            onPlayPause: () {
+              if (_isPlaying) {
+                _player.pause();
+              } else {
+                _player.play();
+              }
+            },
+            onStop: () {
+              _player.stop();
+            },
+            onFullscreen: _toggleFullScreen,
+            onGoLive: () => _loadRecording(_camera!.rtspUri),
           ),
       ],
+    );
+  }
+  
+  // Build a marker for the calendar to show recording count
+  Widget _buildMarker(int count) {
+    return Container(
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppTheme.primaryOrange,
+      ),
+      width: 8,
+      height: 8,
     );
   }
 }
