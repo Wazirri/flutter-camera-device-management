@@ -252,33 +252,31 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> with Automati
             final double itemWidth = availableWidth / _gridColumns;
             final double itemHeight = availableHeight / rows;
             
-            // Get global offset values for the whole screen
-            final double appBarHeight = AppBar().preferredSize.height;
-            final double statusBarHeight = MediaQuery.of(context).padding.top;
-            final double globalOffsetY = appBarHeight + statusBarHeight;
-            
             // Print slot coordinates (x1,y1,x2,y2) for each slot
             for (int i = 0; i < maxCamerasPerPage; i++) {
               // Calculate the grid position (row, column)
               final int row = i ~/ _gridColumns;
               final int column = i % _gridColumns;
               
-              // Calculate coordinates relative to the grid container (0,0 at top-left)
-              final double relativeX1 = column * itemWidth;
-              final double relativeY1 = row * itemHeight;
-              final double relativeX2 = relativeX1 + itemWidth;
-              final double relativeY2 = relativeY1 + itemHeight;
+              // Calculate coordinates based on layout - sağ alt köşe (0,0) kabul edilerek
+              // Bu durumda sol üst köşe (width, height) olur ve değerler negatif olur
               
-              // Calculate absolute screen coordinates
-              final double x1 = relativeX1;
-              final double y1 = relativeY1 + globalOffsetY;
-              final double x2 = relativeX2;
-              final double y2 = relativeY2 + globalOffsetY;
+              // Sağ alt köşeden (0,0) hesaplanan koordinatlar
+              final double rightBottomX1 = ((_gridColumns - column - 1) * itemWidth);
+              final double rightBottomY1 = ((rows - row - 1) * itemHeight);
+              final double rightBottomX2 = rightBottomX1 - itemWidth;
+              final double rightBottomY2 = rightBottomY1 - itemHeight;
               
-              // Print both relative and absolute coordinates
+              // Ekranda gerçek piksel koordinatları (sol üst köşe)
+              final double x1 = column * itemWidth;
+              final double y1 = row * itemHeight;
+              final double x2 = x1 + itemWidth;
+              final double y2 = y1 + itemHeight;
+              
+              // Print sağ alt köşeye göre hesaplanan koordinatlar
               print('Slot ${i+1} (index $i):');
-              print('  Relative coords (grid only): x1=$relativeX1, y1=$relativeY1, x2=$relativeX2, y2=$relativeY2');
-              print('  Absolute coords (screen): x1=$x1, y1=$y1, x2=$x2, y2=$y2');
+              print('  Sağ alt köşeden (0,0) koordinatlar: x1=$rightBottomX1, y1=$rightBottomY1, x2=$rightBottomX2, y2=$rightBottomY2');
+              print('  Karşılaştırma için Sol üst köşeden koordinatlar: x1=$x1, y1=$y1, x2=$x2, y2=$y2');
             }
             
             return GridView.builder(
