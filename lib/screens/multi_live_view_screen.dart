@@ -252,6 +252,11 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> with Automati
             final double itemWidth = availableWidth / _gridColumns;
             final double itemHeight = availableHeight / rows;
             
+            // Get global offset values for the whole screen
+            final double appBarHeight = AppBar().preferredSize.height;
+            final double statusBarHeight = MediaQuery.of(context).padding.top;
+            final double globalOffsetY = appBarHeight + statusBarHeight;
+            
             // Print slot coordinates (x1,y1,x2,y2) for each slot
             for (int i = 0; i < maxCamerasPerPage; i++) {
               // Calculate the grid position (row, column)
@@ -259,13 +264,21 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> with Automati
               final int column = i % _gridColumns;
               
               // Calculate coordinates relative to the grid container (0,0 at top-left)
-              final double x1 = column * itemWidth;
-              final double y1 = row * itemHeight;
-              final double x2 = x1 + itemWidth;
-              final double y2 = y1 + itemHeight;
+              final double relativeX1 = column * itemWidth;
+              final double relativeY1 = row * itemHeight;
+              final double relativeX2 = relativeX1 + itemWidth;
+              final double relativeY2 = relativeY1 + itemHeight;
               
-              // Print coordinates for each slot
-              print('Slot ${i+1} (index $i): x1=$x1, y1=$y1, x2=$x2, y2=$y2');
+              // Calculate absolute screen coordinates
+              final double x1 = relativeX1;
+              final double y1 = relativeY1 + globalOffsetY;
+              final double x2 = relativeX2;
+              final double y2 = relativeY2 + globalOffsetY;
+              
+              // Print both relative and absolute coordinates
+              print('Slot ${i+1} (index $i):');
+              print('  Relative coords (grid only): x1=$relativeX1, y1=$relativeY1, x2=$relativeX2, y2=$relativeY2');
+              print('  Absolute coords (screen): x1=$x1, y1=$y1, x2=$x2, y2=$y2');
             }
             
             return GridView.builder(
