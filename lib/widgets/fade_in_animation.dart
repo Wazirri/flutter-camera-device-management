@@ -3,29 +3,27 @@ import 'package:flutter/material.dart';
 class FadeInAnimation extends StatefulWidget {
   final Widget child;
   final Duration duration;
-  final Duration delay;
   final Curve curve;
-  final double xOffset;
-  final double yOffset;
+  final double begin;
+  final double end;
 
   const FadeInAnimation({
     Key? key,
     required this.child,
-    this.duration = const Duration(milliseconds: 300),
-    this.delay = const Duration(milliseconds: 0),
-    this.curve = Curves.easeOut,
-    this.xOffset = 0.0,
-    this.yOffset = 30.0,
+    this.duration = const Duration(milliseconds: 500),
+    this.curve = Curves.easeInOut,
+    this.begin = 0.0,
+    this.end = 1.0,
   }) : super(key: key);
 
   @override
-  _FadeInAnimationState createState() => _FadeInAnimationState();
+  State<FadeInAnimation> createState() => _FadeInAnimationState();
 }
 
-class _FadeInAnimationState extends State<FadeInAnimation> with SingleTickerProviderStateMixin {
+class _FadeInAnimationState extends State<FadeInAnimation>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _opacityAnimation;
-  late Animation<Offset> _slideAnimation;
+  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -34,28 +32,16 @@ class _FadeInAnimationState extends State<FadeInAnimation> with SingleTickerProv
       vsync: this,
       duration: widget.duration,
     );
-
-    _opacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: widget.curve,
-    ));
-
-    _slideAnimation = Tween<Offset>(
-      begin: Offset(widget.xOffset, widget.yOffset),
-      end: const Offset(0, 0),
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: widget.curve,
-    ));
-
-    Future.delayed(widget.delay, () {
-      if (mounted) {
-        _controller.forward();
-      }
-    });
+    _animation = Tween<double>(
+      begin: widget.begin,
+      end: widget.end,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: widget.curve,
+      ),
+    );
+    _controller.forward();
   }
 
   @override
@@ -66,17 +52,9 @@ class _FadeInAnimationState extends State<FadeInAnimation> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Opacity(
-          opacity: _opacityAnimation.value,
-          child: Transform.translate(
-            offset: _slideAnimation.value,
-            child: widget.child,
-          ),
-        );
-      },
+    return FadeTransition(
+      opacity: _animation,
+      child: widget.child,
     );
   }
 }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:camera_device_manager/theme/app_theme.dart';
-import 'package:camera_device_manager/models/menu_item.dart';
+import '../theme/app_theme.dart';
 
-class DesktopSideMenu extends StatelessWidget {
+class DesktopSideMenu extends StatefulWidget {
   final String currentRoute;
   final Function(String) onDestinationSelected;
 
@@ -13,162 +12,219 @@ class DesktopSideMenu extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<DesktopSideMenu> createState() => _DesktopSideMenuState();
+}
+
+class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProviderStateMixin {
+  late final AnimationController _animationController;
+  
+  // Define menu items
+  final List<Map<String, dynamic>> _menuItems = [
+    {
+      'title': 'Dashboard',
+      'icon': Icons.dashboard,
+      'route': '/dashboard',
+    },
+    {
+      'title': 'Live View',
+      'icon': Icons.videocam,
+      'route': '/live-view',
+    },
+    {
+      'title': 'Multi Camera View',
+      'icon': Icons.grid_view,
+      'route': '/multi-live-view',
+    },
+    {
+      'title': 'Recordings',
+      'icon': Icons.video_library,
+      'route': '/recordings',
+    },
+    {
+      'title': 'Cameras',
+      'icon': Icons.camera,
+      'route': '/cameras',
+    },
+    {
+      'title': 'Devices',
+      'icon': Icons.devices,
+      'route': '/devices',
+    },
+    {
+      'title': 'Camera Devices',
+      'icon': Icons.camera_alt,
+      'route': '/camera-devices',
+    },
+    {
+      'title': 'Settings',
+      'icon': Icons.settings,
+      'route': '/settings',
+    },
+    {
+      'title': 'WebSocket Logs',
+      'icon': Icons.history,
+      'route': '/websocket-logs',
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    
+    // Start the animation
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
       width: 250,
-      color: AppTheme.darkAppBarColor,
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurface,
+        border: Border(
+          right: BorderSide(
+            color: AppTheme.primaryColor.withOpacity(0.1),
+            width: 1,
+          ),
+        ),
+      ),
       child: Column(
         children: [
-          // Header with logo and app name
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-            child: Column(
-              children: [
-                // Logo
-                Icon(
-                  Icons.camera_alt,
-                  size: 48,
-                  color: AppTheme.primaryColor,
-                ),
-                const SizedBox(height: 12),
-                // App title
-                const Text(
-                  'Camera Manager',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+          // App title with logo
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: FadeTransition(
+              opacity: CurvedAnimation(
+                parent: _animationController,
+                curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.camera_enhance,
+                    color: AppTheme.accentColor,
+                    size: 32,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Camera Device Manager',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          const Divider(color: Colors.white24),
           
-          // Navigation items
+          const Divider(height: 1),
+          
+          // Menu items
           Expanded(
-            child: ListView(
+            child: ListView.builder(
               padding: EdgeInsets.zero,
-              children: [
-                _buildNavItem(
-                  context,
-                  MenuItemData(
-                    route: '/dashboard',
-                    title: 'Dashboard',
-                    icon: Icons.dashboard_outlined,
-                    activeIcon: Icons.dashboard,
+              itemCount: _menuItems.length,
+              itemBuilder: (context, index) {
+                final item = _menuItems[index];
+                final isSelected = widget.currentRoute == item['route'];
+                
+                // Create staggered animation for each menu item
+                final animation = CurvedAnimation(
+                  parent: _animationController,
+                  curve: Interval(
+                    0.1 + (index * 0.05),
+                    0.6 + (index * 0.05),
+                    curve: Curves.easeOut,
                   ),
-                ),
-                _buildNavItem(
-                  context,
-                  MenuItemData(
-                    route: '/cameras',
-                    title: 'Cameras',
-                    icon: Icons.camera_outlined,
-                    activeIcon: Icons.camera,
+                );
+                
+                return FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(-0.5, 0.0),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: ListTile(
+                      leading: Icon(
+                        item['icon'],
+                        color: isSelected 
+                            ? AppTheme.accentColor 
+                            : AppTheme.darkTextSecondary,
+                      ),
+                      title: Text(
+                        item['title'],
+                        style: TextStyle(
+                          color: isSelected 
+                              ? AppTheme.accentColor 
+                              : AppTheme.darkTextPrimary,
+                          fontWeight: isSelected 
+                              ? FontWeight.bold 
+                              : FontWeight.normal,
+                        ),
+                      ),
+                      selected: isSelected,
+                      selectedTileColor: AppTheme.accentColor.withOpacity(0.1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      onTap: () => widget.onDestinationSelected(item['route']),
+                    ),
                   ),
-                ),
-                _buildNavItem(
-                  context,
-                  MenuItemData(
-                    route: '/multi-live-view',
-                    title: 'Multi-View',
-                    icon: Icons.grid_view_outlined,
-                    activeIcon: Icons.grid_view,
-                  ),
-                ),
-                _buildNavItem(
-                  context,
-                  MenuItemData(
-                    route: '/camera-devices',
-                    title: 'Camera Devices',
-                    icon: Icons.videocam_outlined,
-                    activeIcon: Icons.videocam,
-                  ),
-                ),
-                _buildNavItem(
-                  context,
-                  MenuItemData(
-                    route: '/devices',
-                    title: 'Devices',
-                    icon: Icons.devices_outlined,
-                    activeIcon: Icons.devices,
-                  ),
-                ),
-                const Divider(color: Colors.white24),
-                _buildNavItem(
-                  context,
-                  MenuItemData(
-                    route: '/settings',
-                    title: 'Settings',
-                    icon: Icons.settings_outlined,
-                    activeIcon: Icons.settings,
-                  ),
-                ),
-              ],
+                );
+              },
             ),
           ),
           
-          // Footer with version info or user info
-          Container(
-            padding: const EdgeInsets.all(16),
+          // Bottom section with logout and version
+          FadeTransition(
+            opacity: CurvedAnimation(
+              parent: _animationController,
+              curve: const Interval(0.7, 1.0, curve: Curves.easeOut),
+            ),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Divider(color: Colors.white24),
-                const SizedBox(height: 8),
+                const Divider(height: 1),
+                // Logout button
+                ListTile(
+                  leading: Icon(
+                    Icons.logout,
+                    color: AppTheme.darkTextSecondary,
+                  ),
+                  title: Text(
+                    'Logout',
+                    style: TextStyle(
+                      color: AppTheme.darkTextPrimary,
+                    ),
+                  ),
+                  onTap: () => widget.onDestinationSelected('/login'),
+                ),
+                const SizedBox(height: 16),
                 Text(
-                  'Version 1.0.0',
+                  'v1.0.0',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
                     fontSize: 12,
+                    color: Colors.grey.shade600,
                   ),
                 ),
+                const SizedBox(height: 8),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem(BuildContext context, MenuItemData item) {
-    final isActive = currentRoute == item.route;
-    final theme = Theme.of(context);
-    
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: () => onDestinationSelected(item.route),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: isActive ? AppTheme.primaryColor.withOpacity(0.2) : Colors.transparent,
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  isActive ? item.activeIcon : item.icon,
-                  color: isActive ? AppTheme.primaryColor : Colors.white70,
-                  size: 24,
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  item.title,
-                  style: TextStyle(
-                    color: isActive ? AppTheme.primaryColor : Colors.white70,
-                    fontSize: 16,
-                    fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

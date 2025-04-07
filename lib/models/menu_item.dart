@@ -1,38 +1,79 @@
 import 'package:flutter/material.dart';
 
-class MenuItemData {
-  final String route;
+class CustomMenuItem {
   final String title;
   final IconData icon;
-  final IconData activeIcon;
-  final List<MenuItemData>? subItems;
-  final bool isVisible;
+  final String route;
+  final bool isSelected;
 
-  MenuItemData({
-    required this.route,
+  CustomMenuItem({
     required this.title,
     required this.icon,
-    required this.activeIcon,
-    this.subItems,
-    this.isVisible = true,
+    required this.route,
+    this.isSelected = false,
   });
 
-  // Create a copy of this menu item with different visibility
-  MenuItemData copyWith({
-    String? route,
+  CustomMenuItem copyWith({
     String? title,
     IconData? icon,
-    IconData? activeIcon,
-    List<MenuItemData>? subItems,
-    bool? isVisible,
+    String? route,
+    bool? isSelected,
   }) {
-    return MenuItemData(
-      route: route ?? this.route,
+    return CustomMenuItem(
       title: title ?? this.title,
       icon: icon ?? this.icon,
-      activeIcon: activeIcon ?? this.activeIcon,
-      subItems: subItems ?? this.subItems,
-      isVisible: isVisible ?? this.isVisible,
+      route: route ?? this.route,
+      isSelected: isSelected ?? this.isSelected,
     );
+  }
+}
+
+// Define static menu items for both mobile and desktop
+class MenuItems {
+  static List<CustomMenuItem> getMenuItems({required String currentRoute}) {
+    return [
+      CustomMenuItem(
+        title: 'Dashboard',
+        icon: Icons.dashboard_rounded,
+        route: '/dashboard',
+        isSelected: currentRoute == '/dashboard',
+      ),
+      CustomMenuItem(
+        title: 'Live View',
+        icon: Icons.videocam_rounded,
+        route: '/live-view',
+        isSelected: currentRoute == '/live-view',
+      ),
+      CustomMenuItem(
+        title: 'Recordings',
+        icon: Icons.video_library_rounded,
+        route: '/recordings',
+        isSelected: currentRoute == '/recordings',
+      ),
+      CustomMenuItem(
+        title: 'Cameras',
+        icon: Icons.camera_alt_rounded,
+        route: '/cameras',
+        isSelected: currentRoute == '/cameras',
+      ),
+      CustomMenuItem(
+        title: 'Devices',
+        icon: Icons.devices_rounded,
+        route: '/devices',
+        isSelected: currentRoute == '/devices',
+      ),
+      CustomMenuItem(
+        title: 'Camera Devices',
+        icon: Icons.camera_enhance_rounded,
+        route: '/camera-devices',
+        isSelected: currentRoute == '/camera-devices',
+      ),
+      CustomMenuItem(
+        title: 'Settings',
+        icon: Icons.settings_rounded,
+        route: '/settings',
+        isSelected: currentRoute == '/settings',
+      ),
+    ];
   }
 }

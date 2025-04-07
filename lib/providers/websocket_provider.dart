@@ -70,7 +70,6 @@ class WebSocketProvider with ChangeNotifier {
   SystemInfo? get systemInfo => _systemInfo;
   Stream<SystemInfo> get onSystemInfoUpdate => _systemInfoController.stream;
   String get serverIp => _serverIp;
-  dynamic get lastMessage => _lastMessage;
   int get serverPort => _serverPort;
   bool get rememberMe => _rememberMe;
   bool get isLocalServerMode => _isLocalServerMode;
@@ -243,7 +242,6 @@ class WebSocketProvider with ChangeNotifier {
         // Try to parse JSON message
         try {
           final jsonData = jsonDecode(message);
-          _lastMessage = jsonData;
           _processJsonMessage(jsonData);
         } catch (e) {
           debugPrint('Not a JSON message: $message');
