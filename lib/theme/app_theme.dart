@@ -5,20 +5,42 @@ class AppTheme {
   static const Color primaryColor = Color(0xFFF7941E); // Orange
   static const Color accentColor = Color(0xFF00ADEE); // Blue
   
+  // Primary colors with aliases for usage in the code
+  static const Color primaryOrange = primaryColor;
+  static const Color primaryBlue = accentColor;
+  
   // Dark Background Colors
   static const Color darkBackgroundColor = Color(0xFF121212);
   static const Color darkCardColor = Color(0xFF1E1E1E);
   static const Color darkAppBarColor = Color(0xFF252525);
   
+  // Alias for dark background and surfaces
+  static const Color darkBackground = darkBackgroundColor;
+  static const Color darkSurface = darkCardColor;
+  
   // Text Colors
   static const Color darkTextColor = Colors.white;
   static const Color darkTextSecondaryColor = Colors.white70;
+  
+  // Alias for text colors
+  static const Color darkTextPrimary = darkTextColor;
+  static const Color darkTextSecondary = darkTextSecondaryColor;
   
   // Status Colors
   static const Color successColor = Color(0xFF4CAF50);
   static const Color errorColor = Color(0xFFE53935);
   static const Color warningColor = Color(0xFFFFB300);
   static const Color infoColor = Color(0xFF2196F3);
+  
+  // Alias for status colors
+  static const Color error = errorColor;
+  static const Color warning = warningColor;
+  static const Color success = successColor;
+  static const Color info = infoColor;
+  
+  // Connection status colors
+  static const Color online = successColor;
+  static const Color offline = errorColor;
   
   // Dark Theme
   static final ThemeData darkTheme = ThemeData(
@@ -112,7 +134,7 @@ class AppTheme {
         borderRadius: BorderRadius.circular(8),
       ),
     ),
-    dialogTheme: DialogTheme(
+    dialogTheme: const DialogTheme(
       backgroundColor: darkCardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -123,7 +145,7 @@ class AppTheme {
       foregroundColor: darkTextColor,
     ),
     dividerColor: Colors.white12,
-    cardTheme: CardTheme(
+    cardTheme: const CardTheme(
       color: darkCardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

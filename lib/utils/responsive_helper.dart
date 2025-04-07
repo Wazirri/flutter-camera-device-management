@@ -90,4 +90,25 @@ class ResponsiveHelper {
       return baseFontSize; // Base size for mobile
     }
   }
+  
+  // Alias for responsiveFontSize to match usage in some files
+  static double getResponsiveFontSize(BuildContext context, double baseFontSize) {
+    return responsiveFontSize(context, baseFontSize);
+  }
+  
+  // Responsive widget builder
+  static Widget responsiveWidget({
+    required Widget mobile,
+    Widget? tablet,
+    Widget? desktop,
+    required BuildContext context,
+  }) {
+    if (isDesktop(context)) {
+      return desktop ?? tablet ?? mobile;
+    } else if (isTablet(context)) {
+      return tablet ?? mobile;
+    } else {
+      return mobile;
+    }
+  }
 }

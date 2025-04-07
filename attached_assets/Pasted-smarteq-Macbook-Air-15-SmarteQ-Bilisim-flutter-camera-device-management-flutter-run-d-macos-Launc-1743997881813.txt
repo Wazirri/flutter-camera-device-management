@@ -1,0 +1,652 @@
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % flutter run -d macos
+Launching lib/main.dart on macOS in debug mode...
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:00008112-001251360E08201E, name:My Mac }
+{ platform:macOS, arch:x86_64, id:00008112-001251360E08201E, name:My Mac }
+lib/providers/websocket_provider.dart:241:32: Error: Can't find '}' to match '{'.
+        if (message == 'PONG') {
+                               ^
+lib/providers/websocket_provider.dart:36:11: Error: '_lastMessage' is already declared in this scope.
+  dynamic _lastMessage;
+          ^^^^^^^^^^^^
+lib/providers/websocket_provider.dart:34:11: Context: Previous declaration of '_lastMessage'.
+  dynamic _lastMessage;
+          ^^^^^^^^^^^^
+lib/providers/websocket_provider.dart:76:15: Error: 'lastMessage' is already declared in this scope.
+  dynamic get lastMessage => _lastMessage;
+              ^^^^^^^^^^^
+lib/providers/websocket_provider.dart:75:15: Context: Previous declaration of 'lastMessage'.
+  dynamic get lastMessage => _lastMessage;
+              ^^^^^^^^^^^
+lib/providers/websocket_provider.dart:75:30: Error: Can't use '_lastMessage' because it is declared more than once.
+  dynamic get lastMessage => _lastMessage;
+                             ^
+lib/providers/websocket_provider.dart:76:30: Error: Can't use '_lastMessage' because it is declared more than once.
+  dynamic get lastMessage => _lastMessage;
+                             ^
+lib/providers/websocket_provider.dart:244:24: Error: Can't assign to this.
+          _lastMessage = jsonData;
+                       ^
+lib/providers/websocket_provider.dart:245:31: Error: The getter 'jsonData' isn't defined for the class 'WebSocketProvider'.
+ - 'WebSocketProvider' is from 'package:camera_device_manager/providers/websocket_provider.dart' ('lib/providers/websocket_provider.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'jsonData'.
+          _processJsonMessage(jsonData);
+                              ^^^^^^^^
+lib/theme/app_theme.dart:115:18: Error: The argument type 'DialogTheme' can't be assigned to the parameter type 'DialogThemeData?'.
+ - 'DialogTheme' is from 'package:flutter/src/material/dialog_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/dialog_theme.dart').
+ - 'DialogThemeData' is from 'package:flutter/src/material/dialog_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/dialog_theme.dart').
+    dialogTheme: DialogTheme(
+                 ^
+lib/theme/app_theme.dart:126:16: Error: The argument type 'CardTheme' can't be assigned to the parameter type 'CardThemeData?'.
+ - 'CardTheme' is from 'package:flutter/src/material/card_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/card_theme.dart').
+ - 'CardThemeData' is from 'package:flutter/src/material/card_theme.dart' ('../../../../Flutter/flutter/packages/flutter/lib/src/material/card_theme.dart').
+    cardTheme: CardTheme(
+               ^
+lib/screens/multi_live_view_screen.dart:219:33: Error: Member not found: 'darkBackground'.
+      backgroundColor: AppTheme.darkBackground,
+                                ^^^^^^^^^^^^^^
+lib/widgets/video_controls.dart:137:45: Error: Member not found: 'primaryOrange'.
+                      activeColor: AppTheme.primaryOrange,
+                                            ^^^^^^^^^^^^^
+lib/screens/websocket_log_screen.dart:14:35: Error: Member not found: 'darkSurface'.
+        backgroundColor: AppTheme.darkSurface,
+                                  ^^^^^^^^^^^
+lib/screens/websocket_log_screen.dart:61:60: Error: Member not found: 'darkTextSecondary'.
+                          style: TextStyle(color: AppTheme.darkTextSecondary),
+                                                           ^^^^^^^^^^^^^^^^^
+lib/screens/websocket_log_screen.dart:76:45: Error: Member not found: 'darkSurface'.
+                            color: AppTheme.darkSurface,
+                                            ^^^^^^^^^^^
+lib/screens/websocket_log_screen.dart:84:51: Error: Member not found: 'darkTextPrimary'.
+                                  color: AppTheme.darkTextPrimary,
+                                                  ^^^^^^^^^^^^^^^
+lib/screens/settings_screen.dart:28:33: Error: Member not found: 'darkBackground'.
+      backgroundColor: AppTheme.darkBackground,
+                                ^^^^^^^^^^^^^^
+lib/screens/settings_screen.dart:36:35: Error: Member not found: 'ResponsiveHelper.responsiveWidget'.
+          child: ResponsiveHelper.responsiveWidget(
+                                  ^^^^^^^^^^^^^^^^
+lib/screens/settings_screen.dart:153:33: Error: Member not found: 'primaryBlue'.
+          activeColor: AppTheme.primaryBlue,
+                                ^^^^^^^^^^^
+lib/screens/settings_screen.dart:165:33: Error: Member not found: 'primaryBlue'.
+          activeColor: AppTheme.primaryBlue,
+                                ^^^^^^^^^^^
+lib/screens/settings_screen.dart:182:37: Error: Member not found: 'primaryBlue'.
+              activeColor: AppTheme.primaryBlue,
+                                    ^^^^^^^^^^^
+lib/screens/settings_screen.dart:190:37: Error: Member not found: 'primaryBlue'.
+              activeColor: AppTheme.primaryBlue,
+                                    ^^^^^^^^^^^
+lib/screens/settings_screen.dart:198:37: Error: Member not found: 'primaryBlue'.
+              activeColor: AppTheme.primaryBlue,
+                                    ^^^^^^^^^^^
+lib/screens/settings_screen.dart:219:39: Error: Member not found: 'darkBackground'.
+            backgroundColor: AppTheme.darkBackground,
+                                      ^^^^^^^^^^^^^^
+lib/screens/settings_screen.dart:222:30: Error: Member not found: 'error'.
+                  ? AppTheme.error
+                             ^^^^^
+lib/screens/settings_screen.dart:224:34: Error: Member not found: 'warning'.
+                      ? AppTheme.warning
+                                 ^^^^^^^
+lib/screens/settings_screen.dart:225:34: Error: Member not found: 'primaryBlue'.
+                      : AppTheme.primaryBlue,
+                                 ^^^^^^^^^^^
+lib/screens/settings_screen.dart:247:37: Error: Member not found: 'primaryBlue'.
+              activeColor: AppTheme.primaryBlue,
+                                    ^^^^^^^^^^^
+lib/screens/settings_screen.dart:260:41: Error: Member not found: 'primaryBlue'.
+              backgroundColor: AppTheme.primaryBlue,
+                                        ^^^^^^^^^^^
+lib/screens/settings_screen.dart:325:33: Error: Member not found: 'primaryBlue'.
+          activeColor: AppTheme.primaryBlue,
+                                ^^^^^^^^^^^
+lib/screens/settings_screen.dart:336:73: Error: Member not found: 'online'.
+          trailing: Text('Up to date', style: TextStyle(color: AppTheme.online)),
+                                                                        ^^^^^^
+lib/screens/settings_screen.dart:350:47: Error: Member not found: 'online'.
+                color: isConnected ? AppTheme.online : AppTheme.offline,
+                                              ^^^^^^
+lib/screens/settings_screen.dart:350:65: Error: Member not found: 'offline'.
+                color: isConnected ? AppTheme.online : AppTheme.offline,
+                                                                ^^^^^^^
+lib/screens/settings_screen.dart:390:41: Error: Member not found: 'error'.
+              foregroundColor: AppTheme.error,
+                                        ^^^^^
+lib/screens/settings_screen.dart:405:23: Error: Member not found: 'darkSurface'.
+      color: AppTheme.darkSurface,
+                      ^^^^^^^^^^^
+lib/screens/settings_screen.dart:420:35: Error: Member not found: 'primaryBlue'.
+                  color: AppTheme.primaryBlue,
+                                  ^^^^^^^^^^^
+lib/screens/settings_screen.dart:458:33: Error: Member not found: 'darkSurface'.
+        dropdownColor: AppTheme.darkSurface,
+                                ^^^^^^^^^^^
+lib/screens/settings_screen.dart:469:37: Error: Member not found: 'darkSurface'.
+          backgroundColor: AppTheme.darkSurface,
+                                    ^^^^^^^^^^^
+lib/screens/settings_screen.dart:487:43: Error: Member not found: 'error'.
+                foregroundColor: AppTheme.error,
+                                          ^^^^^
+lib/widgets/custom_app_bar.dart:24:33: Error: Member not found: 'darkSurface'.
+      backgroundColor: AppTheme.darkSurface,
+                                ^^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:44:38: Error: Member not found: 'ResponsiveHelper.getResponsiveFontSize'.
+          fontSize: ResponsiveHelper.getResponsiveFontSize(
+                                     ^^^^^^^^^^^^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:51:27: Error: Member not found: 'darkTextPrimary'.
+          color: AppTheme.darkTextPrimary,
+                          ^^^^^^^^^^^^^^^
+lib/widgets/custom_app_bar.dart:67:39: Error: Member not found: 'primaryOrange'.
+            backgroundColor: AppTheme.primaryOrange,
+                                      ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:393:64: Error: Member not found: 'primaryOrange'.
+                                  color: isSelected ? AppTheme.primaryOrange : null,
+                                                               ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:395:61: Error: Member not found: 'primaryOrange'.
+                                selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                                            ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:447:49: Error: Member not found: 'primaryBlue'.
+                                color: AppTheme.primaryBlue.withOpacity(0.5),
+                                                ^^^^^^^^^^^
+lib/screens/record_view_screen.dart:451:49: Error: Member not found: 'primaryOrange'.
+                                color: AppTheme.primaryOrange,
+                                                ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:455:49: Error: Member not found: 'primaryOrange'.
+                                color: AppTheme.primaryOrange,
+                                                ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:532:65: Error: Member not found: 'primaryOrange'.
+                                                color: AppTheme.primaryOrange)
+                                                                ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:543:69: Error: Member not found: 'primaryOrange'.
+                                        selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                                                    ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:580:25: Error: Member not found: 'primaryOrange'.
+        color: AppTheme.primaryOrange,
+                        ^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:26:33: Error: Member not found: 'darkBackground'.
+      backgroundColor: AppTheme.darkBackground,
+                                ^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:53:23: Error: Member not found: 'darkSurface'.
+      color: AppTheme.darkSurface,
+                      ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:71:39: Error: Member not found: 'darkTextPrimary'.
+                      color: AppTheme.darkTextPrimary,
+                                      ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:79:39: Error: Member not found: 'darkTextSecondary'.
+                      color: AppTheme.darkTextSecondary,
+                                      ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:90:53: Error: Member not found: 'primaryBlue'.
+                          backgroundColor: AppTheme.primaryBlue,
+                                                    ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:109:53: Error: Member not found: 'primaryBlue'.
+                          foregroundColor: AppTheme.primaryBlue,
+                                                    ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:110:60: Error: Member not found: 'primaryBlue'.
+                          side: BorderSide(color: AppTheme.primaryBlue),
+                                                           ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:132:35: Error: Member not found: 'primaryBlue'.
+                  color: AppTheme.primaryBlue.withOpacity(0.1),
+                                  ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:138:35: Error: Member not found: 'primaryBlue'.
+                  color: AppTheme.primaryBlue,
+                                  ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:163:27: Error: Member not found: 'online'.
+          color: AppTheme.online,
+                          ^^^^^^
+lib/screens/dashboard_screen.dart:170:27: Error: Member not found: 'offline'.
+          color: AppTheme.offline,
+                          ^^^^^^^
+lib/screens/dashboard_screen.dart:177:27: Error: Member not found: 'warning'.
+          color: AppTheme.warning,
+                          ^^^^^^^
+lib/screens/dashboard_screen.dart:184:27: Error: Member not found: 'primaryOrange'.
+          color: AppTheme.primaryOrange,
+                          ^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:198:23: Error: Member not found: 'darkSurface'.
+      color: AppTheme.darkSurface,
+                      ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:227:33: Error: Member not found: 'darkTextPrimary'.
+                color: AppTheme.darkTextPrimary,
+                                ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:235:33: Error: Member not found: 'darkTextSecondary'.
+                color: AppTheme.darkTextSecondary,
+                                ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:256:33: Error: Member not found: 'darkTextPrimary'.
+                color: AppTheme.darkTextPrimary,
+                                ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:300:23: Error: Member not found: 'darkSurface'.
+      color: AppTheme.darkSurface,
+                      ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:319:39: Error: Member not found: 'darkTextPrimary'.
+                      color: AppTheme.darkTextPrimary,
+                                      ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:327:41: Error: Member not found: 'darkTextPrimary'.
+                        color: AppTheme.darkTextPrimary,
+                                        ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:340:33: Error: Member not found: 'darkTextPrimary'.
+                color: AppTheme.darkTextPrimary,
+                                ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:349:35: Error: Member not found: 'darkTextSecondary'.
+                  color: AppTheme.darkTextSecondary,
+                                  ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:356:37: Error: Member not found: 'darkTextSecondary'.
+                    color: AppTheme.darkTextSecondary,
+                                    ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:391:33: Error: Member not found: 'darkTextPrimary'.
+                color: AppTheme.darkTextPrimary,
+                                ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:410:27: Error: Member not found: 'darkSurface'.
+          color: AppTheme.darkSurface,
+                          ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:435:35: Error: Member not found: 'darkTextSecondary'.
+                  color: AppTheme.darkTextSecondary,
+                                  ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:445:35: Error: Member not found: 'darkTextSecondary'.
+                  color: AppTheme.darkTextSecondary,
+                                  ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:455:35: Error: Member not found: 'darkTextSecondary'.
+                  color: AppTheme.darkTextSecondary,
+                                  ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:466:37: Error: Member not found: 'darkTextSecondary'.
+                    color: AppTheme.darkTextSecondary,
+                                    ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:508:33: Error: Member not found: 'darkTextPrimary'.
+                color: AppTheme.darkTextPrimary,
+                                ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:517:33: Error: Member not found: 'darkTextPrimary'.
+                color: AppTheme.darkTextPrimary,
+                                ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:534:35: Error: Member not found: 'darkTextPrimary'.
+                  color: AppTheme.darkTextPrimary,
+                                  ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:548:35: Error: Member not found: 'darkTextSecondary'.
+                  color: AppTheme.darkTextSecondary,
+                                  ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:572:33: Error: Member not found: 'darkTextPrimary'.
+                color: AppTheme.darkTextPrimary,
+                                ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:579:27: Error: Member not found: 'darkSurface'.
+          color: AppTheme.darkSurface,
+                          ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:603:62: Error: Member not found: 'darkTextPrimary'.
+                            style: TextStyle(color: AppTheme.darkTextPrimary),
+                                                             ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:631:43: Error: Member not found: 'primaryBlue'.
+                          color: AppTheme.primaryBlue,
+                                          ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:637:43: Error: Member not found: 'online'.
+                          color: AppTheme.online,
+                                          ^^^^^^
+lib/screens/dashboard_screen.dart:643:43: Error: Member not found: 'primaryOrange'.
+                          color: AppTheme.primaryOrange,
+                                          ^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:649:43: Error: Member not found: 'primaryBlue'.
+                          color: AppTheme.primaryBlue,
+                                          ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:681:25: Error: Member not found: 'darkBackground'.
+        color: AppTheme.darkBackground.withOpacity(0.3),
+                        ^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:683:44: Error: Member not found: 'darkBorder'.
+        border: Border.all(color: AppTheme.darkBorder),
+                                           ^^^^^^^^^^
+lib/screens/dashboard_screen.dart:710:37: Error: Member not found: 'darkTextSecondary'.
+                    color: AppTheme.darkTextSecondary,
+                                    ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:722:31: Error: Member not found: 'darkTextPrimary'.
+              color: AppTheme.darkTextPrimary,
+                              ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:736:25: Error: Member not found: 'darkBackground'.
+        color: AppTheme.darkBackground.withOpacity(0.3),
+                        ^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:738:44: Error: Member not found: 'darkBorder'.
+        border: Border.all(color: AppTheme.darkBorder),
+                                           ^^^^^^^^^^
+lib/screens/dashboard_screen.dart:748:35: Error: Member not found: 'primaryOrange'.
+                  color: AppTheme.primaryOrange.withOpacity(0.1),
+                                  ^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:753:35: Error: Member not found: 'primaryOrange'.
+                  color: AppTheme.primaryOrange,
+                                  ^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:763:35: Error: Member not found: 'darkTextPrimary'.
+                  color: AppTheme.darkTextPrimary,
+                                  ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:782:41: Error: Member not found: 'darkBackground'.
+              backgroundColor: AppTheme.darkBackground,
+                                        ^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:795:35: Error: Member not found: 'darkTextSecondary'.
+                  color: AppTheme.darkTextSecondary,
+                                  ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:802:35: Error: Member not found: 'darkTextSecondary'.
+                  color: AppTheme.darkTextSecondary,
+                                  ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:818:25: Error: Member not found: 'darkBackground'.
+        color: AppTheme.darkBackground.withOpacity(0.3),
+                        ^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:820:44: Error: Member not found: 'darkBorder'.
+        border: Border.all(color: AppTheme.darkBorder),
+                                           ^^^^^^^^^^
+lib/screens/dashboard_screen.dart:836:45: Error: Member not found: 'warning'.
+                            color: AppTheme.warning.withOpacity(0.1),
+                                            ^^^^^^^
+lib/screens/dashboard_screen.dart:841:45: Error: Member not found: 'warning'.
+                            color: AppTheme.warning,
+                                            ^^^^^^^
+lib/screens/dashboard_screen.dart:851:45: Error: Member not found: 'darkTextPrimary'.
+                            color: AppTheme.darkTextPrimary,
+                                            ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:871:49: Error: Member not found: 'darkTextPrimary'.
+                                color: AppTheme.darkTextPrimary,
+                                                ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:900:47: Error: Member not found: 'primaryBlue'.
+                              color: AppTheme.primaryBlue.withOpacity(0.1),
+                                              ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:905:47: Error: Member not found: 'primaryBlue'.
+                              color: AppTheme.primaryBlue,
+                                              ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:915:47: Error: Member not found: 'darkTextPrimary'.
+                              color: AppTheme.darkTextPrimary,
+                                              ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:928:47: Error: Member not found: 'darkTextPrimary'.
+                              color: AppTheme.darkTextPrimary,
+                                              ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:936:71: Error: Member not found: 'online'.
+                              color: sysInfo.eth0 != 'Yok' ? AppTheme.online : AppTheme.offline,
+                                                                      ^^^^^^
+lib/screens/dashboard_screen.dart:936:89: Error: Member not found: 'offline'.
+                              color: sysInfo.eth0 != 'Yok' ? AppTheme.online : AppTheme.offline,
+                                                                                        ^^^^^^^
+lib/screens/dashboard_screen.dart:949:47: Error: Member not found: 'darkTextPrimary'.
+                              color: AppTheme.darkTextPrimary,
+                                              ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:957:71: Error: Member not found: 'online'.
+                              color: sysInfo.ppp0 != 'Yok' ? AppTheme.online : AppTheme.offline,
+                                                                      ^^^^^^
+lib/screens/dashboard_screen.dart:957:89: Error: Member not found: 'offline'.
+                              color: sysInfo.ppp0 != 'Yok' ? AppTheme.online : AppTheme.offline,
+                                                                                        ^^^^^^^
+lib/screens/dashboard_screen.dart:970:47: Error: Member not found: 'darkTextPrimary'.
+                              color: AppTheme.darkTextPrimary,
+                                              ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:978:47: Error: Member not found: 'darkTextPrimary'.
+                              color: AppTheme.darkTextPrimary,
+                                              ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:998:41: Error: Member not found: 'primaryBlue'.
+                        color: AppTheme.primaryBlue.withOpacity(0.1),
+                                        ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1003:41: Error: Member not found: 'primaryBlue'.
+                        color: AppTheme.primaryBlue,
+                                        ^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1013:41: Error: Member not found: 'darkTextPrimary'.
+                        color: AppTheme.darkTextPrimary,
+                                        ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1026:41: Error: Member not found: 'darkTextPrimary'.
+                        color: AppTheme.darkTextPrimary,
+                                        ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1034:65: Error: Member not found: 'online'.
+                        color: sysInfo.eth0 != 'Yok' ? AppTheme.online : AppTheme.offline,
+                                                                ^^^^^^
+lib/screens/dashboard_screen.dart:1034:83: Error: Member not found: 'offline'.
+                        color: sysInfo.eth0 != 'Yok' ? AppTheme.online : AppTheme.offline,
+                                                                                  ^^^^^^^
+lib/screens/dashboard_screen.dart:1047:41: Error: Member not found: 'darkTextPrimary'.
+                        color: AppTheme.darkTextPrimary,
+                                        ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1055:65: Error: Member not found: 'online'.
+                        color: sysInfo.ppp0 != 'Yok' ? AppTheme.online : AppTheme.offline,
+                                                                ^^^^^^
+lib/screens/dashboard_screen.dart:1055:83: Error: Member not found: 'offline'.
+                        color: sysInfo.ppp0 != 'Yok' ? AppTheme.online : AppTheme.offline,
+                                                                                  ^^^^^^^
+lib/screens/dashboard_screen.dart:1068:41: Error: Member not found: 'darkTextPrimary'.
+                        color: AppTheme.darkTextPrimary,
+                                        ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1076:41: Error: Member not found: 'darkTextPrimary'.
+                        color: AppTheme.darkTextPrimary,
+                                        ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1092:25: Error: Member not found: 'darkBackground'.
+        color: AppTheme.darkBackground.withOpacity(0.3),
+                        ^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1094:44: Error: Member not found: 'darkBorder'.
+        border: Border.all(color: AppTheme.darkBorder),
+                                           ^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1104:35: Error: Member not found: 'primaryOrange'.
+                  color: AppTheme.primaryOrange.withOpacity(0.1),
+                                  ^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1109:35: Error: Member not found: 'primaryOrange'.
+                  color: AppTheme.primaryOrange,
+                                  ^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1119:35: Error: Member not found: 'darkTextPrimary'.
+                  color: AppTheme.darkTextPrimary,
+                                  ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1135:39: Error: Member not found: 'darkTextSecondary'.
+                      color: AppTheme.darkTextSecondary,
+                                      ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1144:39: Error: Member not found: 'darkTextPrimary'.
+                      color: AppTheme.darkTextPrimary,
+                                      ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1156:39: Error: Member not found: 'darkTextSecondary'.
+                      color: AppTheme.darkTextSecondary,
+                                      ^^^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1165:39: Error: Member not found: 'darkTextPrimary'.
+                      color: AppTheme.darkTextPrimary,
+                                      ^^^^^^^^^^^^^^^
+lib/screens/dashboard_screen.dart:1179:23: Error: Member not found: 'online'.
+      return AppTheme.online;
+                      ^^^^^^
+lib/screens/dashboard_screen.dart:1181:23: Error: Member not found: 'warning'.
+      return AppTheme.warning;
+                      ^^^^^^^
+lib/screens/dashboard_screen.dart:1183:23: Error: Member not found: 'error'.
+      return AppTheme.error;
+                      ^^^^^
+lib/screens/dashboard_screen.dart:1189:23: Error: Member not found: 'online'.
+      return AppTheme.online;
+                      ^^^^^^
+lib/screens/dashboard_screen.dart:1191:23: Error: Member not found: 'warning'.
+      return AppTheme.warning;
+                      ^^^^^^^
+lib/screens/dashboard_screen.dart:1193:23: Error: Member not found: 'error'.
+      return AppTheme.error;
+                      ^^^^^
+lib/screens/dashboard_screen.dart:1243:25: Error: Member not found: 'online'.
+        return AppTheme.online;
+                        ^^^^^^
+lib/screens/dashboard_screen.dart:1245:25: Error: Member not found: 'offline'.
+        return AppTheme.offline;
+                        ^^^^^^^
+lib/screens/dashboard_screen.dart:1247:25: Error: Member not found: 'warning'.
+        return AppTheme.warning;
+                        ^^^^^^^
+lib/widgets/status_indicator.dart:47:33: Error: Member not found: 'darkTextSecondary'.
+                color: AppTheme.darkTextSecondary,
+                                ^^^^^^^^^^^^^^^^^
+lib/widgets/status_indicator.dart:77:25: Error: Member not found: 'online'.
+        return AppTheme.online;
+                        ^^^^^^
+lib/widgets/status_indicator.dart:79:25: Error: Member not found: 'offline'.
+        return AppTheme.offline;
+                        ^^^^^^^
+lib/widgets/status_indicator.dart:81:25: Error: Member not found: 'warning'.
+        return AppTheme.warning;
+                        ^^^^^^^
+lib/widgets/status_indicator.dart:83:25: Error: Member not found: 'error'.
+        return AppTheme.error;
+                        ^^^^^
+lib/widgets/status_indicator.dart:85:25: Error: Member not found: 'warning'.
+        return AppTheme.warning;
+                        ^^^^^^^
+lib/widgets/status_indicator.dart:87:25: Error: Member not found: 'darkTextSecondary'.
+        return AppTheme.darkTextSecondary; // Gray for unknown status
+                        ^^^^^^^^^^^^^^^^^
+lib/screens/live_view_screen.dart:284:64: Error: Member not found: 'primaryOrange'.
+                                  color: isSelected ? AppTheme.primaryOrange : null,
+                                                               ^^^^^^^^^^^^^
+lib/screens/live_view_screen.dart:286:61: Error: Member not found: 'primaryOrange'.
+                                selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
+                                                            ^^^^^^^^^^^^^
+lib/screens/live_view_screen.dart:511:74: Error: Member not found: 'primaryOrange'.
+                        const Icon(Icons.info, size: 28, color: AppTheme.primaryOrange),
+                                                                         ^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:36:33: Error: Member not found: 'darkBackground'.
+      backgroundColor: AppTheme.darkBackground,
+                                ^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:52:35: Error: Member not found: 'primaryOrange'.
+        backgroundColor: AppTheme.primaryOrange,
+                                  ^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:90:31: Error: Member not found: 'darkSurface'.
+          fillColor: AppTheme.darkSurface,
+                              ^^^^^^^^^^^
+lib/screens/devices_screen.dart:142:33: Error: Member not found: 'primaryBlue'.
+        selectedColor: AppTheme.primaryBlue.withOpacity(0.2),
+                                ^^^^^^^^^^^
+lib/screens/devices_screen.dart:143:35: Error: Member not found: 'darkSurface'.
+        backgroundColor: AppTheme.darkSurface,
+                                  ^^^^^^^^^^^
+lib/screens/devices_screen.dart:145:40: Error: Member not found: 'primaryBlue'.
+          color: isSelected ? AppTheme.primaryBlue : AppTheme.darkTextPrimary,
+                                       ^^^^^^^^^^^
+lib/screens/devices_screen.dart:145:63: Error: Member not found: 'darkTextPrimary'.
+          color: isSelected ? AppTheme.primaryBlue : AppTheme.darkTextPrimary,
+                                                              ^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:170:31: Error: Member not found: 'darkTextSecondary'.
+              color: AppTheme.darkTextSecondary,
+                              ^^^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:177:33: Error: Member not found: 'darkTextSecondary'.
+                color: AppTheme.darkTextSecondary,
+                                ^^^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:185:33: Error: Member not found: 'darkTextSecondary'.
+                color: AppTheme.darkTextSecondary,
+                                ^^^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:270:33: Error: Member not found: 'darkSurface'.
+      backgroundColor: AppTheme.darkSurface,
+                                ^^^^^^^^^^^
+lib/screens/devices_screen.dart:299:47: Error: Member not found: 'primaryBlue'.
+                  selectedTileColor: AppTheme.primaryBlue.withOpacity(0.15),
+                                              ^^^^^^^^^^^
+lib/screens/devices_screen.dart:301:65: Error: Member not found: 'primaryBlue'.
+                      ? const Icon(Icons.check, color: AppTheme.primaryBlue)
+                                                                ^^^^^^^^^^^
+lib/screens/devices_screen.dart:354:33: Error: Member not found: 'darkSurface'.
+      backgroundColor: AppTheme.darkSurface,
+                                ^^^^^^^^^^^
+lib/screens/devices_screen.dart:382:47: Error: Member not found: 'primaryBlue'.
+                  selectedTileColor: AppTheme.primaryBlue.withOpacity(0.15),
+                                              ^^^^^^^^^^^
+lib/screens/devices_screen.dart:384:65: Error: Member not found: 'primaryBlue'.
+                      ? const Icon(Icons.check, color: AppTheme.primaryBlue)
+                                                                ^^^^^^^^^^^
+lib/screens/devices_screen.dart:404:33: Error: Member not found: 'darkSurface'.
+      backgroundColor: AppTheme.darkSurface,
+                                ^^^^^^^^^^^
+lib/screens/devices_screen.dart:420:39: Error: Member not found: 'primaryBlue'.
+                      color: AppTheme.primaryBlue.withOpacity(0.1),
+                                      ^^^^^^^^^^^
+lib/screens/devices_screen.dart:425:39: Error: Member not found: 'primaryBlue'.
+                      color: AppTheme.primaryBlue,
+                                      ^^^^^^^^^^^
+lib/screens/devices_screen.dart:446:45: Error: Member not found: 'darkTextSecondary'.
+                            color: AppTheme.darkTextSecondary,
+                                            ^^^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:495:33: Error: Member not found: 'error'.
+                color: AppTheme.error,
+                                ^^^^^
+lib/screens/devices_screen.dart:517:37: Error: Member not found: 'darkSurface'.
+          backgroundColor: AppTheme.darkSurface,
+                                    ^^^^^^^^^^^
+lib/screens/devices_screen.dart:552:45: Error: Member not found: 'primaryBlue'.
+                  foregroundColor: AppTheme.primaryBlue,
+                                            ^^^^^^^^^^^
+lib/screens/devices_screen.dart:573:33: Error: Member not found: 'darkTextSecondary'.
+                color: AppTheme.darkTextSecondary,
+                                ^^^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:583:33: Error: Member not found: 'darkTextPrimary'.
+                color: AppTheme.darkTextPrimary,
+                                ^^^^^^^^^^^^^^^
+lib/screens/devices_screen.dart:597:37: Error: Member not found: 'darkSurface'.
+          backgroundColor: AppTheme.darkSurface,
+                                    ^^^^^^^^^^^
+lib/screens/devices_screen.dart:660:43: Error: Member not found: 'primaryBlue'.
+                backgroundColor: AppTheme.primaryBlue,
+                                          ^^^^^^^^^^^
+lib/screens/devices_screen.dart:675:37: Error: Member not found: 'darkSurface'.
+          backgroundColor: AppTheme.darkSurface,
+                                    ^^^^^^^^^^^
+lib/screens/devices_screen.dart:698:47: Error: Member not found: 'primaryBlue'.
+                    backgroundColor: AppTheme.primaryBlue,
+                                              ^^^^^^^^^^^
+lib/screens/devices_screen.dart:703:43: Error: Member not found: 'error'.
+                foregroundColor: AppTheme.error,
+                                          ^^^^^
+lib/widgets/device_list_item.dart:52:45: Error: Member not found: 'primaryBlue'.
+                            color: AppTheme.primaryBlue.withOpacity(0.1),
+                                            ^^^^^^^^^^^
+lib/widgets/device_list_item.dart:57:45: Error: Member not found: 'primaryBlue'.
+                            color: AppTheme.primaryBlue,
+                                            ^^^^^^^^^^^
+lib/widgets/device_list_item.dart:78:51: Error: Member not found: 'darkTextSecondary'.
+                                  color: AppTheme.darkTextSecondary,
+                                                  ^^^^^^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:92:37: Error: Member not found: 'darkTextSecondary'.
+                    color: AppTheme.darkTextSecondary,
+                                    ^^^^^^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:112:41: Error: Member not found: 'darkTextSecondary'.
+                        color: AppTheme.darkTextSecondary,
+                                        ^^^^^^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:141:27: Error: Member not found: 'darkTextSecondary'.
+          color: AppTheme.darkTextSecondary,
+                          ^^^^^^^^^^^^^^^^^
+lib/widgets/device_list_item.dart:148:29: Error: Member not found: 'darkTextSecondary'.
+            color: AppTheme.darkTextSecondary,
+                            ^^^^^^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:20:35: Error: Member not found: 'darkBackground'.
+        backgroundColor: AppTheme.darkBackground,
+                                  ^^^^^^^^^^^^^^
+lib/screens/camera_devices_screen.dart:59:33: Error: Member not found: 'darkBackground'.
+      backgroundColor: AppTheme.darkBackground,
+                                ^^^^^^^^^^^^^^
+lib/screens/cameras_screen.dart:44:33: Error: Member not found: 'darkBackground'.
+      backgroundColor: AppTheme.darkBackground,
+                                ^^^^^^^^^^^^^^
+lib/screens/cameras_screen.dart:226:47: Error: Member not found: 'primaryOrange'.
+                      selectedColor: AppTheme.primaryOrange.withOpacity(0.2),
+                                              ^^^^^^^^^^^^^
+lib/screens/cameras_screen.dart:240:49: Error: Member not found: 'primaryOrange'.
+                        selectedColor: AppTheme.primaryOrange.withOpacity(0.2),
+                                                ^^^^^^^^^^^^^
+lib/widgets/camera_details_bottom_sheet.dart:39:35: Error: Member not found: 'primaryBlue'.
+                  color: AppTheme.primaryBlue.withOpacity(0.1),
+                                  ^^^^^^^^^^^
+lib/widgets/camera_details_bottom_sheet.dart:44:35: Error: Member not found: 'primaryBlue'.
+                  color: AppTheme.primaryBlue,
+                                  ^^^^^^^^^^^
+lib/widgets/camera_details_bottom_sheet.dart:58:41: Error: Member not found: 'darkTextPrimary'.
+                        color: AppTheme.darkTextPrimary,
+                                        ^^^^^^^^^^^^^^^
+lib/widgets/camera_details_bottom_sheet.dart:163:53: Error: Member not found: 'primaryBlue'.
+                          backgroundColor: AppTheme.primaryBlue,
+                                                    ^^^^^^^^^^^
+lib/widgets/camera_details_bottom_sheet.dart:178:53: Error: Member not found: 'primaryOrange'.
+                          foregroundColor: AppTheme.primaryOrange,
+                                                    ^^^^^^^^^^^^^
+lib/widgets/camera_details_bottom_sheet.dart:213:29: Error: Member not found: 'primaryOrange'.
+            color: AppTheme.primaryOrange,
+                            ^^^^^^^^^^^^^
+lib/widgets/camera_details_bottom_sheet.dart:218:27: Error: Member not found: 'darkSurface'.
+          color: AppTheme.darkSurface,
+                          ^^^^^^^^^^^
+lib/widgets/camera_details_bottom_sheet.dart:245:45: Error: Member not found: 'darkTextSecondary'.
+                            color: AppTheme.darkTextSecondary,
+                                            ^^^^^^^^^^^^^^^^^
+lib/widgets/camera_details_bottom_sheet.dart:255:45: Error: Member not found: 'darkTextPrimary'.
+                            color: AppTheme.darkTextPrimary,
+                                            ^^^^^^^^^^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **
+
+Building macOS application...                                           
+Error: Build process failed
+smarteq@Macbook-Air-15-SmarteQ-Bilisim flutter-camera-device-management % 
