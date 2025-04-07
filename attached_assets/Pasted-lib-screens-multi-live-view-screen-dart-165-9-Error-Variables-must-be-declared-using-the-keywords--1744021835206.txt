@@ -1,0 +1,197 @@
+lib/screens/multi_live_view_screen.dart:165:9: Error: Variables must be declared using the keywords 'const', 'final', 'var' or a type name.
+Try adding the name of the type of the variable or the keyword 'var'.
+        _errorStates[slotIndex] = true;
+        ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:165:9: Error: Expected ';' after this.
+        _errorStates[slotIndex] = true;
+        ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:165:21: Error: Expected a class member, but got '['.
+        _errorStates[slotIndex] = true;
+                    ^
+lib/screens/multi_live_view_screen.dart:165:22: Error: Variables must be declared using the keywords 'const', 'final', 'var' or a type name.
+Try adding the name of the type of the variable or the keyword 'var'.
+        _errorStates[slotIndex] = true;
+                     ^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:165:22: Error: Expected ';' after this.
+        _errorStates[slotIndex] = true;
+                     ^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:165:31: Error: Expected a class member, but got ']'.
+        _errorStates[slotIndex] = true;
+                              ^
+lib/screens/multi_live_view_screen.dart:165:33: Error: Operator declarations must be preceded by the keyword 'operator'.
+Try adding the keyword 'operator'.
+        _errorStates[slotIndex] = true;
+                                ^
+lib/screens/multi_live_view_screen.dart:165:33: Error: The string '=' isn't a user-definable operator.
+        _errorStates[slotIndex] = true;
+                                ^
+lib/screens/multi_live_view_screen.dart:165:33: Error: A method declaration needs an explicit list of parameters.
+Try adding a parameter list to the method declaration.
+        _errorStates[slotIndex] = true;
+                                ^
+lib/screens/multi_live_view_screen.dart:165:35: Error: Expected '{' before this.
+        _errorStates[slotIndex] = true;
+                                  ^^^^
+lib/screens/multi_live_view_screen.dart:165:35: Error: Expected a class member, but got 'true'.
+        _errorStates[slotIndex] = true;
+                                  ^^^^
+lib/screens/multi_live_view_screen.dart:165:39: Error: Expected a class member, but got ';'.
+        _errorStates[slotIndex] = true;
+                                      ^
+lib/screens/multi_live_view_screen.dart:167:5: Error: Expected a declaration, but got '}'.
+    }
+    ^
+lib/screens/multi_live_view_screen.dart:168:3: Error: Expected a declaration, but got '}'.
+  }
+  ^
+lib/screens/multi_live_view_screen.dart:432:1: Error: Expected a declaration, but got '}'.
+}
+^
+lib/screens/multi_live_view_screen.dart:165:9: Error: '_errorStates' is already declared in this scope.
+        _errorStates[slotIndex] = true;
+        ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:31:20: Context: Previous declaration of '_errorStates'.
+  final List<bool> _errorStates = List.filled(maxCamerasPerPage, false);
+                   ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:21:7: Error: The non-abstract class '_MultiLiveViewScreenState' is missing implementations for these members:
+ - State.build
+Try to either
+ - provide an implementation,
+ - inherit an implementation from a superclass or mixin,
+ - mark the class as abstract, or
+ - provide a 'noSuchMethod' implementation.
+
+class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
+      ^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart:1471:10: Context: 'State.build' is defined here.
+  Widget build(BuildContext context);
+         ^^^^^
+lib/screens/multi_live_view_screen.dart:56:13: Error: Can't use '_errorStates' because it is declared more than once.
+            _errorStates[i] = true;
+            ^
+lib/screens/multi_live_view_screen.dart:150:5: Error: Can't use '_errorStates' because it is declared more than once.
+    _errorStates[slotIndex] = false; // Reset error state
+    ^
+lib/screens/multi_live_view_screen.dart:160:9: Error: Can't use '_errorStates' because it is declared more than once.
+        _errorStates[slotIndex] = true;
+        ^
+lib/screens/multi_live_view_screen.dart:156:62: Error: The getter 'isEmpty' isn't defined for the class 'Playlist'.
+ - 'Playlist' is from 'package:media_kit/src/models/playlist.dart' ('../../../../.pub-cache/hosted/pub.dev/media_kit-1.2.0/lib/src/models/playlist.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'isEmpty'.
+      if (camera.rtspUri.isNotEmpty && player.state.playlist.isEmpty) {
+                                                             ^^^^^^^
+lib/screens/multi_live_view_screen.dart:173:26: Error: Undefined name '_players'.
+    for (final player in _players) {
+                         ^^^^^^^^
+lib/screens/multi_live_view_screen.dart:177:5: Error: Expected identifier, but got 'super'.
+    super.dispose();
+    ^^^^^
+lib/screens/multi_live_view_screen.dart:189:45: Error: Undefined name '_currentLayout'.
+        layoutProvider.currentLayout!.id != _currentLayout.id) {
+                                            ^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:190:7: Error: Setter not found: '_currentLayout'.
+      _currentLayout = layoutProvider.currentLayout!;
+      ^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:191:22: Error: Undefined name '_currentLayout'.
+      _gridColumns = _currentLayout.columns;
+                     ^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:191:7: Error: Setter not found: '_gridColumns'.
+      _gridColumns = _currentLayout.columns;
+      ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:192:7: Error: Method not found: '_updateGridColumnsBasedOnScreenSize'.
+      _updateGridColumnsBasedOnScreenSize(); // Recalculate grid dimensions
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:196:9: Error: Undefined name '_availableCameras'.
+    if (_availableCameras.isEmpty && cameraProvider.cameras.isNotEmpty) {
+        ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:197:7: Error: Setter not found: '_availableCameras'.
+      _availableCameras = cameraProvider.cameras;
+      ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:198:7: Error: Method not found: '_loadCamerasForCurrentPage'.
+      _loadCamerasForCurrentPage();
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:208:40: Error: Undefined name '_selectedCameras'.
+    final List<Camera> activeCameras = _selectedCameras.whereType<Camera>().toList();
+                                       ^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:213:79: Error: Undefined name '_gridColumns'.
+    final int activeRowsNeeded = math.max(1, math.min(5, (activeCameraCount + _gridColumns - 1) / _gridColumns).ceil()); // Dynamic rows based on camera count to ensure grid fills the screen
+                                                                              ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:213:99: Error: Undefined name '_gridColumns'.
+    final int activeRowsNeeded = math.max(1, math.min(5, (activeCameraCount + _gridColumns - 1) / _gridColumns).ceil()); // Dynamic rows based on camera count to ensure grid fills the screen
+                                                                                          ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:216:43: Error: Undefined name '_gridColumns'.
+    final double cellWidth = size.width / _gridColumns;
+                                          ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:219:51: Error: Undefined name '_totalPages'.
+    final double cellHeight = (availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0)) / activeRowsNeeded - 0.1;
+                                                  ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:232:17: Error: Method not found: '_loadCamerasForCurrentPage'.
+                _loadCamerasForCurrentPage();
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:230:15: Error: Method not found: 'setState'.
+              setState(() {
+              ^^^^^^^^
+lib/screens/multi_live_view_screen.dart:247:33: Error: Undefined name '_gridColumns'.
+                crossAxisCount: _gridColumns,
+                                ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:255:26: Error: Undefined name 'maxCamerasPerPage'.
+              itemCount: maxCamerasPerPage,
+                         ^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:257:40: Error: Undefined name '_selectedCameras'.
+                final camera = index < _selectedCameras.length ? _selectedCameras[index] : null;
+                                       ^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:257:66: Error: Undefined name '_selectedCameras'.
+                final camera = index < _selectedCameras.length ? _selectedCameras[index] : null;
+                                                                 ^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:266:40: Error: Undefined name '_controllers'.
+                        child: index < _controllers.length
+                                       ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:281:47: Error: Undefined name '_controllers'.
+                                  controller: _controllers[index],
+                                              ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:290:27: Error: Undefined name '_loadingStates'.
+                      if (_loadingStates[index])
+                          ^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:298:27: Error: Undefined name '_errorStates'.
+                      if (_errorStates[index])
+                          ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:389:15: Error: Undefined name '_totalPages'.
+          if (_totalPages > 1)
+              ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:399:32: Error: Undefined name '_currentPage'.
+                    onPressed: _currentPage > 0
+                               ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:402:31: Error: Getter not found: '_currentPage'.
+                              _currentPage--;
+                              ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:403:31: Error: Method not found: '_loadCamerasForCurrentPage'.
+                              _loadCamerasForCurrentPage();
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:401:29: Error: Method not found: 'setState'.
+                            setState(() {
+                            ^^^^^^^^
+lib/screens/multi_live_view_screen.dart:410:29: Error: Undefined name '_currentPage'.
+                    'Page ${_currentPage + 1} of $_totalPages',
+                            ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:410:51: Error: Undefined name '_totalPages'.
+                    'Page ${_currentPage + 1} of $_totalPages',
+                                                  ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:416:47: Error: Undefined name '_totalPages'.
+                    onPressed: _currentPage < _totalPages - 1
+                                              ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:416:32: Error: Undefined name '_currentPage'.
+                    onPressed: _currentPage < _totalPages - 1
+                               ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:419:31: Error: Getter not found: '_currentPage'.
+                              _currentPage++;
+                              ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:420:31: Error: Method not found: '_loadCamerasForCurrentPage'.
+                              _loadCamerasForCurrentPage();
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:418:29: Error: Method not found: 'setState'.
+                            setState(() {
+                            ^^^^^^^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **

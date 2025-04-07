@@ -6,8 +6,6 @@ import '../providers/camera_devices_provider.dart';
 import '../providers/multi_view_layout_provider.dart';
 import '../models/camera_device.dart';
 import '../models/camera_layout.dart';
-import '../theme/app_theme.dart';
-import '../widgets/video_controls.dart';
 import '../utils/responsive_helper.dart';
 import 'dart:math' as math;
 
@@ -145,22 +143,19 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
   }
   
   // Stream camera at a specific slot
-  // Stream camera at a specific slot
   void _streamCamera(int slotIndex, Camera camera) {
     _errorStates[slotIndex] = false; // Reset error state
     
     if (slotIndex < _players.length) {
       final player = _players[slotIndex];
       
-      // Skip if already playing the same URL
-      if (camera.rtspUri.isNotEmpty && player.state.playlist.isEmpty) {
-        player.open(Media(camera.rtspUri));
-      } else if (camera.rtspUri.isEmpty) {
-        // Handle no URL available
-        _errorStates[slotIndex] = true;
-      }
-    }
-  }
+      // Check if camera has RTSP URL
+      if (camera.rtspUri.isNotEmpty) {
+        // Only open if not already playing something
+        if (player.state.playlist.medias.isEmpty) {
+          player.open(Media(camera.rtspUri));
+        }
+      } else {
         // Handle no URL available
         _errorStates[slotIndex] = true;
       }
@@ -208,14 +203,12 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     final List<Camera> activeCameras = _selectedCameras.whereType<Camera>().toList();
     final activeCameraCount = activeCameras.length;
     
-    // Instead of calculating rows based on active cameras, we use a fixed number of rows
-    // This ensures the grid always fills the entire screen regardless of camera count
-    final int activeRowsNeeded = math.max(1, math.min(5, (activeCameraCount + _gridColumns - 1) / _gridColumns).ceil()); // Dynamic rows based on camera count to ensure grid fills the screen
+    // Calculate how many rows we need based on camera count
+    final int activeRowsNeeded = math.max(1, math.min(5, (activeCameraCount + _gridColumns - 1) ~/ _gridColumns)); 
     
     // Calculate optimal aspect ratio based on the available height and active rows
     final double cellWidth = size.width / _gridColumns;
     // Adjust the available height by removing the pagination controls height if needed
-    // Calculate cell height directly using the effective available height
     final double cellHeight = (availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0)) / activeRowsNeeded - 0.1;
     final double aspectRatio = cellWidth / cellHeight;
     
