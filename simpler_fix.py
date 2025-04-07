@@ -1,4 +1,7 @@
-import 'package:flutter/material.dart';
+#!/usr/bin/env python3
+
+def fix_multiview_layout():
+    fixed_code = """import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -345,4 +348,13 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
       ),
     );
   }
-}
+}"""
+
+    # Write the fixed code to the file
+    with open('lib/screens/multi_live_view_screen.dart', 'w') as f:
+        f.write(fixed_code)
+    
+    print("Fixed multi live view screen code has been written to file.")
+
+if __name__ == "__main__":
+    fix_multiview_layout()

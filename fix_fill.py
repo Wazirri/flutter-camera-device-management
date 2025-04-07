@@ -1,4 +1,7 @@
-import 'package:flutter/material.dart';
+#!/usr/bin/env python3
+
+def fix_multiview_layout():
+    fixed_code = """import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -187,6 +190,9 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
       _loadCamerasForCurrentPage();
     }
     
+    // Fixed number of rows - 5 rows for standard layout
+    const int fixedRows = 5;
+    
     return Scaffold(
       appBar: AppBar(
         title: Text('Multi Camera View', style: theme.textTheme.headlineSmall),
@@ -203,35 +209,30 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           ),
         ],
       ),
-      body: Container(
-        width: size.width,
-        height: size.height - AppBar().preferredSize.height - MediaQuery.of(context).padding.top,
-        color: Colors.black,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final double availableWidth = constraints.maxWidth;
-            final double availableHeight = constraints.maxHeight;
-            
-            // Calculate how many rows we need based on columns
-            final int rows = (maxCamerasPerPage / _gridColumns).ceil();
-            
-            // Calculate item size to fill the available space exactly
-            final double itemWidth = availableWidth / _gridColumns;
-            final double itemHeight = availableHeight / rows;
-            
-            return GridView.builder(
+      // Use Expanded to ensure the grid takes all available space
+      body: Column(
+        children: [
+          Expanded(
+            child: GridView.builder(
+              // Disable scrolling for fixed layout
               physics: const NeverScrollableScrollPhysics(),
+              // No padding or spacing
+              padding: EdgeInsets.zero,
+              // Use GridDelegate with fixed cross axis count for predictable sizing
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _gridColumns,
-                childAspectRatio: itemWidth / itemHeight,
+                // Use aspect ratio that fills the space
+                childAspectRatio: (size.width / _gridColumns) / (size.height / fixedRows),
+                // No spacing between cells
                 crossAxisSpacing: 0,
                 mainAxisSpacing: 0,
               ),
+              // Build camera cells
               itemCount: maxCamerasPerPage,
-              padding: EdgeInsets.zero,
               itemBuilder: (context, index) {
                 final camera = index < _selectedCameras.length ? _selectedCameras[index] : null;
                 
+                // If we have a camera and it's connected, show the video
                 if (camera != null && camera.connected) {
                   return Stack(
                     fit: StackFit.expand,
@@ -239,17 +240,34 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                       // Video player
                       ClipRect(
                         child: index < _controllers.length
-                            ? Video(
-                                controller: _controllers[index],
-                                fit: BoxFit.cover,
+                            ? MaterialVideoControlsTheme(
+                                normal: MaterialVideoControlsThemeData(
+                                  bottomButtonBar: const [
+                                    MaterialPositionIndicator(),
+                                  ],
+                                  controlsHoverDuration: const Duration(seconds: 2),
+                                ),
+                                fullscreen: MaterialVideoControlsThemeData(
+                                  bottomButtonBar: const [
+                                    MaterialPositionIndicator(),
+                                  ],
+                                  controlsHoverDuration: const Duration(seconds: 2),
+                                ),
+                                child: Video(
+                                  controller: _controllers[index],
+                                  fill: Colors.black,
+                                  controls: AdaptiveVideoControls,
+                                ),
                               )
                             : const Center(child: Text('No player available')),
                       ),
                       
                       // Loading indicator
                       if (_loadingStates[index])
-                        const Center(
-                          child: CircularProgressIndicator(),
+                        Center(
+                          child: CircularProgressIndicator(
+                            color: theme.colorScheme.secondary,
+                          ),
                         ),
                       
                       // Error indicator
@@ -268,7 +286,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                           ),
                         ),
                       
-                      // Camera name overlay
+                      // Camera name overlay (top left)
                       Positioned(
                         top: 4,
                         left: 4,
@@ -288,7 +306,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                         ),
                       ),
                       
-                      // Camera status overlay
+                      // Camera status overlay (bottom right)
                       Positioned(
                         bottom: 4,
                         right: 4,
@@ -311,11 +329,12 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                         ),
                       ),
                       
-                      // Make the entire cell tappable
+                      // Make the entire camera cell tappable
                       Material(
                         color: Colors.transparent,
                         child: InkWell(
                           onTap: () {
+                            // Navigate to single camera view
                             Navigator.pushNamed(
                               context,
                               '/live-view',
@@ -327,7 +346,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                     ],
                   );
                 } else {
-                  // Show empty slot
+                  // Show empty slot with darker background
                   return Container(
                     color: Colors.black38,
                     child: const Center(
@@ -339,10 +358,20 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                   );
                 }
               },
-            );
-          },
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
+"""
+
+    # Write the fixed code to the file
+    with open('lib/screens/multi_live_view_screen.dart', 'w') as f:
+        f.write(fixed_code)
+    
+    print("Fixed multi live view screen code has been written to file.")
+
+if __name__ == "__main__":
+    fix_multiview_layout()
