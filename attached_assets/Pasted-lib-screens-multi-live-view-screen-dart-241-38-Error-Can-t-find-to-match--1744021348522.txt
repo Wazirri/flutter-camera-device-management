@@ -1,0 +1,300 @@
+lib/screens/multi_live_view_screen.dart:241:38: Error: Can't find '>' to match '<'.
+                        child: index < _controllers.length
+                                     ^
+lib/screens/multi_live_view_screen.dart:240:31: Error: Can't find ')' to match '('.
+                      ClipRect(
+                              ^
+lib/screens/multi_live_view_screen.dart:235:57: Error: Can't find '}' to match '{'.
+                if (camera != null && camera.connected) {
+                                                        ^
+lib/screens/multi_live_view_screen.dart:231:45: Error: Can't find '}' to match '{'.
+              itemBuilder: (context, index) {
+                                            ^
+lib/screens/multi_live_view_screen.dart:197:20: Error: Can't find ')' to match '('.
+    return Scaffold(
+                   ^
+lib/screens/multi_live_view_screen.dart:359:19: Error: Expected a class member, but got 'else'.
+                } else {
+                  ^^^^
+lib/screens/multi_live_view_screen.dart:359:24: Error: Expected an identifier, but got '{'.
+Try inserting an identifier before '{'.
+                } else {
+                       ^
+lib/screens/multi_live_view_screen.dart:359:24: Error: A method declaration needs an explicit list of parameters.
+Try adding a parameter list to the method declaration.
+                } else {
+                       ^
+lib/screens/multi_live_view_screen.dart:371:16: Error: Expected a declaration, but got ','.
+              },
+               ^
+lib/screens/multi_live_view_screen.dart:372:13: Error: Expected a declaration, but got ')'.
+            ),
+            ^
+lib/screens/multi_live_view_screen.dart:372:14: Error: Expected a declaration, but got ','.
+            ),
+             ^
+lib/screens/multi_live_view_screen.dart:373:11: Error: Expected a declaration, but got ')'.
+          ),
+          ^
+lib/screens/multi_live_view_screen.dart:373:12: Error: Expected a declaration, but got ','.
+          ),
+           ^
+lib/screens/multi_live_view_screen.dart:376:11: Error: 'if' can't be used as an identifier because it's a keyword.
+Try renaming this to be an identifier that isn't a keyword.
+          if (_totalPages > 1)
+          ^^
+lib/screens/multi_live_view_screen.dart:376:27: Error: Expected ')' before this.
+          if (_totalPages > 1)
+                          ^
+lib/screens/multi_live_view_screen.dart:377:13: Error: Expected '{' before this.
+            Container(
+            ^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:378:21: Error: Non-optional parameters can't have a default value.
+Try removing the default value or making the parameter optional.
+              height: paginationControlsHeight,
+                    ^
+lib/screens/multi_live_view_screen.dart:379:20: Error: Non-optional parameters can't have a default value.
+Try removing the default value or making the parameter optional.
+              color: theme.colorScheme.surface.withOpacity(0.8),
+                   ^
+lib/screens/multi_live_view_screen.dart:380:22: Error: Non-optional parameters can't have a default value.
+Try removing the default value or making the parameter optional.
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                     ^
+lib/screens/multi_live_view_screen.dart:381:20: Error: Non-optional parameters can't have a default value.
+Try removing the default value or making the parameter optional.
+              child: Row(
+                   ^
+lib/screens/multi_live_view_screen.dart:414:14: Error: Expected '{' before this.
+            ),
+             ^
+lib/screens/multi_live_view_screen.dart:414:14: Error: Expected a declaration, but got ','.
+            ),
+             ^
+lib/screens/multi_live_view_screen.dart:415:9: Error: Expected a declaration, but got ']'.
+        ],
+        ^
+lib/screens/multi_live_view_screen.dart:415:10: Error: Expected a declaration, but got ','.
+        ],
+         ^
+lib/screens/multi_live_view_screen.dart:416:7: Error: Expected a declaration, but got ')'.
+      ),
+      ^
+lib/screens/multi_live_view_screen.dart:416:8: Error: Expected a declaration, but got ','.
+      ),
+       ^
+lib/screens/multi_live_view_screen.dart:417:5: Error: Expected a declaration, but got ')'.
+    );
+    ^
+lib/screens/multi_live_view_screen.dart:417:6: Error: Unexpected token ';'.
+    );
+     ^
+lib/screens/multi_live_view_screen.dart:418:3: Error: Expected a declaration, but got '}'.
+  }
+  ^
+lib/screens/multi_live_view_screen.dart:445:1: Error: Expected a declaration, but got '}'.
+}
+^
+lib/screens/multi_live_view_screen.dart:261:35: Error: Expected an identifier, but got ']'.
+Try inserting an identifier before ']'.
+                                  ],
+                                  ^
+lib/screens/multi_live_view_screen.dart:261:35: Error: Expected ':' before this.
+                                  ],
+                                  ^
+lib/screens/multi_live_view_screen.dart:263:35: Error: No named parameter with the name 'controlsHoverDuration'.
+                                  controlsHoverDuration: Duration(seconds: 2),
+                                  ^^^^^^^^^^^^^^^^^^^^^
+../../../../Flutter/flutter/packages/flutter/lib/src/widgets/basic.dart:3971:9: Context: Found this candidate, but the arguments don't match.
+  const Stack({
+        ^^^^^
+lib/screens/multi_live_view_screen.dart:266:33: Error: Expected ';' after this.
+                                ),
+                                ^
+lib/screens/multi_live_view_screen.dart:266:34: Error: Expected an identifier, but got ','.
+Try inserting an identifier before ','.
+                                ),
+                                 ^
+lib/screens/multi_live_view_screen.dart:266:34: Error: Unexpected token ','.
+                                ),
+                                 ^
+lib/screens/multi_live_view_screen.dart:271:33: Error: Expected ';' after this.
+                                ),
+                                ^
+lib/screens/multi_live_view_screen.dart:271:34: Error: Expected an identifier, but got ','.
+Try inserting an identifier before ','.
+                                ),
+                                 ^
+lib/screens/multi_live_view_screen.dart:271:34: Error: Unexpected token ','.
+                                ),
+                                 ^
+lib/screens/multi_live_view_screen.dart:273:29: Error: Expected ')' before this.
+                            : Center(child: Text('No player available')),
+                            ^
+lib/screens/multi_live_view_screen.dart:304:41: Error: Too few positional arguments: 4 required, 0 given.
+                        child: Container(
+                                        ^
+lib/screens/multi_live_view_screen.dart:377:13: Context: Found this candidate, but the arguments don't match.
+            Container(
+            ^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:324:41: Error: Too few positional arguments: 4 required, 0 given.
+                        child: Container(
+                                        ^
+lib/screens/multi_live_view_screen.dart:377:13: Context: Found this candidate, but the arguments don't match.
+            Container(
+            ^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:277:42: Error: The getter 'index' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'index'.
+                      if (_loadingStates[index])
+                                         ^^^^^
+lib/screens/multi_live_view_screen.dart:285:40: Error: The getter 'index' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'index'.
+                      if (_errorStates[index])
+                                       ^^^^^
+lib/screens/multi_live_view_screen.dart:352:42: Error: The getter 'camera' isn't defined for the class '_MultiLiveViewScreenState'.
+ - '_MultiLiveViewScreenState' is from 'package:camera_device_manager/screens/multi_live_view_screen.dart' ('lib/screens/multi_live_view_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'camera'.
+                              arguments: camera,
+                                         ^^^^^^
+lib/screens/multi_live_view_screen.dart:378:23: Error: Undefined name 'paginationControlsHeight'.
+              height: paginationControlsHeight,
+                      ^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:379:22: Error: Undefined name 'theme'.
+              color: theme.colorScheme.surface.withOpacity(0.8),
+                     ^^^^^
+lib/screens/multi_live_view_screen.dart:379:28: Error: Not a constant expression.
+              color: theme.colorScheme.surface.withOpacity(0.8),
+                           ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:379:48: Error: Method invocation is not a constant expression.
+              color: theme.colorScheme.surface.withOpacity(0.8),
+                                               ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:380:35: Error: Constant expression expected.
+Try inserting 'const'.
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                                  ^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:385:27: Error: Constant expression expected.
+Try inserting 'const'.
+                    icon: Icon(Icons.arrow_back),
+                          ^^^^
+lib/screens/multi_live_view_screen.dart:386:32: Error: Undefined name '_currentPage'.
+                    onPressed: _currentPage > 0
+                               ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:389:31: Error: Getter not found: '_currentPage'.
+                              _currentPage--;
+                              ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:390:31: Error: Method not found: '_loadCamerasForCurrentPage'.
+                              _loadCamerasForCurrentPage();
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:388:38: Error: Not a constant expression.
+                            setState(() {
+                                     ^^
+lib/screens/multi_live_view_screen.dart:388:29: Error: Method not found: 'setState'.
+                            setState(() {
+                            ^^^^^^^^
+lib/screens/multi_live_view_screen.dart:387:27: Error: Not a constant expression.
+                        ? () {
+                          ^^
+lib/screens/multi_live_view_screen.dart:384:19: Error: Constant expression expected.
+Try inserting 'const'.
+                  IconButton(
+                  ^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:395:19: Error: Constant expression expected.
+Try inserting 'const'.
+                  SizedBox(width: 16),
+                  ^^^^^^^^
+lib/screens/multi_live_view_screen.dart:397:29: Error: Undefined name '_currentPage'.
+                    'Page ${_currentPage + 1} of $_totalPages',
+                            ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:397:51: Error: Undefined name '_totalPages'.
+                    'Page ${_currentPage + 1} of $_totalPages',
+                                                  ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:398:28: Error: Undefined name 'theme'.
+                    style: theme.textTheme.bodyLarge,
+                           ^^^^^
+lib/screens/multi_live_view_screen.dart:398:34: Error: Not a constant expression.
+                    style: theme.textTheme.bodyLarge,
+                                 ^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:396:19: Error: Constant expression expected.
+Try inserting 'const'.
+                  Text(
+                  ^^^^
+lib/screens/multi_live_view_screen.dart:400:19: Error: Constant expression expected.
+Try inserting 'const'.
+                  SizedBox(width: 16),
+                  ^^^^^^^^
+lib/screens/multi_live_view_screen.dart:402:27: Error: Constant expression expected.
+Try inserting 'const'.
+                    icon: Icon(Icons.arrow_forward),
+                          ^^^^
+lib/screens/multi_live_view_screen.dart:403:47: Error: Undefined name '_totalPages'.
+                    onPressed: _currentPage < _totalPages - 1
+                                              ^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:403:32: Error: Undefined name '_currentPage'.
+                    onPressed: _currentPage < _totalPages - 1
+                               ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:406:31: Error: Getter not found: '_currentPage'.
+                              _currentPage++;
+                              ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:407:31: Error: Method not found: '_loadCamerasForCurrentPage'.
+                              _loadCamerasForCurrentPage();
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:405:38: Error: Not a constant expression.
+                            setState(() {
+                                     ^^
+lib/screens/multi_live_view_screen.dart:405:29: Error: Method not found: 'setState'.
+                            setState(() {
+                            ^^^^^^^^
+lib/screens/multi_live_view_screen.dart:404:27: Error: Not a constant expression.
+                        ? () {
+                          ^^
+lib/screens/multi_live_view_screen.dart:401:19: Error: Constant expression expected.
+Try inserting 'const'.
+                  IconButton(
+                  ^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:383:27: Error: Constant expression expected.
+Try inserting 'const'.
+                children: [
+                          ^
+lib/screens/multi_live_view_screen.dart:381:22: Error: Constant expression expected.
+Try inserting 'const'.
+              child: Row(
+                     ^^^
+lib/screens/multi_live_view_screen.dart:422:39: Error: Undefined name 'context'.
+    final screenWidth = MediaQuery.of(context).size.width;
+                                      ^^^^^^^
+lib/screens/multi_live_view_screen.dart:425:9: Error: Undefined name '_currentLayout'.
+    if (_currentLayout.columns > 0) {
+        ^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:426:22: Error: Undefined name '_currentLayout'.
+      _gridColumns = _currentLayout.columns;
+                     ^^^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:426:7: Error: Setter not found: '_gridColumns'.
+      _gridColumns = _currentLayout.columns;
+      ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:430:9: Error: Setter not found: '_gridColumns'.
+        _gridColumns = 5;
+        ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:432:9: Error: Setter not found: '_gridColumns'.
+        _gridColumns = 4;
+        ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:434:9: Error: Setter not found: '_gridColumns'.
+        _gridColumns = 3;
+        ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:436:9: Error: Setter not found: '_gridColumns'.
+        _gridColumns = 2;
+        ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:438:9: Error: Setter not found: '_gridColumns'.
+        _gridColumns = 1;
+        ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:443:37: Error: Undefined name '_gridColumns'.
+    print('Setting grid columns to $_gridColumns (screen width: $screenWidth)');
+                                    ^^^^^^^^^^^^
+lib/screens/multi_live_view_screen.dart:383:27: Error: Non-constant list literal is not a constant expression.
+                children: [
+                          ^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+** BUILD FAILED **

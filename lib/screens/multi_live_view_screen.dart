@@ -97,6 +97,23 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     // Adjust grid columns based on screen size
     _updateGridColumnsBasedOnScreenSize();
   }
+  
+  // Update grid columns based on screen size
+  void _updateGridColumnsBasedOnScreenSize() {
+    final size = MediaQuery.of(context).size;
+    
+    if (size.width < 600) {
+      // Mobile: 2 columns
+      _gridColumns = 2;
+    } else if (size.width < 900) {
+      // Small tablet: 3 columns
+      _gridColumns = 3;
+    } else {
+      // Use layout provider columns or default to 4
+      _gridColumns = _currentLayout.columns;
+    }
+  }
+  
   // Load cameras for the current page
   void _loadCamerasForCurrentPage() {
     // Clear all slots first
@@ -194,13 +211,14 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     // Calculate cell height directly using the effective available height
     final double cellHeight = (availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0)) / activeRowsNeeded;
     final double aspectRatio = cellWidth / cellHeight;
+    
     return Scaffold(
       appBar: AppBar(
         title: Text('Multi Camera View', style: theme.textTheme.headlineSmall),
         backgroundColor: theme.appBarTheme.backgroundColor,
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh),
             onPressed: () {
               setState(() {
                 // Reload cameras
@@ -216,7 +234,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           Expanded(
             child: GridView.builder(
               // Disable scrolling as we're handling paging ourselves
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               // Grid properties
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _gridColumns,
@@ -241,36 +259,24 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                         child: index < _controllers.length
                             ? MaterialVideoControlsTheme(
                                 normal: MaterialVideoControlsThemeData(
-                                  bottomButtonBar: [
-                                    const MaterialPositionIndicator(),
+                                  bottomButtonBar: const [
+                                    MaterialPositionIndicator(),
                                   ],
-                                  controlsHoverDuration: Duration(seconds: 2),
+                                  controlsHoverDuration: const Duration(seconds: 2),
                                 ),
                                 fullscreen: MaterialVideoControlsThemeData(
-                                  bottomButtonBar: [
-                                    const MaterialPositionIndicator(),
+                                  bottomButtonBar: const [
+                                    MaterialPositionIndicator(),
                                   ],
-                                  controlsHoverDuration: Duration(seconds: 2),
+                                  controlsHoverDuration: const Duration(seconds: 2),
                                 ),
                                 child: Video(
                                   controller: _controllers[index],
                                   fill: Colors.black,
-                                  controls: NoVideoControls,
+                                  controls: AdaptiveVideoControls,
                                 ),
                               )
-                                  ],
-                                  // Ensure controls overlay is visible
-                                  controlsHoverDuration: Duration(seconds: 2),
-                                  // Use accent color for controls
-                                  primaryColor: theme.colorScheme.secondary,
-                                ),
-                                child: Video(
-                                  controller: _controllers[index],
-                                  fill: Colors.black,
-                                  controls: NoVideoControls,
-                                ),
-                              )
-                            : Center(child: Text('No player available')),
+                            : const Center(child: Text('No player available')),
                       ),
                       
                       // Loading indicator
@@ -287,9 +293,9 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.error_outline, color: Colors.red, size: 32),
-                              SizedBox(height: 8),
-                              Text(
+                              const Icon(Icons.error_outline, color: Colors.red, size: 32),
+                              const SizedBox(height: 8),
+                              const Text(
                                 'Stream Error',
                                 style: TextStyle(color: Colors.red),
                               ),
@@ -302,14 +308,14 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                         top: 4,
                         left: 4,
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: Colors.black.withOpacity(0.6),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
                             camera.name,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
                             ),
@@ -322,7 +328,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                         bottom: 4,
                         right: 4,
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: camera.recording
                                 ? Colors.red.withOpacity(0.7)
@@ -331,7 +337,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                           ),
                           child: Text(
                             camera.recording ? 'REC' : 'LIVE',
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
@@ -360,7 +366,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                   // Show empty slot with darker background
                   return Container(
                     color: Colors.black38,
-                    child: Center(
+                    child: const Center(
                       child: Text(
                         'No Camera',
                         style: TextStyle(color: Colors.white70),
@@ -377,12 +383,12 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
             Container(
               height: paginationControlsHeight,
               color: theme.colorScheme.surface.withOpacity(0.8),
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back),
+                    icon: const Icon(Icons.arrow_back),
                     onPressed: _currentPage > 0
                         ? () {
                             setState(() {
@@ -392,14 +398,14 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                           }
                         : null,
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Text(
                     'Page ${_currentPage + 1} of $_totalPages',
                     style: theme.textTheme.bodyLarge,
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   IconButton(
-                    icon: Icon(Icons.arrow_forward),
+                    icon: const Icon(Icons.arrow_forward),
                     onPressed: _currentPage < _totalPages - 1
                         ? () {
                             setState(() {
@@ -415,31 +421,5 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
         ],
       ),
     );
-  }
-  
-  // Method to update grid columns based on screen size
-  void _updateGridColumnsBasedOnScreenSize() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    
-    // Use layout columns if available, otherwise calculate based on screen width
-    if (_currentLayout.columns > 0) {
-      _gridColumns = _currentLayout.columns;
-    } else {
-      // First, determine max possible columns based on screen width
-      if (screenWidth > 1400) {
-        _gridColumns = 5;
-      } else if (screenWidth > 1100) {
-        _gridColumns = 4;
-      } else if (screenWidth > 800) {
-        _gridColumns = 3;
-      } else if (screenWidth > 500) {
-        _gridColumns = 2;
-      } else {
-        _gridColumns = 1;
-      }
-    }
-    
-    // For debugging
-    print('Setting grid columns to $_gridColumns (screen width: $screenWidth)');
   }
 }
