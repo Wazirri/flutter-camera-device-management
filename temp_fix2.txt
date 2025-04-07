@@ -1,0 +1,7 @@
+    // Filter out null cameras and create a list of only active cameras
+    final activeCameras = _selectedCameras.where((cam) => cam != null).toList();
+    final activeCameraCount = activeCameras.length;
+    
+    // Calculate how many actual rows we need for the active cameras
+    // This ensures we don't reserve space for empty slots
+    final activeRowsNeeded = (activeCameraCount / _gridColumns).ceil();

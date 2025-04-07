@@ -1,0 +1,7 @@
+              itemCount: activeCameraCount,
+              itemBuilder: (context, index) {
+                // Find the original index of this camera in the _selectedCameras list
+                final originalIndex = _selectedCameras.indexOf(activeCameras[index]);
+                final camera = activeCameras[index];
+                final isLoading = _loadingStates[originalIndex];
+                final hasError = _errorStates[originalIndex];

@@ -383,16 +383,20 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     final paginationControlsHeight = _totalPages > 1 ? 60.0 : 0.0;
     final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0;
     
-    // Calculate available height for the grid with minimal padding
-    
+    // Calculate available height for the grid
     final availableHeight = size.height - appBarHeight - paginationControlsHeight - bottomNavHeight;
     
-    // Calculate number of rows needed based on the current grid columns
-    final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
+    // Filter out null cameras and create a list of only active cameras
+    final activeCameras = _selectedCameras.where((cam) => cam != null).toList();
+    final activeCameraCount = activeCameras.length;
     
-    // Calculate optimal aspect ratio based on the available height and number of rows needed
+    // Calculate how many actual rows we need for the active cameras
+    // This ensures we don't reserve space for empty slots
+    final activeRowsNeeded = (activeCameraCount / _gridColumns).ceil();
+    
+    // Calculate optimal aspect ratio based on the available height and active rows
     final double cellWidth = size.width / _gridColumns;
-    final double cellHeight = availableHeight / rowsNeeded;
+    final double cellHeight = availableHeight / activeRowsNeeded;
     final double aspectRatio = cellWidth / cellHeight;
     return Scaffold(
       appBar: AppBar(
@@ -445,11 +449,15 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
                 crossAxisSpacing: 0,
                 mainAxisSpacing: 0,
               ),
-              itemCount: maxCamerasPerPage,
+              itemCount: activeCameraCount,
               itemBuilder: (context, index) {
-                final camera = _selectedCameras[index];
-                final isLoading = _loadingStates[index];
-                final hasError = _errorStates[index];
+                // Find the original index of this camera in the _selectedCameras list
+                final originalIndex = _selectedCameras.indexOf(activeCameras[index]);
+                final camera = activeCameras[index];
+                final isLoading = _loadingStates[originalIndex];
+                final hasError = _errorStates[originalIndex];
+                final isLoading = _loadingStates[originalIndex];
+                final hasError = _errorStates[originalIndex];
                 
                 return Card(
                   clipBehavior: Clip.antiAlias,
