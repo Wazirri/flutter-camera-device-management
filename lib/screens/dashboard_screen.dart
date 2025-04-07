@@ -615,43 +615,117 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildSystemInfoItem(String label, String value, IconData icon) {
+    // Extract numeric value from percentage strings for progress indicator
+    double percentValue = 0.0;
+    if (value.contains('%')) {
+      try {
+        percentValue = double.parse(value.replaceAll('%', '').trim()) / 100.0;
+        if (percentValue > 1.0) percentValue = 1.0;
+        if (percentValue < 0.0) percentValue = 0.0;
+      } catch (e) {
+        percentValue = 0.0;
+      }
+    }
+    
+    bool hasProgressBar = label.toLowerCase().contains('usage') || 
+                          label.toLowerCase().contains('temp') ||
+                          label.toLowerCase().contains('cpu') ||
+                          label.toLowerCase().contains('gpu');
+    
+    // Color logic for indicators
+    Color indicatorColor = AppTheme.primaryBlue;
+    if (percentValue > 0.8) {
+      indicatorColor = AppTheme.error;
+    } else if (percentValue > 0.6) {
+      indicatorColor = AppTheme.warning;
+    }
+    
+    // If it's a temperature value (contains °C)
+    if (value.contains('°C')) {
+      try {
+        double tempValue = double.parse(value.replaceAll('°C', '').trim());
+        percentValue = tempValue / 100.0; // Assuming max temp is 100°C
+        if (percentValue > 1.0) percentValue = 1.0;
+        
+        if (tempValue > 75) {
+          indicatorColor = AppTheme.error;
+        } else if (tempValue > 60) {
+          indicatorColor = AppTheme.warning;
+        }
+      } catch (e) {
+        percentValue = 0.0;
+      }
+    }
+    
     return Container(
-      width: 180,
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryBlue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              color: AppTheme.primaryBlue,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
+      width: 220,
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Card(
+        color: AppTheme.darkSurface.withOpacity(0.7),
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppTheme.darkTextSecondary,
-                ),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryBlue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      icon,
+                      color: AppTheme.primaryBlue,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppTheme.darkTextSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          value,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              if (hasProgressBar) ...[
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: percentValue,
+                    backgroundColor: AppTheme.darkBackground,
+                    valueColor: AlwaysStoppedAnimation<Color>(indicatorColor),
+                    minHeight: 6,
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
-        ],
+        ),
       ),
     );
   }
