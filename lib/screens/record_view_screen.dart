@@ -413,10 +413,15 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
           // Video controls
           if (_isPlaying && !_isBuffering && !_hasError)
             Positioned.fill(
-              child: VideoControls(isPlaying: _player.state.playing, isMuted: _isMuted, isFullscreen: _isFullscreen, onPlayPause: () { _player.state.playing ? _player.pause() : _player.play(); }, onMuteToggle: _toggleMute, onFullscreenToggle: _toggleFullscreen,
-                player: _player,
+              child: VideoControls(
+                isPlaying: _player.state.playing,
+                isMuted: _isMuted,
+                isFullscreen: _isFullscreen,
+                onPlayPause: () { _player.state.playing ? _player.pause() : _player.play(); },
+                onMuteToggle: _toggleMute,
                 onFullscreenToggle: _toggleFullScreen,
               ),
+
             ),
           
           // Live indicator

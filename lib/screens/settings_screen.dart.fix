@@ -1,0 +1,3 @@
+# Fix for settings_screen.dart to use color names from AppTheme
+sed -i 's/AppTheme.online/AppTheme.successColor/g' lib/screens/settings_screen.dart
+sed -i 's/AppTheme.offline/AppTheme.errorColor/g' lib/screens/settings_screen.dart

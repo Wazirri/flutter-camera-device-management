@@ -333,7 +333,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         const ListTile(
           title: Text('Current Version'),
           subtitle: Text('v1.2.0'),
-          trailing: Text('Up to date', style: TextStyle(color: AppTheme.online)),
+          trailing: Text('Up to date', style: TextStyle(color: AppTheme.successColor)),
         ),
         const Divider(),
         Consumer<WebSocketProvider>(
@@ -347,7 +347,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               leading: Icon(
                 Icons.wifi_tethering,
-                color: isConnected ? AppTheme.online : AppTheme.offline,
+                color: isConnected ? AppTheme.successColor : AppTheme.errorColor,
               ),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {

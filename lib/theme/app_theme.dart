@@ -10,6 +10,11 @@ class AppTheme {
   static const Color warningColor = Color(0xFFFF9800); // Orange
   static const Color errorColor = Color(0xFFE53935);   // Red
   
+  // Device status colors
+  static const Color online = Color(0xFF4CAF50);  // Green - online
+  static const Color offline = Color(0xFFE53935); // Red - offline
+  static const Color warning = Color(0xFFFF9800); // Orange - warning
+  
   // Dark theme colors
   static const Color darkBackground = Color(0xFF121212);
   static const Color darkSurface = Color(0xFF1E1E1E);
@@ -59,11 +64,11 @@ class AppTheme {
         color: darkTextPrimary,
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: const CardTheme(
       color: darkSurface,
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
@@ -121,10 +126,10 @@ class AppTheme {
       type: BottomNavigationBarType.fixed,
       elevation: 8,
     ),
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: const TabBarTheme(
       labelColor: accentColor,
-      unselectedLabelColor: darkTextSecondary,
-      indicator: const BoxDecoration(
+      unselectedLabelColor: Colors.white70,
+      indicator: BoxDecoration(
         border: Border(
           bottom: BorderSide(
             color: accentColor,
@@ -133,10 +138,10 @@ class AppTheme {
         ),
       ),
     ),
-    dialogTheme: DialogTheme(
+    dialogTheme: const DialogTheme(
       backgroundColor: darkSurface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
     ),
     snackBarTheme: SnackBarThemeData(

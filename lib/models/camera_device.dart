@@ -116,6 +116,9 @@ class Camera {
   bool connected = false;     // Is camera currently connected
   bool recording = false;     // Is camera currently recording
   String lastSeenAt = '';     // When camera was last seen
+  
+  // Getter for the RTSP URI (using subUri by default as requested by the user)
+  String get rtspUri => subUri;
 
   // Constructor for creating a Camera
   Camera({

@@ -61,13 +61,16 @@ class ResponsiveHelper {
   }
   
   // Get responsive font size based on screen size
-  static double getResponsiveFontSize(BuildContext context, double baseFontSize) {
+  static double getResponsiveFontSize(
+    BuildContext context, 
+    {double mobile = 14, double tablet = 16, double desktop = 18}
+  ) {
     if (isDesktop(context)) {
-      return baseFontSize * 1.2;
+      return desktop;
     } else if (isTablet(context)) {
-      return baseFontSize * 1.1;
+      return tablet;
     } else {
-      return baseFontSize;
+      return mobile;
     }
   }
   

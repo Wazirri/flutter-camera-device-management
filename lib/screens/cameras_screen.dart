@@ -431,7 +431,7 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => LiveViewScreen(camera: camera),
+        builder: (context) => LiveViewScreen(initialCamera: camera),
       ),
     );
   }
