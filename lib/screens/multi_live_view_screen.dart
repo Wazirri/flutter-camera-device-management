@@ -383,17 +383,17 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     final paginationControlsHeight = _totalPages > 1 ? 60.0 : 0.0;
     final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0;
     
-    // Calculate available height for the grid with proper padding
-    final availableHeight = size.height - appBarHeight - paginationControlsHeight - bottomNavHeight - 16;
+    // Calculate available height for the grid with minimal padding
+    
+    final availableHeight = size.height - appBarHeight - paginationControlsHeight - bottomNavHeight;
     
     // Calculate number of rows needed based on the current grid columns
     final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
     
     // Calculate optimal aspect ratio based on the available height and number of rows needed
-    final double cellWidth = (size.width - (16 + (_gridColumns - 1) * 8)) / _gridColumns;
-    final double cellHeight = (availableHeight - ((rowsNeeded - 1) * 8)) / rowsNeeded;
+    final double cellWidth = size.width / _gridColumns;
+    final double cellHeight = availableHeight / rowsNeeded;
     final double aspectRatio = cellWidth / cellHeight;
-    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Multi Camera View'),
@@ -430,20 +430,20 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: Column(
+      body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisAlignment: MainAxisAlignment.start, 
         children: [
           // Fixed-height grid view of cameras (non-scrollable)
           // Ensuring all players fit within the screen with proper aspect ratio
           Expanded(
             child: GridView.builder(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(), // Disable scrolling to fit all slots
               shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _gridColumns,
                 childAspectRatio: aspectRatio, // Custom aspect ratio to fit all slots perfectly
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
+                crossAxisSpacing: 0,
+                mainAxisSpacing: 0,
               ),
               itemCount: maxCamerasPerPage,
               itemBuilder: (context, index) {
