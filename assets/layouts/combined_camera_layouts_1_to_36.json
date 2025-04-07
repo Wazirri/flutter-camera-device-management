@@ -1,0 +1,564 @@
+[
+  {
+    "id": 1,
+    "name": "1 Camera (Full Screen)",
+    "cameraCount": 1,
+    "positions": [
+      {
+        "id": 0,
+        "left": 0.0,
+        "top": 0.0,
+        "width": 1.0,
+        "height": 1.0,
+        "cameraId": null
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "2 Cameras (Horizontal)",
+    "cameraCount": 2,
+    "positions": [
+      {
+        "id": 0,
+        "left": 0.0,
+        "top": 0.0,
+        "width": 0.5,
+        "height": 1.0,
+        "cameraId": null
+      },
+      {
+        "id": 1,
+        "left": 0.5,
+        "top": 0.0,
+        "width": 0.5,
+        "height": 1.0,
+        "cameraId": null
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "2 Cameras (Vertical)",
+    "cameraCount": 2,
+    "positions": [
+      {
+        "id": 0,
+        "left": 0.0,
+        "top": 0.0,
+        "width": 1.0,
+        "height": 0.5,
+        "cameraId": null
+      },
+      {
+        "id": 1,
+        "left": 0.0,
+        "top": 0.5,
+        "width": 1.0,
+        "height": 0.5,
+        "cameraId": null
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "4 Cameras (2x2 Grid)",
+    "cameraCount": 4,
+    "positions": [
+      {
+        "id": 0,
+        "left": 0.0,
+        "top": 0.0,
+        "width": 0.5,
+        "height": 0.5,
+        "cameraId": null
+      },
+      {
+        "id": 1,
+        "left": 0.5,
+        "top": 0.0,
+        "width": 0.5,
+        "height": 0.5,
+        "cameraId": null
+      },
+      {
+        "id": 2,
+        "left": 0.0,
+        "top": 0.5,
+        "width": 0.5,
+        "height": 0.5,
+        "cameraId": null
+      },
+      {
+        "id": 3,
+        "left": 0.5,
+        "top": 0.5,
+        "width": 0.5,
+        "height": 0.5,
+        "cameraId": null
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "4 Cameras (1 Large + 3 Small)",
+    "cameraCount": 4,
+    "positions": [
+      {
+        "id": 0,
+        "left": 0.0,
+        "top": 0.0,
+        "width": 0.7,
+        "height": 0.7,
+        "cameraId": null
+      },
+      {
+        "id": 1,
+        "left": 0.7,
+        "top": 0.0,
+        "width": 0.3,
+        "height": 0.33,
+        "cameraId": null
+      },
+      {
+        "id": 2,
+        "left": 0.7,
+        "top": 0.33,
+        "width": 0.3,
+        "height": 0.33,
+        "cameraId": null
+      },
+      {
+        "id": 3,
+        "left": 0.7,
+        "top": 0.66,
+        "width": 0.3,
+        "height": 0.34,
+        "cameraId": null
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "6 Cameras (2x3 Grid)",
+    "cameraCount": 6,
+    "positions": [
+      {
+        "id": 0,
+        "left": 0.0,
+        "top": 0.0,
+        "width": 0.33,
+        "height": 0.5,
+        "cameraId": null
+      },
+      {
+        "id": 1,
+        "left": 0.33,
+        "top": 0.0,
+        "width": 0.34,
+        "height": 0.5,
+        "cameraId": null
+      },
+      {
+        "id": 2,
+        "left": 0.67,
+        "top": 0.0,
+        "width": 0.33,
+        "height": 0.5,
+        "cameraId": null
+      },
+      {
+        "id": 3,
+        "left": 0.0,
+        "top": 0.5,
+        "width": 0.33,
+        "height": 0.5,
+        "cameraId": null
+      },
+      {
+        "id": 4,
+        "left": 0.33,
+        "top": 0.5,
+        "width": 0.34,
+        "height": 0.5,
+        "cameraId": null
+      },
+      {
+        "id": 5,
+        "left": 0.67,
+        "top": 0.5,
+        "width": 0.33,
+        "height": 0.5,
+        "cameraId": null
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "9 Cameras (3x3 Grid)",
+    "cameraCount": 9,
+    "positions": [
+      {
+        "id": 0,
+        "left": 0.0,
+        "top": 0.0,
+        "width": 0.33,
+        "height": 0.33,
+        "cameraId": null
+      },
+      {
+        "id": 1,
+        "left": 0.33,
+        "top": 0.0,
+        "width": 0.34,
+        "height": 0.33,
+        "cameraId": null
+      },
+      {
+        "id": 2,
+        "left": 0.67,
+        "top": 0.0,
+        "width": 0.33,
+        "height": 0.33,
+        "cameraId": null
+      },
+      {
+        "id": 3,
+        "left": 0.0,
+        "top": 0.33,
+        "width": 0.33,
+        "height": 0.34,
+        "cameraId": null
+      },
+      {
+        "id": 4,
+        "left": 0.33,
+        "top": 0.33,
+        "width": 0.34,
+        "height": 0.34,
+        "cameraId": null
+      },
+      {
+        "id": 5,
+        "left": 0.67,
+        "top": 0.33,
+        "width": 0.33,
+        "height": 0.34,
+        "cameraId": null
+      },
+      {
+        "id": 6,
+        "left": 0.0,
+        "top": 0.67,
+        "width": 0.33,
+        "height": 0.33,
+        "cameraId": null
+      },
+      {
+        "id": 7,
+        "left": 0.33,
+        "top": 0.67,
+        "width": 0.34,
+        "height": 0.33,
+        "cameraId": null
+      },
+      {
+        "id": 8,
+        "left": 0.67,
+        "top": 0.67,
+        "width": 0.33,
+        "height": 0.33,
+        "cameraId": null
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "name": "9 Cameras (1 Large + 8 Small)",
+    "cameraCount": 9,
+    "positions": [
+      {
+        "id": 0,
+        "left": 0.0,
+        "top": 0.0,
+        "width": 0.8,
+        "height": 0.8,
+        "cameraId": null
+      },
+      {
+        "id": 1,
+        "left": 0.8,
+        "top": 0.0,
+        "width": 0.2,
+        "height": 0.2,
+        "cameraId": null
+      },
+      {
+        "id": 2,
+        "left": 0.8,
+        "top": 0.2,
+        "width": 0.2,
+        "height": 0.2,
+        "cameraId": null
+      },
+      {
+        "id": 3,
+        "left": 0.8,
+        "top": 0.4,
+        "width": 0.2,
+        "height": 0.2,
+        "cameraId": null
+      },
+      {
+        "id": 4,
+        "left": 0.8,
+        "top": 0.6,
+        "width": 0.2,
+        "height": 0.2,
+        "cameraId": null
+      },
+      {
+        "id": 5,
+        "left": 0.8,
+        "top": 0.8,
+        "width": 0.2,
+        "height": 0.2,
+        "cameraId": null
+      },
+      {
+        "id": 6,
+        "left": 0.0,
+        "top": 0.8,
+        "width": 0.2,
+        "height": 0.2,
+        "cameraId": null
+      },
+      {
+        "id": 7,
+        "left": 0.2,
+        "top": 0.8,
+        "width": 0.2,
+        "height": 0.2,
+        "cameraId": null
+      },
+      {
+        "id": 8,
+        "left": 0.4,
+        "top": 0.8,
+        "width": 0.2,
+        "height": 0.2,
+        "cameraId": null
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "name": "16 Cameras (4x4 Grid)",
+    "cameraCount": 16,
+    "positions": [
+      {
+        "id": 0,
+        "left": 0.0,
+        "top": 0.0,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 1,
+        "left": 0.25,
+        "top": 0.0,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 2,
+        "left": 0.5,
+        "top": 0.0,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 3,
+        "left": 0.75,
+        "top": 0.0,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 4,
+        "left": 0.0,
+        "top": 0.25,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 5,
+        "left": 0.25,
+        "top": 0.25,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 6,
+        "left": 0.5,
+        "top": 0.25,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 7,
+        "left": 0.75,
+        "top": 0.25,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 8,
+        "left": 0.0,
+        "top": 0.5,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 9,
+        "left": 0.25,
+        "top": 0.5,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 10,
+        "left": 0.5,
+        "top": 0.5,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 11,
+        "left": 0.75,
+        "top": 0.5,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 12,
+        "left": 0.0,
+        "top": 0.75,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 13,
+        "left": 0.25,
+        "top": 0.75,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 14,
+        "left": 0.5,
+        "top": 0.75,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      },
+      {
+        "id": 15,
+        "left": 0.75,
+        "top": 0.75,
+        "width": 0.25,
+        "height": 0.25,
+        "cameraId": null
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "name": "25 Cameras (5x5 Grid)",
+    "cameraCount": 25,
+    "positions": [
+      {"id": 0, "left": 0.0, "top": 0.0, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 1, "left": 0.2, "top": 0.0, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 2, "left": 0.4, "top": 0.0, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 3, "left": 0.6, "top": 0.0, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 4, "left": 0.8, "top": 0.0, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 5, "left": 0.0, "top": 0.2, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 6, "left": 0.2, "top": 0.2, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 7, "left": 0.4, "top": 0.2, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 8, "left": 0.6, "top": 0.2, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 9, "left": 0.8, "top": 0.2, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 10, "left": 0.0, "top": 0.4, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 11, "left": 0.2, "top": 0.4, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 12, "left": 0.4, "top": 0.4, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 13, "left": 0.6, "top": 0.4, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 14, "left": 0.8, "top": 0.4, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 15, "left": 0.0, "top": 0.6, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 16, "left": 0.2, "top": 0.6, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 17, "left": 0.4, "top": 0.6, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 18, "left": 0.6, "top": 0.6, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 19, "left": 0.8, "top": 0.6, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 20, "left": 0.0, "top": 0.8, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 21, "left": 0.2, "top": 0.8, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 22, "left": 0.4, "top": 0.8, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 23, "left": 0.6, "top": 0.8, "width": 0.2, "height": 0.2, "cameraId": null},
+      {"id": 24, "left": 0.8, "top": 0.8, "width": 0.2, "height": 0.2, "cameraId": null}
+    ]
+  },
+  {
+    "id": 36,
+    "name": "36 Cameras (6x6 Grid)",
+    "cameraCount": 36,
+    "positions": [
+      {"id": 0, "left": 0.0, "top": 0.0, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 1, "left": 0.16667, "top": 0.0, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 2, "left": 0.33334, "top": 0.0, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 3, "left": 0.50001, "top": 0.0, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 4, "left": 0.66668, "top": 0.0, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 5, "left": 0.83335, "top": 0.0, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 6, "left": 0.0, "top": 0.16667, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 7, "left": 0.16667, "top": 0.16667, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 8, "left": 0.33334, "top": 0.16667, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 9, "left": 0.50001, "top": 0.16667, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 10, "left": 0.66668, "top": 0.16667, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 11, "left": 0.83335, "top": 0.16667, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 12, "left": 0.0, "top": 0.33334, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 13, "left": 0.16667, "top": 0.33334, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 14, "left": 0.33334, "top": 0.33334, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 15, "left": 0.50001, "top": 0.33334, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 16, "left": 0.66668, "top": 0.33334, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 17, "left": 0.83335, "top": 0.33334, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 18, "left": 0.0, "top": 0.50001, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 19, "left": 0.16667, "top": 0.50001, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 20, "left": 0.33334, "top": 0.50001, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 21, "left": 0.50001, "top": 0.50001, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 22, "left": 0.66668, "top": 0.50001, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 23, "left": 0.83335, "top": 0.50001, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 24, "left": 0.0, "top": 0.66668, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 25, "left": 0.16667, "top": 0.66668, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 26, "left": 0.33334, "top": 0.66668, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 27, "left": 0.50001, "top": 0.66668, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 28, "left": 0.66668, "top": 0.66668, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 29, "left": 0.83335, "top": 0.66668, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 30, "left": 0.0, "top": 0.83335, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 31, "left": 0.16667, "top": 0.83335, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 32, "left": 0.33334, "top": 0.83335, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 33, "left": 0.50001, "top": 0.83335, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 34, "left": 0.66668, "top": 0.83335, "width": 0.16667, "height": 0.16667, "cameraId": null},
+      {"id": 35, "left": 0.83335, "top": 0.83335, "width": 0.16667, "height": 0.16667, "cameraId": null}
+    ]
+  }
+]

@@ -4,6 +4,8 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import '../providers/camera_devices_provider.dart';
 import '../models/camera_device.dart';
+import '../models/camera_layout.dart';
+import '../providers/multi_view_layout_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
 import '../utils/responsive_helper.dart';
@@ -17,18 +19,14 @@ class MultiLiveViewScreen extends StatefulWidget {
 }
 
 class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
-  // Maximum number of cameras per page (requirement: 20 per page)
-  static const int maxCamerasPerPage = 20;
-  
   // State variables
   List<Camera> _availableCameras = [];
-  final List<Camera?> _selectedCameras = List.filled(maxCamerasPerPage, null);
-  final List<Player> _players = [];
-  final List<VideoController> _controllers = [];
-  final List<bool> _loadingStates = List.filled(maxCamerasPerPage, false);
-  final List<bool> _errorStates = List.filled(maxCamerasPerPage, false);
-  int _currentPage = 0;
-  int _totalPages = 1;
+  late MultiViewLayoutProvider _layoutProvider;
+  late List<Camera?> _selectedCameras;
+  late List<Player> _players;
+  late List<VideoController> _controllers;
+  late List<bool> _loadingStates;
+  late List<bool> _errorStates;
   int _gridColumns = 4; // Default grid columns for desktop
   
   @override

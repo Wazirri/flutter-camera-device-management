@@ -3,476 +3,445 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:camera_device_manager/models/system_info.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:http/http.dart' as http;
+
 import 'camera_devices_provider.dart';
 
 class WebSocketProvider with ChangeNotifier {
-  WebSocket? _socket;
-  Timer? _heartbeatTimer;
-  Timer? _reconnectTimer;
-  String? _lastUsername;
-  String? _lastPassword;
-  bool _rememberMe = false;
-
-  bool _isConnected = false;
-  bool _isLoggedIn = false;
-  bool _isConnecting = false;
-  String _errorMessage = '';
-  SystemInfo? _systemInfo;
+  // Store websocket connection
+  WebSocketChannel? _channel;
   
-  // Reference to CameraDevicesProvider
+  // Store connection state
+  bool _isConnected = false;
+  bool _isAuthenticated = false;
+  bool _isConnecting = false;
+  
+  // Store login credentials
+  String _username = '';
+  String _password = '';
+  
+  // Store connection details
+  String _serverHost = '85.104.114.145'; // Default host
+  int _serverPort = 1200; // Default port
+  
+  // Store log messages
+  List<String> _logMessages = [];
+  
+  // Store the last received message for other providers to access
+  dynamic _lastMessage;
+  
+  // Maximum number of log messages to store
+  static const int maxLogMessages = 100;
+  
+  // Heartbeat timer
+  Timer? _heartbeatTimer;
+  
+  // Auto reconnect timer
+  Timer? _reconnectTimer;
+  
+  // Reference to camera devices provider
   CameraDevicesProvider? _cameraDevicesProvider;
-
-  // System info stream controller
-  final _systemInfoController = StreamController<SystemInfo>.broadcast();
-
-  // Message log functionality
-  final List<String> _messageLog = [];
-  bool _isLocalServerMode = false;
-
-  // Connection settings
-  String _serverIp = '85.104.114.145';
-  int _serverPort = 1200;
-
-  // Constructor - load saved settings
+  
+  // Getters
+  bool get isConnected => _isConnected;
+  bool get isAuthenticated => _isAuthenticated;
+  bool get isConnecting => _isConnecting;
+  List<String> get logMessages => _logMessages;
+  String get username => _username;
+  String get serverHost => _serverHost;
+  int get serverPort => _serverPort;
+  dynamic get lastMessage => _lastMessage;
+  
+  // Constructor
   WebSocketProvider() {
-    _loadSettings();
-    _detectPlatform();
+    debugPrint("WebSocketProvider initialized");
+    
+    // Determine the server connection details based on platform
+    _determineServerConnection();
   }
-
-  // Set the camera devices provider
+  
+  // Set the camera devices provider reference
   void setCameraDevicesProvider(CameraDevicesProvider provider) {
     _cameraDevicesProvider = provider;
   }
-
-  // Detect platform and use local server if desktop
-  bool _isDesktop = false;
-  void _detectPlatform() {
-    _isDesktop = Platform.isWindows || Platform.isMacOS || Platform.isLinux;
-    if (_isDesktop) {
-      // Use local server if running on desktop
-      _serverIp = 'localhost';
+  
+  // Determine the server connection details based on platform
+  void _determineServerConnection() {
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      // When running on desktop, connect to localhost WebSocket server
+      _serverHost = 'localhost';
       _serverPort = 5000;
-      _isLocalServerMode = true;
-      debugPrint('Running on desktop platform, using local server at $_serverIp:$_serverPort');
+      debugPrint("Using desktop WebSocket connection: $_serverHost:$_serverPort");
+    } else {
+      // Keep default values for mobile platforms
+      debugPrint("Using mobile WebSocket connection: $_serverHost:$_serverPort");
     }
   }
-
-  // Getters
-  bool get isConnected => _isConnected;
-  bool get isLoggedIn => _isLoggedIn;
-  bool get isConnecting => _isConnecting;
-  String get errorMessage => _errorMessage;
-  SystemInfo? get systemInfo => _systemInfo;
-  Stream<SystemInfo> get onSystemInfoUpdate => _systemInfoController.stream;
-  String get serverIp => _serverIp;
-  int get serverPort => _serverPort;
-  bool get rememberMe => _rememberMe;
-  bool get isLocalServerMode => _isLocalServerMode;
-  List<String> get messageLog => List.unmodifiable(_messageLog);
-
-  // Clear message log
-  void clearLog() {
-    _messageLog.clear();
-    notifyListeners();
-  }
-
-  // Add message to log
-  void _logMessage(String message) {
-    // Add timestamp to message
-    final timestamp = DateTime.now().toString().split('.').first;
-    final logEntry = '[$timestamp] $message';
-    
-    _messageLog.add(logEntry);
-    
-    // Keep log size manageable (max 100 messages)
-    if (_messageLog.length > 100) {
-      _messageLog.removeAt(0);
-    }
-    
-    notifyListeners();
-  }
-
+  
   // Connect to WebSocket server
-  Future<bool> connect(String serverIp, int serverPort,
-      {String? username, String? password, bool rememberMe = false}) async {
-    // Save connection settings
-    _serverIp = serverIp;
-    _serverPort = serverPort;
-    _rememberMe = rememberMe;
-    _lastUsername = username;
-    _lastPassword = password;
-
-    // Save settings if Remember Me is checked
-    if (_rememberMe) {
-      await _saveSettings();
+  Future<bool> connect() async {
+    if (_isConnected || _isConnecting) {
+      debugPrint("Already connected or connecting to WebSocket");
+      return _isConnected;
     }
-
-    // Close existing connections
-    await disconnect();
-
+    
+    _isConnecting = true;
+    notifyListeners();
+    
     try {
-      _isConnecting = true;
-      _errorMessage = '';
-      notifyListeners();
+      // Check if the server is reachable
+      bool isReachable = await _isServerReachable();
+      if (!isReachable) {
+        addLog("Server is not reachable at $_serverHost:$_serverPort");
+        _isConnecting = false;
+        notifyListeners();
+        return false;
+      }
 
-      // Check if we are using a secure connection
-      final wsScheme = _isSecureConnection() ? 'wss' : 'ws';
-      final url = '$wsScheme://$_serverIp:$_serverPort/ws';
-      debugPrint('Connecting to WebSocket: $url');
-      _logMessage('Connecting to $url');
-
-      // Connect to WebSocket server
-      _socket = await WebSocket.connect(url).timeout(
-        const Duration(seconds: 5),
-        onTimeout: () {
-          throw TimeoutException('Connection timed out');
-        },
+      // Determine the correct WebSocket URL based on the platform
+      String wsUrl;
+      
+      if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+        // For desktop platforms, connect to the testing WebSocket server
+        wsUrl = 'ws://$_serverHost:$_serverPort/ws';
+      } else {
+        // For mobile platforms, connect to the production WebSocket server
+        wsUrl = 'ws://$_serverHost:$_serverPort';
+      }
+      
+      debugPrint("Connecting to WebSocket at $wsUrl");
+      addLog("Connecting to $wsUrl");
+      
+      // Create the WebSocket channel
+      _channel = IOWebSocketChannel.connect(
+        Uri.parse(wsUrl),
+        pingInterval: const Duration(seconds: 5),
       );
-
-      // Set up listeners
-      _socket!.listen(
+      
+      // Listen for messages from the server
+      _channel!.stream.listen(
         _handleMessage,
         onDone: _handleDisconnect,
         onError: _handleError,
         cancelOnError: false,
       );
-
+      
       _isConnected = true;
       _isConnecting = false;
-      _logMessage('Connected successfully');
+      addLog("Connected to WebSocket server");
+      
+      // Setup heartbeat to keep connection alive
+      _setupHeartbeat();
+      
       notifyListeners();
-
-      // Start heartbeat
-      _startHeartbeat();
-
-      // Attempt login if credentials are provided
-      if (username != null && password != null) {
-        return login(username, password, rememberMe);
-      }
-
       return true;
     } catch (e) {
-      _handleError(e);
+      debugPrint("WebSocket connection error: $e");
+      addLog("Connection error: $e");
+      _isConnected = false;
+      _isConnecting = false;
+      notifyListeners();
+      
+      // Schedule auto reconnect
+      _scheduleReconnect();
+      
       return false;
     }
   }
-
+  
+  // Check if server is reachable
+  Future<bool> _isServerReachable() async {
+    try {
+      // For desktop servers, use the HTTP health endpoint to check reachability
+      if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+        final response = await http.get(
+          Uri.parse('http://$_serverHost:$_serverPort/health'),
+        ).timeout(const Duration(seconds: 5));
+        
+        return response.statusCode == 200;
+      } else {
+        // For mobile servers, just try to connect to the host
+        final socket = await Socket.connect(
+          _serverHost, 
+          _serverPort,
+          timeout: const Duration(seconds: 5),
+        );
+        socket.destroy();
+        return true;
+      }
+    } catch (e) {
+      debugPrint("Server reachability check failed: $e");
+      return false;
+    }
+  }
+  
   // Disconnect from WebSocket server
   Future<void> disconnect() async {
-    _stopHeartbeat();
-    _stopReconnectTimer();
-
-    if (_socket != null) {
-      try {
-        await _socket!.close();
-        _logMessage('Disconnected from server');
-      } catch (e) {
-        debugPrint('Error closing socket: $e');
-        _logMessage('Error closing socket: $e');
-      }
-      _socket = null;
+    if (!_isConnected) {
+      return;
     }
-
+    
+    // Cancel timers
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
+    
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
+    
+    // Close the channel
+    try {
+      await _channel?.sink.close(1000, "Client disconnect");
+    } catch (e) {
+      debugPrint("Error closing WebSocket channel: $e");
+    }
+    
     _isConnected = false;
-    _isLoggedIn = false;
+    _isAuthenticated = false;
     notifyListeners();
+    
+    addLog("Disconnected from WebSocket server");
   }
-
-  // Login to server
-  Future<bool> login(String username, String password, [bool rememberMe = false]) async {
-    if (!_isConnected || _socket == null) {
-      _errorMessage = 'Not connected to server';
-      _logMessage('Login failed: Not connected to server');
-      notifyListeners();
-      return false;
-    }
-
-    try {
-      _lastUsername = username;
-      _lastPassword = password;
-      _rememberMe = rememberMe;
-
-      // Save settings if Remember Me is checked
-      if (_rememberMe) {
-        await _saveSettings();
-      }
-
-      // Send login command
-      final loginCommand = 'LOGIN "$username" "$password"';
-      _socket!.add(loginCommand);
-      _logMessage('Sending login request');
-
-      // Wait for login response (handled in _handleMessage)
-      // We'll return true for now and let the message handler update the state
-      return true;
-    } catch (e) {
-      _errorMessage = 'Login error: $e';
-      _logMessage('Login error: $e');
-      notifyListeners();
-      return false;
-    }
-  }
-
-  // Start monitoring ECS (should be called after successful login)
-  void startEcsMonitoring() {
-    if (_isConnected && _isLoggedIn && _socket != null) {
-      _socket!.add('DO MONITORECS');
-      _logMessage('Started ECS monitoring');
-    }
-  }
-
-  // Handle incoming WebSocket messages
-  void _handleMessage(dynamic message) {
-    try {
-      if (message is String) {
-        // Log the message (truncate if too long)
-        final logMsg = message.length > 500 ? '${message.substring(0, 500)}...' : message;
-        _logMessage('Received: $logMsg');
-        
-        if (message == 'PONG') {
-          // Handle heartbeat response
-          return;
-        }
-
-        // Try to parse JSON message
-        try {
-          final jsonData = jsonDecode(message);
-          _processJsonMessage(jsonData);
-        } catch (e) {
-          debugPrint('Not a JSON message: $message');
-        }
-      }
-    } catch (e) {
-      debugPrint('Error handling message: $e');
-      _logMessage('Error handling message: $e');
-    }
-  }
-
-  // Process JSON messages
-  void _processJsonMessage(dynamic jsonData) {
-    if (jsonData is Map<String, dynamic>) {
-      final command = jsonData['c'];
-
-      switch (command) {
-        case 'login':
-          // Login required or failed
-          _isLoggedIn = false;
-          _errorMessage = jsonData['msg'] ?? 'Login required';
-          _logMessage('Login status: $_errorMessage');
-          notifyListeners();
-          break;
-
-        case 'loginok':
-          // Login successful
-          _isLoggedIn = true;
-          _errorMessage = '';
-          _logMessage('Login successful');
-          notifyListeners();
-
-          // Start monitoring after successful login
-          startEcsMonitoring();
-          break;
-
-        case 'sysinfo':
-          // System information update
-          _systemInfo = SystemInfo.fromJson(jsonData);
-          _systemInfoController.add(_systemInfo!);
-          _logMessage('Received system info update');
-          notifyListeners();
-          break;
-
-        case 'changed':
-          // Forward camera device updates to the CameraDevicesProvider
-          if (_cameraDevicesProvider != null) {
-            _cameraDevicesProvider!.processWebSocketMessage(jsonData);
-            _logMessage('Received camera device update');
-          }
-          break;
-
-        default:
-          debugPrint('Unknown command: $command');
-          _logMessage('Received unknown command: $command');
-          break;
-      }
-    }
-  }
-
-  // Handle WebSocket disconnection
+  
+  // Handle disconnection
   void _handleDisconnect() {
-    debugPrint('WebSocket disconnected');
-    _logMessage('WebSocket disconnected');
-    _isConnected = false;
-    _isLoggedIn = false;
-    notifyListeners();
-
-    // Try to reconnect
-    _scheduleReconnect();
+    if (_isConnected) {
+      debugPrint("WebSocket disconnected");
+      addLog("Disconnected from server");
+      
+      _isConnected = false;
+      _isAuthenticated = false;
+      notifyListeners();
+      
+      // Schedule reconnect
+      _scheduleReconnect();
+    }
   }
-
-  // Handle WebSocket errors
+  
+  // Handle connection error
   void _handleError(dynamic error) {
-    debugPrint('WebSocket error: $error');
-    _logMessage('WebSocket error: $error');
-    _errorMessage = error.toString();
+    debugPrint("WebSocket error: $error");
+    addLog("Connection error: $error");
+    
     _isConnected = false;
-    _isConnecting = false;
+    _isAuthenticated = false;
     notifyListeners();
-
-    // Try to reconnect
+    
+    // Schedule reconnect
     _scheduleReconnect();
   }
-
-  // Start heartbeat timer
-  void _startHeartbeat() {
-    _stopHeartbeat(); // Stop existing timer if any
-
-    _heartbeatTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
-      if (_isConnected && _socket != null) {
-        try {
-          _socket!.add('PING');
-          _logMessage('Sending heartbeat ping');
-        } catch (e) {
-          debugPrint('Error sending heartbeat: $e');
-          _logMessage('Error sending heartbeat: $e');
-          _handleDisconnect();
-        }
-      } else {
-        _stopHeartbeat();
+  
+  // Schedule reconnection
+  void _scheduleReconnect() {
+    if (_reconnectTimer != null) {
+      _reconnectTimer!.cancel();
+    }
+    
+    debugPrint("Scheduling reconnect in 5 seconds");
+    _reconnectTimer = Timer(const Duration(seconds: 5), () {
+      if (!_isConnected && !_isConnecting) {
+        debugPrint("Attempting to reconnect...");
+        connect();
       }
     });
   }
-
-  // Stop heartbeat timer
-  void _stopHeartbeat() {
+  
+  // Setup heartbeat timer
+  void _setupHeartbeat() {
+    // Cancel existing timer if any
     _heartbeatTimer?.cancel();
-    _heartbeatTimer = null;
-  }
-
-  // Schedule reconnection attempt
-  void _scheduleReconnect() {
-    _stopReconnectTimer(); // Stop existing timer if any
-
-    // Try to reconnect if we were previously connected and have credentials
-    if (_lastUsername != null && _lastPassword != null) {
-      _reconnectTimer = Timer(const Duration(seconds: 5), () {
-        if (!_isConnected && !_isConnecting) {
-          debugPrint('Attempting to reconnect...');
-          _logMessage('Attempting to reconnect...');
-          connect(_serverIp, _serverPort,
-              username: _lastUsername,
-              password: _lastPassword,
-              rememberMe: _rememberMe);
-        }
-      });
-    }
-  }
-
-  // Stop reconnect timer
-  void _stopReconnectTimer() {
-    _reconnectTimer?.cancel();
-    _reconnectTimer = null;
-  }
-
-  // Check if connection should use secure WebSocket
-  bool _isSecureConnection() {
-    // Implement criteria for when to use secure connection (WSS)
-    // For example, if connecting to a domain other than localhost
-    if (_serverIp == 'localhost' || _serverIp == '127.0.0.1') {
-      return false;
-    }
     
-    // Check if server uses an IP address format
-    final ipRegex = RegExp(r'^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$');
-    if (ipRegex.hasMatch(_serverIp)) {
-      return false; 
-    }
-    
-    // For other domains, use secure WebSocket
-    return true;
-  }
-
-  // Load saved settings
-  Future<void> _loadSettings() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      
-      _serverIp = prefs.getString('serverIp') ?? _serverIp;
-      _serverPort = prefs.getInt('serverPort') ?? _serverPort;
-      _rememberMe = prefs.getBool('rememberMe') ?? false;
-      
-      // Only load credentials if rememberMe was true
-      if (_rememberMe) {
-        _lastUsername = prefs.getString('username');
-        _lastPassword = prefs.getString('password');
-      }
-      
-      notifyListeners();
-      
-      // Auto-connect if we have credentials and rememberMe is true
-      if (_rememberMe && _lastUsername != null && _lastPassword != null) {
-        connect(_serverIp, _serverPort, 
-          username: _lastUsername, 
-          password: _lastPassword,
-          rememberMe: _rememberMe);
-      }
-    } catch (e) {
-      debugPrint('Error loading settings: $e');
-      _logMessage('Error loading settings: $e');
-    }
-  }
-
-  // Save settings
-  Future<void> _saveSettings() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      
-      await prefs.setString('serverIp', _serverIp);
-      await prefs.setInt('serverPort', _serverPort);
-      await prefs.setBool('rememberMe', _rememberMe);
-      
-      // Only save credentials if rememberMe is true
-      if (_rememberMe && _lastUsername != null && _lastPassword != null) {
-        await prefs.setString('username', _lastUsername!);
-        await prefs.setString('password', _lastPassword!);
+    // Create new timer that sends a ping every 30 seconds
+    _heartbeatTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      if (_isConnected) {
+        debugPrint("Sending heartbeat ping");
+        sendMessage("PING");
       } else {
-        // Clear saved credentials if rememberMe is turned off
-        await prefs.remove('username');
-        await prefs.remove('password');
+        timer.cancel();
+      }
+    });
+  }
+  
+  // Send message to server
+  void sendMessage(String message) {
+    if (_isConnected && _channel != null) {
+      try {
+        _channel!.sink.add(message);
+        addLog("Sent: $message");
+      } catch (e) {
+        debugPrint("Error sending message: $e");
+        addLog("Send error: $e");
+      }
+    } else {
+      debugPrint("Cannot send message: not connected");
+      addLog("Cannot send message: not connected");
+    }
+  }
+  
+  // Handle incoming message
+  void _handleMessage(dynamic message) {
+    if (message == null) return;
+    
+    // Log the raw message for debugging
+    debugPrint("Received: $message");
+    
+    // Store the last message for other providers to access
+    _lastMessage = message;
+    
+    // Handle ping response
+    if (message == "PONG") {
+      debugPrint("Received PONG heartbeat response");
+      return;
+    }
+    
+    // Handle JSON messages
+    try {
+      Map<String, dynamic> jsonData = jsonDecode(message);
+      
+      // Add to log with formatted JSON for readability
+      addLog("Received: ${jsonEncode(jsonData)}");
+      
+      // Handle different message types based on the 'c' field
+      String messageType = jsonData['c'] ?? '';
+      
+      switch (messageType) {
+        case 'login':
+          _handleLoginResponse(jsonData);
+          break;
+        case 'changed':
+          _handleChangedData(jsonData);
+          break;
+        case 'sysinfo':
+          _handleSystemInfo(jsonData);
+          break;
+        default:
+          // Other message types
+          debugPrint("Unhandled message type: $messageType");
       }
     } catch (e) {
-      debugPrint('Error saving settings: $e');
-      _logMessage('Error saving settings: $e');
+      // If not a JSON message, just add to log
+      addLog("Received non-JSON message: $message");
+    }
+    
+    // Notify listeners of the new message
+    notifyListeners();
+  }
+  
+  // Handle login response
+  void _handleLoginResponse(Map<String, dynamic> data) {
+    final status = data['status'] ?? '';
+    final message = data['msg'] ?? '';
+    
+    if (status == 'success') {
+      _isAuthenticated = true;
+      addLog("Login successful");
+      
+      // After successful login, start monitoring ECS
+      sendMessage("DO MONITORECS");
+    } else {
+      _isAuthenticated = false;
+      addLog("Login failed: $message");
+    }
+    
+    notifyListeners();
+  }
+  
+  // Handle changed data (device/camera updates)
+  void _handleChangedData(Map<String, dynamic> data) {
+    final String dataPath = data['data'] ?? '';
+    final dynamic value = data['value'];
+    
+    // Check if it's a camera device update (ecs.slaves.m_*)
+    if (dataPath.startsWith('ecs.slaves.m_') && value != null) {
+      if (_cameraDevicesProvider != null) {
+        // Pass the camera device update to the camera devices provider
+        _cameraDevicesProvider!.handleCameraDeviceUpdate(dataPath, value);
+      } else {
+        debugPrint("CameraDevicesProvider not set, cannot handle camera device update");
+      }
     }
   }
-
-  // Clear saved credentials
-  Future<void> clearSavedCredentials() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('username');
-      await prefs.remove('password');
-      await prefs.setBool('rememberMe', false);
-      
-      _lastUsername = null;
-      _lastPassword = null;
-      _rememberMe = false;
-      
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Error clearing credentials: $e');
-      _logMessage('Error clearing credentials: $e');
+  
+  // Handle system information updates
+  void _handleSystemInfo(Map<String, dynamic> data) {
+    // Just log and store system info in this provider
+    // Can be expanded later to pass to a dedicated system info provider
+    debugPrint("System info update received");
+  }
+  
+  // Login to the server
+  Future<bool> login(String username, String password) async {
+    if (!_isConnected) {
+      bool connected = await connect();
+      if (!connected) {
+        addLog("Cannot login: not connected");
+        return false;
+      }
+    }
+    
+    _username = username;
+    _password = password;
+    
+    // Send login message
+    sendMessage("LOGIN $username $password");
+    
+    // Return current authentication state
+    // Note: This will be updated when the server responds
+    return _isAuthenticated;
+  }
+  
+  // Add a message to the log
+  void addLog(String message) {
+    final timestamp = DateTime.now().toString().substring(0, 19);
+    final logMessage = "[$timestamp] $message";
+    
+    _logMessages.add(logMessage);
+    
+    // Keep log size manageable
+    if (_logMessages.length > maxLogMessages) {
+      _logMessages = _logMessages.sublist(_logMessages.length - maxLogMessages);
     }
   }
-
+  
+  // Handle app lifecycle changes (called from parent widget)
+  void handleAppLifecycleChange(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        // App is visible and responding to user input
+        if (!_isConnected && !_isConnecting) {
+          debugPrint("App resumed, attempting to reconnect");
+          connect();
+        }
+        break;
+      case AppLifecycleState.inactive:
+        // App is inactive, happens when notifications or modal alerts appear
+        break;
+      case AppLifecycleState.paused:
+        // App is not visible to the user, running in the background
+        break;
+      case AppLifecycleState.detached:
+        // Application is detached (applicable for iOS and Android)
+        // Ensure clean disconnect
+        disconnect();
+        break;
+      default:
+        break;
+    }
+  }
+  
   // Clean up resources
   @override
   void dispose() {
-    _stopHeartbeat();
-    _stopReconnectTimer();
-    disconnect();
-    _systemInfoController.close();
+    debugPrint("Disposing WebSocketProvider");
+    
+    // Cancel timers
+    _heartbeatTimer?.cancel();
+    _reconnectTimer?.cancel();
+    
+    // Close connection
+    _channel?.sink.close();
+    
     super.dispose();
   }
 }
