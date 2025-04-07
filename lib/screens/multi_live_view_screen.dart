@@ -187,27 +187,25 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
       _loadCamerasForCurrentPage();
     }
     
-    // Calculate the height available for the grid
-    final appBarHeight = AppBar().preferredSize.height;
-    final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0;
-    final statusBarHeight = MediaQuery.of(context).padding.top;
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
-    final availableHeight = size.height - appBarHeight - bottomNavHeight - statusBarHeight - bottomPadding;
+    // Calculate the height available for the grid with more precision
+    final MediaQueryData mediaQuery = MediaQuery.of(context);
+    final double appBarHeight = AppBar().preferredSize.height;
+    final double statusBarHeight = mediaQuery.padding.top;
+    final double bottomPadding = mediaQuery.padding.bottom;
+    final double bottomNavHeight = ResponsiveHelper.isMobile(context) ? kBottomNavigationBarHeight : 0.0;
     
-    // Filter out null cameras for the grid
-    final List<Camera> activeCameras = _selectedCameras.whereType<Camera>().toList();
-    final activeCameraCount = activeCameras.length;
+    // Calculate total height available with buffer for precision
+    final double availableHeight = size.height - (appBarHeight + statusBarHeight + bottomNavHeight + bottomPadding);
     
-    // Use fixed 5 rows for consistent layout
-    const int activeRowsNeeded = 5;
+    // Fixed number of rows for consistency - use 5 rows for standard layout
+    const int fixedRows = 5;
     
-    // Calculate optimal aspect ratio based on the available height and active rows
-    final double cellWidth = size.width / _gridColumns;
-    // Fixed correction: -2 to account for possible rounding errors
-    final double cellHeight = (availableHeight - 2) / activeRowsNeeded;
-    final double aspectRatio = cellWidth / cellHeight;
+    // Calculate exact cell dimensions for maximum screen utilization
+    final double exactCellHeight = availableHeight / fixedRows;
+    final double exactCellWidth = size.width / _gridColumns;
     
     return Scaffold(
+      // Using primary AppBar to ensure proper layout calculations
       appBar: AppBar(
         title: Text('Multi Camera View', style: theme.textTheme.headlineSmall),
         backgroundColor: theme.appBarTheme.backgroundColor,
@@ -223,149 +221,166 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           ),
         ],
       ),
-      body: GridView.builder(
-        // Disable scrolling to keep all cameras in view
-        physics: const NeverScrollableScrollPhysics(),
-        // Grid properties
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: _gridColumns,
-          childAspectRatio: aspectRatio,
-          // Remove all spacing between grid cells for maximum screen utilization
-          crossAxisSpacing: 0,
-          mainAxisSpacing: 0,
-        ),
-        // Use zero padding to maximize viewable area
+      // MainAxisSize.max to use full height
+      body: Container(
+        // Use the entire available height without any padding
+        height: availableHeight,
+        // Container takes full width
+        width: size.width,
+        // No margin or padding to use maximum space
+        margin: EdgeInsets.zero,
         padding: EdgeInsets.zero,
-        itemCount: maxCamerasPerPage,
-        itemBuilder: (context, index) {
-          final camera = index < _selectedCameras.length ? _selectedCameras[index] : null;
-          
-          // If we have a camera and it's connected, show the video
-          if (camera != null && camera.connected) {
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                // Video player
-                ClipRect(
-                  child: index < _controllers.length
-                      ? MaterialVideoControlsTheme(
-                          normal: MaterialVideoControlsThemeData(
-                            bottomButtonBar: const [
-                              MaterialPositionIndicator(),
-                            ],
-                            controlsHoverDuration: const Duration(seconds: 2),
-                          ),
-                          fullscreen: MaterialVideoControlsThemeData(
-                            bottomButtonBar: const [
-                              MaterialPositionIndicator(),
-                            ],
-                            controlsHoverDuration: const Duration(seconds: 2),
-                          ),
-                          child: Video(
-                            controller: _controllers[index],
-                            fill: Colors.black,
-                            controls: AdaptiveVideoControls,
-                          ),
-                        )
-                      : const Center(child: Text('No player available')),
-                ),
-                
-                // Loading indicator
-                if (_loadingStates[index])
-                  Center(
-                    child: CircularProgressIndicator(
-                      color: theme.colorScheme.secondary, // Use accent color
-                    ),
-                  ),
-                
-                // Error indicator
-                if (_errorStates[index])
-                  Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+        // Use CustomScrollView with SliverGrid for more precise layout control
+        child: CustomScrollView(
+          // Disable scrolling for fixed layout
+          physics: const NeverScrollableScrollPhysics(),
+          // No padding on the sliver
+          slivers: [
+            SliverGrid(
+              // Use SliverGridDelegateWithFixedCrossAxisCount for exact sizing
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: _gridColumns,
+                // Use exact size ratio and no spacing
+                childAspectRatio: exactCellWidth / exactCellHeight,
+                crossAxisSpacing: 0,
+                mainAxisSpacing: 0,
+              ),
+              // Build camera cells
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final camera = index < _selectedCameras.length ? _selectedCameras[index] : null;
+                  
+                  // If we have a camera and it's connected, show the video
+                  if (camera != null && camera.connected) {
+                    return Stack(
+                      fit: StackFit.expand,
                       children: [
-                        const Icon(Icons.error_outline, color: Colors.red, size: 32),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Stream Error',
-                          style: TextStyle(color: Colors.red),
+                        // Video player
+                        ClipRect(
+                          child: index < _controllers.length
+                              ? MaterialVideoControlsTheme(
+                                  normal: MaterialVideoControlsThemeData(
+                                    bottomButtonBar: const [
+                                      MaterialPositionIndicator(),
+                                    ],
+                                    controlsHoverDuration: const Duration(seconds: 2),
+                                  ),
+                                  fullscreen: MaterialVideoControlsThemeData(
+                                    bottomButtonBar: const [
+                                      MaterialPositionIndicator(),
+                                    ],
+                                    controlsHoverDuration: const Duration(seconds: 2),
+                                  ),
+                                  child: Video(
+                                    controller: _controllers[index],
+                                    fill: Colors.black,
+                                    controls: AdaptiveVideoControls,
+                                  ),
+                                )
+                              : const Center(child: Text('No player available')),
+                        ),
+                        
+                        // Loading indicator
+                        if (_loadingStates[index])
+                          Center(
+                            child: CircularProgressIndicator(
+                              color: theme.colorScheme.secondary, // Use accent color
+                            ),
+                          ),
+                        
+                        // Error indicator
+                        if (_errorStates[index])
+                          Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.error_outline, color: Colors.red, size: 32),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  'Stream Error',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ],
+                            ),
+                          ),
+                        
+                        // Camera name overlay (top left)
+                        Positioned(
+                          top: 4,
+                          left: 4,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              camera.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ),
+                        
+                        // Camera status overlay (bottom right)
+                        Positioned(
+                          bottom: 4,
+                          right: 4,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: camera.recording
+                                  ? Colors.red.withOpacity(0.7)
+                                  : Colors.green.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              camera.recording ? 'REC' : 'LIVE',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        
+                        // Make the entire camera cell tappable
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              // Navigate to single camera view
+                              Navigator.pushNamed(
+                                context,
+                                '/live-view',
+                                arguments: camera,
+                              );
+                            },
+                          ),
                         ),
                       ],
-                    ),
-                  ),
-                
-                // Camera name overlay (top left)
-                Positioned(
-                  top: 4,
-                  left: 4,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      camera.name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
+                    );
+                  } else {
+                    // Show empty slot with darker background
+                    return Container(
+                      color: Colors.black38,
+                      child: const Center(
+                        child: Text(
+                          'No Camera',
+                          style: TextStyle(color: Colors.white70),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-                
-                // Camera status overlay (bottom right)
-                Positioned(
-                  bottom: 4,
-                  right: 4,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: camera.recording
-                          ? Colors.red.withOpacity(0.7)
-                          : Colors.green.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      camera.recording ? 'REC' : 'LIVE',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                
-                // Make the entire camera cell tappable
-                Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {
-                      // Navigate to single camera view
-                      Navigator.pushNamed(
-                        context,
-                        '/live-view',
-                        arguments: camera,
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          } else {
-            // Show empty slot with darker background
-            return Container(
-              color: Colors.black38,
-              child: const Center(
-                child: Text(
-                  'No Camera',
-                  style: TextStyle(color: Colors.white70),
-                ),
+                    );
+                  }
+                },
+                childCount: maxCamerasPerPage,
               ),
-            );
-          }
-        },
+            ),
+          ],
+        ),
       ),
     );
   }
