@@ -385,8 +385,9 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     final safeAreaPadding = MediaQuery.of(context).padding;
     
     // Calculate available height for the grid, now using size.height from MediaQuery
-    // Subtract appBar, pagination controls (if present), bottom nav bar (if mobile), and system UI insets
-    final availableHeight = size.height - appBarHeight - paginationControlsHeight - bottomNavHeight - safeAreaPadding.top - safeAreaPadding.bottom;
+    // Subtract appBar, bottom nav bar (if mobile), and system UI insets
+    // Do NOT subtract pagination controls here, we'll handle them separately
+    final availableHeight = size.height - appBarHeight - bottomNavHeight - safeAreaPadding.top - safeAreaPadding.bottom;
     
     // Filter out null cameras and create a list of only active cameras
     final activeCameras = _selectedCameras.where((cam) => cam != null).toList();
@@ -396,10 +397,10 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     // This ensures we don't reserve space for empty slots
     final activeRowsNeeded = (activeCameraCount / _gridColumns).ceil();
     
-        // Calculate optimal aspect ratio based on the available height and active rows
+    // Calculate optimal aspect ratio based on the available height and active rows
     final double cellWidth = size.width / _gridColumns;
     // Adjust the available height by removing the pagination controls height if needed
-    final double adjustedAvailableHeight = availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0);
+    final double adjustedAvailableHeight = availableHeight; // Not subtracting pagination again
     final double cellHeight = adjustedAvailableHeight / activeRowsNeeded;
     final double aspectRatio = cellWidth / cellHeight;
     return Scaffold(
@@ -443,7 +444,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           // Main grid taking all available space
           Container(
             width: size.width,
-            height: availableHeight,
+            height: availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0),
             child: GridView.builder(
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(),
