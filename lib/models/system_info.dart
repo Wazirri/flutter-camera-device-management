@@ -1,147 +1,74 @@
+import 'dart:convert';
+
 class SystemInfo {
+  // CPU info
   final String cpuTemp;
+  final String cpuModel;
+  final String cpuCores;
+  
+  // Memory info
+  final String memTotal;
+  final String memUsed;
+  final String memFree;
+  
+  // Disk info
+  final String diskTotal;
+  final String diskUsed;
+  final String diskFree;
+  
+  // System info
   final String upTime;
-  final String srvTime;
-  final String totalRam;
-  final String freeRam;
-  final String totalConns;
-  final String sessions;
-  final String eth0;
-  final String ppp0;
-  final List<Map<String, dynamic>> thermal;
-  final Map<String, dynamic> gps;
-  final String version; // Versiyon bilgisi eklendi
+  final String version;
+  final String hostname;
+  
+  // Additional stats
+  final int cameraCount;
+  final int recordingCount;
 
   SystemInfo({
     required this.cpuTemp,
+    required this.cpuModel,
+    required this.cpuCores,
+    required this.memTotal,
+    required this.memUsed,
+    required this.memFree,
+    required this.diskTotal,
+    required this.diskUsed,
+    required this.diskFree,
     required this.upTime,
-    required this.srvTime,
-    required this.totalRam,
-    required this.freeRam,
-    required this.totalConns,
-    required this.sessions,
-    required this.eth0,
-    required this.ppp0,
-    required this.thermal,
-    required this.gps,
     required this.version,
+    required this.hostname,
+    required this.cameraCount,
+    required this.recordingCount,
   });
-
-  factory SystemInfo.fromJson(Map<dynamic, dynamic> json) {
-    // Convert raw thermal list to properly typed List<Map<String, dynamic>>
-    List<Map<String, dynamic>> typedThermal = [];
-    if (json['thermal'] != null) {
-      for (var item in json['thermal']) {
-        if (item is Map) {
-          // Convert each thermal map to <String, dynamic>
-          final Map<String, dynamic> typedItem = {};
-          item.forEach((key, value) {
-            if (key is String) {
-              typedItem[key] = value;
-            }
-          });
-          typedThermal.add(typedItem);
-        }
-      }
-    }
-    
-    // Convert gps map to properly typed Map<String, dynamic>
-    Map<String, dynamic> typedGps = {'lat': '0', 'lon': '0', 'speed': '0'};
-    if (json['gps'] is Map) {
-      final rawGps = json['gps'] as Map;
-      rawGps.forEach((key, value) {
-        if (key is String) {
-          typedGps[key] = value.toString();
-        }
-      });
-    }
+  
+  factory SystemInfo.fromJson(String jsonString) {
+    final Map<String, dynamic> json = jsonDecode(jsonString);
     
     return SystemInfo(
-      cpuTemp: json['cpuTemp']?.toString() ?? '0',
-      upTime: json['upTime']?.toString() ?? '0',
-      srvTime: json['srvTime']?.toString() ?? '0',
-      totalRam: json['totalRam']?.toString() ?? '0',
-      freeRam: json['freeRam']?.toString() ?? '0',
-      totalConns: json['totalconns']?.toString() ?? '0',
-      sessions: json['sessions']?.toString() ?? '0',
-      eth0: json['eth0']?.toString() ?? 'Unknown',
-      ppp0: json['ppp0']?.toString() ?? 'Unknown',
-      thermal: typedThermal,
-      gps: typedGps,
-      version: json['version']?.toString() ?? 'Unknown',
+      // CPU information
+      cpuTemp: json['cpuTemp'] ?? '0',
+      cpuModel: json['cpuModel'] ?? 'Unknown CPU',
+      cpuCores: json['cpuCores'] ?? '0',
+      
+      // Memory information (convert to MB if needed)
+      memTotal: json['memTotal'] ?? '0',
+      memUsed: json['memUsed'] ?? '0',
+      memFree: json['memFree'] ?? '0',
+      
+      // Disk information (convert to GB if needed)
+      diskTotal: json['diskTotal'] ?? '0',
+      diskUsed: json['diskUsed'] ?? '0',
+      diskFree: json['diskFree'] ?? '0',
+      
+      // System information
+      upTime: json['upTime'] ?? '0',
+      version: json['version'] ?? 'Unknown',
+      hostname: json['hostname'] ?? 'Unknown',
+      
+      // Additional stats (mock data if not available)
+      cameraCount: int.tryParse(json['cameraCount'] ?? '0') ?? 0,
+      recordingCount: int.tryParse(json['recordingCount'] ?? '0') ?? 0,
     );
-  }
-
-  // Helper methods for formatted values
-  String get formattedCpuTemp => '$cpuTemp°C';
-  
-  String get formattedUpTime {
-    final int seconds = int.tryParse(upTime) ?? 0;
-    final int hours = seconds ~/ 3600;
-    final int minutes = (seconds % 3600) ~/ 60;
-    final int remainingSeconds = seconds % 60;
-    return '${hours}h ${minutes}m ${remainingSeconds}s';
-  }
-  
-  String get formattedSrvTime {
-    final int seconds = int.tryParse(srvTime) ?? 0;
-    final int hours = seconds ~/ 3600;
-    final int minutes = (seconds % 3600) ~/ 60;
-    final int remainingSeconds = seconds % 60;
-    return '${hours}h ${minutes}m ${remainingSeconds}s';
-  }
-  
-  String get formattedTotalRam {
-    final double mb = (int.tryParse(totalRam) ?? 0) / (1024 * 1024);
-    return '${mb.toStringAsFixed(2)} MB';
-  }
-  
-  String get formattedFreeRam {
-    final double mb = (int.tryParse(freeRam) ?? 0) / (1024 * 1024);
-    return '${mb.toStringAsFixed(2)} MB';
-  }
-  
-  double get ramUsagePercentage {
-    final int total = int.tryParse(totalRam) ?? 1;
-    final int free = int.tryParse(freeRam) ?? 0;
-    if (total <= 0) return 0;
-    final double used = (total - free) / total;
-    return used * 100;
-  }
-  
-  String get socThermal {
-    for (final item in thermal) {
-      if (item.containsKey('soc-thermal')) {
-        return '${item['soc-thermal']}°C';
-      }
-    }
-    return 'N/A';
-  }
-  
-  String get gpuThermal {
-    for (final item in thermal) {
-      if (item.containsKey('gpu-thermal')) {
-        return '${item['gpu-thermal']}°C';
-      }
-    }
-    return 'N/A';
-  }
-  
-  String get gpsLocation {
-    final lat = gps['lat'] ?? '0';
-    final lon = gps['lon'] ?? '0';
-    if (lat == '0.000000' && lon == '0.000000') {
-      return 'No GPS Signal';
-    }
-    return 'Lat: $lat, Lon: $lon';
-  }
-  
-  String get gpsSpeed {
-    final speed = gps['speed'] ?? '0';
-    if (speed == '0.000000') {
-      return '0 km/h';
-    }
-    final double speedValue = double.tryParse(speed) ?? 0;
-    return '${speedValue.toStringAsFixed(2)} km/h';
   }
 }

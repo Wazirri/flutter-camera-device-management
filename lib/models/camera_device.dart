@@ -8,13 +8,13 @@ class CameraDevice {
   final List<Camera> cameras;  // List of cameras attached to this device
   
   // Additional device properties
-  final String firmwareVersion;
-  final String ipv4;
-  final String lastSeenAt;
-  final String recordPath;
-  final String uptime;
-  final String deviceType;
-  final bool connected;
+  String firmwareVersion;
+  String ipv4;
+  String lastSeenAt;
+  String recordPath;
+  String uptime;
+  String deviceType;
+  bool connected;
   final String macKey;  // The MAC key extracted from device path
   
   CameraDevice({
@@ -111,6 +111,11 @@ class Camera {
   int subWidth;               // Width of sub-stream resolution
   String subCodec;            // Codec for sub-stream (e.g., H.264)
   String id;                  // Unique identifier for the camera
+  
+  // Camera status properties
+  bool connected = false;     // Is camera currently connected
+  bool recording = false;     // Is camera currently recording
+  String lastSeenAt = '';     // When camera was last seen
 
   // Constructor for creating a Camera
   Camera({
@@ -139,6 +144,9 @@ class Camera {
     required this.subWidth,
     required this.subCodec,
     required this.id,
+    this.connected = false,
+    this.recording = false,
+    this.lastSeenAt = '',
   });
   
   // Helper method to extract an integer from JSON
@@ -177,11 +185,14 @@ class Camera {
       subWidth: getInt(json['subWidth']),
       subCodec: json['subCodec'] ?? 'H.264',
       id: json['cameraId'] ?? '',
+      connected: json['connected'] ?? false,
+      recording: json['recording'] ?? false,
+      lastSeenAt: json['lastSeenAt'] ?? '',
     );
   }
   
   @override
   String toString() {
-    return 'Camera { name: $name, ip: $ip, stream: $subUri }';
+    return 'Camera { name: $name, ip: $ip, stream: $subUri, connected: $connected }';
   }
 }
