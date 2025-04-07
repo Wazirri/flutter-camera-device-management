@@ -396,10 +396,10 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     // This ensures we don't reserve space for empty slots
     final activeRowsNeeded = (activeCameraCount / _gridColumns).ceil();
     
-        // Calculate optimal aspect ratio based on the available height and active rows
+    // Calculate optimal aspect ratio based on the available height and active rows
     final double cellWidth = size.width / _gridColumns;
     // Adjust the available height by removing the pagination controls height if needed
-    final double adjustedAvailableHeight = availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0);
+    final adjustedAvailableHeight = availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0);
     final double cellHeight = adjustedAvailableHeight / activeRowsNeeded;
     final double aspectRatio = cellWidth / cellHeight;
     return Scaffold(
@@ -443,7 +443,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
           // Main grid taking all available space
           Container(
             width: size.width,
-            height: availableHeight,
+            height: availableHeight - (_totalPages > 1 ? paginationControlsHeight : 0),
             child: GridView.builder(
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(),
