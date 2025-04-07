@@ -99,7 +99,8 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     final paginationControlsHeight = 60.0; // Estimated height for pagination controls
     
     // Calculate available height for the grid (excluding app bar, pagination controls, and bottom nav)
-    final availableHeight = screenHeight - appBarHeight - (_totalPages > 1 ? paginationControlsHeight : 0) - bottomNavHeight - 32; // Add extra padding
+    // Add more padding to ensure we have enough space
+    final availableHeight = screenHeight - appBarHeight - (_totalPages > 1 ? paginationControlsHeight : 0) - bottomNavHeight - 48; 
     
     // First, determine max possible columns based on screen width
     int maxColumns;
@@ -115,10 +116,27 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
       maxColumns = 1;
     }
     
-    // Start with max columns and adjust down if needed to fit height
+    // Start with max columns but now ensure reasonable row count
     _gridColumns = maxColumns;
     
-    // Iteratively check if all cameras fit within the available height
+    // Calculate the number of rows needed for current column count
+    final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
+    
+    // Calculate ideal cell height based on available space and number of rows
+    final maxCellHeight = (availableHeight - ((rowsNeeded - 1) * 8)) / rowsNeeded;
+    
+    // Calculate necessary cell width to maintain 16:9 aspect ratio
+    final idealCellWidth = maxCellHeight * 16 / 9;
+    
+    // Calculate max columns that fit within screen width
+    final maxPossibleColumns = (screenWidth - 32) ~/ idealCellWidth;
+    
+    // Adjust columns to be the smaller of width-based or maxColumns
+    if (maxPossibleColumns < _gridColumns && maxPossibleColumns > 0) {
+      _gridColumns = maxPossibleColumns;
+    }
+    
+    // Safety check - if we still can't fit the content, reduce columns further
     bool fitsInHeight = false;
     while (!fitsInHeight && _gridColumns > 1) {
       // Calculate the number of rows needed for current column count
@@ -363,23 +381,17 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     // Calculate available height for the grid
     final appBarHeight = AppBar().preferredSize.height;
     final paginationControlsHeight = _totalPages > 1 ? 60.0 : 0.0;
-    final bottomNavHeight = 56.0;
+    final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0;
     
-    // Calculate available height for the grid
-    final availableHeight = size.height - appBarHeight - paginationControlsHeight - bottomNavHeight;
+    // Calculate available height for the grid with more generous padding
+    final availableHeight = size.height - appBarHeight - paginationControlsHeight - bottomNavHeight - 48;
     
-    // Calculate number of rows based on the number of cameras and columns
-    final displayedCameras = _availableCameras.isEmpty ? 
-        maxCamerasPerPage : 
-        math.min(maxCamerasPerPage, _availableCameras.length - (_currentPage * maxCamerasPerPage));
-    final rowCount = (displayedCameras / _gridColumns).ceil();
+    // Calculate number of rows needed based on the current grid columns
+    final rowsNeeded = (maxCamerasPerPage / _gridColumns).ceil();
     
-    // Calculate the cell height to ensure no vertical scrolling is needed
-    final gridHeight = availableHeight - 16; // Account for padding
-    final cellHeight = (gridHeight / rowCount) - 8; // Account for grid spacing
-    
-    // Calculate the cell width based on the 16:9 aspect ratio
-    final cellWidth = cellHeight * 16 / 9;
+    // Calculate the optimal grid height to ensure all rows are visible
+    // This is crucial for making sure all camera slots fit without scrolling
+    final gridHeight = availableHeight; 
     
     return Scaffold(
       appBar: AppBar(
@@ -421,11 +433,10 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
         children: [
           // Fixed-height grid view of cameras (non-scrollable)
           // Ensuring all players fit within the screen with proper aspect ratio
-          Container(
-            height: gridHeight,
+          Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(8.0),
-              physics: const NeverScrollableScrollPhysics(), // Prevent scrolling
+              physics: const AlwaysScrollableScrollPhysics(), // Allow scrolling if needed
               shrinkWrap: true,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _gridColumns,
