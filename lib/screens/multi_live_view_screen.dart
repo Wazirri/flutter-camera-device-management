@@ -380,14 +380,14 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> {
     
     // Calculate available height for the grid
     final appBarHeight = AppBar().preferredSize.height;
-    final paginationControlsHeight = _totalPages > 1 ? 60.0 : 0.0;
+    final paginationControlsHeight = _totalPages > 1 ? 48.0 : 0.0; // Reduced from 60.0 to 48.0
     final bottomNavHeight = ResponsiveHelper.isMobile(context) ? 56.0 : 0.0;
     final safeAreaPadding = MediaQuery.of(context).padding;
     
     // Calculate available height for the grid, now using size.height from MediaQuery
     // Subtract appBar, bottom nav bar (if mobile), and system UI insets
     // We handle pagination controls separately to avoid duplicate calculations
-    final availableHeight = size.height - appBarHeight - bottomNavHeight - safeAreaPadding.top - safeAreaPadding.bottom;
+    final availableHeight = size.height - appBarHeight - bottomNavHeight - safeAreaPadding.top - safeAreaPadding.bottom - 0.1; // Subtracting an additional 0.1 to eliminate any potential floating point rounding errors
     
     // Filter out null cameras and create a list of only active cameras
     final activeCameras = _selectedCameras.where((cam) => cam != null).toList();
