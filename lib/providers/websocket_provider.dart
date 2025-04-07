@@ -38,7 +38,7 @@ class WebSocketProvider with ChangeNotifier {
   String _serverIp = '85.104.114.145';
   int _serverPort = 1200;
 
-  // Constructor - load saved settings
+  // Constructor - load saved settings but don't connect automatically
   WebSocketProvider() {
     _loadSettings();
     _detectPlatform();
@@ -413,13 +413,8 @@ class WebSocketProvider with ChangeNotifier {
       
       notifyListeners();
       
-      // Auto-connect if we have credentials and rememberMe is true
-      if (_rememberMe && _lastUsername != null && _lastPassword != null) {
-        connect(_serverIp, _serverPort, 
-          username: _lastUsername, 
-          password: _lastPassword,
-          rememberMe: _rememberMe);
-      }
+      // No longer auto-connect - wait for user to press login button
+      // Auto-connect functionality removed as per requirement
     } catch (e) {
       debugPrint('Error loading settings: $e');
       _logMessage('Error loading settings: $e');
