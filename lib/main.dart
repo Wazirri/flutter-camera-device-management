@@ -156,15 +156,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return KeyboardFixWrapper(
       child: MaterialApp(
-      title: 'movita ECS',
-      theme: AppTheme.darkTheme,
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/login',
-      onGenerateRoute: (settings) {
-        // Define custom page transitions for different routes
-        Widget page;
-        
-        switch(settings.name) {
+        title: 'movita ECS',
+        theme: AppTheme.darkTheme,
+        debugShowCheckedModeBanner: false,
+        initialRoute: '/login',
+        onGenerateRoute: (settings) {
+          // Define custom page transitions for different routes
+          Widget page;
+          
+          switch(settings.name) {
           case '/login':
             page = const LoginScreen();
             // Fade in transition for login
@@ -263,7 +263,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             return AppPageTransitions.fade(page);
         }
       },
-    ),
     ),
     );
   }
