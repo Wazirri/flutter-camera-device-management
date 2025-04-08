@@ -431,10 +431,11 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                 AppBar(
                   backgroundColor: Colors.transparent,
                   elevation: 0,
-                  leading: IconButton(
+                  automaticallyImplyLeading: false, // Ana menülerden geliyorsa geri butonu olmayacak
+                  leading: Navigator.of(context).canPop() ? IconButton(
                     icon: Icon(Icons.arrow_back, color: AppTheme.primaryColor),
                     onPressed: () => Navigator.of(context).pop(),
-                  ),
+                  ) : null,
                   title: Text(_camera != null 
                     ? 'Recordings: ${_camera!.name}' 
                     : 'Camera Recordings',

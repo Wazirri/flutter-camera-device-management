@@ -323,6 +323,13 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
     
     return Scaffold(
       key: _scaffoldKey,
+      // Ana menülerden otomatik geri butonunu devre dışı bırak
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        automaticallyImplyLeading: false, // Ana menülerde geri butonu gösterme
+        toolbarHeight: 0, // AppBar görünmez yap ama kontrolü sağla
+      ),
       drawer: isMobile
           ? SizedBox(
               width: 250,
