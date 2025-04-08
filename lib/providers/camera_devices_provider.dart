@@ -41,6 +41,18 @@ class CameraDevicesProvider with ChangeNotifier {
   // Get devices grouped by MAC address as a map of key to device
   Map<String, CameraDevice> get devicesByMacAddress => _devices;
   
+  // Find the parent device for a specific camera
+  CameraDevice? getDeviceForCamera(Camera camera) {
+    for (var device in _devices.values) {
+      for (var cam in device.cameras) {
+        if (cam.id == camera.id) {
+          return device;
+        }
+      }
+    }
+    return null;
+  }
+  
   // Get the selected camera from the selected device
   Camera? get selectedCamera {
     if (_selectedDevice == null || _selectedDevice!.cameras.isEmpty) {

@@ -183,14 +183,21 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     });
     
     try {
-      // Construct the recordings base URL using the device IP
-      final deviceIp = _camera!.ip;
+      // Get the parent device of this camera
+      final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+      final parentDevice = cameraProvider.getDeviceForCamera(_camera!);
+      
+      if (parentDevice == null) {
+        throw Exception('Could not find parent device for this camera');
+      }
+      
+      // Construct the recordings base URL using the device IP (not camera IP)
+      final deviceIp = parentDevice.ipv4;
       if (deviceIp.isEmpty) {
-        throw Exception('Camera device IP is not available');
+        throw Exception('Device IP is not available');
       }
       
       _recordingsUrl = 'http://$deviceIp:8080/Rec/${_camera!.name}/';
-      
       // Fetch the recordings directory listing
       final response = await http.get(Uri.parse(_recordingsUrl!));
       
@@ -244,7 +251,6 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     }
   }
   
-  // Update available recordings based on the selected day
   void _updateRecordingsForSelectedDay() async {
     if (_selectedDay == null || _camera == null || _recordingsUrl == null) {
       setState(() {
