@@ -207,7 +207,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
         
         // For demo purposes, let's assume response contains a basic HTML directory listing
         // In reality, you might need to use a regex or HTML parser to extract folders
-        final dateRegex = RegExp(r'(\d{4}_\d{2}_\d{2})');
+        final dateRegex = RegExp(r'href="(\d{4}_\d{2}_\d{2})/"');
         final matches = dateRegex.allMatches(response.body);
         
         final Map<DateTime, List<String>> newRecordings = {};
@@ -280,7 +280,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
         
         // Parse recording files from the response
         // This is simplified - adjust according to actual server response format
-        final recordingRegex = RegExp(r'href="([^"]+\.mp4)"');
+        final recordingRegex = RegExp(r'href="([^"]+\.mkv)"');
         final matches = recordingRegex.allMatches(response.body);
         
         final List<String> recordings = [];
