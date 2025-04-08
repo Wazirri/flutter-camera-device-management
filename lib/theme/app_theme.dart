@@ -60,7 +60,7 @@ class AppTheme {
       foregroundColor: darkTextPrimary,
       elevation: 0,
     ),
-    cardTheme: CardThemeData(
+    cardTheme: CardTheme(
       color: darkSurface,
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -163,7 +163,7 @@ class AppTheme {
       iconColor: darkTextSecondary,
       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     ),
-    tabBarTheme: const TabBarThemeData(
+    tabBarTheme: const TabBarTheme(
       labelColor: primaryBlue,
       unselectedLabelColor: darkTextSecondary,
       indicatorColor: primaryBlue,
@@ -223,7 +223,7 @@ class AppTheme {
       ),
       behavior: SnackBarBehavior.floating,
     ),
-    dialogTheme: DialogThemeData(
+    dialogTheme: DialogTheme(
       backgroundColor: darkSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),

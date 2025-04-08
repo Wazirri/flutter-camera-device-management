@@ -12,6 +12,15 @@ class WebSocketLogScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('WebSocket Logs'),
         backgroundColor: AppTheme.darkSurface,
+        // Geri dön butonu ekleniyor
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // Ana sayfaya dön
+            Navigator.of(context).pushNamedAndRemoveUntil('/dashboard', (route) => false);
+          },
+          tooltip: 'Geri Dön',
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_outline),
