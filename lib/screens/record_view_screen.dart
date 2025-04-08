@@ -411,41 +411,14 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   bool _hasRecordings(DateTime day) {
     return _getRecordingsForDay(day).isNotEmpty;
   }
-  // İndirme işlevini başlat
+  // İndirme işlevini başlat (Download function)
+  // İndirme işlevini başlat (Download function)
   void _downloadRecording(String recording) async {
     if (_selectedDay == null || _camera == null || _recordingsUrl == null) {
       return;
     }
     
-    // Bildirimi göster
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('İndiriliyor: $recording'),
-        duration: const Duration(seconds: 2),
-        action: SnackBarAction(
-          label: 'Tamam',
-          onPressed: () {},
-        ),
-      ),
-    );
-    
-    // İndirme URL'sini oluştur
-    final dateStr = DateFormat('yyyy_MM_dd').format(_selectedDay!);
-    final dayUrl = '$_recordingsUrl$dateStr/';
-    final downloadUrl = '$dayUrl$recording';
-    
-    // Bu URL'yi paylaşmak veya tarayıcıda açmak için ilgili platform API'lerini kullanabilirsiniz
-    // Örneğin: url_launcher paketi ile tarayıcıda açma
-    print('İndirme URL: $downloadUrl');
-  }
-  
-  // İndirme işlevini başlat
-  void _downloadRecording(String recording) async {
-    if (_selectedDay == null || _camera == null || _recordingsUrl == null) {
-      return;
-    }
-    
-    // Bildirimi göster
+    // Bildirimi göster (Show notification)
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('İndiriliyor: $recording'),
