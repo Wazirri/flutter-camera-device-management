@@ -154,6 +154,12 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
           _selectedCameraIndex = index;
         }
       }
+      // If we have cameras but no camera is selected yet, select the first one
+      else if (cameras.isNotEmpty && _camera == null) {
+        _camera = cameras.first;
+        _selectedCameraIndex = 0;
+        _initializeCamera(); // Initialize the first camera automatically
+      }
     });
   }
 
@@ -179,6 +185,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   
   void _updateRecordingsForSelectedDay() async {
     if (_selectedDay == null || _recordingsUrl == null) {
+      print('Cannot load recordings: selectedDay or recordingsUrl is null');
       return;
     }
     
@@ -187,6 +194,10 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
       _availableRecordings = [];
       _loadingError = '';
     });
+    
+    // Debug logging
+    print('Loading recordings for day: ${_selectedDay}');
+    print('Using recordings URL: $_recordingsUrl');
     
     try {
       // Format date for URL
