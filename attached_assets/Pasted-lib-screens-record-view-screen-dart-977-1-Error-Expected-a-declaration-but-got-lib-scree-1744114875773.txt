@@ -1,0 +1,251 @@
+lib/screens/record_view_screen.dart:977:1: Error: Expected a declaration, but got '}'.
+}
+^
+lib/screens/record_view_screen.dart:31:7: Error: The non-abstract class '_RecordViewScreenState' is missing implementations for these members:
+ - State.build
+Try to either
+ - provide an implementation,
+ - inherit an implementation from a superclass or mixin,
+ - mark the class as abstract, or
+ - provide a 'noSuchMethod' implementation.
+
+class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerProviderStateMixin {
+      ^^^^^^^^^^^^^^^^^^^^^^
+../../../../Flutter/flutter/packages/flutter/lib/src/widgets/framework.dart:1471:10: Context: 'State.build' is defined here.
+  Widget build(BuildContext context);
+         ^^^^^
+lib/screens/record_view_screen.dart:544:5: Error: Undefined name '_animationController'.
+    _animationController.dispose();
+    ^^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:545:5: Error: Undefined name '_player'.
+    _player.dispose();
+    ^^^^^^^
+lib/screens/record_view_screen.dart:546:5: Error: Expected identifier, but got 'super'.
+    super.dispose();
+    ^^^^^
+lib/screens/record_view_screen.dart:553:9: Error: Undefined name '_isFullScreen'.
+    if (_isFullScreen) {
+        ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:559:22: Error: Undefined name '_toggleFullScreen'.
+          onPressed: _toggleFullScreen,
+                     ^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:566:21: Error: Undefined name '_camera'.
+        title: Text(_camera != null 
+                    ^^^^^^^
+lib/screens/record_view_screen.dart:567:28: Error: Undefined name '_camera'.
+          ? 'Recordings: ${_camera!.name}' 
+                           ^^^^^^^
+lib/screens/record_view_screen.dart:573:24: Error: Undefined name '_selectedRecording'.
+            onPressed: _selectedRecording != null ? _toggleFullScreen : null,
+                       ^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:573:53: Error: Undefined name '_toggleFullScreen'.
+            onPressed: _selectedRecording != null ? _toggleFullScreen : null,
+                                                    ^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:582:17: Error: Undefined name '_availableCameras'.
+            if (_availableCameras.length > 1)
+                ^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:606:43: Error: Undefined name '_availableCameras'.
+                        initialItemCount: _availableCameras.length,
+                                          ^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:608:42: Error: Undefined name '_availableCameras'.
+                          final camera = _availableCameras[index];
+                                         ^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:609:55: Error: Undefined name '_selectedCameraIndex'.
+                          final isSelected = index == _selectedCameraIndex;
+                                                      ^^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:633:46: Error: Method not found: '_selectCamera'.
+                                onTap: () => _selectCamera(index),
+                                             ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:650:31: Error: Undefined name '_calendarSlideAnimation'.
+                    position: _calendarSlideAnimation,
+                              ^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:652:32: Error: Undefined name '_fadeInAnimation'.
+                      opacity: _fadeInAnimation,
+                               ^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:663:39: Error: Undefined name 'kFirstDay'.
+                            firstDay: kFirstDay,
+                                      ^^^^^^^^^
+lib/screens/record_view_screen.dart:664:38: Error: Undefined name 'kLastDay'.
+                            lastDay: kLastDay,
+                                     ^^^^^^^^
+lib/screens/record_view_screen.dart:665:41: Error: Undefined name '_focusedDay'.
+                            focusedDay: _focusedDay,
+                                        ^^^^^^^^^^^
+lib/screens/record_view_screen.dart:668:48: Error: Undefined name '_selectedDay'.
+                              return isSameDay(_selectedDay, day);
+                                               ^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:672:33: Error: Setter not found: '_selectedDay'.
+                                _selectedDay = selectedDay;
+                                ^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:673:33: Error: Setter not found: '_focusedDay'.
+                                _focusedDay = focusedDay; // update focused day
+                                ^^^^^^^^^^^
+lib/screens/record_view_screen.dart:671:31: Error: Method not found: 'setState'.
+                              setState(() {
+                              ^^^^^^^^
+lib/screens/record_view_screen.dart:675:31: Error: Method not found: '_updateRecordingsForSelectedDay'.
+                              _updateRecordingsForSelectedDay();
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:678:31: Error: Setter not found: '_focusedDay'.
+                              _focusedDay = focusedDay;
+                              ^^^^^^^^^^^
+lib/screens/record_view_screen.dart:680:42: Error: Undefined name '_getRecordingsForDay'.
+                            eventLoader: _getRecordingsForDay,
+                                         ^^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:720:23: Error: Undefined name '_isLoadingDates'.
+                  if (_isLoadingDates)
+                      ^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:735:23: Error: Undefined name '_loadingError'.
+                  if (_loadingError.isNotEmpty)
+                      ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:747:45: Error: Undefined name '_loadingError'.
+                                child: Text(_loadingError, 
+                                            ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:757:23: Error: Undefined name '_availableRecordings'.
+                  if (_availableRecordings.isNotEmpty)
+                      ^^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:759:32: Error: Undefined name '_fadeInAnimation'.
+                      opacity: _fadeInAnimation,
+                               ^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:775:53: Error: Undefined name '_selectedDay'.
+                                  'Recordings for ${_selectedDay != null ? DateFormat('MMMM d, yyyy').format(_selectedDay!) : "Today"}',
+                                                    ^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:775:110: Error: Undefined name '_selectedDay'.
+                                  'Recordings for ${_selectedDay != null ? DateFormat('MMMM d, yyyy').format(_selectedDay!) : "Today"}',
+                                                                                          ^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:786:46: Error: Undefined name '_availableRecordings'.
+                                  itemCount: _availableRecordings.length,
+                                             ^^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:788:55: Error: Undefined name '_availableRecordings'.
+                                    final recording = _availableRecordings[index];
+                                                      ^^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:789:69: Error: Undefined name '_selectedRecording'.
+                                    final isSelected = recording == _selectedRecording;
+                                                                    ^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:801:58: Error: Method not found: '_downloadRecording'.
+                                        onPressed: () => _downloadRecording(recording),
+                                                         ^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:804:52: Error: Method not found: '_selectRecording'.
+                                      onTap: () => _selectRecording(recording),
+                                                   ^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:816:23: Error: Undefined name '_isLoadingRecordings'.
+                  if (_isLoadingRecordings)
+                      ^^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:833:33: Error: Undefined name '_playerSlideAnimation'.
+                      position: _playerSlideAnimation,
+                                ^^^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:835:34: Error: Undefined name '_fadeInAnimation'.
+                        opacity: _fadeInAnimation,
+                                 ^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:842:23: Error: Undefined name '_availableRecordings'.
+                  if (_availableRecordings.isEmpty && _camera != null && !_isLoadingRecordings)
+                      ^^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:842:55: Error: Undefined name '_camera'.
+                  if (_availableRecordings.isEmpty && _camera != null && !_isLoadingRecordings)
+                                                      ^^^^^^^
+lib/screens/record_view_screen.dart:842:75: Error: Undefined name '_isLoadingRecordings'.
+                  if (_availableRecordings.isEmpty && _camera != null && !_isLoadingRecordings)
+                                                                          ^^^^^^^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:864:65: Error: Undefined name '_camera'.
+                                onPressed: () => _loadRecording(_camera!.rtspUri),
+                                                                ^^^^^^^
+lib/screens/record_view_screen.dart:864:50: Error: Method not found: '_loadRecording'.
+                                onPressed: () => _loadRecording(_camera!.rtspUri),
+                                                 ^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:896:35: Error: Undefined name '_controller'.
+                      controller: _controller,
+                                  ^^^^^^^^^^^
+lib/screens/record_view_screen.dart:903:21: Error: Undefined name '_isBuffering'.
+                if (_isBuffering)
+                    ^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:909:21: Error: Undefined name '_hasError'.
+                if (_hasError)
+                    ^^^^^^^^^
+lib/screens/record_view_screen.dart:923:29: Error: Undefined name '_errorMessage'.
+                            _errorMessage,
+                            ^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:928:31: Error: Undefined name '_camera'.
+                          if (_camera != null)
+                              ^^^^^^^
+lib/screens/record_view_screen.dart:932:63: Error: Undefined name '_camera'.
+                              onPressed: () => _loadRecording(_camera!.rtspUri),
+                                                              ^^^^^^^
+lib/screens/record_view_screen.dart:932:48: Error: Method not found: '_loadRecording'.
+                              onPressed: () => _loadRecording(_camera!.rtspUri),
+                                               ^^^^^^^^^^^^^^
+lib/screens/record_view_screen.dart:944:13: Error: Undefined name '_camera'.
+        if (_camera != null)
+            ^^^^^^^
+lib/screens/record_view_screen.dart:946:21: Error: Undefined name '_player'.
+            player: _player,
+                    ^^^^^^^
+lib/screens/record_view_screen.dart:948:33: Error: Undefined name '_toggleFullScreen'.
+            onFullScreenToggle: _toggleFullScreen,
+                                ^^^^^^^^^^^^^^^^^
+lib/screens/login_screen.dart:198:25: Error: String starting with ' must end with '.
+                        'movita ECS
+                        ^^^^^^^^^^^
+lib/screens/login_screen.dart:199:25: Error: String starting with ' must end with '.
+Enterprise Camera System',
+                        ^^
+lib/screens/login_screen.dart:259:25: Error: String starting with ' must end with '.
+                        'movita ECS
+                        ^^^^^^^^^^^
+lib/screens/login_screen.dart:260:52: Error: String starting with ' must end with '.
+Enterprise Camera System - Camera Management System',
+                                                   ^^
+lib/screens/login_screen.dart:199:1: Error: Expected ',' before this.
+Enterprise Camera System',
+^^^^^^^^^^
+lib/screens/login_screen.dart:199:12: Error: Expected ',' before this.
+Enterprise Camera System',
+           ^^^^^^
+lib/screens/login_screen.dart:199:19: Error: Expected ',' before this.
+Enterprise Camera System',
+                  ^^^^^^
+lib/screens/login_screen.dart:199:25: Error: Expected ',' before this.
+Enterprise Camera System',
+                        ^^
+lib/screens/login_screen.dart:200:25: Error: Expected ',' before this.
+                        style: TextStyle(
+                        ^^^^^
+lib/screens/login_screen.dart:197:27: Error: Too many positional arguments: 1 allowed, but 5 found.
+Try removing the extra positional arguments.
+                      Text(
+                          ^
+../../../../Flutter/flutter/packages/flutter/lib/src/widgets/text.dart:496:9: Context: Found this candidate, but the arguments don't match.
+  const Text(
+        ^^^^
+lib/screens/login_screen.dart:260:1: Error: Expected ',' before this.
+Enterprise Camera System - Camera Management System',
+^^^^^^^^^^
+lib/screens/login_screen.dart:260:12: Error: Expected ',' before this.
+Enterprise Camera System - Camera Management System',
+           ^^^^^^
+lib/screens/login_screen.dart:260:19: Error: Expected ',' before this.
+Enterprise Camera System - Camera Management System',
+                  ^^^^^^
+lib/screens/login_screen.dart:260:35: Error: Expected ',' before this.
+Enterprise Camera System - Camera Management System',
+                                  ^^^^^^^^^^
+lib/screens/login_screen.dart:260:46: Error: Expected ',' before this.
+Enterprise Camera System - Camera Management System',
+                                             ^^^^^^
+lib/screens/login_screen.dart:260:52: Error: Expected ',' before this.
+Enterprise Camera System - Camera Management System',
+                                                   ^^
+lib/screens/login_screen.dart:261:25: Error: Expected ',' before this.
+                        style: TextStyle(
+                        ^^^^^
+lib/screens/login_screen.dart:258:27: Error: Too many positional arguments: 1 allowed, but 7 found.
+Try removing the extra positional arguments.
+                      Text(
+                          ^
+../../../../Flutter/flutter/packages/flutter/lib/src/widgets/text.dart:496:9: Context: Found this candidate, but the arguments don't match.
+  const Text(
+        ^^^^
+Target kernel_snapshot_program failed: Exception
+
+Command PhaseScriptExecution failed with a nonzero exit code
+warning: Run script build phase 'Run Script' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase. (in target 'Flutter Assemble' from project 'Runner')
+** BUILD FAILED **
