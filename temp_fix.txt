@@ -1,3 +1,0 @@
-    // Instead of calculating rows based on active cameras, we use a fixed number of rows
-    // This ensures the grid always fills the entire screen regardless of camera count
-    final activeRowsNeeded = 5; // Fixed number of rows to ensure grid fills the screen

@@ -1,3 +1,0 @@
-  Widget build(BuildContext context) {
-    return KeyboardFixWrapper(
-      child: MaterialApp(

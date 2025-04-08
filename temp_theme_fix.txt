@@ -1,7 +1,0 @@
-    cardTheme: CardTheme(
-      color: Colors.grey[800],
-      elevation: 5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-    ),
