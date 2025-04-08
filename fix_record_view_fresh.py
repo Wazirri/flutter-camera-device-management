@@ -1,4 +1,8 @@
-import 'package:flutter/material.dart';
+#!/usr/bin/env python3
+
+def fix_record_view_fresh():
+    # Completely new implementation of record_view_screen.dart
+    new_content = '''import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -798,3 +802,12 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     );
   }
 }
+'''
+    
+    # Write the new content to the file
+    with open('lib/screens/record_view_screen.dart', 'w') as file:
+        file.write(new_content)
+    
+    return "record_view_screen.dart completely rewritten with proper implementation"
+
+print(fix_record_view_fresh())
