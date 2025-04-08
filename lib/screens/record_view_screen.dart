@@ -11,7 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../providers/camera_devices_provider.dart';
 import '../models/camera_device.dart';
-import '../models/camera.dart';
+
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
 import '../utils/responsive_helper.dart';
@@ -140,7 +140,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     List<Camera> cameras = [];
     
     // Collect all cameras from all devices
-    for (final device in cameraDevicesProvider.devices) {
+    for (final device in cameraDevicesProvider.devices.values) {
       cameras.addAll(device.cameras);
     }
     
@@ -737,7 +737,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
           child: Video(
             controller: _controller,
             fill: Colors.black,
-            controls: false,
+            controls: null,
           ),
         ),
         
@@ -790,7 +790,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
           bottom: 0,
           child: _camera != null ? VideoControls(
             player: _player,
-            hasFullScreenButton: true,
+            showFullScreenButton: true,
             onFullScreenToggle: _toggleFullScreen,
           ) : const SizedBox.shrink(),
         ),
