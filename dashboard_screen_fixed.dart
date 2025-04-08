@@ -137,12 +137,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildOverviewCards(BuildContext context) {
-    // Check screen size for responsive layout
     final isSmallScreen = ResponsiveHelper.isMobile(context);
     
-    // Create grid of statistics cards
     return GridView.count(
-      shrinkWrap: true, // Fixed
+      shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: isSmallScreen ? 2 : 4,
       childAspectRatio: isSmallScreen ? 1.5 : 2.0,

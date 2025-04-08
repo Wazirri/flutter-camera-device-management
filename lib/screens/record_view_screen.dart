@@ -411,6 +411,61 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   bool _hasRecordings(DateTime day) {
     return _getRecordingsForDay(day).isNotEmpty;
   }
+  // İndirme işlevini başlat
+  void _downloadRecording(String recording) async {
+    if (_selectedDay == null || _camera == null || _recordingsUrl == null) {
+      return;
+    }
+    
+    // Bildirimi göster
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('İndiriliyor: $recording'),
+        duration: const Duration(seconds: 2),
+        action: SnackBarAction(
+          label: 'Tamam',
+          onPressed: () {},
+        ),
+      ),
+    );
+    
+    // İndirme URL'sini oluştur
+    final dateStr = DateFormat('yyyy_MM_dd').format(_selectedDay!);
+    final dayUrl = '$_recordingsUrl$dateStr/';
+    final downloadUrl = '$dayUrl$recording';
+    
+    // Bu URL'yi paylaşmak veya tarayıcıda açmak için ilgili platform API'lerini kullanabilirsiniz
+    // Örneğin: url_launcher paketi ile tarayıcıda açma
+    print('İndirme URL: $downloadUrl');
+  }
+  
+  // İndirme işlevini başlat
+  void _downloadRecording(String recording) async {
+    if (_selectedDay == null || _camera == null || _recordingsUrl == null) {
+      return;
+    }
+    
+    // Bildirimi göster
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('İndiriliyor: $recording'),
+        duration: const Duration(seconds: 2),
+        action: SnackBarAction(
+          label: 'Tamam',
+          onPressed: () {},
+        ),
+      ),
+    );
+    
+    // İndirme URL'sini oluştur
+    final dateStr = DateFormat('yyyy_MM_dd').format(_selectedDay!);
+    final dayUrl = '$_recordingsUrl$dateStr/';
+    final downloadUrl = '$dayUrl$recording';
+    
+    // Bu URL'yi paylaşmak veya tarayıcıda açmak için ilgili platform API'lerini kullanabilirsiniz
+    // Örneğin: url_launcher paketi ile tarayıcıda açma
+    print('İndirme URL: $downloadUrl');
+  }
   
   @override
   void dispose() {
@@ -565,6 +620,11 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                                 color: AppTheme.primaryOrange,
                                 shape: BoxShape.circle,
                               ),
+                              markersMaxCount: 3,
+                              markersAnchor: 0.7,
+                              outsideDaysVisible: false,
+                              weekendTextStyle: const TextStyle(color: Colors.red),
+                              holidayTextStyle: const TextStyle(color: Colors.blue),
                             ),
                             calendarBuilders: CalendarBuilders(
                               markerBuilder: (context, date, events) {
@@ -662,6 +722,11 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                                       leading: Icon(
                                         Icons.video_library,
                                         color: isSelected ? AppTheme.primaryOrange : null,
+                                      ),
+                                      trailing: IconButton(
+                                        icon: const Icon(Icons.download),
+                                        tooltip: 'İndir',
+                                        onPressed: () => _downloadRecording(recording),
                                       ),
                                       selectedTileColor: AppTheme.primaryOrange.withOpacity(0.1),
                                       onTap: () => _selectRecording(recording),
@@ -821,8 +886,20 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
         shape: BoxShape.circle,
         color: AppTheme.primaryOrange,
       ),
-      width: 8,
-      height: 8,
+      width: 12,
+      height: 12,
+      child: Center(
+        child: count > 1 
+          ? Text(
+              count.toString(),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 8,
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          : null,
+      ),
     );
   }
 }
