@@ -38,10 +38,22 @@ class WebSocketProvider with ChangeNotifier {
   String _serverIp = '85.104.114.145';
   int _serverPort = 1200;
 
-  // Constructor - load saved settings but don't connect automatically
+  // Constructor - load saved settings and try to connect automatically if credentials exist
   WebSocketProvider() {
-    _loadSettings();
-    _detectPlatform();
+    _loadSettings().then((_) {
+      _detectPlatform();
+      
+      // Attempt to connect automatically if we have saved credentials
+      if (_lastUsername != null && _lastPassword != null && _rememberMe) {
+        debugPrint('Auto-connecting with saved credentials');
+        Future.delayed(const Duration(seconds: 2), () {
+          connect(_serverIp, _serverPort, 
+            username: _lastUsername, 
+            password: _lastPassword, 
+            rememberMe: _rememberMe);
+        });
+      }
+    });
   }
 
   // Set the camera devices provider
@@ -264,6 +276,13 @@ class WebSocketProvider with ChangeNotifier {
           _isLoggedIn = false;
           _errorMessage = jsonData['msg'] ?? 'Login required';
           _logMessage('Login status: $_errorMessage');
+          
+          // Auto-login when we receive a login message if we have credentials
+          if (_lastUsername != null && _lastPassword != null) {
+            _logMessage('Auto-login triggered by login message');
+            login(_lastUsername!, _lastPassword!, _rememberMe);
+          }
+          
           notifyListeners();
           break;
 
@@ -413,8 +432,8 @@ class WebSocketProvider with ChangeNotifier {
       
       notifyListeners();
       
-      // No longer auto-connect - wait for user to press login button
-      // Auto-connect functionality removed as per requirement
+      // Auto-connect will be handled in the constructor after _loadSettings completes
+      // This allows for proper initialization before attempting connection
     } catch (e) {
       debugPrint('Error loading settings: $e');
       _logMessage('Error loading settings: $e');
