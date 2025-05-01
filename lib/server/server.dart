@@ -181,7 +181,7 @@ class ServerApp {
             }));
           }
         }
-      } else if (data == 'DO MONITORECS') {
+      } else if (data == 'Monitor ecs_slaves') {
         // Check if client is logged in
         if (_clientLoginStatus[socket.hashCode.toString()] == true) {
           // Start sending system info and camera updates periodically
@@ -426,7 +426,7 @@ class ServerApp {
   void _sendCameraDeviceProperty(WebSocket socket, String macKey, String propertyPath, dynamic value) {
     final message = {
       'c': 'changed',
-      'data': 'ecs.slaves.$macKey.$propertyPath',
+      'data': 'ecs_slaves.$macKey.$propertyPath',
       'val': value,
     };
     socket.add(jsonEncode(message));
@@ -436,7 +436,7 @@ class ServerApp {
   void _sendCameraProperty(WebSocket socket, String macKey, int cameraIndex, String propertyName, dynamic value) {
     final message = {
       'c': 'changed',
-      'data': 'ecs.slaves.$macKey.cam[$cameraIndex].$propertyName',
+      'data': 'ecs_slaves.$macKey.cam[$cameraIndex].$propertyName',
       'val': value,
     };
     socket.add(jsonEncode(message));
@@ -446,7 +446,7 @@ class ServerApp {
   void _sendCameraReportProperty(WebSocket socket, String macKey, String cameraName, String propertyName, dynamic value) {
     final message = {
       'c': 'changed',
-      'data': 'ecs.slaves.$macKey.camreports.$cameraName.$propertyName',
+      'data': 'ecs_slaves.$macKey.camreports.$cameraName.$propertyName',
       'val': value,
     };
     socket.add(jsonEncode(message));

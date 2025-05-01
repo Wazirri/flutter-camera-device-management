@@ -201,7 +201,7 @@ class WebSocketService with ChangeNotifier {
               final String dataPath = jsonMessage['data'].toString();
               
               // Add detailed debug info for camera device messages
-              if (dataPath.startsWith('ecs.slaves.m_')) {
+              if (dataPath.startsWith('ecs_slaves.m_')) {
                 print('📦 Device message: ${jsonMessage['data']} = ${jsonMessage['val']}');
                 _onParsedMessage!(jsonMessage);
               }
@@ -236,7 +236,7 @@ class WebSocketService with ChangeNotifier {
   // Send the "DO MONITORECS" command
   void sendMonitorCommand() {
     if (_channel != null && _isConnected) {
-      final monitorCommand = 'DO MONITORECS';
+      final monitorCommand = 'Monitor ecs_slaves';
       _channel!.sink.add(monitorCommand);
       
       // Log the command

@@ -233,7 +233,7 @@ class WebSocketProvider with ChangeNotifier {
   // Start monitoring ECS (should be called after successful login)
   void startEcsMonitoring() {
     if (_isConnected && _isLoggedIn && _socket != null) {
-      _socket!.add('DO MONITORECS');
+      _socket!.add('Monitor ecs_slaves');
       _logMessage('Started ECS monitoring');
     }
   }

@@ -1,4 +1,3 @@
-# Uncomment this line to define a global platform for your project
 platform :osx, '10.14'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
@@ -23,61 +22,21 @@ def flutter_root
   raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}. Try deleting Flutter-Generated.xcconfig, then run \"flutter pub get\""
 end
 
-# Load the Flutter podhelper manually instead of using require
-flutter_helpers_path = File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
-load flutter_helpers_path rescue load File.join(flutter_root, 'packages', 'flutter_tools', 'bin', 'podhelper.rb')
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
 
 flutter_macos_podfile_setup
 
 target 'Runner' do
   use_frameworks!
-  use_modular_headers!
-
-  # Fix for POD_CONFIGURATION_DEBUG macro redefinition warnings
-  post_install do |installer|
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        if config.name == 'Debug'
-          # Check for and modify preprocessor definitions to avoid redefinition
-          if config.build_settings['GCC_PREPROCESSOR_DEFINITIONS']
-            # Remove any existing POD_CONFIGURATION_DEBUG definition to prevent redefinition
-            config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].reject do |define|
-              define.include?('POD_CONFIGURATION_DEBUG')
-            end
-            # Add the definition with a guard
-            config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'POD_CONFIGURATION_DEBUG=1'
-          else
-            config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = ['POD_CONFIGURATION_DEBUG=1']
-          end
-        end
-        
-        # Ensure consistent deployment target
-        config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '10.14'
-      end
-      
-      # Skip application extension API restriction for non-extension targets
-      unless target.name.include?('Extension')
-        target.build_configurations.each do |config|
-          config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
-        end
-      end
-    end
-    
-    # Instead of calling flutter_additional_macos_build_settings which has issues,
-    # we implement the needed settings directly
-    installer.pods_project.targets.each do |target|
-      # Only apply to framework targets (Flutter plugins)
-      next unless target.respond_to?(:product_type)
-      next unless target.product_type == "com.apple.product-type.framework"
-      
-      target.build_configurations.each do |config|
-        # Disable code signing for frameworks
-        config.build_settings['EXPANDED_CODE_SIGN_IDENTITY'] = ""
-        config.build_settings['CODE_SIGNING_REQUIRED'] = "NO"
-        config.build_settings['CODE_SIGNING_ALLOWED'] = "NO"
-      end
-    end
-  end
 
   flutter_install_all_macos_pods File.dirname(File.realpath(__FILE__))
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_macos_build_settings(target)
+  end
 end

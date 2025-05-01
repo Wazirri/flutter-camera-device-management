@@ -104,12 +104,12 @@ class CameraDevicesProvider with ChangeNotifier {
       print('Processing WebSocket message: ${json.encode(message)}');
       
       // Check if this is a camera device-related message
-      if (dataPath.startsWith('ecs.slaves.m_')) {
+      if (dataPath.startsWith('ecs_slaves.m_')) {
         // Extract the MAC address from the data path
-        // Format is like: ecs.slaves.m_26_C1_7A_0B_1F_19.property
+        // Format is like: ecs_slaves.m_26_C1_7A_0B_1F_19.property
         final parts = dataPath.split('.');
         if (parts.length >= 3) {
-          final macKey = parts[2]; // Get m_26_C1_7A_0B_1F_19
+          final macKey = parts[1]; // Get m_26_C1_7A_0B_1F_19 (index changed from 2 to 1 after ecs_slaves format change)
           final macAddress = macKey.substring(2).replaceAll('_', ':'); // Convert to proper MAC format
           
           print('Extracted macKey: $macKey, macAddress: $macAddress');
@@ -148,8 +148,8 @@ class CameraDevicesProvider with ChangeNotifier {
   void _updateDeviceProperty(String macKey, List<String> parts, dynamic value) {
     final device = _devices[macKey]!;
     
-    // Skip ecs.slaves.macKey prefix to get the actual property path
-    final propertyPath = parts.sublist(3);
+    // Skip ecs_slaves.macKey prefix to get the actual property path
+    final propertyPath = parts.sublist(2); // Changed from 3 to 2 due to ecs_slaves format change
     
     if (propertyPath.isNotEmpty) {
       switch (propertyPath[0]) {
