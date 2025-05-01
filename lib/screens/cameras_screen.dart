@@ -19,7 +19,7 @@ class _CamerasScreenState extends State<CamerasScreen> {
   Camera? selectedCamera;
   String searchQuery = '';
   bool showOnlyActive = false;
-  bool isGridView = true;
+  bool isGridView = false; // Default to list view
   String? selectedMacAddress;
 
   @override
@@ -155,6 +155,16 @@ class _CamerasScreenState extends State<CamerasScreen> {
               : 'Switch to Grid View',
             onPressed: _toggleViewMode,
           ),
+          if (!isGridView)
+            IconButton(
+              icon: const Icon(Icons.view_list),
+              tooltip: 'Default to List View',
+              onPressed: () {
+                setState(() {
+                  isGridView = false;
+                });
+              },
+            ),
         ],
       ),
       body: Consumer<CameraDevicesProvider>(
@@ -287,15 +297,17 @@ class _CamerasScreenState extends State<CamerasScreen> {
                       );
                     },
                   )
-                : ListView.builder(
+                : ListView.separated(
                     padding: const EdgeInsets.all(16.0),
                     itemCount: displayCameras.length,
+                    separatorBuilder: (context, index) => const Divider(height: 1),
                     itemBuilder: (context, index) {
                       final camera = displayCameras[index];
                       
                       // List item
                       return Card(
-                        margin: const EdgeInsets.only(bottom: 12.0),
+                        margin: const EdgeInsets.only(bottom: 8.0),
+                        elevation: 2,
                         clipBehavior: Clip.antiAlias,
                         child: InkWell(
                           onTap: () => _selectCamera(camera),

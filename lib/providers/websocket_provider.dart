@@ -38,21 +38,14 @@ class WebSocketProvider with ChangeNotifier {
   String _serverIp = '85.104.114.145';
   int _serverPort = 1200;
 
-  // Constructor - load saved settings and try to connect automatically if credentials exist
+  // Constructor - load saved settings but don't auto-connect
   WebSocketProvider() {
     _loadSettings().then((_) {
       _detectPlatform();
       
-      // Attempt to connect automatically if we have saved credentials
-      if (_lastUsername != null && _lastPassword != null && _rememberMe) {
-        debugPrint('Auto-connecting with saved credentials');
-        Future.delayed(const Duration(seconds: 2), () {
-          connect(_serverIp, _serverPort, 
-            username: _lastUsername, 
-            password: _lastPassword, 
-            rememberMe: _rememberMe);
-        });
-      }
+      // We no longer auto-connect to prevent connection attempts before login
+      // User must explicitly call connect/login methods instead
+      debugPrint('WebSocket initialized. Waiting for user to log in before attempting connection.');
     });
   }
 
