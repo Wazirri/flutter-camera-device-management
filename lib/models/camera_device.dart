@@ -125,6 +125,9 @@ class CameraDevice {
 }
 
 class Camera {
+  // ... mevcut alanlar ...
+  String health; // camreports için sağlık bilgisi
+  double temperature; // camreports için sıcaklık bilgisi
   final int index;            // Index of the camera in the device's cameras array
   String name;                // User-friendly name (e.g., KAMERA1)
   String ip;                  // IP address of the camera (cameraIp)
@@ -159,6 +162,8 @@ class Camera {
   
   Camera({
     required this.index,
+    this.health = '',
+    this.temperature = 0.0,
     required this.name,
     required this.ip,
     this.rawIp = 0,
@@ -197,6 +202,8 @@ class Camera {
   // Copy with method for immutable updates
   Camera copyWith({
     String? name,
+    String? health,
+    double? temperature,
     String? ip,
     int? rawIp,
     String? username,
@@ -226,6 +233,8 @@ class Camera {
   }) {
     return Camera(
       index: this.index,
+      health: health ?? this.health,
+      temperature: temperature ?? this.temperature,
       name: name ?? this.name,
       ip: ip ?? this.ip,
       rawIp: rawIp ?? this.rawIp,
@@ -286,11 +295,13 @@ class Camera {
       subWidth: json['subWidth'] ?? 0,
       subHeight: json['subHeight'] ?? 0,
       connected: json['connected'] ?? false,
-      disconnected: json['disconnected'] ?? '-',
+      disconnected: json['disconnected'] ?? '',
       lastSeenAt: json['lastSeenAt'] ?? '',
       recording: json['recording'] ?? false,
       soundRec: json['soundRec'] ?? false,
       xAddr: json['xAddr'] ?? '',
+      health: json['health'] ?? '',
+      temperature: (json['temperature'] is num) ? (json['temperature'] as num).toDouble() : double.tryParse(json['temperature']?.toString() ?? '') ?? 0.0,
     );
   }
   
@@ -298,6 +309,8 @@ class Camera {
   Map<String, dynamic> toJson() {
     return {
       'index': index,
+      'health': health,
+      'temperature': temperature,
       'name': name,
       'ip': ip,
       'rawIp': rawIp,

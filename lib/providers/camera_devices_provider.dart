@@ -101,24 +101,30 @@ class CameraDevicesProvider with ChangeNotifier {
 
   // Process "changed" messages from WebSocket
   void processWebSocketMessage(Map<String, dynamic> message) async {
-    // 1. Log the raw message first
-    try {
-      await FileLogger.log('Received Raw WebSocket Message: ${json.encode(message)}', tag: 'CAMERA_RAW_MSG');
-    } catch (e) {
-      await FileLogger.log('Error encoding raw message for logging: $e', tag: 'LOGGING_ERROR');
-    }
-
-    // 2. Check if message is valid for processing and log decision
+    // Check if message is valid for processing
     if (message['c'] == 'changed' && message.containsKey('data') && message.containsKey('val')) {
-      await FileLogger.log('Processing message...', tag: 'CAMERA_INFO');
-
-      // 3. Proceed with processing
       final String dataPath = message['data'];
       final dynamic value = message['val'];
       
-      // Redundant print removed
-      // print('Processing WebSocket message: ${json.encode(message)}');
-      await FileLogger.log('Processing camera device message: $dataPath = $value', tag: 'CAMERA_PROC');
+      // Kamera tespiti için pattern'ler
+      final bool isCameraData = 
+          // ecs_slaves.MAC.cam[INDEX] pattern
+          dataPath.contains('cam[') || 
+          // ecs_slaves.MAC.camreports pattern
+          dataPath.contains('camreports') ||
+          // Diğer olası kamera veri pattern'leri
+          dataPath.contains('cameras.');
+          
+      // Eğer herhangi bir kamera verisi ile ilgili mesaj ise log at
+      if (isCameraData) {
+        // Kamera verisi bulundu - tam kamera mesajı olduğu anda log at
+        await FileLogger.log('[CAM FOUND!] PATH: $dataPath, VALUE: $value', tag: 'CAMERA_FOUND');
+        try {
+          await FileLogger.log('[CAM RAW DATA] ${json.encode(message)}', tag: 'CAM_RAW_DATA');
+        } catch (e) {
+          await FileLogger.log('Error logging raw message data: $e', tag: 'LOGGING_ERROR');
+        }
+      }
       
       // Check if this is a camera device-related message
       if (dataPath.startsWith('ecs_slaves.m_')) {
@@ -268,6 +274,7 @@ class CameraDevicesProvider with ChangeNotifier {
         // Process the rest of the path if available
         if (parts.length >= 2) {
            List<String> cameraPropertyPath = parts.sublist(1);
+          // Artık bu kısımda log atmıyoruz, tüm loglar processWebSocketMessage'da yapılıyor
           _updateCameraProperty(device, cameraIdx, cameraPropertyPath, value);
         } else {
           await FileLogger.log('Missing property path for legacy camera format: $propName', tag: 'CAMERA_WARN');
@@ -290,6 +297,8 @@ class CameraDevicesProvider with ChangeNotifier {
 
         // If camera not found, create it
         if (targetCamera == null) {
+          await FileLogger.log('[CAM FOUND!] New camera "$cameraName" for device $macKey', tag: 'CAMERA_FOUND');
+          await FileLogger.log('CAM RAW DATA: CameraName=$cameraName, Value=$value', tag: 'CAM_RAW_DATA');
           await FileLogger.log('Camera "$cameraName" not found for device $macKey. Creating new camera entry.', tag: 'CAMERA_NEW');
           targetCamera = Camera(
             index: device.cameras.length, // Assign next available index
@@ -396,6 +405,7 @@ class CameraDevicesProvider with ChangeNotifier {
   }
 
   void _updateCameraPropertyByName(CameraDevice device, String cameraName, List<String> propertyPath, dynamic value) async {
+    // Artık bu kısımda log atmıyoruz, tüm loglar processWebSocketMessage'da yapılıyor
     // Log the camera property update
     await FileLogger.log(
       'Camera property update - Device: ${device.macAddress}, Camera: $cameraName, ' +
@@ -540,6 +550,7 @@ class CameraDevicesProvider with ChangeNotifier {
   }
 
   void _updateCameraProperty(CameraDevice device, int cameraIndex, List<String> propertyPath, dynamic value) async {
+    // Artık bu kısımda log atmıyoruz, tüm loglar processWebSocketMessage'da yapılıyor
     // Log the camera property update
     await FileLogger.log(
       'Camera property update - Device: ${device.macAddress}, Camera: $cameraIndex, ' +
@@ -578,6 +589,7 @@ class CameraDevicesProvider with ChangeNotifier {
       ));
       
       await FileLogger.log('New camera created with default properties', tag: 'CAMERA_NEW');
+      // Artık burada log atmıyoruz
     }
     
     final camera = device.cameras[cameraIndex];
@@ -702,6 +714,27 @@ class CameraDevicesProvider with ChangeNotifier {
         'Brand: ${camera.brand}, Connected: ${camera.connected}',
         tag: 'CAMERA_STATE'
       );
+    }
+  }
+
+  // Ek bilgi güncelleyici (camreports)
+  Future<void> _updateCameraReportProperty(Camera camera, List<String> propertyPath, dynamic value) async {
+    // Burada camreports ile gelen ek bilgiler kameraya işlenir
+    // Örneğin: camreports[$i].health, camreports[$i].temperature gibi
+    if (propertyPath.isEmpty) return;
+    final propertyName = propertyPath[0];
+    switch (propertyName) {
+      case 'health':
+        camera.health = value.toString();
+        await FileLogger.log('Set camera[${camera.name}] health to: ${camera.health}', tag: 'CAMERA_REPORT');
+        break;
+      case 'temperature':
+        camera.temperature = value is num ? (value as num).toDouble() : double.tryParse(value.toString()) ?? 0.0;
+        await FileLogger.log('Set camera[${camera.name}] temperature to: ${camera.temperature}', tag: 'CAMERA_REPORT');
+        break;
+      // Diğer camreports özellikleri buraya eklenebilir
+      default:
+        await FileLogger.log('Unknown camreports property: $propertyName', tag: 'CAMERA_REPORT_WARN');
     }
   }
 
