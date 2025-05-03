@@ -137,8 +137,8 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> with Automati
         final camera = _availableCameras[i];
         _selectedCameras[i] = camera;
         
-        // Start streaming if camera is connected
-        if (camera.connected && _players.isNotEmpty && i < _players.length) {
+        // Start streaming for all cameras, not just connected ones
+        if (_players.isNotEmpty && i < _players.length) {
           _streamCamera(i, camera);
         }
       }
@@ -292,7 +292,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> with Automati
               itemBuilder: (context, index) {
                 final camera = index < _selectedCameras.length ? _selectedCameras[index] : null;
                 
-                if (camera != null && camera.connected) {
+                if (camera != null) { // Tüm kameraları göster, bağlantı durumuna bakılmaksızın
                   return Stack(
                     fit: StackFit.expand,
                     children: [
