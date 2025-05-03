@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' show min;
 import '../theme/app_theme.dart';
 
 class DesktopSideMenu extends StatefulWidget {
@@ -39,6 +40,11 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
       'title': 'Recordings',
       'icon': Icons.video_library,
       'route': '/recordings',
+    },
+    {
+      'title': 'Multi Recordings',
+      'icon': Icons.video_collection,
+      'route': '/multi-recordings',
     },
     {
       'title': 'Cameras',
@@ -141,11 +147,15 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
                 final isSelected = widget.currentRoute == item['route'];
                 
                 // Create staggered animation for each menu item
+                // Menü öğesi sayısı arttığı için interval değerlerini ölçeklendiriyoruz
+                final maxMenuItems = _menuItems.length.toDouble();
+                final step = 0.9 / maxMenuItems; // 0.9 aralığını öğe sayısına böl (0.1 marj bırak)
+                
                 final animation = CurvedAnimation(
                   parent: _animationController,
                   curve: Interval(
-                    0.1 + (index * 0.05),
-                    0.6 + (index * 0.05),
+                    0.1 + (index * step), // Dinamik başlangıç değeri
+                    min(0.1 + ((index + 1) * step), 1.0), // Bitiş değeri en fazla 1.0 olabilir
                     curve: Curves.easeOut,
                   ),
                 );

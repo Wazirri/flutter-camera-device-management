@@ -236,6 +236,14 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                   '/multi-live-view',
                   0,
                 ),
+                
+                _buildAnimatedMoreMenuItem(
+                  context,
+                  Icon(Icons.video_collection, color: AppTheme.accentColor),
+                  'Multi Recordings',
+                  '/multi-recordings',
+                  1,
+                ),
 
                 _buildAnimatedMoreMenuItem(
                   context,

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/websocket_provider.dart';
+import '../providers/camera_devices_provider.dart';
 import '../models/system_info.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/status_indicator.dart';
+import 'package:intl/intl.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -387,7 +389,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             TextButton(
               onPressed: () {
-                // No implementation, UI only
+                Navigator.pushNamed(context, '/devices');
               },
               child: Row(
                 children: const [
@@ -416,6 +418,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildDeviceTable(BuildContext context) {
+    final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context);
+    final devicesList = cameraDevicesProvider.devicesList;
+    
+    // Tabloyu boş göstermemek için
+    if (devicesList.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Text(
+            'No devices found. Connect devices to see them here.',
+            style: TextStyle(color: AppTheme.darkTextSecondary),
+          ),
+        ),
+      );
+    }
+    
     return Column(
       children: [
         Row(
@@ -468,16 +486,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
         const Divider(height: 32),
-        ...List.generate(
-          4,
-          (index) => _buildDeviceStatusRow(
+        
+        // Gerçek cihaz verilerini kullan
+        ...devicesList.take(4).map((device) {
+          // Son görülme zamanını hesapla
+          String lastActive = 'Unknown';
+          if (device.lastSeenAt.isNotEmpty) {
+            try {
+              final lastSeen = DateFormat('yyyy-MM-dd - HH:mm:ss').parse(device.lastSeenAt);
+              final now = DateTime.now();
+              final difference = now.difference(lastSeen);
+              
+              if (difference.inMinutes < 60) {
+                lastActive = '${difference.inMinutes}m ago';
+              } else if (difference.inHours < 24) {
+                lastActive = '${difference.inHours}h ago';
+              } else {
+                lastActive = '${difference.inDays}d ago';
+              }
+            } catch (e) {
+              lastActive = device.lastSeenAt;
+            }
+          }
+          
+          return _buildDeviceStatusRow(
             context,
-            name: 'Device ${index + 1}',
-            type: index % 2 == 0 ? 'Camera' : 'NVR',
-            status: index == 1 ? DeviceStatus.offline : DeviceStatus.online,
-            lastActive: '${index * 2}h ago',
-          ),
-        ),
+            name: device.deviceType.isEmpty ? device.macKey : device.deviceType,
+            type: device.firmwareVersion.isEmpty ? 'NVR' : 'NVR v${device.firmwareVersion}',
+            status: device.connected ? DeviceStatus.online : DeviceStatus.offline,
+            lastActive: lastActive,
+          );
+        }),
       ],
     );
   }
