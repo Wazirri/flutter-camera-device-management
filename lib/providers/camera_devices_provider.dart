@@ -1,5 +1,11 @@
 import 'dart:convert';
+// import 'dart:math'; // Unused import removed
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+// import 'package:universal_io/io.dart'; // Commented out - Target URI doesn't exist (dependency missing?)
+import 'package:collection/collection.dart'; // Import for firstWhereOrNull
+
 import '../models/camera_device.dart';
 import '../utils/file_logger.dart';
 
@@ -95,12 +101,23 @@ class CameraDevicesProvider with ChangeNotifier {
 
   // Process "changed" messages from WebSocket
   void processWebSocketMessage(Map<String, dynamic> message) async {
+    // 1. Log the raw message first
+    try {
+      await FileLogger.log('Received Raw WebSocket Message: ${json.encode(message)}', tag: 'CAMERA_RAW_MSG');
+    } catch (e) {
+      await FileLogger.log('Error encoding raw message for logging: $e', tag: 'LOGGING_ERROR');
+    }
+
+    // 2. Check if message is valid for processing and log decision
     if (message['c'] == 'changed' && message.containsKey('data') && message.containsKey('val')) {
+      await FileLogger.log('Processing message...', tag: 'CAMERA_INFO');
+
+      // 3. Proceed with processing
       final String dataPath = message['data'];
       final dynamic value = message['val'];
       
-      // Debugging log the message
-      print('Processing WebSocket message: ${json.encode(message)}');
+      // Redundant print removed
+      // print('Processing WebSocket message: ${json.encode(message)}');
       await FileLogger.log('Processing camera device message: $dataPath = $value', tag: 'CAMERA_PROC');
       
       // Check if this is a camera device-related message
@@ -144,7 +161,7 @@ class CameraDevicesProvider with ChangeNotifier {
           await FileLogger.log('Property path parts: ${propertyPathParts.join(".")}, value: $value', tag: 'CAMERA_PROP');
           
           // Update the device property
-          _updateDeviceProperty(macKey, propertyPathParts, value);
+          _updateDeviceProperty(macKey, propertyPathParts, value, message);
           
           // Notify listeners of the change
           notifyListeners();
@@ -153,16 +170,18 @@ class CameraDevicesProvider with ChangeNotifier {
         }
       }
     } else {
-      // Log non-changed messages or ones missing data/val
+      // 2b. Log reason for skipping
       if (message['c'] != 'changed') {
-        await FileLogger.log('Not a changed message: ${message['c']}', tag: 'CAMERA_SKIP');
+        await FileLogger.log("Skipping message (type is not 'changed': ${message['c']}).", tag: 'CAMERA_INFO');
+        await FileLogger.log('Not a changed message: ${message['c']}', tag: 'CAMERA_SKIP'); // Keep original skip log
       } else {
-        await FileLogger.log('Missing data or val fields in message', tag: 'CAMERA_ERROR');
+        await FileLogger.log("Skipping message (missing 'data' or 'val' fields).", tag: 'CAMERA_INFO');
+        await FileLogger.log('Missing data or val fields in message', tag: 'CAMERA_ERROR'); // Keep original error log
       }
     }
   }
 
-  void _updateDeviceProperty(String macKey, List<String> parts, dynamic value) async {
+  void _updateDeviceProperty(String macKey, List<String> parts, dynamic value, Map<String, dynamic> fullMessage) async {
     try {
       // Get the device, handle potential null if key is invalid (shouldn't happen if called correctly)
       final CameraDevice? device = _devices[macKey];
@@ -172,13 +191,12 @@ class CameraDevicesProvider with ChangeNotifier {
       }
       
       // Log the update attempt
-      await FileLogger.logCameraPropertyUpdate(
-        macKey: macKey,
-        property: parts.isEmpty ? 'empty_property' : parts.join('.'),
-        value: value,
-        dataPath: 'ecs_slaves.$macKey.${parts.join('.')}'  
+      await FileLogger.log(
+        'Camera property update - Device: $macKey, ' +
+        'Property: ${parts.join('.')}, Value: $value', 
+        tag: 'CAMERA_PROP_UPDATE'
       );
-
+      
       // Simple device properties
       if (parts.isEmpty) {
         await FileLogger.log('Empty property parts for device: $macKey', tag: 'CAMERA_WARN');
@@ -191,7 +209,7 @@ class CameraDevicesProvider with ChangeNotifier {
       if (propName == 'ipv4') {
         device.ipv4 = value.toString();
         await FileLogger.log('Set device $macKey ipv4 to: ${device.ipv4}', tag: 'DEVICE_PROP');
-      } else if (propName == 'lastseenat') {
+      } else if (propName == 'lastseenat' || propName == 'last_seen_at') { 
         device.lastSeenAt = value.toString();
         await FileLogger.log('Set device $macKey lastSeenAt to: ${device.lastSeenAt}', tag: 'DEVICE_PROP');
       } else if (propName == 'connected') {
@@ -256,46 +274,116 @@ class CameraDevicesProvider with ChangeNotifier {
         }
       }
       // Camera specific properties, check if we got a cameras structure (legacy format)
-      else if (propName == 'cameras' && parts.length >= 2) {
-        // Ensure there is a device associated with this macKey
-        // Note: device is guaranteed non-null here due to check at start of function
-        // var device = _devices[macKey]!; // Device already fetched at the start
-        await FileLogger.log('Received camera list payload for device: ${device.macAddress}', tag: 'CAMERA_PAYLOAD');
+      else if (propName == 'cameras' && parts.length >= 3) { 
+        // Extract camera name (e.g., me8_b7_23_0c_12_4b or KAMERA76)
+        String cameraName = parts[1];
+        // Extract property path for the camera (e.g., ['status'] or ['config', 'resolution'])
+        List<String> cameraPropertyPath = parts.sublist(2);
+
+        // Find the camera by name in the device's list
+        Camera? targetCamera;
         try {
-          _updateCameraData(device, value); // Call the dedicated function
-        } catch (e, stackTrace) {
-          await FileLogger.log('Error updating camera data for device ${device.macAddress}: $e\nStackTrace: $stackTrace\nPayload: $value', tag: 'CAMERA_ERROR');
+          targetCamera = device.cameras.firstWhere((cam) => cam.name.toLowerCase() == cameraName.toLowerCase());
+        } catch (e) {
+          targetCamera = null; // Not found
         }
-        notifyListeners(); // Notify after potential camera list update
+
+        // If camera not found, create it
+        if (targetCamera == null) {
+          await FileLogger.log('Camera "$cameraName" not found for device $macKey. Creating new camera entry.', tag: 'CAMERA_NEW');
+          targetCamera = Camera(
+            index: device.cameras.length, // Assign next available index
+            name: cameraName, 
+            ip: '', // Default value
+            rawIp: 0, // Default value
+            username: '', // Default value
+            password: '', // Default value
+            brand: '', // Default value
+            hw: '', // Default value
+            manufacturer: '', // Default value
+            country: '', // Default value
+            xAddrs: '', // Default value
+            mediaUri: '', // Default value
+            recordUri: '', // Default value
+            subUri: '', // Default value
+            remoteUri: '', // Default value
+            mainSnapShot: '', // Default value
+            subSnapShot: '', // Default value
+            recordPath: '', // Default value
+            recordCodec: '', // Default value
+            recordWidth: 0, // Default value
+            recordHeight: 0, // Default value
+            subCodec: '', // Default value
+            subWidth: 0, // Default value
+            subHeight: 0, // Default value
+            connected: false, // Default value
+            disconnected: '-', // Default value
+            lastSeenAt: '', // Default value
+            recording: false, // Default value
+            soundRec: false, // Default value
+            xAddr: '', // Default value
+          );
+          device.cameras.add(targetCamera);
+          await FileLogger.log('Added new camera "$cameraName" to device $macKey.', tag: 'CAMERA_NEW');
+          // Log the raw message that caused the new camera addition
+          await FileLogger.log('Source message for new camera[$cameraName]: ${json.encode(fullMessage)}', tag: 'CAMERA_NEW_SOURCE');
+        }
+        
+        // Update the property of the found or newly created camera
+        _updateCameraPropertyByName(device, cameraName, cameraPropertyPath, value);
+
       }
-      // Handle camreport (singular) and camreports (plural) formats
-      else if((propName == 'camreport' || propName == 'camreports') && parts.length >= 3) {
-        String cameraName = parts[1].toLowerCase();
-        String reportProperty = parts[2].toLowerCase();
-        
-        await FileLogger.log('Processing camera report for device $macKey: Camera Name=$cameraName, Property=$reportProperty, Value=$value', tag: 'CAMERA_REPORT');
-        
-        // Find the camera with matching name (case insensitive)
-        int cameraIndex = device.cameras.indexWhere((cam) => cam.name.toLowerCase() == cameraName);
-        
-        if(cameraIndex >= 0) {
-          // Update the specific property based on the report
-          // Example: update connection status, recording status etc.
-          var camera = device.cameras[cameraIndex];
-          if (reportProperty == 'connected') {
-            camera.connected = value is bool ? value : (value.toString().toLowerCase() == 'true');
-            await FileLogger.log('Updated camera[$cameraIndex] (${camera.name}) connected status via report: ${camera.connected}', tag: 'CAMERA_REPORT');
-          } else if (reportProperty == 'recording') {
-            camera.recording = value is bool ? value : (value.toString().toLowerCase() == 'true');
-             await FileLogger.log('Updated camera[$cameraIndex] (${camera.name}) recording status via report: ${camera.recording}', tag: 'CAMERA_REPORT');
+      // Handle camera reports which might not follow the full path
+      else if (parts.length >= 2 && parts[0] == 'camreports') {
+        // Extract camera name and property path
+        final String cameraName = parts[1];
+        final List<String> cameraPropertyPath = parts.sublist(2);
+
+        // Find the camera by NAME.
+        var targetCamera = device.cameras.firstWhereOrNull((c) => c.name.toLowerCase() == cameraName.toLowerCase());
+
+        if (targetCamera != null) {
+          // If camera found by name, assign the property directly
+          if (cameraPropertyPath.isNotEmpty) {
+            final String propertyName = cameraPropertyPath[0];
+            // Determine the actual value to assign (handle potential sub-properties if needed)
+            final dynamic propertyValue = cameraPropertyPath.length > 1 
+                ? { cameraPropertyPath.sublist(1).join('.'): value } // Handle nested properties if necessary
+                : value;
+                
+            await FileLogger.log('Assigning property via camreports to camera "$cameraName": $propertyName = $propertyValue', tag: 'CAMERA_ASSIGN_REPORT');
+            
+            // Update known camera properties directly
+            switch (propertyName) {
+              case 'connected':
+                targetCamera.connected = propertyValue is bool ? propertyValue : (propertyValue.toString().toLowerCase() == 'true');
+                await FileLogger.log('Set camera ${targetCamera.name} connected to: ${targetCamera.connected}', tag: 'CAMERA_PROP');
+                break;
+              case 'recording':
+                 targetCamera.recording = propertyValue is bool ? propertyValue : (propertyValue.toString().toLowerCase() == 'true');
+                 await FileLogger.log('Set camera ${targetCamera.name} recording to: ${targetCamera.recording}', tag: 'CAMERA_PROP');
+                break;
+              // Add other properties from camreports if needed
+              default:
+                 await FileLogger.log('Unknown camera property via camreports: $propertyName for camera ${targetCamera.name}', tag: 'CAMERA_WARN');
+            }
+            
           } else {
-            await FileLogger.log('Unknown camera report property: $reportProperty for camera $cameraName', tag: 'CAMERA_WARN');
+            await FileLogger.log('Received update for camreports.$cameraName itself, but no specific property. Value: $value', tag: 'CAMERA_WARN');
           }
         } else {
-          await FileLogger.log('Warning: Received camera report for unknown camera name: $cameraName on device $macKey. Ignoring.', tag: 'CAMERA_ERROR');
-          await FileLogger.log('Device cameras: ${device.cameras.map((c) => c.name).join(', ')}', tag: 'CAMERA_ERROR');
+          // If camera NOT found by name, DO NOT create a new one.
+          // Log a warning that the report is for an unknown/unnamed camera.
+          await FileLogger.log('Received camreport for unknown or not-yet-named camera "$cameraName" on device $macKey. Property: ${cameraPropertyPath.join('.')}, Value: $value. Ignoring.', tag: 'CAMERA_WARN');
         }
+      }
+      // Handle app specific properties (path starts with 'app.')
+      else if (propName == 'app' && parts.length > 1) {
+        String appProp = parts[1].toLowerCase();
+        await FileLogger.log('Processing app property: $appProp for device $macKey with value: $value', tag: 'APP_INFO');
+        // Handle app properties as needed
       } else {
+        // Reverted: Log all unknown properties again
         await FileLogger.log('Unknown or unhandled device property for device $macKey: ${parts.join('.')}', tag: 'CAMERA_WARN');
       }
     } catch (e, stackTrace) {
@@ -305,6 +393,150 @@ class CameraDevicesProvider with ChangeNotifier {
     
     // Notify listeners after processing any property update
     notifyListeners();
+  }
+
+  void _updateCameraPropertyByName(CameraDevice device, String cameraName, List<String> propertyPath, dynamic value) async {
+    // Log the camera property update
+    await FileLogger.log(
+      'Camera property update - Device: ${device.macAddress}, Camera: $cameraName, ' +
+      'Property: ${propertyPath.join('.')}, Value: $value', 
+      tag: 'CAMERA_PROP_UPDATE'
+    );
+    
+    // Find the camera by name
+    Camera? targetCamera;
+    try {
+      targetCamera = device.cameras.firstWhere((cam) => cam.name.toLowerCase() == cameraName.toLowerCase());
+    } catch (e) {
+      targetCamera = null; // Not found
+    }
+
+    if (targetCamera == null) {
+      await FileLogger.log('Camera "$cameraName" not found for device ${device.macAddress}. Cannot update property.', tag: 'CAMERA_ERROR');
+      return;
+    }
+    
+    // Extract the property name after cam[X]
+    final propertyName = propertyPath.isNotEmpty ? propertyPath[0] : '';
+    
+    if (propertyName.isEmpty) {
+      await FileLogger.log('Empty property name for camera[$cameraName]', tag: 'CAMERA_ERROR');
+      return;
+    }
+    
+    await FileLogger.log(
+      'Updating camera[$cameraName] property: $propertyName, value: $value (${value.runtimeType})', 
+      tag: 'CAMERA_PROP'
+    );
+    
+    // Update the camera property based on name
+    switch (propertyName) {
+      case 'name':
+        String oldName = targetCamera.name;
+        targetCamera.name = value.toString();
+        print('Set camera[$cameraName] name to: ${targetCamera.name}');
+        await FileLogger.log('Set camera[$cameraName] name from "$oldName" to: "${targetCamera.name}"', tag: 'CAMERA_PROP');
+        break;
+      case 'cameraIp':
+        targetCamera.ip = value.toString();
+        await FileLogger.log('Set camera[$cameraName] IP to: ${targetCamera.ip}', tag: 'CAMERA_PROP');
+        break;
+      case 'cameraRawIp':
+        targetCamera.rawIp = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        await FileLogger.log('Set camera[$cameraName] rawIp to: ${targetCamera.rawIp}', tag: 'CAMERA_PROP');
+        break;
+      case 'username':
+        targetCamera.username = value.toString();
+        await FileLogger.log('Set camera[$cameraName] username to: ${targetCamera.username}', tag: 'CAMERA_PROP');
+        break;
+      case 'password':
+        targetCamera.password = value.toString();
+        await FileLogger.log('Set camera[$cameraName] password to: [REDACTED]', tag: 'CAMERA_PROP');
+        break;
+      case 'brand':
+        targetCamera.brand = value.toString();
+        await FileLogger.log('Set camera[$cameraName] brand to: ${targetCamera.brand}', tag: 'CAMERA_PROP');
+        break;
+      case 'hw':
+        targetCamera.hw = value.toString();
+        await FileLogger.log('Set camera[$cameraName] hw to: ${targetCamera.hw}', tag: 'CAMERA_PROP');
+        break;
+      case 'manufacturer':
+        targetCamera.manufacturer = value.toString();
+        await FileLogger.log('Set camera[$cameraName] manufacturer to: ${targetCamera.manufacturer}', tag: 'CAMERA_PROP');
+        break;
+      case 'country':
+        targetCamera.country = value.toString();
+        await FileLogger.log('Set camera[$cameraName] country to: ${targetCamera.country}', tag: 'CAMERA_PROP');
+        break;
+      case 'xAddrs':
+        targetCamera.xAddrs = value.toString();
+        await FileLogger.log('Set camera[$cameraName] xAddrs to: ${targetCamera.xAddrs}', tag: 'CAMERA_PROP');
+        break;
+      case 'mediaUri':
+        targetCamera.mediaUri = value.toString();
+        await FileLogger.log('Set camera[$cameraName] mediaUri to: ${targetCamera.mediaUri}', tag: 'CAMERA_PROP');
+        break;
+      case 'recordUri':
+        targetCamera.recordUri = value.toString();
+        await FileLogger.log('Set camera[$cameraName] recordUri to: ${targetCamera.recordUri}', tag: 'CAMERA_PROP');
+        break;
+      case 'subUri':
+        targetCamera.subUri = value.toString();
+        await FileLogger.log('Set camera[$cameraName] subUri to: ${targetCamera.subUri}', tag: 'CAMERA_PROP');
+        break;
+      case 'remoteUri':
+        targetCamera.remoteUri = value.toString();
+        await FileLogger.log('Set camera[$cameraName] remoteUri to: ${targetCamera.remoteUri}', tag: 'CAMERA_PROP');
+        break;
+      case 'mainSnapShot':
+        targetCamera.mainSnapShot = value.toString();
+        await FileLogger.log('Set camera[$cameraName] mainSnapShot to: ${targetCamera.mainSnapShot}', tag: 'CAMERA_PROP');
+        break;
+      case 'subSnapShot':
+        targetCamera.subSnapShot = value.toString();
+        await FileLogger.log('Set camera[$cameraName] subSnapShot to: ${targetCamera.subSnapShot}', tag: 'CAMERA_PROP');
+        break;
+      case 'recordPath':
+        targetCamera.recordPath = value.toString();
+        await FileLogger.log('Set camera[$cameraName] recordPath to: ${targetCamera.recordPath}', tag: 'CAMERA_PROP');
+        break;
+      case 'recordcodec':
+        targetCamera.recordCodec = value.toString();
+        await FileLogger.log('Set camera[$cameraName] recordCodec to: ${targetCamera.recordCodec}', tag: 'CAMERA_PROP');
+        break;
+      case 'recordwidth':
+        targetCamera.recordWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        await FileLogger.log('Set camera[$cameraName] recordWidth to: ${targetCamera.recordWidth}', tag: 'CAMERA_PROP');
+        break;
+      case 'recordheight':
+        targetCamera.recordHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        await FileLogger.log('Set camera[$cameraName] recordHeight to: ${targetCamera.recordHeight}', tag: 'CAMERA_PROP');
+        break;
+      case 'subcodec':
+        targetCamera.subCodec = value.toString();
+        await FileLogger.log('Set camera[$cameraName] subCodec to: ${targetCamera.subCodec}', tag: 'CAMERA_PROP');
+        break;
+      case 'subwidth':
+        targetCamera.subWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        await FileLogger.log('Set camera[$cameraName] subWidth to: ${targetCamera.subWidth}', tag: 'CAMERA_PROP');
+        break;
+      case 'subheight':
+        targetCamera.subHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        await FileLogger.log('Set camera[$cameraName] subHeight to: ${targetCamera.subHeight}', tag: 'CAMERA_PROP');
+        break;
+      default:
+        await FileLogger.log('Unknown camera property: $propertyName', tag: 'CAMERA_WARN');
+    }
+    
+    // After updating a property, log the updated camera state
+    if (propertyName == 'name' || propertyName == 'ip' || propertyName == 'brand') {
+      await FileLogger.log(
+        'Current camera[$cameraName] state - Name: "${targetCamera.name}", IP: ${targetCamera.ip}, ' +
+        'Brand: ${targetCamera.brand}, Connected: ${targetCamera.connected}',
+        tag: 'CAMERA_STATE'
+      );
+    }
   }
 
   void _updateCameraProperty(CameraDevice device, int cameraIndex, List<String> propertyPath, dynamic value) async {
@@ -325,6 +557,7 @@ class CameraDevicesProvider with ChangeNotifier {
         index: nextIndex,
         name: 'Camera ${nextIndex + 1}',
         ip: '',
+        rawIp: 0,
         username: '',
         password: '',
         brand: '',
@@ -339,6 +572,7 @@ class CameraDevicesProvider with ChangeNotifier {
         subWidth: 0, 
         subHeight: 0,
         connected: false,
+        disconnected: '-',
         lastSeenAt: '',
         recording: false,
       ));
@@ -468,50 +702,6 @@ class CameraDevicesProvider with ChangeNotifier {
         'Brand: ${camera.brand}, Connected: ${camera.connected}',
         tag: 'CAMERA_STATE'
       );
-    }
-  }
-
-  void _updateCameraData(CameraDevice device, dynamic payload) async {
-    try {
-      if (payload is List) {
-        // Log the camera data with details
-        await FileLogger.log('Updating cameras for device ${device.macAddress}. Received ${payload.length} cameras', tag: 'CAMERA_INFO');
-        await FileLogger.log('Camera payload: ${jsonEncode(payload)}', tag: 'CAMERA_PAYLOAD');
-
-        List<Camera> newCameras = [];
-
-        // Create new cameras from payload
-        for (var i = 0; i < payload.length; i++) {
-          var cameraData = payload[i];
-          if (cameraData != null && cameraData is Map<String, dynamic>) {
-            try {
-              // Inject the index into the data before parsing
-              cameraData['index'] = i;
-              await FileLogger.log('Processing camera data for index $i on device ${device.macAddress}: ${jsonEncode(cameraData)}', tag: 'CAMERA_UPDATE');
-              newCameras.add(Camera.fromJson(cameraData));
-            } catch (e, stackTrace) {
-              await FileLogger.log('Error parsing camera data at index $i for device ${device.macAddress}: $e\nStackTrace: $stackTrace\nData: $cameraData', tag: 'CAMERA_ERROR');
-              // Optionally add a placeholder or skip
-            }
-          } else {
-            await FileLogger.log('Invalid or null camera data format at index $i on device ${device.macAddress}: $cameraData (${cameraData?.runtimeType})', tag: 'CAMERA_ERROR');
-          }
-        }
-
-        // Atomically update the device's camera list
-        device.cameras = newCameras;
-
-        // Log final camera count
-        await FileLogger.log('Device ${device.macAddress} now has ${device.cameras.length} cameras: ${device.cameras.map((c) => 'Camera(${c.index}:${c.name})').join(', ')}', tag: 'CAMERA_RESULT');
-        
-        // Ensure UI updates after camera data changes
-        // notifyListeners(); // Moved notification to the caller (_updateDeviceProperty)
-
-      } else {
-        await FileLogger.log('Invalid camera data format for device ${device.macAddress}. Expected List but got: ${payload.runtimeType}\nPayload: $payload', tag: 'CAMERA_ERROR');
-      }
-    } catch (e, stackTrace) {
-      await FileLogger.log('Error updating camera data for device ${device.macAddress}: $e\nStackTrace: $stackTrace\nPayload: $payload', tag: 'CAMERA_ERROR');
     }
   }
 
