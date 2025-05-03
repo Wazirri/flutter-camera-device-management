@@ -44,7 +44,16 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           _rememberMe = true;
           _serverAddressController.text = prefs.getString('serverAddress') ?? '';
-          _serverPortController.text = prefs.getString('serverPort') ?? '';
+          
+          // Handle both string and int cases for server port to fix type mismatch
+          var serverPort = prefs.getString('serverPort');
+          if (serverPort == null) {
+            // Try to get it as an int and convert to string
+            final portInt = prefs.getInt('serverPort');
+            serverPort = portInt?.toString() ?? '';
+          }
+          _serverPortController.text = serverPort;
+          
           _emailController.text = prefs.getString('username') ?? 'admin';
           // Password is intentionally not loaded for security reasons
         });
@@ -61,6 +70,9 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setBool('rememberMe', true);
         await prefs.setString('serverAddress', _serverAddressController.text);
         await prefs.setString('serverPort', _serverPortController.text);
+        // Remove any old int value that might be causing the type mismatch
+        await prefs.remove('serverPort'); // Remove potential int value
+        await prefs.setString('serverPort', _serverPortController.text); // Save as string
         await prefs.setString('username', _emailController.text);
         // We intentionally don't save the password for security reasons
       } catch (e) {

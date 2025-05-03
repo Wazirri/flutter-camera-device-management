@@ -1,6 +1,8 @@
+import 'dart:convert' show json;
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 
 import '../models/camera_device.dart';
 import '../utils/file_logger.dart';
@@ -59,30 +61,6 @@ class CameraDevicesProvider with ChangeNotifier {
       _selectedCameraIndex = cameraIndex;
       notifyListeners();
     }
-  }
-  
-  // Eski API uyumluluğu için - setSelectedDevice metodu
-  void setSelectedDevice(String macKey) {
-    selectDevice(macKey);
-  }
-  
-  // Eski API uyumluluğu için - setSelectedCameraIndex metodu
-  void setSelectedCameraIndex(int index) {
-    if (_selectedDevice != null) {
-      _selectedCameraIndex = index;
-      notifyListeners();
-    }
-  }
-  
-  // Kameraları yenile - UI için gerekli
-  void refreshCameras() {
-    // Kameraları yeniden yükleme işlemini başlat
-    _isLoading = true;
-    notifyListeners();
-    
-    // Yenileme işlemi tamamlandı (gerçekte websocket üzerinden zaten güncel verileri alıyoruz)
-    _isLoading = false;
-    notifyListeners();
   }
 
   // WebSocket mesajlarını işle
@@ -186,12 +164,6 @@ class CameraDevicesProvider with ChangeNotifier {
   
   // Kamera verilerini işle
   Future<void> _processCameraData(CameraDevice device, String camIndexPath, List<String> properties, dynamic value) async {
-    // TAM LOG: Gelen kamera veri mesajının detaylarını kaydet
-    await FileLogger.log(
-      "KAMERA VERİSİ - Device: ${device.macKey}, Path: $camIndexPath, Properties: ${properties.join('.')}, Value: $value",
-      tag: 'CAMERA_TRACE'
-    );
-    
     // Kamera indeksini çıkar: cam[0] -> 0
     String indexStr = camIndexPath.substring(4, camIndexPath.indexOf(']'));
     int cameraIndex = int.tryParse(indexStr) ?? -1;
@@ -208,30 +180,13 @@ class CameraDevicesProvider with ChangeNotifier {
     }
     
     String propertyName = properties[0];
-    await FileLogger.log(
-      "Mevcut kameralar: ${device.cameras.length} - İşlenen indeks: $cameraIndex - İşlenen özellik: $propertyName=$value",
-      tag: 'CAMERA_DEBUG'
-    );
-    
-    // Kamera mevcut mu kontrol et
-    bool cameraExists = cameraIndex < device.cameras.length;
-    await FileLogger.log(
-      "Kamera #$cameraIndex mevcut mu: $cameraExists - Device: ${device.macKey}", 
-      tag: 'CAMERA_DEBUG'
-    );
     
     // Kamera mevcut değilse ve kritik bir özellikse kamera oluştur
     if (cameraIndex >= device.cameras.length) {
       // Sadece önemli özelliklerde kamera oluştur
-      bool isEssential = _isEssentialCameraProperty(propertyName, value);
-      await FileLogger.log(
-        "Kamera #$cameraIndex yok - Özellik '$propertyName=$value' kritik mi: $isEssential",
-        tag: 'CAMERA_DEBUG'
-      );
-      
-      if (!isEssential) {
+      if (!_isEssentialCameraProperty(propertyName, value)) {
         await FileLogger.log(
-          'Kamera yaratma atlandı - Kritik olmayan özellik: $propertyName = $value', 
+          'Skipping camera creation for non-essential property: $propertyName = $value', 
           tag: 'CAMERA_SKIP'
         );
         return;
@@ -365,129 +320,53 @@ class CameraDevicesProvider with ChangeNotifier {
     }
   }
   
-  // Kamera oluşturma (SADECE BELLİ BİR İNDEKS İÇİN)
+  // Kamera oluşturma
   Future<void> _createCamera(CameraDevice device, int cameraIndex, String initialPropertyName, dynamic initialValue) async {
-    // ÖNEMLİ LOG: Kamera oluşturma isteğinin ayrıntılarını kaydet
-    await FileLogger.log(
-      "!!! KAMERA OLUSTURMA BASLATILIYOR !!! - Device: ${device.macKey}, Index: $cameraIndex, Ozellik: $initialPropertyName, Deger: $initialValue",
-      tag: 'CAMERA_CREATE'
-    );
-    
-    // Mevcut kamera sayısı ile hedef indeks arasında boşluk var mı kontrol et
-    if (device.cameras.length < cameraIndex) {
-      await FileLogger.log(
-        "ARA BOSLUK MEVCUT: ${device.cameras.length} --> $cameraIndex. Bu boslukta kamera olusturulmayacak.",
-        tag: 'CAMERA_SKIP'
-      );
+    // Tüm ara kameraları doldur
+    while (device.cameras.length <= cameraIndex) {
+      int nextIndex = device.cameras.length;
+      
+      // Kamera oluşturma hakkında bilgi logla
+      await FileLogger.log('Creating camera at index $nextIndex with initial property: $initialPropertyName', tag: 'CAMERA_NEW');
+      
+      // Kamera adını belirle - özellik "name" ise değerini kullan, değilse indekse göre oluştur
+      String cameraName = initialPropertyName == 'name' ? initialValue.toString() : 'Camera ${nextIndex + 1}';
+      
+      // Kamera IP'sini belirle - özellik "cameraIp" ise değerini kullan
+      String cameraIp = initialPropertyName == 'cameraIp' ? initialValue.toString() : '';
+      
+      // Kamera markasını belirle - özellik "brand" ise değerini kullan
+      String brand = initialPropertyName == 'brand' ? initialValue.toString() : '';
+      
+      // Yeni kamerayı oluştur
+      device.cameras.add(Camera(
+        index: nextIndex,
+        name: cameraName,
+        ip: cameraIp,
+        rawIp: 0,
+        username: '',
+        password: '',
+        brand: brand,
+        mediaUri: initialPropertyName == 'mediaUri' ? initialValue.toString() : '',
+        recordUri: initialPropertyName == 'recordUri' ? initialValue.toString() : '',
+        subUri: initialPropertyName == 'subUri' ? initialValue.toString() : '',
+        remoteUri: '',
+        mainSnapShot: '',
+        subSnapShot: '',
+        recordWidth: 0,
+        recordHeight: 0,
+        subWidth: 0, 
+        subHeight: 0,
+        connected: initialPropertyName == 'connected' ? 
+                  (initialValue is bool ? initialValue : initialValue.toString().toLowerCase() == 'true') : 
+                  false,
+        disconnected: '-',
+        lastSeenAt: '',
+        recording: false,
+      ));
+      
+      await FileLogger.log('New camera created with $initialPropertyName: $initialValue', tag: 'CAMERA_NEW');
     }
-    
-    int indexDiff = cameraIndex - device.cameras.length;
-    if (indexDiff > 0) {
-      await FileLogger.log(
-        "ATLANAN KAMERA SAYISI: $indexDiff (Index $cameraIndex icin dogrudan olusturuluyor)",
-        tag: 'CAMERA_SKIP'
-      );
-    }
-    
-    // Kamera verilerini hazırla
-    // Kamera adını belirle - özellik "name" ise değerini kullan, değilse indekse göre oluştur
-    String cameraName = initialPropertyName == 'name' ? initialValue.toString() : 'Camera ${cameraIndex + 1}';
-    
-    // Kamera IP'sini belirle - özellik "cameraIp" ise değerini kullan
-    String cameraIp = initialPropertyName == 'cameraIp' ? initialValue.toString() : '';
-    
-    // Kamera markasını belirle - özellik "brand" ise değerini kullan
-    String brand = initialPropertyName == 'brand' ? initialValue.toString() : '';
-    
-    // Listeyi genislet - SADECE TAM KAMERALARIN SAYISINI GENISLET, ARA BOSLUKLARA KAMERA EKLEME
-    if (device.cameras.length != cameraIndex) {
-      // Bosluk durumunda liste boyutunu ayarla (dart'ta dogrudan indeksle eleman ekleyemiyoruz)
-      // Bosluklari ekleyip sonra bunlari silecegiz
-      while (device.cameras.length < cameraIndex) {
-        await FileLogger.log(
-          "Bos liste boyutu artirildi ${device.cameras.length} -> ${device.cameras.length + 1}",
-          tag: 'CAMERA_INTERNAL'
-        );
-        
-        // Bos kamera ekle (sonra temizlenecek)
-        String tempName = "DUMMY_KAMERA_${device.cameras.length}";
-        device.cameras.add(Camera(
-          index: device.cameras.length,
-          name: tempName,
-          ip: '',
-          rawIp: 0,
-          username: '',
-          password: '',
-          brand: '',
-          mediaUri: '',
-          recordUri: '',
-          subUri: '',
-          remoteUri: '',
-          mainSnapShot: '',
-          subSnapShot: '',
-          recordWidth: 0,
-          recordHeight: 0,
-          subWidth: 0, 
-          subHeight: 0,
-          connected: false,
-          disconnected: '-',
-          lastSeenAt: '',
-          recording: false,
-        ));
-      }
-    }
-   
-    // Istenilen indekse yeni kamerayi olustur/guncelle
-    Camera newCamera = Camera(
-      index: cameraIndex,
-      name: cameraName,
-      ip: cameraIp,
-      rawIp: 0,
-      username: '',
-      password: '',
-      brand: brand,
-      mediaUri: initialPropertyName == 'mediaUri' ? initialValue.toString() : '',
-      recordUri: initialPropertyName == 'recordUri' ? initialValue.toString() : '',
-      subUri: initialPropertyName == 'subUri' ? initialValue.toString() : '',
-      remoteUri: '',
-      mainSnapShot: '',
-      subSnapShot: '',
-      recordWidth: 0,
-      recordHeight: 0,
-      subWidth: 0, 
-      subHeight: 0,
-      connected: initialPropertyName == 'connected' ? 
-                (initialValue is bool ? initialValue : initialValue.toString().toLowerCase() == 'true') : 
-                false,
-      disconnected: '-',
-      lastSeenAt: '',
-      recording: false,
-    );
-    
-    // Kamerayi ekle veya guncelle
-    if (device.cameras.length <= cameraIndex) {
-      device.cameras.add(newCamera);  // Yeni kamera ekle
-      await FileLogger.log(
-        "YENI KAMERA EKLENDI: $cameraIndex, Name: $cameraName, Ozellik: $initialPropertyName=$initialValue",
-        tag: 'CAMERA_NEW'
-      );
-    } else {
-      // Mevcut bos kamerayi guncelle
-      device.cameras[cameraIndex] = newCamera;
-      await FileLogger.log(
-        "MEVCUT KAMERA GUNCELLENDI: $cameraIndex, Name: $cameraName, Ozellik: $initialPropertyName=$initialValue",
-        tag: 'CAMERA_UPDATE'
-      );
-    }
-    
-    // Bos (DUMMY) kameralari temizle
-    device.cameras.removeWhere((camera) => camera.name.startsWith('DUMMY_KAMERA_'));
-    
-    // Islem tamamlandi
-    await FileLogger.log(
-      "KAMERA OLUSTURMA TAMAMLANDI - Device: ${device.macKey}, Kamera Listesi Boyutu: ${device.cameras.length}, Son Eklenen: $cameraName",
-      tag: 'CAMERA_CREATE_DONE'
-    );
   }
   
   // Kamera özelliği güncellemesi
