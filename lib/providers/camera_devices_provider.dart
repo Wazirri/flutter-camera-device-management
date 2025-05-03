@@ -359,18 +359,75 @@ class CameraDevicesProvider with ChangeNotifier {
         device.uptime = value.toString();
         await FileLogger.log('Set device ${device.macKey} uptime to: ${device.uptime} from sysinfo', tag: 'SYSINFO');
         break;
+        
       case 'cpuTemp':
-        await FileLogger.log('System CPU Temperature: $value', tag: 'CPU_TEMP');
+        try {
+          // Sıcaklık değerini double'a çevir
+          double temp = double.tryParse(value.toString()) ?? 0.0;
+          device.cpuTemp = temp;
+          await FileLogger.log('System CPU Temperature: $value', tag: 'CPU_TEMP');
+        } catch (e) {
+          await FileLogger.log('Error parsing CPU temperature: $e', tag: 'CPU_TEMP_ERROR');
+        }
         break;
+        
+      case 'thermal[0]': // Alternatif sıcaklık bilgisi
+        try {
+          double temp = double.tryParse(value.toString()) ?? 0.0;
+          if (device.cpuTemp == 0.0) { // Eğer henüz ayarlanmamışsa
+            device.cpuTemp = temp;
+          }
+          await FileLogger.log('Unhandled sysinfo property: $infoType with value: $value', tag: 'SYSINFO');
+        } catch (e) {
+          await FileLogger.log('Error parsing thermal temperature: $e', tag: 'CPU_TEMP_ERROR');
+        }
+        break;
+        
       case 'eth0':
+        device.networkInfo = value.toString();
         await FileLogger.log('System eth0 network info: $value', tag: 'SYSINFO');
         break;
+        
       case 'freeRam':
-        await FileLogger.log('System free RAM: $value', tag: 'SYSINFO');
+        try {
+          int ram = int.tryParse(value.toString()) ?? 0;
+          device.freeRam = ram;
+          await FileLogger.log('System free RAM: $value', tag: 'SYSINFO');
+        } catch (e) {
+          await FileLogger.log('Error parsing free RAM: $e', tag: 'SYSINFO_ERROR');
+        }
         break;
+        
       case 'totalRam':
-        await FileLogger.log('System total RAM: $value', tag: 'SYSINFO');
+        try {
+          int ram = int.tryParse(value.toString()) ?? 0;
+          device.totalRam = ram;
+          await FileLogger.log('System total RAM: $value', tag: 'SYSINFO');
+        } catch (e) {
+          await FileLogger.log('Error parsing total RAM: $e', tag: 'SYSINFO_ERROR');
+        }
         break;
+        
+      case 'totalconns': // Toplam bağlantı sayısı
+        try {
+          int conns = int.tryParse(value.toString()) ?? 0;
+          device.totalConnections = conns;
+          await FileLogger.log('Unhandled sysinfo property: $infoType with value: $value', tag: 'SYSINFO');
+        } catch (e) {
+          await FileLogger.log('Error parsing connections: $e', tag: 'SYSINFO_ERROR');
+        }
+        break;
+        
+      case 'sessions': // Oturum sayısı
+        try {
+          int sessions = int.tryParse(value.toString()) ?? 0;
+          device.totalSessions = sessions;
+          await FileLogger.log('Unhandled sysinfo property: $infoType with value: $value', tag: 'SYSINFO');
+        } catch (e) {
+          await FileLogger.log('Error parsing sessions: $e', tag: 'SYSINFO_ERROR');
+        }
+        break;
+        
       // Diğer sistem bilgilerini işle
       default:
         await FileLogger.log('Unhandled sysinfo property: $infoType with value: $value', tag: 'SYSINFO');

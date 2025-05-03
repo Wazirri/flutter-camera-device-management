@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:math';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
@@ -507,6 +508,14 @@ class _DevicesScreenState extends State<DevicesScreen> {
     );
   }
 
+  // Ram miktarını insanların anlayabileceği formata çeviren yardımcı metot
+  String _formatBytes(int bytes) {
+    if (bytes <= 0) return "0 B";
+    const suffixes = ["B", "KB", "MB", "GB", "TB"];
+    var i = (log(bytes) / log(1024)).floor();
+    return "${(bytes / pow(1024, i)).toStringAsFixed(2)} ${suffixes[i]}";
+  }
+  
   void _showDeviceDetails(int deviceIndex, CameraDevice device) {
     final statusText = device.connected ? 'Online' : 'Offline';
     
@@ -520,16 +529,64 @@ class _DevicesScreenState extends State<DevicesScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Temel Bilgiler
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryBlue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Temel Bilgiler',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.primaryBlue,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 _buildDetailRow('Device Type', device.deviceType.isEmpty ? 'Unknown' : device.deviceType),
                 _buildDetailRow('IP Address', device.ipv4.isEmpty ? 'Unknown' : device.ipv4),
                 _buildDetailRow('MAC Address', device.macAddress),
                 _buildDetailRow('Firmware', device.firmwareVersion.isEmpty ? 'Unknown' : device.firmwareVersion),
                 _buildDetailRow('Last Active', device.lastSeenAt.isEmpty ? 'Unknown' : device.lastSeenAt),
                 _buildDetailRow('Status', statusText),
-                _buildDetailRow('Uptime', device.uptime.isEmpty ? 'Unknown' : device.uptime),
+                _buildDetailRow('Uptime', device.uptime.isEmpty ? 'Unknown' : '${device.uptime} saniye'),
                 _buildDetailRow('Cameras', '${device.cameras.length}'),
                 if (device.recordPath.isNotEmpty)
                   _buildDetailRow('Recording Path', device.recordPath),
+                
+                // Sistem Bilgileri (sysinfo)
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryOrange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Sistem Bilgileri',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.primaryOrange,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                _buildDetailRow('İşlemci Sıcaklığı', device.cpuTemp > 0 ? '${device.cpuTemp.toStringAsFixed(1)}°C' : 'Bilinmiyor'),
+                _buildDetailRow('Toplam RAM', device.totalRam > 0 ? _formatBytes(device.totalRam) : 'Bilinmiyor'),
+                _buildDetailRow('Boş RAM', device.freeRam > 0 ? _formatBytes(device.freeRam) : 'Bilinmiyor'),
+                _buildDetailRow('RAM Kullanımı', device.totalRam > 0 && device.freeRam > 0 ? 
+                    '${((device.totalRam - device.freeRam) / device.totalRam * 100).toStringAsFixed(1)}%' : 'Bilinmiyor'),
+                _buildDetailRow('Ağ Adresi', device.networkInfo.isNotEmpty ? device.networkInfo : 'Bilinmiyor'),
+                _buildDetailRow('Bağlantı Sayısı', device.totalConnections > 0 ? device.totalConnections.toString() : 'Bilinmiyor'),
+                _buildDetailRow('Oturum Sayısı', device.totalSessions > 0 ? device.totalSessions.toString() : 'Bilinmiyor'),
               ],
             ),
           ),

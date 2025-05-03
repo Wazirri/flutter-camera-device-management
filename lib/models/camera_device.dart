@@ -21,6 +21,14 @@ class CameraDevice {
   String recordPath;
   List<Camera> cameras;
   
+  // SysInfo bilgileri
+  double cpuTemp = 0.0; // İşlemci sıcaklığı
+  int totalRam = 0;     // Toplam RAM (byte)
+  int freeRam = 0;      // Boş RAM (byte)
+  String networkInfo = ''; // Ağ adresi bilgisi (eth0)
+  int totalConnections = 0; // Toplam bağlantı sayısı
+  int totalSessions = 0;    // Toplam oturum sayısı
+  
   CameraDevice({
     required this.macAddress,
     required this.macKey,
