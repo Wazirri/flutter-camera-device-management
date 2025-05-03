@@ -141,6 +141,21 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                 ),
                 _buildDetailGroup(
                   context: context,
+                  title: 'Camera Reports',
+                  details: [
+                    DetailItem(name: 'Health Status', value: camera.health),
+                    DetailItem(name: 'Temperature', value: camera.temperature.toString() + (camera.temperature > 0 ? '°C' : '')),
+                    DetailItem(name: 'Last Restart', value: camera.lastRestartTime),
+                    DetailItem(name: 'Report Error', value: camera.reportError),
+                    DetailItem(name: 'Report Name', value: camera.reportName),
+                    DetailItem(name: 'Connected', value: camera.connected ? 'Yes' : 'No'),
+                    DetailItem(name: 'Disconnected At', value: camera.disconnected),
+                    DetailItem(name: 'Last Seen At', value: camera.lastSeenAt),
+                    DetailItem(name: 'Recording', value: camera.recording ? 'Yes' : 'No'),
+                  ],
+                ),
+                _buildDetailGroup(
+                  context: context,
                   title: 'Recording Information',
                   details: [
                     DetailItem(name: 'Record Path', value: camera.recordPath),

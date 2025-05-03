@@ -126,8 +126,11 @@ class CameraDevice {
 
 class Camera {
   // ... mevcut alanlar ...
-  String health; // camreports için sağlık bilgisi
-  double temperature; // camreports için sıcaklık bilgisi
+  String health;              // camreports için sağlık bilgisi
+  double temperature;         // camreports için sıcaklık bilgisi
+  String reportError;         // camreports.reported hatası (error: 1000 gibi)
+  String lastRestartTime;     // camreports.last_restart_time
+  String reportName;          // camreports için rapor adı (KAMERA1 gibi)
   final int index;            // Index of the camera in the device's cameras array
   String name;                // User-friendly name (e.g., KAMERA1)
   String ip;                  // IP address of the camera (cameraIp)
@@ -164,6 +167,9 @@ class Camera {
     required this.index,
     this.health = '',
     this.temperature = 0.0,
+    this.reportError = '',
+    this.lastRestartTime = '',
+    this.reportName = '',
     required this.name,
     required this.ip,
     this.rawIp = 0,
@@ -204,6 +210,9 @@ class Camera {
     String? name,
     String? health,
     double? temperature,
+    String? reportError,
+    String? lastRestartTime,
+    String? reportName,
     String? ip,
     int? rawIp,
     String? username,
@@ -235,6 +244,9 @@ class Camera {
       index: this.index,
       health: health ?? this.health,
       temperature: temperature ?? this.temperature,
+      reportError: reportError ?? this.reportError,
+      lastRestartTime: lastRestartTime ?? this.lastRestartTime,
+      reportName: reportName ?? this.reportName,
       name: name ?? this.name,
       ip: ip ?? this.ip,
       rawIp: rawIp ?? this.rawIp,

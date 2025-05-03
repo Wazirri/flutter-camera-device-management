@@ -254,16 +254,94 @@ class CameraDevicesProvider with ChangeNotifier {
       return;
     }
     
-    String reportName = reportPath[0];
-    List<String> reportProperties = reportPath.length > 1 ? reportPath.sublist(1) : [];
+    // camreports.KAMERA1.property formatindaki veriyi isle
+    String reportName = reportPath[0]; // Ornek: KAMERA1
     
-    // Rapor adını ve özelliklerini logla
+    // Eger property kismi yoksa isleme
+    if (reportPath.length < 2) {
+      await FileLogger.log('Missing property in camera report: $reportName', tag: 'CAMREPORT_WARN');
+      return;
+    }
+    
+    // Rapor ozelligini al (ornek: connected, disconnected, last_seen_at vs.)
+    String reportProperty = reportPath[1];
+    
+    // Rapor verilerini logla
     await FileLogger.log(
-      'Camera report: $reportName, properties: ${reportProperties.join('.')}, value: $value',
+      'Camera report: $reportName, property: $reportProperty, value: $value',
       tag: 'CAMREPORT'
     );
     
-    // Burada raporlara özgü işlemler yapılabilir
+    // Bu rapor adina karsilik gelen kamerayi bul
+    // Not: Kamera adi ile rapor adi genellikle ayni oluyor (ornek: KAMERA1)
+    Camera? matchingCamera;
+    
+    // Mevcut kameralari kontrol et
+    for (var camera in device.cameras) {
+      if (camera.name == reportName) {
+        matchingCamera = camera;
+        break;
+      }
+    }
+    
+    // Eslesen kamera yoksa, yeni bir log olustur
+    if (matchingCamera == null) {
+      await FileLogger.log(
+        'No matching camera found for report: $reportName, property: $reportProperty',
+        tag: 'CAMREPORT_MISS'
+      );
+      // Kamera durumu guncellemek istiyorsak kamera raporlarini saklayabiliriz
+      // Buraya kod ekleyebiliriz
+      return;
+    }
+    
+    // Eslesen kameranin rapor bilgilerini guncelle
+    await _updateCameraReportProperty(matchingCamera, reportProperty, value);
+  }
+  
+  // Kamera rapor ozelliklerini guncelleme
+  Future<void> _updateCameraReportProperty(Camera camera, String propertyName, dynamic value) async {
+    // Ozellige gore kamera raporunu guncelle
+    switch (propertyName.toLowerCase()) {
+      case 'connected':
+        bool isConnected = value is bool ? value : (value.toString().toLowerCase() == 'true' || value.toString() == '1');
+        camera.connected = isConnected;
+        await FileLogger.log('Updated camera ${camera.name} connected status to: $isConnected from report', tag: 'CAMREPORT_UPDATE');
+        break;
+        
+      case 'disconnected':
+        camera.disconnected = value.toString();
+        await FileLogger.log('Updated camera ${camera.name} disconnected time to: ${camera.disconnected} from report', tag: 'CAMREPORT_UPDATE');
+        break;
+        
+      case 'last_seen_at':
+        camera.lastSeenAt = value.toString();
+        await FileLogger.log('Updated camera ${camera.name} last seen time to: ${camera.lastSeenAt} from report', tag: 'CAMREPORT_UPDATE');
+        break;
+        
+      case 'recording':
+        bool isRecording = value is bool ? value : (value.toString().toLowerCase() == 'true' || value.toString() == '1');
+        camera.recording = isRecording;
+        await FileLogger.log('Updated camera ${camera.name} recording status to: $isRecording from report', tag: 'CAMREPORT_UPDATE');
+        break;
+        
+      case 'last_restart_time':
+        camera.lastRestartTime = value.toString();
+        await FileLogger.log('Updated camera ${camera.name} last restart time to: ${camera.lastRestartTime} from report', tag: 'CAMREPORT_UPDATE');
+        break;
+        
+      case 'reported':
+        camera.reportError = value.toString();
+        await FileLogger.log('Updated camera ${camera.name} report error to: ${camera.reportError} from report', tag: 'CAMREPORT_UPDATE');
+        break;
+        
+      default:
+        await FileLogger.log('Unhandled camera report property: $propertyName with value: $value', tag: 'CAMREPORT_UNKNOWN');
+        break;
+    }
+    
+    // Rapor icin kamera adini kaydet
+    camera.reportName = camera.name;
   }
   
   // Sistem bilgilerini işle
