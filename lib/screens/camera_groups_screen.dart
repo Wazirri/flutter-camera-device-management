@@ -5,7 +5,6 @@ import '../models/camera_device.dart';
 import '../models/camera_group.dart';
 import '../providers/camera_devices_provider.dart';
 import '../theme/app_theme.dart';
-import '../widgets/camera_grid_item.dart';
 import 'live_view_screen.dart';
 import 'record_view_screen.dart';
 import '../widgets/camera_details_bottom_sheet.dart';
@@ -162,37 +161,58 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
           
           // Expanded cameras list
           if (isExpanded)
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              height: filteredCameras.isEmpty 
-                  ? 60  // If no cameras to show
-                  : 110.0 * (filteredCameras.length + (filteredCameras.length % 2 == 1 ? 1 : 0)) / 2, // Adjust height based on camera count
-              child: filteredCameras.isEmpty 
-                ? const Center(
-                    child: Text('No cameras in this group match your filters'),
-                  )
-                : GridView.builder(
-                    padding: const EdgeInsets.all(8.0),
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1.5,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemCount: filteredCameras.length,
-                    itemBuilder: (context, index) {
-                      return CameraGridItem(
-                        camera: filteredCameras[index],
-                        index: index,
-                        isSelected: false, // We don't track selection in grid view
-                        onTap: () => _selectCamera(filteredCameras[index]),
-                        onLiveView: () => _openLiveView(filteredCameras[index]),
-                        onPlayback: () => _openRecordView(filteredCameras[index]),
-                      );
-                    },
+            filteredCameras.isEmpty 
+              ? const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'No cameras in this group match your filters',
+                    textAlign: TextAlign.center,
                   ),
-            ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(8.0),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: filteredCameras.length,
+                  itemBuilder: (context, index) {
+                    final camera = filteredCameras[index];
+                    
+                    return Card(
+                      elevation: 2,
+                      margin: const EdgeInsets.only(bottom: 8.0),
+                      child: ListTile(
+                        leading: Icon(
+                          camera.connected ? Icons.videocam : Icons.videocam_off,
+                          color: camera.connected ? Colors.green : Colors.red,
+                          size: 28,
+                        ),
+                        title: Text(
+                          camera.name,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text('${camera.ip} • ${camera.brand}'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Live View button
+                            IconButton(
+                              icon: const Icon(Icons.play_arrow, color: AppTheme.primaryBlue),
+                              onPressed: () => _openLiveView(camera),
+                              tooltip: 'Live View',
+                            ),
+                            // Playback button
+                            IconButton(
+                              icon: const Icon(Icons.history, color: AppTheme.primaryOrange),
+                              onPressed: () => _openRecordView(camera),
+                              tooltip: 'Recordings',
+                            ),
+                          ],
+                        ),
+                        onTap: () => _selectCamera(camera),
+                      ),
+                    );
+                  },
+                ),
         ],
       ),
     );

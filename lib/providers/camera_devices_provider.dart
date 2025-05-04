@@ -844,26 +844,7 @@ class CameraDevicesProvider with ChangeNotifier {
         camera.recordPath = value.toString();
         await FileLogger.log('Set camera[${camera.index}] recordPath to: ${camera.recordPath}', tag: 'CAMERA_PROP');
         break;
-      case 'recordWidth':
-        camera.recordWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
-        await FileLogger.log('Set camera[${camera.index}] recordWidth to: ${camera.recordWidth}', tag: 'CAMERA_PROP');
-        break;
-      case 'recordHeight':
-        camera.recordHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
-        await FileLogger.log('Set camera[${camera.index}] recordHeight to: ${camera.recordHeight}', tag: 'CAMERA_PROP');
-        break;
-      case 'subWidth':
-        camera.subWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
-        await FileLogger.log('Set camera[${camera.index}] subWidth to: ${camera.subWidth}', tag: 'CAMERA_PROP');
-        break;
-      case 'subHeight':
-        camera.subHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
-        await FileLogger.log('Set camera[${camera.index}] subHeight to: ${camera.subHeight}', tag: 'CAMERA_PROP');
-        break;
-      case 'connected':
-        camera.connected = value is bool ? value : (value.toString().toLowerCase() == 'true');
-        await FileLogger.log('Set camera[${camera.index}] connected to: ${camera.connected}', tag: 'CAMERA_PROP');
-        break;
+        
       case 'disconnected':
         camera.disconnected = value.toString();
         await FileLogger.log('Set camera[${camera.index}] disconnected to: ${camera.disconnected}', tag: 'CAMERA_PROP');
@@ -890,9 +871,34 @@ class CameraDevicesProvider with ChangeNotifier {
         break;
         
       // Çözünürlük bilgileri - ana akış
+      case 'recordwidth':
       case 'recordwith': // yazım hatası - sunucudan gelen mesajda böyle
         camera.recordWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
-        await FileLogger.log('Set camera[${camera.index}] recordWidth (from recordwith) to: ${camera.recordWidth}', tag: 'CAMERA_PROP');
+        await FileLogger.log('Set camera[${camera.index}] recordWidth (from ${propertyName}) to: ${camera.recordWidth}', tag: 'CAMERA_PROP');
+        // Kamera nesnesinde doğrudan değeri kontrol edelim
+        await FileLogger.log('After update camera recordWidth = ${camera.recordWidth}, recordHeight = ${camera.recordHeight}', tag: 'CAMERA_DEBUG');
+        break;
+        
+      case 'recordheight':
+        camera.recordHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        await FileLogger.log('Set camera[${camera.index}] recordHeight to: ${camera.recordHeight}', tag: 'CAMERA_PROP');
+        // Kamera nesnesinde doğrudan değeri kontrol edelim
+        await FileLogger.log('After update camera recordWidth = ${camera.recordWidth}, recordHeight = ${camera.recordHeight}', tag: 'CAMERA_DEBUG');
+        break;
+        
+      // Çözünürlük bilgileri - alt akış
+      case 'subwidth':
+        camera.subWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        await FileLogger.log('Set camera[${camera.index}] subWidth to: ${camera.subWidth}', tag: 'CAMERA_PROP');
+        // Alt çözünürlük bilgilerini kontrol et
+        await FileLogger.log('After update camera subWidth = ${camera.subWidth}, subHeight = ${camera.subHeight}', tag: 'CAMERA_DEBUG');
+        break;
+      
+      case 'subheight':
+        camera.subHeight = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        await FileLogger.log('Set camera[${camera.index}] subHeight to: ${camera.subHeight}', tag: 'CAMERA_PROP');
+        // Alt çözünürlük bilgilerini kontrol et
+        await FileLogger.log('After update camera subWidth = ${camera.subWidth}, subHeight = ${camera.subHeight}', tag: 'CAMERA_DEBUG');
         break;
         
       // Ses kayıt bilgisi
@@ -905,6 +911,12 @@ class CameraDevicesProvider with ChangeNotifier {
       case 'xaddr':
         camera.xAddr = value.toString();
         await FileLogger.log('Set camera[${camera.index}] xAddr to: ${camera.xAddr}', tag: 'CAMERA_PROP');
+        break;
+        
+      // Kamera durumu
+      case 'connected':
+        camera.connected = value is bool ? value : (value.toString().toLowerCase() == 'true' || value.toString() == '1');
+        await FileLogger.log('Set camera[${camera.index}] connected to: ${camera.connected}', tag: 'CAMERA_PROP');
         break;
         
       // Diğer kamera özellikleri için
