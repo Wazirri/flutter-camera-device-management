@@ -52,6 +52,11 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
       'route': '/cameras',
     },
     {
+      'title': 'Camera Groups',
+      'icon': Icons.folder,
+      'route': '/camera-groups',
+    },
+    {
       'title': 'Devices',
       'icon': Icons.devices,
       'route': '/devices',

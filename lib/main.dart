@@ -9,6 +9,7 @@ import 'utils/keyboard_fix.dart'; // Import keyboard fix utilities
 import 'utils/keyboard_fix.dart'; // Import keyboard fix utilities
 import 'screens/cameras_screen.dart';
 import 'screens/camera_devices_screen.dart';
+import 'screens/camera_groups_screen.dart';  // New camera groups screen
 import 'screens/dashboard_screen.dart';
 import 'screens/devices_screen.dart';
 import 'screens/live_view_screen.dart';
@@ -162,44 +163,52 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         debugShowCheckedModeBanner: false,
         initialRoute: '/login',
         routes: {
+          '/': (context) => const LoginScreen(),
           '/login': (context) => const LoginScreen(),
-          '/dashboard': (context) => const AppShell(
-              currentRoute: '/dashboard',
-              child: DashboardScreen(),
-            ),
+          '/dashboard': (context) => AppShell(
+            currentRoute: '/dashboard',
+            child: const DashboardScreen(),
+          ),
+          '/cameras': (context) => AppShell(
+            currentRoute: '/cameras',
+            child: const CamerasScreen(),
+          ),
+          '/camera-groups': (context) => AppShell(
+            currentRoute: '/camera-groups',
+            child: const CameraGroupsScreen(),
+          ),
+          '/devices': (context) => AppShell(
+            currentRoute: '/devices',
+            child: const DevicesScreen(),
+          ),
+          '/settings': (context) => AppShell(
+            currentRoute: '/settings',
+            child: const SettingsScreen(),
+          ),
+          '/camera-devices': (context) => AppShell(
+            currentRoute: '/camera-devices',
+            child: const CameraDevicesScreen(),
+          ),
+          '/websocket-logs': (context) => AppShell(
+            currentRoute: '/websocket-logs',
+            child: const WebSocketLogScreen(),
+          ),
+          '/multi-live-view': (context) => AppShell(
+            currentRoute: '/multi-live-view',
+            child: const MultiLiveViewScreen(),
+          ),
+          '/multi-recordings': (context) => AppShell(
+            currentRoute: '/multi-recordings',
+            child: const MultiRecordingsScreen(),
+          ),
           '/live-view': (context) => const AppShell(
               currentRoute: '/live-view',
-              child: LiveViewScreen(),
+              child: LiveViewScreen(camera: null),
             ),
           '/recordings': (context) => const AppShell(
               currentRoute: '/recordings',
-              child: RecordViewScreen(),
+              child: RecordViewScreen(camera: null),
             ),
-          '/multi-live-view': (context) => const AppShell(
-              currentRoute: '/multi-live-view',
-              child: MultiLiveViewScreen(),
-            ),
-          '/multi-recordings': (context) => const AppShell(
-              currentRoute: '/multi-recordings',
-              child: MultiRecordingsScreen(),
-            ),
-          '/cameras': (context) => const AppShell(
-              currentRoute: '/cameras',
-              child: CamerasScreen(),
-            ),
-          '/devices': (context) => const AppShell(
-              currentRoute: '/devices',
-              child: DevicesScreen(),
-            ),
-          '/camera-devices': (context) => const AppShell(
-              currentRoute: '/camera-devices',
-              child: CameraDevicesScreen(),
-            ),
-          '/settings': (context) => const AppShell(
-              currentRoute: '/settings',
-              child: SettingsScreen(),
-            ),
-          '/websocket-logs': (context) => const WebSocketLogScreen(),
         },
         // Özel geçişler ve parametreli rotalar için onGenerateRoute
         onGenerateRoute: (settings) {

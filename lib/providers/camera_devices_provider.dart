@@ -4,19 +4,28 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 
 import '../models/camera_device.dart';
+import '../models/camera_group.dart';
 import '../utils/file_logger.dart';
 
 class CameraDevicesProvider with ChangeNotifier {
   final Map<String, CameraDevice> _devices = {};
+  final Map<String, CameraGroup> _cameraGroups = {}; // Kamera grupları
   CameraDevice? _selectedDevice;
   int _selectedCameraIndex = 0;
   bool _isLoading = false;
+  String? _selectedGroupName; // Seçilen grup
 
   Map<String, CameraDevice> get devices => _devices;
   List<CameraDevice> get devicesList => _devices.values.toList();
   CameraDevice? get selectedDevice => _selectedDevice;
   int get selectedCameraIndex => _selectedCameraIndex;
   bool get isLoading => _isLoading;
+  
+  // Kamera grupları ile ilgili getters
+  Map<String, CameraGroup> get cameraGroups => _cameraGroups;
+  List<CameraGroup> get cameraGroupsList => _cameraGroups.values.toList();
+  String? get selectedGroupName => _selectedGroupName;
+  CameraGroup? get selectedGroup => _selectedGroupName != null ? _cameraGroups[_selectedGroupName] : null;
   
   // Get all cameras from all devices as a flat list
   List<Camera> get cameras {
@@ -73,6 +82,77 @@ class CameraDevicesProvider with ChangeNotifier {
       _selectedCameraIndex = index;
       notifyListeners();
     }
+  }
+  
+  // Grup seçme metodu
+  void selectGroup(String groupName) {
+    if (_cameraGroups.containsKey(groupName)) {
+      _selectedGroupName = groupName;
+      notifyListeners();
+    }
+  }
+  
+  // Gruba göre kameraları getir
+  List<Camera> getCamerasInGroup(String groupName) {
+    if (!_cameraGroups.containsKey(groupName)) {
+      FileLogger.log('Grup bulunamadı: $groupName', tag: 'GROUP_ERROR').then((_) {});
+      return [];
+    }
+    
+    final group = _cameraGroups[groupName]!;
+    final List<Camera> camerasInGroup = [];
+    
+    FileLogger.log('Grup için kamera listesi kontrol ediliyor: $groupName, ${group.cameraMacs.length} kamera tanımlayıcısı var', 
+      tag: 'GROUP_INFO').then((_) {});
+    FileLogger.log('Kamera tanımlayıcıları: ${group.cameraMacs.join(", ")}', tag: 'GROUP_DEBUG').then((_) {});
+    
+    // Tüm cihazları tara
+    for (final deviceEntry in _devices.entries) {
+      final deviceMac = deviceEntry.key;
+      final device = deviceEntry.value;
+      
+      // Her bir kamera için
+      for (int i = 0; i < device.cameras.length; i++) {
+        final Camera camera = device.cameras[i];
+        
+        // Bu kamera herhangi bir formatta grup listesinde var mı?
+        // Bu kamera için kontrol edilecek üç format:
+        final String simpleIndex = i.toString(); // örn: "0", "1", "2"...
+        final String camFormat = "cam[$i]"; // örn: "cam[0]", "cam[1]"...
+        final String fullFormat = "$deviceMac.cam[$i]"; // örn: "m_XX_XX_XX_XX_XX_XX.cam[0]"...
+        
+        // Grup bu tanımlayıcılardan birini içeriyor mu?
+        if (group.cameraMacs.contains(simpleIndex) || 
+            group.cameraMacs.contains(camFormat) || 
+            group.cameraMacs.contains(fullFormat)) {
+          
+          camerasInGroup.add(camera);
+          FileLogger.log('Kamera gruba eklendi: Cihaz=$deviceMac, Kamera=${camera.name}, Format=(${simpleIndex}/${camFormat})',
+            tag: 'GROUP_DEBUG').then((_) {});
+        }
+      }
+    }
+    
+    // Test amaçlı olarak cihazların tüm kameralarını görelim
+    for (final deviceEntry in _devices.entries) {
+      final deviceMac = deviceEntry.key;
+      final device = deviceEntry.value;
+      FileLogger.log('Cihaz $deviceMac - ${device.cameras.length} kamera var', tag: 'GROUP_DEBUG').then((_) {});
+      for (int i = 0; i < device.cameras.length; i++) {
+        final camera = device.cameras[i];
+        FileLogger.log('  Kamera[$i]: ${camera.name} (${camera.ip})', tag: 'GROUP_DEBUG').then((_) {});
+      }
+    }
+    
+    FileLogger.log('Grupta toplam ${camerasInGroup.length} kamera bulundu: $groupName', tag: 'GROUP_INFO').then((_) {});
+    return camerasInGroup;
+  }
+  
+  // Grupları temizle (reset)
+  void clearGroups() {
+    _cameraGroups.clear();
+    _selectedGroupName = null;
+    notifyListeners();
   }
   
   // Kameraları yenile - UI için gerekli
@@ -142,8 +222,39 @@ class CameraDevicesProvider with ChangeNotifier {
           case MessageCategory.basicProperty:
             await _processBasicDeviceProperty(device, parts[2], value);
             break;
+          case MessageCategory.cameraGroupAssignment:
+            // Format: ecs_slaves.mac_address.cam[index].group = group_name
+            if (parts.length > 3 && parts[2].startsWith('cam')) {
+              final cameraIndex = parts[2].replaceAll('cam', '').replaceAll(RegExp(r'\[|\]'), '');
+              await FileLogger.log('Kamera-grup ataması (Yeni kategori): ${parts[0]}.${parts[1]}.${parts[2]}.group = $value', tag: 'GROUP_DEBUG');
+              await _processCameraGroupAssignment(device, cameraIndex, value.toString());
+            }
+            break;
+          case MessageCategory.cameraGroupDefinition:
+            // Format: ecs_slaves.mac_address.configuration.cameraGroups[index] = group_name
+            if (parts.length > 3 && parts[2] == 'configuration' && parts[3].startsWith('cameraGroups')) {
+              final groupIndex = parts[3].replaceAll('cameraGroups', '').replaceAll(RegExp(r'\[|\]'), '');
+              await FileLogger.log('Grup tanımı (Yeni kategori): ${parts[0]}.${parts[1]}.${parts[2]}.${parts[3]} = $value', tag: 'GROUP_DEBUG');
+              await _processGroupDefinition(device, groupIndex, value.toString());
+            }
+            break;
           case MessageCategory.unknown:
-            await FileLogger.log('Unknown message category: ${parts[2]}', tag: 'CAMERA_WARN');
+            // Eski kodlardan gelebilecek mesajları desteklemek için bırakıyoruz
+            // Format: ecs_slaves.mac_address.cam[index].group = group_name
+            if (parts.length > 3 && parts[2] == 'cam' && parts.length > 4 && parts[4] == 'group') {
+              final cameraIndex = parts[3].replaceAll(RegExp(r'\[|\]'), '');
+              await FileLogger.log('Kamera-grup ataması (Eski format): ${parts[0]}.${parts[1]}.cam[$cameraIndex].group = $value', tag: 'GROUP_DEBUG');
+              await _processCameraGroupAssignment(device, cameraIndex, value.toString());
+            }
+            // Format: ecs_slaves.mac_address.configuration.cameraGroups[index] = group_name
+            else if (parts.length > 3 && parts[2] == 'configuration' && parts[3].startsWith('cameraGroups')) {
+              final groupIndex = parts[3].replaceAll('cameraGroups', '').replaceAll(RegExp(r'\[|\]'), '');
+              await FileLogger.log('Grup tanımı: ${parts[0]}.${parts[1]}.configuration.cameraGroups[$groupIndex] = $value', tag: 'GROUP_DEBUG');
+              await _processGroupDefinition(device, groupIndex, value.toString());
+            } 
+            else {
+              await FileLogger.log('Unknown message category: ${parts[2]}', tag: 'CAMERA_WARN');
+            }
             break;
         }
         
@@ -157,18 +268,43 @@ class CameraDevicesProvider with ChangeNotifier {
     }
   }
   
-  // Mesaj kategorisini belirle
+  // Mesaj kategorilerini belirle - WebSocket mesajı ne tür bir veri içeriyor?
   MessageCategory _categorizeMessage(String pathComponent, List<String> remainingPath) {
-    if (pathComponent.startsWith('cam[') && pathComponent.contains(']')) {
+    // Önce log tut
+    FileLogger.log('Mesaj kategorizasyon: component=$pathComponent, remaining=${remainingPath.join(", ")}', 
+      tag: 'CAT_DEBUG').then((_) {});
+      
+    // Grup ilgili özel durumlar
+    if (pathComponent == 'configuration' && remainingPath.isNotEmpty && 
+        remainingPath[0].startsWith('cameraGroups')) {
+      FileLogger.log('Grup tanımı bulundu: $pathComponent ${remainingPath.join(", ")}', 
+        tag: 'GROUP_DEBUG').then((_) {});
+      return MessageCategory.cameraGroupDefinition;
+    }
+    
+    // Kamera grubu ataması
+    if (pathComponent.startsWith('cam') && remainingPath.isNotEmpty && 
+        remainingPath.contains('group')) {
+      FileLogger.log('Kamera grup ataması bulundu: $pathComponent ${remainingPath.join(", ")}', 
+        tag: 'GROUP_DEBUG').then((_) {});
+      return MessageCategory.cameraGroupAssignment;
+    }
+    
+    // Diğer kategoriler
+    if (pathComponent.startsWith('cam') && pathComponent != 'camreports') {
       return MessageCategory.camera;
     } else if (pathComponent == 'camreports') {
       return MessageCategory.cameraReport;
-    } else if (pathComponent == 'sysinfo') {
-      return MessageCategory.systemInfo;
     } else if (pathComponent == 'configuration') {
       return MessageCategory.configuration;
+    } else if (pathComponent == 'system' || pathComponent == 'cpuTemp' || pathComponent.contains('version')) {
+      return MessageCategory.systemInfo;
+    } else if (pathComponent == 'sysinfo') {
+      return MessageCategory.systemInfo;
     } else {
-      return MessageCategory.basicProperty;
+      FileLogger.log('Kategori belirlenemeyen mesaj: $pathComponent ${remainingPath.join(", ")}', 
+        tag: 'CAT_DEBUG').then((_) {});
+      return MessageCategory.basicProperty; 
     }
   }
   
@@ -732,14 +868,46 @@ class CameraDevicesProvider with ChangeNotifier {
         camera.disconnected = value.toString();
         await FileLogger.log('Set camera[${camera.index}] disconnected to: ${camera.disconnected}', tag: 'CAMERA_PROP');
         break;
+        
       case 'lastSeenAt':
         camera.lastSeenAt = value.toString();
         await FileLogger.log('Set camera[${camera.index}] lastSeenAt to: ${camera.lastSeenAt}', tag: 'CAMERA_PROP');
         break;
+        
       case 'recording':
         camera.recording = value is bool ? value : (value.toString().toLowerCase() == 'true');
         await FileLogger.log('Set camera[${camera.index}] recording to: ${camera.recording}', tag: 'CAMERA_PROP');
         break;
+
+      // Codec bilgileri
+      case 'recordcodec':
+        camera.recordCodec = value.toString();
+        await FileLogger.log('Set camera[${camera.index}] recordCodec to: ${camera.recordCodec}', tag: 'CAMERA_PROP');
+        break;
+      case 'subcodec':
+        camera.subCodec = value.toString();
+        await FileLogger.log('Set camera[${camera.index}] subCodec to: ${camera.subCodec}', tag: 'CAMERA_PROP');
+        break;
+        
+      // Çözünürlük bilgileri - ana akış
+      case 'recordwith': // yazım hatası - sunucudan gelen mesajda böyle
+        camera.recordWidth = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        await FileLogger.log('Set camera[${camera.index}] recordWidth (from recordwith) to: ${camera.recordWidth}', tag: 'CAMERA_PROP');
+        break;
+        
+      // Ses kayıt bilgisi
+      case 'soundrec':
+        camera.soundRec = value is bool ? value : (value.toString().toLowerCase() == 'true' || value.toString() == '1');
+        await FileLogger.log('Set camera[${camera.index}] soundRec to: ${camera.soundRec}', tag: 'CAMERA_PROP');
+        break;
+      
+      // ONVIF adres bilgisi
+      case 'xaddr':
+        camera.xAddr = value.toString();
+        await FileLogger.log('Set camera[${camera.index}] xAddr to: ${camera.xAddr}', tag: 'CAMERA_PROP');
+        break;
+        
+      // Diğer kamera özellikleri için
       default:
         await FileLogger.log('Unknown camera property: $propertyName with value: $value', tag: 'CAMERA_WARN');
         break;
@@ -760,6 +928,92 @@ class CameraDevicesProvider with ChangeNotifier {
     
     return criticalProperties.contains(propertyName) && hasSubstantiveValue;
   }
+  
+  // Kamera-grup atama işleme - ecs_slaves.mac_address.cam[index].group = group_name
+  // WebSocket'ten gelen grup atamalarnı işler
+  Future<void> _processCameraGroupAssignment(CameraDevice device, String cameraIndex, String groupName) async {
+    try {
+      // Kamera indeksini parse et
+      final int camIdx = int.tryParse(cameraIndex) ?? -1;
+      if (camIdx < 0 || camIdx >= device.cameras.length) {
+        await FileLogger.log('Geçersiz kamera indeksi: $cameraIndex', tag: 'GROUP_ERROR');
+        return;
+      }
+
+      // Cihaz MAC adresini bul
+      final String deviceMacKey = _devices.entries
+          .firstWhere((entry) => entry.value == device, orElse: () => MapEntry('unknown', device))
+          .key;
+
+      // Kamera tanımlayıcısı oluştur (farklı formatlar için)
+      final String cameraIdentifier = cameraIndex; // Basitçe indeks ("0", "1" vb.)
+      final String camFormatIdentifier = "cam[$cameraIndex]"; // cam[index] formatı
+      final String fullIdentifier = "$deviceMacKey.cam[$cameraIndex]"; // Tam format
+      
+      await FileLogger.log('WebSocket kamera grup ataması: Cihaz=${deviceMacKey}, Kamera=${camIdx}, Grup=${groupName}', tag: 'GROUP_INFO');
+
+      // Grup boş mu? 
+      if (groupName.isEmpty) {
+        // Boş grup, kamerayı tüm gruplardan çıkar
+        for (final group in _cameraGroups.values) {
+          group.removeCamera(cameraIdentifier);
+          group.removeCamera(camFormatIdentifier);
+          group.removeCamera(fullIdentifier);
+        }
+        await FileLogger.log('Kamera tüm gruplardan çıkarıldı: MAC=${deviceMacKey}, Cam=${cameraIndex}', tag: 'GROUP_DEBUG');
+        notifyListeners();
+        return;
+      }
+
+      // Gerekirse grubu oluştur
+      if (!_cameraGroups.containsKey(groupName)) {
+        _cameraGroups[groupName] = CameraGroup(name: groupName);
+        await FileLogger.log('WebSocket mesajından yeni grup oluşturuldu: $groupName', tag: 'GROUP_INFO');
+      }
+
+      // Önce tüm gruplardan çıkar
+      for (final group in _cameraGroups.values) {
+        group.removeCamera(cameraIdentifier);
+        group.removeCamera(camFormatIdentifier);
+        group.removeCamera(fullIdentifier);
+      }
+      
+      // Yeni gruba ekle
+      final group = _cameraGroups[groupName]!;
+      group.addCamera(cameraIdentifier); // Basit indeks formatını ekle
+      
+      await FileLogger.log('Kamera gruba eklendi: $cameraIdentifier -> $groupName', tag: 'GROUP_INFO');
+      await FileLogger.log('Grup içeriği: ${group.cameraMacs.join(", ")}', tag: 'GROUP_DEBUG');
+      
+      notifyListeners();
+    } catch (e) {
+      await FileLogger.log('Kamera grup atama hatası: $e', tag: 'GROUP_ERROR');
+    }
+  }
+  
+  // Grup tanımı işleme - ecs_slaves.mac_address.configuration.cameraGroups[index] = group_name
+  Future<void> _processGroupDefinition(CameraDevice device, String groupIndex, String groupName) async {
+    try {
+      // Grup adı boş mu?
+      if (groupName.isEmpty) {
+        return;
+      }
+      
+      await FileLogger.log('Grup tanımı: [$groupIndex] = $groupName', tag: 'GROUP_INFO');
+      
+      // Grup zaten var mı?
+      if (!_cameraGroups.containsKey(groupName)) {
+        _cameraGroups[groupName] = CameraGroup(name: groupName);
+        await FileLogger.log('Yeni kamera grubu tanımlandı: $groupName', tag: 'GROUP_INFO');
+      } else {
+        await FileLogger.log('Mevcut grup: $groupName (kameralar: ${_cameraGroups[groupName]!.cameraMacs.length})', tag: 'GROUP_DEBUG');
+      }
+      
+      notifyListeners();
+    } catch (e) {
+      await FileLogger.log('Error processing group definition: $e', tag: 'GROUP_ERROR');
+    }
+  }
 }
 
 // Mesaj kategorilerini tanımla
@@ -769,5 +1023,12 @@ enum MessageCategory {
   systemInfo,    // sysinfo.*
   configuration, // configuration.*
   basicProperty, // doğrudan cihaz özellikleri
-  unknown        // bilinmeyen mesaj tipi
+  unknown,       // bilinmeyen mesaj tipi
+  cameraGroupDefinition,  // Grup tanımı (configuration.cameraGroups[index])
+  cameraGroupAssignment,   // Kamera-grup atama (cam[index].group)
 }
+
+// CameraDevicesProvider sınıfına yukarıdaki metod ve properties eklenecek
+/* 
+NOT: Bu kod parçası silinecek - metotlar sınıfın içine taşındı 
+*/
