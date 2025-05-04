@@ -15,10 +15,12 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
   bool _emailAlertsEnabled = false;
-  bool _autoUpdateEnabled = true;
   double _storageLimit = 70;
   String _videoQuality = 'High';
   String _retentionPeriod = '30 Days';
+  
+  // Kamera grubu için text controller
+  final TextEditingController _groupNameController = TextEditingController();
   
   @override
   Widget build(BuildContext context) {
@@ -314,47 +316,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildSystemSection(BuildContext context) {
+    final wsProvider = Provider.of<WebSocketProvider>(context);
+    final isConnected = wsProvider.isConnected;
+    
     return _buildSettingCard(
       title: 'System',
-      icon: Icons.system_update_outlined,
+      icon: Icons.developer_board,
       children: [
-        SwitchListTile(
-          title: const Text('Automatic Updates'),
-          subtitle: const Text('Keep system up to date automatically'),
-          value: _autoUpdateEnabled,
-          activeColor: AppTheme.primaryBlue,
-          onChanged: (value) {
-            setState(() {
-              _autoUpdateEnabled = value;
-            });
+        ListTile(
+          title: const Text('Connection Status'),
+          subtitle: Text(
+            isConnected ? 'Connected' : 'Disconnected',
+            style: TextStyle(
+              color: isConnected ? AppTheme.online : AppTheme.offline,
+            ),
+          ),
+          trailing: Icon(
+            isConnected ? Icons.check_circle : Icons.error_outline,
+            color: isConnected ? AppTheme.online : AppTheme.offline,
+          ),
+          onTap: () {
+            Navigator.pushNamed(context, '/websocket-logs');
           },
         ),
         const Divider(),
-        const ListTile(
-          title: Text('Current Version'),
-          subtitle: Text('v1.2.0'),
-          trailing: Text('Up to date', style: TextStyle(color: AppTheme.online)),
+        ListTile(
+          title: const Text('WebSocket Logs'),
+          subtitle: Text(
+            isConnected ? 'Connected to ${wsProvider.serverIp}' : 'Not connected',
+            style: TextStyle(
+              color: isConnected ? AppTheme.online : AppTheme.offline,
+            ),
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            Navigator.pushNamed(context, '/websocket-logs');
+          },
         ),
         const Divider(),
-        Consumer<WebSocketProvider>(
-          builder: (context, provider, child) {
-            final isConnected = provider.isConnected;
-            return ListTile(
-              title: const Text('WebSocket Logs'),
-              subtitle: Text(isConnected 
-                ? 'View WebSocket communication logs (Connected)'
-                : 'View WebSocket communication logs (Disconnected)'
-              ),
-              leading: Icon(
-                Icons.wifi_tethering,
-                color: isConnected ? AppTheme.online : AppTheme.offline,
-              ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                Navigator.pushNamed(context, '/websocket-logs');
-              },
-            );
-          },
+        ListTile(
+          title: const Text('Add Camera Group'),
+          subtitle: const Text('Create a new camera group via script command'),
+          trailing: IconButton(
+            icon: const Icon(Icons.add_circle_outline),
+            onPressed: isConnected ? () {
+              _showAddCameraGroupDialog(context, wsProvider);
+            } : null,
+          ),
+          enabled: isConnected,
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text('Change WiFi Settings'),
+          subtitle: const Text('Change WiFi name and password via script'),
+          trailing: IconButton(
+            icon: const Icon(Icons.wifi),
+            onPressed: isConnected ? () {
+              _showChangeWiFiDialog(context, wsProvider);
+            } : null,
+          ),
+          enabled: isConnected,
         ),
         const Divider(),
         ListTile(
@@ -487,6 +508,185 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 foregroundColor: AppTheme.error,
               ),
               child: const Text('Reset'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
+  // DO SCRIPT add_camera_group "grup1" komutu için dialog
+  void _showAddCameraGroupDialog(BuildContext context, WebSocketProvider provider) {
+    _groupNameController.clear(); // Her seferinde text field'i temizle
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Add Camera Group'),
+          backgroundColor: AppTheme.darkSurface,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Enter the name for the new camera group:'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _groupNameController,
+                decoration: const InputDecoration(
+                  labelText: 'Group Name',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.group_work),
+                ),
+                autofocus: true,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'This will execute: DO SCRIPT add_camera_group "[group_name]"',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+              ),
+              onPressed: () async {
+                final groupName = _groupNameController.text.trim();
+                if (groupName.isNotEmpty) {
+                  // WebSocket üzerinden komutu gönder
+                  final command = 'DO SCRIPT add_camera_group "$groupName"';
+                  final success = await provider.sendCommand(command);
+                  
+                  if (!context.mounted) return;
+                  Navigator.pop(dialogContext);
+                  
+                  // Başarı durumunu bildir
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        success
+                          ? 'Camera group "$groupName" added successfully'
+                          : 'Failed to add camera group',
+                      ),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                    ),
+                  );
+                } else {
+                  // Boş grup adı uyarısı
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter a group name'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Add Group'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // DO SCRIPT "wifichange" "new_name" "new_pw" komutu için dialog
+  void _showChangeWiFiDialog(BuildContext context, WebSocketProvider provider) {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Change WiFi Settings'),
+          backgroundColor: AppTheme.darkSurface,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Enter new WiFi credentials:'),
+              const SizedBox(height: 16),
+              
+              // WiFi adı giriş alanı
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'WiFi Name (SSID)',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.wifi),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // WiFi şifresi giriş alanı
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'WiFi Password',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock),
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'This will execute: DO SCRIPT "wifichange" "[name]" "[password]"',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber,
+              ),
+              onPressed: () async {
+                final name = nameController.text.trim();
+                final password = passwordController.text.trim();
+                
+                if (name.isNotEmpty && password.isNotEmpty) {
+                  // WebSocket üzerinden komutu gönder
+                  final command = 'DO SCRIPT "wifichange" "$name" "$password"';
+                  final success = await provider.sendCommand(command);
+                  
+                  if (!context.mounted) return;
+                  Navigator.pop(dialogContext);
+                  
+                  // Sonuç bildirimi göster
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        success
+                          ? 'WiFi settings updated successfully'
+                          : 'Failed to update WiFi settings',
+                      ),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                    ),
+                  );
+                } else {
+                  // Boş alan uyarısı
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please fill in all fields'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Update WiFi'),
             ),
           ],
         );

@@ -226,12 +226,64 @@ class WebSocketProvider with ChangeNotifier {
     }
   }
 
-  // Start monitoring ECS (should be called after successful login)
+  // Start monitoring ECS system after login
   void startEcsMonitoring() {
     if (_isConnected && _isLoggedIn && _socket != null) {
+      // Önce sistem bilgilerini al
+      _socket!.add('GET SYSINFO');
+      _logMessage('Sent GET SYSINFO command');
+      
+      // Yeni format: ecs_slaves.m_X formatını kullan
       _socket!.add('Monitor ecs_slaves');
-      _logMessage('Started ECS monitoring');
+      _logMessage('Started monitoring ecs_slaves (using new format)');
+      
+      // Kamera ve cihaz bilgilerini al
+      _socket!.add('GET CAMERAS');
+      _logMessage('Sent GET CAMERAS command');
+    } else {
+      _logMessage('Cannot start monitoring: Not connected or not logged in');
+      debugPrint('Cannot start monitoring: connected=${_isConnected}, logged in=${_isLoggedIn}');
     }
+  }
+  
+  // Websocket üzerinden komut gönder
+  Future<bool> sendCommand(String command) async {
+    if (!_isConnected || _socket == null) {
+      _errorMessage = 'WebSocket bağlantısı yok. Komut gönderilemedi.';
+      _logMessage(_errorMessage);
+      notifyListeners();
+      return false;
+    }
+    
+    try {
+      _socket!.add(command);
+      _logMessage('Komut gönderildi: $command');
+      return true;
+    } catch (e) {
+      _errorMessage = 'Komut gönderirken hata: $e';
+      _logMessage(_errorMessage);
+      debugPrint(_errorMessage);
+      notifyListeners();
+      return false;
+    }
+  }
+  
+  // Kameraya grup ekle
+  Future<bool> addGroupToCamera(String cameraName, String groupName) {
+    final command = 'DO SCRIPT add_group_to_cam "$cameraName" "$groupName"';
+    return sendCommand(command);
+  }
+  
+  // Kamerayı cihaza taşı
+  Future<bool> moveCamera(String deviceMac, String cameraMac) {
+    final command = 'MOVECAM $deviceMac $cameraMac';
+    return sendCommand(command);
+  }
+  
+  // Cihazın WiFi ayarlarını değiştir
+  Future<bool> changeWifiSettings(String newName, String newPassword) {
+    final command = 'DO SCRIPT "wifichange" "$newName" "$newPassword"';
+    return sendCommand(command);
   }
 
   // Handle incoming WebSocket messages
@@ -241,6 +293,17 @@ class WebSocketProvider with ChangeNotifier {
         // Log the message (truncate if too long)
         final logMsg = message.length > 500 ? '${message.substring(0, 500)}...' : message;
         _logMessage('Received: $logMsg');
+        
+        // Debug için data path bilgisini çıkarmaya çalış
+        if (message.contains('"data"') && message.contains('"val"')) {
+          try {
+            final jsonData = jsonDecode(message);
+            final dataPath = jsonData['data']; 
+            debugPrint('⚡ WebSocket data path: $dataPath');
+          } catch (e) {
+            // JSON parse hatası - sessizce görmezden gel
+          }
+        }
         
         if (message == 'PONG') {
           // Handle heartbeat response
@@ -260,15 +323,15 @@ class WebSocketProvider with ChangeNotifier {
       _logMessage('Error handling message: $e');
     }
   }
-
-  // Process JSON messages
-  void _processJsonMessage(dynamic jsonData) {
-    if (jsonData is Map<String, dynamic>) {
+  
+  // JSON mesajlarını işle
+  void _processJsonMessage(Map<String, dynamic> jsonData) {
+    try {
       // Son gelen mesajı kaydet
       _lastMessage = jsonData;
       
       final command = jsonData['c'];
-
+      
       switch (command) {
         case 'login':
           // Login required or failed
@@ -317,6 +380,9 @@ class WebSocketProvider with ChangeNotifier {
           _logMessage('Received unknown command: $command');
           break;
       }
+    } catch (e) {
+      debugPrint('Error processing JSON message: $e');
+      _logMessage('Error processing JSON message: $e');
     }
   }
 

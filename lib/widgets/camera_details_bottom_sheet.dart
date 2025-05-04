@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
+import '../providers/websocket_provider.dart';
+import '../providers/camera_devices_provider.dart';
 
 class CameraDetailsBottomSheet extends StatelessWidget {
   final Camera camera;
@@ -167,7 +170,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 
-                // Butonlar
+                // Video Butonları
                 Row(
                   children: [
                     Expanded(
@@ -200,6 +203,57 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+                
+                const SizedBox(height: 24),
+                const Text(
+                  'Advanced Commands',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.darkTextPrimary,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                
+                // Kamera Yönetim Komutları
+                Consumer<WebSocketProvider>(
+                  builder: (context, websocketProvider, child) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Kameraya Grup Ekle
+                        OutlinedButton.icon(
+                          icon: const Icon(Icons.group_add),
+                          label: const Text('Add Group to Camera'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppTheme.primaryBlue,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          onPressed: () {
+                            // Grup ekleme dialog'unu göster
+                            _showAddGroupDialog(context, camera, websocketProvider);
+                          },
+                        ),
+                        
+                        const SizedBox(height: 8),
+                        
+                        // Kamerayı cihaza taşı
+                        OutlinedButton.icon(
+                          icon: const Icon(Icons.swap_horiz),
+                          label: const Text('Move Camera to Device'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.green,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          onPressed: () {
+                            // Cihaza taşıma dialog'unu göster
+                            _showMoveCameraDialog(context, camera, websocketProvider);
+                          },
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 24),
               ],
@@ -281,6 +335,174 @@ class CameraDetailsBottomSheet extends StatelessWidget {
       ],
     );
   }
+}
+
+// Kameraya grup ekleme dialog'u
+void _showAddGroupDialog(BuildContext context, Camera camera, WebSocketProvider provider) {
+  final TextEditingController groupNameController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (dialogContext) {
+      return AlertDialog(
+        backgroundColor: AppTheme.darkSurface,
+        title: const Text('Add Group to Camera'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Add camera ${camera.name} to a group',
+              style: const TextStyle(color: AppTheme.darkTextSecondary),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: groupNameController,
+              decoration: const InputDecoration(
+                labelText: 'Group Name',
+                border: OutlineInputBorder(),
+                hintText: 'Enter group name',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryBlue,
+            ),
+            onPressed: () async {
+              final groupName = groupNameController.text.trim();
+              if (groupName.isNotEmpty) {
+                final success = await provider.addGroupToCamera(camera.name, groupName);
+                
+                if (!context.mounted) return;
+                Navigator.pop(dialogContext);
+                
+                // Sonuç bildirimi göster
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                        ? 'Camera ${camera.name} added to group $groupName'
+                        : 'Failed to add camera to group',
+                    ),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('Add to Group'),
+          ),
+        ],
+      );
+    }
+  );
+}
+
+// Kamerayı cihaza taşıma dialog'u
+void _showMoveCameraDialog(BuildContext context, Camera camera, WebSocketProvider provider) {
+  // Tüm cihazları almak için CameraDevicesProvider kullan
+  final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+  final devices = devicesProvider.devicesList;
+  String? selectedDeviceMac;
+
+  showDialog(
+    context: context,
+    builder: (dialogContext) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            backgroundColor: AppTheme.darkSurface,
+            title: const Text('Move Camera to Device'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Move camera ${camera.name} to another device',
+                  style: const TextStyle(color: AppTheme.darkTextSecondary),
+                ),
+                const SizedBox(height: 16),
+                const Text('Select Target Device:'),
+                const SizedBox(height: 8),
+                
+                // Cihaz seçimi için dropdown
+                if (devices.isEmpty)
+                  const Text('No devices available', style: TextStyle(color: Colors.red))
+                else
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
+                    hint: const Text('Select a device'),
+                    value: selectedDeviceMac,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedDeviceMac = value;
+                      });
+                    },
+                    items: devices.map((device) {
+                      return DropdownMenuItem<String>(
+                        value: device.macKey,
+                        child: Text(
+                          device.deviceType.isEmpty 
+                            ? device.macKey 
+                            : '${device.deviceType} (${device.macKey})'
+                        ),
+                      );
+                    }).toList(),
+                  ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                },
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryBlue,
+                ),
+                onPressed: selectedDeviceMac == null
+                  ? null // Cihaz seçilmediyse butonu devre dışı bırak
+                  : () async {
+                      final success = await provider.moveCamera(
+                        selectedDeviceMac!, 
+                        'me${camera.ip.replaceAll('.', '_')}' // Bu format örnek - gerçek format değişebilir
+                      );
+                      
+                      if (!context.mounted) return;
+                      Navigator.pop(dialogContext);
+                      
+                      // Sonuç bildirimi göster
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            success
+                              ? 'Camera ${camera.name} moved to selected device'
+                              : 'Failed to move camera to device',
+                          ),
+                          backgroundColor: success ? Colors.green : Colors.red,
+                        ),
+                      );
+                    },
+                child: const Text('Move Camera'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  );
 }
 
 // Detayları temsil eden helper sınıf

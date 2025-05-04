@@ -8,6 +8,7 @@ import '../widgets/device_list_item.dart';
 import '../widgets/status_indicator.dart';
 import '../models/camera_device.dart';
 import '../providers/camera_devices_provider.dart';
+import '../providers/websocket_provider.dart';
 
 class DevicesScreen extends StatefulWidget {
   const DevicesScreen({Key? key}) : super(key: key);
@@ -517,100 +518,130 @@ class _DevicesScreenState extends State<DevicesScreen> {
   }
   
   void _showDeviceDetails(int deviceIndex, CameraDevice device) {
-    final statusText = device.connected ? 'Online' : 'Offline';
-    
+    // Dialog'u göster
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppTheme.darkSurface,
-          title: Text(device.deviceType.isEmpty ? 'Device Details' : '${device.deviceType} Details'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Temel Bilgiler
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryBlue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Temel Bilgiler',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.primaryBlue,
+      builder: (dialogContext) {
+        // CameraDevicesProvider'dan gelen güncellemeleri dinle
+        return Consumer<CameraDevicesProvider>(
+          builder: (context, devicesProvider, child) {
+            // Cihazı güncel verilerle al
+            final updatedDevice = devicesProvider.devices[device.macKey] ?? device;
+            final statusText = updatedDevice.connected ? 'Online' : 'Offline';
+            
+            return AlertDialog(
+              backgroundColor: AppTheme.darkSurface,
+              title: Text(updatedDevice.deviceType.isEmpty ? 'Device Details' : '${updatedDevice.deviceType} Details'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Temel Bilgiler
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryBlue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'Temel Bilgiler',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primaryBlue,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                _buildDetailRow('Device Type', device.deviceType.isEmpty ? 'Unknown' : device.deviceType),
-                _buildDetailRow('IP Address', device.ipv4.isEmpty ? 'Unknown' : device.ipv4),
-                _buildDetailRow('MAC Address', device.macAddress),
-                _buildDetailRow('Firmware', device.firmwareVersion.isEmpty ? 'Unknown' : device.firmwareVersion),
-                _buildDetailRow('Last Active', device.lastSeenAt.isEmpty ? 'Unknown' : device.lastSeenAt),
-                _buildDetailRow('Status', statusText),
-                _buildDetailRow('Uptime', device.uptime.isEmpty ? 'Unknown' : '${device.uptime} saniye'),
-                _buildDetailRow('Cameras', '${device.cameras.length}'),
-                if (device.recordPath.isNotEmpty)
-                  _buildDetailRow('Recording Path', device.recordPath),
-                
-                // Sistem Bilgileri (sysinfo)
-                const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryOrange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Sistem Bilgileri',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.primaryOrange,
+                    const SizedBox(height: 8),
+                    _buildDetailRow('Device Type', updatedDevice.deviceType.isEmpty ? 'Unknown' : updatedDevice.deviceType),
+                    _buildDetailRow('IP Address', updatedDevice.ipv4.isEmpty ? 'Unknown' : updatedDevice.ipv4),
+                    _buildDetailRow('MAC Address', updatedDevice.macAddress),
+                    _buildDetailRow('Firmware', updatedDevice.firmwareVersion.isEmpty ? 'Unknown' : updatedDevice.firmwareVersion),
+                    _buildDetailRow('Last Active', updatedDevice.lastSeenAt.isEmpty ? 'Unknown' : updatedDevice.lastSeenAt),
+                    _buildDetailRow('Status', statusText),
+                    _buildDetailRow('Uptime', updatedDevice.uptime.isEmpty ? 'Unknown' : '${updatedDevice.uptime} saniye'),
+                    _buildDetailRow('Cameras', '${updatedDevice.cameras.length}'),
+                    if (updatedDevice.recordPath.isNotEmpty)
+                      _buildDetailRow('Recording Path', updatedDevice.recordPath),
+                    
+                    // Sistem Bilgileri (sysinfo)
+                    const SizedBox(height: 16),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryOrange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'Sistem Bilgileri',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primaryOrange,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    _buildDetailRow('İşlemci Sıcaklığı', updatedDevice.cpuTemp > 0 ? '${updatedDevice.cpuTemp.toStringAsFixed(1)}°C' : 'Bilinmiyor'),
+                    _buildDetailRow('Toplam RAM', updatedDevice.totalRam > 0 ? _formatBytes(updatedDevice.totalRam) : 'Bilinmiyor'),
+                    _buildDetailRow('Boş RAM', updatedDevice.freeRam > 0 ? _formatBytes(updatedDevice.freeRam) : 'Bilinmiyor'),
+                    _buildDetailRow('RAM Kullanımı', updatedDevice.totalRam > 0 && updatedDevice.freeRam > 0 ? 
+                        '${((updatedDevice.totalRam - updatedDevice.freeRam) / updatedDevice.totalRam * 100).toStringAsFixed(1)}%' : 'Bilinmiyor'),
+                    _buildDetailRow('Ağ Adresi', updatedDevice.networkInfo.isNotEmpty ? updatedDevice.networkInfo : 'Bilinmiyor'),
+                    _buildDetailRow('Bağlantı Sayısı', updatedDevice.totalConnections > 0 ? updatedDevice.totalConnections.toString() : 'Bilinmiyor'),
+                    _buildDetailRow('Oturum Sayısı', updatedDevice.totalSessions > 0 ? updatedDevice.totalSessions.toString() : 'Bilinmiyor'),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                _buildDetailRow('İşlemci Sıcaklığı', device.cpuTemp > 0 ? '${device.cpuTemp.toStringAsFixed(1)}°C' : 'Bilinmiyor'),
-                _buildDetailRow('Toplam RAM', device.totalRam > 0 ? _formatBytes(device.totalRam) : 'Bilinmiyor'),
-                _buildDetailRow('Boş RAM', device.freeRam > 0 ? _formatBytes(device.freeRam) : 'Bilinmiyor'),
-                _buildDetailRow('RAM Kullanımı', device.totalRam > 0 && device.freeRam > 0 ? 
-                    '${((device.totalRam - device.freeRam) / device.totalRam * 100).toStringAsFixed(1)}%' : 'Bilinmiyor'),
-                _buildDetailRow('Ağ Adresi', device.networkInfo.isNotEmpty ? device.networkInfo : 'Bilinmiyor'),
-                _buildDetailRow('Bağlantı Sayısı', device.totalConnections > 0 ? device.totalConnections.toString() : 'Bilinmiyor'),
-                _buildDetailRow('Oturum Sayısı', device.totalSessions > 0 ? device.totalSessions.toString() : 'Bilinmiyor'),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Close'),
-            ),
-            if (device.cameras.isNotEmpty)
-              TextButton(
-                onPressed: () {
-                  final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
-                  devicesProvider.setSelectedDevice(device.macKey);
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/cameras');
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: AppTheme.primaryBlue,
-                ),
-                child: const Text('View Cameras'),
               ),
-          ],
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+                      },
+                      child: const Text('Close'),
+                    ),
+                    if (updatedDevice.cameras.isNotEmpty)
+                      TextButton(
+                        onPressed: () {
+                          final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                          devicesProvider.setSelectedDevice(updatedDevice.macKey);
+                          Navigator.pop(dialogContext);
+                          Navigator.pushNamed(context, '/cameras');
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppTheme.primaryBlue,
+                        ),
+                        child: const Text('View Cameras'),
+                      ),
+                    
+                    // WiFi Ayarları Butonu
+                    Consumer<WebSocketProvider>(
+                      builder: (context, wsProvider, child) {
+                        return TextButton.icon(
+                          icon: const Icon(Icons.wifi),
+                          label: const Text('WiFi Settings'),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.amber,
+                          ),
+                          onPressed: () {
+                            // WiFi ayarlarını değiştirme dialog'unu göster
+                            _showChangeWifiDialog(dialogContext, updatedDevice, wsProvider);
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -618,31 +649,124 @@ class _DevicesScreenState extends State<DevicesScreen> {
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: AppTheme.darkTextSecondary,
-                fontWeight: FontWeight.w500,
-              ),
+          Text(
+            '$label:',
+            style: const TextStyle(
+              color: AppTheme.darkTextPrimary,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          Expanded(
-            flex: 3,
+          Flexible(
             child: Text(
               value,
-              style: const TextStyle(
-                color: AppTheme.darkTextPrimary,
+              style: TextStyle(
+                color: AppTheme.darkTextSecondary,
               ),
+              textAlign: TextAlign.end,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
             ),
           ),
         ],
       ),
+    );
+  }
+  
+  // WiFi ayarlarını değiştirme dialog'u
+  void _showChangeWifiDialog(BuildContext context, CameraDevice device, WebSocketProvider provider) {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: AppTheme.darkSurface,
+          title: const Text('Change WiFi Settings'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Change WiFi settings for ${device.deviceType.isEmpty ? "device ${device.macAddress}" : device.deviceType}',
+                style: const TextStyle(color: AppTheme.darkTextSecondary),
+              ),
+              const SizedBox(height: 16),
+              
+              // WiFi adı giriş alanı
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'WiFi Name (SSID)',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.wifi),
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              // WiFi şifresi giriş alanı
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'WiFi Password',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.lock),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber,
+              ),
+              onPressed: () async {
+                final name = nameController.text.trim();
+                final password = passwordController.text.trim();
+                
+                if (name.isNotEmpty && password.isNotEmpty) {
+                  final success = await provider.changeWifiSettings(name, password);
+                  
+                  if (!context.mounted) return;
+                  Navigator.pop(dialogContext);
+                  
+                  // Sonuç bildirimi göster
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        success
+                          ? 'WiFi settings updated successfully'
+                          : 'Failed to update WiFi settings',
+                      ),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                    ),
+                  );
+                } else {
+                  // Boş alan uyarısı
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please fill in all fields'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Update WiFi'),
+            ),
+          ],
+        );
+      },
     );
   }
 

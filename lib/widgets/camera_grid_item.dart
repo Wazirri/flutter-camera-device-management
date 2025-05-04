@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
+import '../providers/camera_devices_provider.dart';
 
 class CameraGridItem extends StatelessWidget {
   final Camera camera;
@@ -169,36 +171,62 @@ class CameraGridItem extends StatelessWidget {
                   icon: const Icon(Icons.more_vert),
                   tooltip: 'More Options',
                   onPressed: () {
-                    // Show camera options
+                    // Show camera options with real-time updates
                     showDialog(
                       context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('Camera: ${camera.name}'),
-                          content: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildDetailRow('IP', camera.ip),
-                                _buildDetailRow('Brand', camera.brand),
-                                _buildDetailRow('Status', camera.connected ? 'Connected' : 'Disconnected'),
-                                if (camera.mediaUri.isNotEmpty) 
-                                  _buildDetailRow('Media URI', camera.mediaUri),
-                                if (camera.recordUri.isNotEmpty) 
-                                  _buildDetailRow('Record URI', camera.recordUri),
-                              ],
+                      builder: (dialogContext) {
+                        // Parent device'ı bul (mac adresine göre)
+                        String? macKey;
+                        for (var entry in Provider.of<CameraDevicesProvider>(context, listen: false).devices.entries) {
+                          if (entry.value.cameras.any((c) => c.index == camera.index)) {
+                            macKey = entry.key;
+                            break;
+                          }
+                        }
+                        
+                        // CameraDevicesProvider'dan gelen kamera güncellemelerini dinle
+                        return Consumer<CameraDevicesProvider>(builder: (context, devicesProvider, child) {
+                          // Kamera verilerini güncel olarak al
+                          Camera updatedCamera = camera;
+                          
+                          // MAC adresi biliniyorsa güncel veri almaya çalış
+                          if (macKey != null && devicesProvider.devices.containsKey(macKey)) {
+                            final device = devicesProvider.devices[macKey]!;
+                            final foundCamera = device.cameras.firstWhere(
+                              (c) => c.index == camera.index, 
+                              orElse: () => camera
+                            );
+                            updatedCamera = foundCamera;
+                          }
+                          
+                          return AlertDialog(
+                            title: Text('Camera: ${updatedCamera.name}'),
+                            content: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _buildDetailRow('IP', updatedCamera.ip),
+                                  _buildDetailRow('Brand', updatedCamera.brand),
+                                  _buildDetailRow('Status', updatedCamera.connected ? 'Connected' : 'Disconnected'),
+                                  _buildDetailRow('Last Update', DateTime.now().toString().split('.')[0]),
+                                  if (updatedCamera.mediaUri.isNotEmpty) 
+                                    _buildDetailRow('Media URI', updatedCamera.mediaUri),
+                                  if (updatedCamera.recordUri.isNotEmpty) 
+                                    _buildDetailRow('Record URI', updatedCamera.recordUri),
+                                ],
+                              ),
                             ),
-                          ),
-                          actions: [
-                            TextButton(
-                              child: const Text('Close'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
+                            actions: [
+                              TextButton(
+                                child: const Text('Close'),
+                                onPressed: () {
+                                  Navigator.of(dialogContext).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        });
                       },
                     );
                   },
