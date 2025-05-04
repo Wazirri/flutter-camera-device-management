@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
@@ -87,65 +88,72 @@ class CameraDevicesProvider with ChangeNotifier {
 
   // WebSocket mesajlarını işle
   void processWebSocketMessage(Map<String, dynamic> message) async {
-    // Mesajın geçerli olup olmadığını kontrol et
-    if (message['c'] != 'changed' || !message.containsKey('data') || !message.containsKey('val')) {
-      if (message['c'] != 'changed') {
-        await FileLogger.log("Skipping message (type is not 'changed': ${message['c']}).", tag: 'CAMERA_INFO');
-      } else {
-        await FileLogger.log("Skipping message (missing 'data' or 'val' fields).", tag: 'CAMERA_INFO');
-      }
-      return;
-    }
-    
-    final String dataPath = message['data'];
-    final dynamic value = message['val'];
-    
-    // Veri yolu ecs_slaves ile başlamıyorsa, işleme
-    if (!dataPath.startsWith('ecs_slaves.')) {
-      return;
-    }
-    
-    // Veri yolunu parçalara ayır ve MAC adresini çıkar
-    final parts = dataPath.split('.');
-    if (parts.length < 2) {
-      await FileLogger.log('Invalid data path format: $dataPath', tag: 'CAMERA_ERROR');
-      return;
-    }
-    
-    // MAC adresi bileşenini al
-    final macKey = parts[1];
-    final macAddress = macKey.startsWith('m_') ? macKey.substring(2).replaceAll('_', ':') : macKey;
-    
-    // Cihazı al veya oluştur
-    final device = _getOrCreateDevice(macKey, macAddress);
-    
-    // Mesajı kategorize et ve işle
-    if (parts.length >= 3) {
-      final messageCategory = _categorizeMessage(parts[2], parts.length > 3 ? parts.sublist(3) : []);
-      
-      switch (messageCategory) {
-        case MessageCategory.camera:
-          await _processCameraData(device, parts[2], parts.length > 3 ? parts.sublist(3) : [], value);
-          break;
-        case MessageCategory.cameraReport:
-          await _processCameraReport(device, parts.length > 3 ? parts.sublist(3) : [], value);
-          break;
-        case MessageCategory.systemInfo:
-          await _processSystemInfo(device, parts.length > 3 ? parts.sublist(3) : [], value);
-          break;
-        case MessageCategory.configuration:
-          await _processConfiguration(device, parts.length > 3 ? parts.sublist(3) : [], value);
-          break;
-        case MessageCategory.basicProperty:
-          await _processBasicDeviceProperty(device, parts[2], value);
-          break;
-        case MessageCategory.unknown:
-          await FileLogger.log('Unknown message category: ${parts[2]}', tag: 'CAMERA_WARN');
-          break;
+    try {
+      // Mesajın geçerli olup olmadığını kontrol et
+      if (message['c'] != 'changed' || !message.containsKey('data') || !message.containsKey('val')) {
+        if (message['c'] != 'changed') {
+          await FileLogger.log("Skipping message (type is not 'changed': ${message['c']}).", tag: 'CAMERA_INFO');
+        } else {
+          await FileLogger.log("Skipping message (missing 'data' or 'val' fields).", tag: 'CAMERA_INFO');
+        }
+        return;
       }
       
-      // Değişiklikleri bildir
-      notifyListeners();
+      final String dataPath = message['data'];
+      final dynamic value = message['val'];
+      
+      // Veri yolu ecs_slaves ile başlamıyorsa, işleme
+      if (!dataPath.startsWith('ecs_slaves.')) {
+        return;
+      }
+      
+      // Veri yolunu parçalara ayır ve MAC adresini çıkar
+      final parts = dataPath.split('.');
+      if (parts.length < 2) {
+        await FileLogger.log('Invalid data path format: $dataPath', tag: 'CAMERA_ERROR');
+        return;
+      }
+      
+      // MAC adresi bileşenini al
+      final macKey = parts[1];
+      final macAddress = macKey.startsWith('m_') ? macKey.substring(2).replaceAll('_', ':') : macKey;
+      
+      // Cihazı al veya oluştur
+      final device = _getOrCreateDevice(macKey, macAddress);
+      
+      // Mesajı kategorize et ve sadece ilgili alanı güncelleyerek işle
+      if (parts.length >= 3) {
+        final messageCategory = _categorizeMessage(parts[2], parts.length > 3 ? parts.sublist(3) : []);
+        
+        // Her bir veri tipi için ayrı işleme ve sadece ilgili alanları güncelleme
+        switch (messageCategory) {
+          case MessageCategory.camera:
+            await _processCameraData(device, parts[2], parts.length > 3 ? parts.sublist(3) : [], value);
+            break;
+          case MessageCategory.cameraReport:
+            await _processCameraReport(device, parts.length > 3 ? parts.sublist(3) : [], value);
+            break;
+          case MessageCategory.systemInfo:
+            await _processSystemInfo(device, parts.length > 3 ? parts.sublist(3) : [], value);
+            break;
+          case MessageCategory.configuration:
+            await _processConfiguration(device, parts.length > 3 ? parts.sublist(3) : [], value);
+            break;
+          case MessageCategory.basicProperty:
+            await _processBasicDeviceProperty(device, parts[2], value);
+            break;
+          case MessageCategory.unknown:
+            await FileLogger.log('Unknown message category: ${parts[2]}', tag: 'CAMERA_WARN');
+            break;
+        }
+        
+        // Her alan güncellemesinden sonra değişiklikleri bildir
+        notifyListeners();
+      }
+    } catch (e) {
+      // Hata durumunda güvenli şekilde işle ve loglama yap
+      await FileLogger.log('Error processing WebSocket message: $e', tag: 'CAMERA_ERROR');
+      debugPrint('Error processing WebSocket message: $e');
     }
   }
   
@@ -353,86 +361,82 @@ class CameraDevicesProvider with ChangeNotifier {
     
     String infoType = infoPath[0];
     
-    // Belirli sistem bilgilerini cihaza aktar
-    switch (infoType) {
-      case 'upTime':
-        device.uptime = value.toString();
-        await FileLogger.log('Set device ${device.macKey} uptime to: ${device.uptime} from sysinfo', tag: 'SYSINFO');
-        break;
-        
-      case 'cpuTemp':
-        try {
-          // Sıcaklık değerini double'a çevir
+    // Her bir sistem bilgisi alanı için sadece o alanı güncelle
+    try {
+      switch (infoType) {
+        case 'upTime':
+          // Sadece uptime bilgisini güncelle, diğerlerini etkileme
+          device.uptime = value.toString();
+          await FileLogger.log('Güncelleme - device ${device.macKey} uptime: ${device.uptime}', tag: 'SYSINFO');
+          break;
+          
+        case 'cpuTemp':
+          // Sadece CPU sıcaklığını güncelle
           double temp = double.tryParse(value.toString()) ?? 0.0;
           device.cpuTemp = temp;
-          await FileLogger.log('System CPU Temperature: $value', tag: 'CPU_TEMP');
-        } catch (e) {
-          await FileLogger.log('Error parsing CPU temperature: $e', tag: 'CPU_TEMP_ERROR');
-        }
-        break;
-        
-      case 'thermal[0]': // Alternatif sıcaklık bilgisi
-        try {
+          await FileLogger.log('Güncelleme - CPU Temperature: $temp°C', tag: 'CPU_TEMP');
+          break;
+          
+        case 'thermal[0]': // Alternatif sıcaklık bilgisi
           double temp = double.tryParse(value.toString()) ?? 0.0;
-          if (device.cpuTemp == 0.0) { // Eğer henüz ayarlanmamışsa
+          // CPU sıcaklığı henüz ayarlanmamışsa veya bu değer daha yüksekse güncelle
+          if (device.cpuTemp == 0.0 || temp > device.cpuTemp) {
             device.cpuTemp = temp;
+            await FileLogger.log('Güncelleme - Thermal Temperature: $temp°C', tag: 'CPU_TEMP');
           }
-          await FileLogger.log('Unhandled sysinfo property: $infoType with value: $value', tag: 'SYSINFO');
-        } catch (e) {
-          await FileLogger.log('Error parsing thermal temperature: $e', tag: 'CPU_TEMP_ERROR');
-        }
-        break;
-        
-      case 'eth0':
-        device.networkInfo = value.toString();
-        await FileLogger.log('System eth0 network info: $value', tag: 'SYSINFO');
-        break;
-        
-      case 'freeRam':
-        try {
+          break;
+          
+        case 'eth0':
+          // Sadece ağ bilgisini güncelle
+          device.networkInfo = value.toString();
+          await FileLogger.log('Güncelleme - Network Info: ${device.networkInfo}', tag: 'SYSINFO');
+          break;
+          
+        case 'freeRam':
+          // Sadece boş RAM bilgisini güncelle
           int ram = int.tryParse(value.toString()) ?? 0;
           device.freeRam = ram;
-          await FileLogger.log('System free RAM: $value', tag: 'SYSINFO');
-        } catch (e) {
-          await FileLogger.log('Error parsing free RAM: $e', tag: 'SYSINFO_ERROR');
-        }
-        break;
-        
-      case 'totalRam':
-        try {
+          await FileLogger.log('Güncelleme - Free RAM: ${_formatBytes(ram)}', tag: 'SYSINFO');
+          break;
+          
+        case 'totalRam':
+          // Sadece toplam RAM bilgisini güncelle
           int ram = int.tryParse(value.toString()) ?? 0;
           device.totalRam = ram;
-          await FileLogger.log('System total RAM: $value', tag: 'SYSINFO');
-        } catch (e) {
-          await FileLogger.log('Error parsing total RAM: $e', tag: 'SYSINFO_ERROR');
-        }
-        break;
-        
-      case 'totalconns': // Toplam bağlantı sayısı
-        try {
+          await FileLogger.log('Güncelleme - Total RAM: ${_formatBytes(ram)}', tag: 'SYSINFO');
+          break;
+          
+        case 'totalconns': // Toplam bağlantı sayısı
+          // Sadece bağlantı sayısını güncelle
           int conns = int.tryParse(value.toString()) ?? 0;
           device.totalConnections = conns;
-          await FileLogger.log('Unhandled sysinfo property: $infoType with value: $value', tag: 'SYSINFO');
-        } catch (e) {
-          await FileLogger.log('Error parsing connections: $e', tag: 'SYSINFO_ERROR');
-        }
-        break;
-        
-      case 'sessions': // Oturum sayısı
-        try {
+          await FileLogger.log('Güncelleme - Total Connections: $conns', tag: 'SYSINFO');
+          break;
+          
+        case 'sessions': // Oturum sayısı
+          // Sadece oturum sayısını güncelle
           int sessions = int.tryParse(value.toString()) ?? 0;
           device.totalSessions = sessions;
-          await FileLogger.log('Unhandled sysinfo property: $infoType with value: $value', tag: 'SYSINFO');
-        } catch (e) {
-          await FileLogger.log('Error parsing sessions: $e', tag: 'SYSINFO_ERROR');
-        }
-        break;
-        
-      // Diğer sistem bilgilerini işle
-      default:
-        await FileLogger.log('Unhandled sysinfo property: $infoType with value: $value', tag: 'SYSINFO');
-        break;
+          await FileLogger.log('Güncelleme - Total Sessions: $sessions', tag: 'SYSINFO');
+          break;
+          
+        // Diğer sistem bilgilerini işle ama zaten var olan değerleri değiştirme
+        default:
+          await FileLogger.log('İşlenmeyen sistem bilgisi: $infoType = $value', tag: 'SYSINFO');
+          break;
+      }
+    } catch (e) {
+      // Hata durumunda htanın hangi alanda oluştuğunu kaydet
+      await FileLogger.log('Sistem bilgisi güncelleme hatası - $infoType: $e', tag: 'SYSINFO_ERROR');
     }
+  }
+
+  // Byte değerlerini insan okunabilir formata çevirir
+  String _formatBytes(int bytes, {int decimals = 1}) {
+    if (bytes <= 0) return '0 B';
+    const suffixes = ['B', 'KB', 'MB', 'GB', 'TB'];
+    var i = (log(bytes) / log(1024)).floor();
+    return '${(bytes / pow(1024, i)).toStringAsFixed(decimals)} ${suffixes[i]}';
   }
   
   // Konfigürasyon verilerini işle

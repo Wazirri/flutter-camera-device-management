@@ -34,6 +34,9 @@ class WebSocketProvider with ChangeNotifier {
   // Store last received message for other providers to access
   dynamic _lastMessage;
   
+  // Son gelen mesajı al
+  dynamic get lastMessage => _lastMessage;
+  
   // Connection settings
   String _serverIp = '85.104.114.145';
   int _serverPort = 1200;
@@ -261,6 +264,9 @@ class WebSocketProvider with ChangeNotifier {
   // Process JSON messages
   void _processJsonMessage(dynamic jsonData) {
     if (jsonData is Map<String, dynamic>) {
+      // Son gelen mesajı kaydet
+      _lastMessage = jsonData;
+      
       final command = jsonData['c'];
 
       switch (command) {
