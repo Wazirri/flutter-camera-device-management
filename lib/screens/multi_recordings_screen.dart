@@ -24,7 +24,7 @@ class MultiRecordingsScreen extends StatefulWidget {
 class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with SingleTickerProviderStateMixin {
   // Seçilen kamera ve kayıtlar
   List<Camera> _availableCameras = [];
-  Map<Camera, List<String>> _cameraRecordings = {};
+  final Map<Camera, List<String>> _cameraRecordings = {};
   
   // Aktif oynatılan kayıt bilgileri
   Camera? _activeCamera;
@@ -56,7 +56,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   
   // Çoklu seçim modu
   bool _isMultiSelectionMode = false;
-  Set<String> _selectedForDownload = {};
+  final Set<String> _selectedForDownload = {};
 
   @override
   void initState() {
@@ -425,8 +425,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         body: _buildVideoPlayer(),
         floatingActionButton: FloatingActionButton(
           mini: true,
-          child: const Icon(Icons.fullscreen_exit),
           onPressed: _toggleFullScreen,
+          child: const Icon(Icons.fullscreen_exit),
         ),
       );
     }
@@ -492,11 +492,11 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                         color: AppTheme.primaryBlue.withOpacity(0.5),
                         shape: BoxShape.circle,
                       ),
-                      selectedDecoration: BoxDecoration(
+                      selectedDecoration: const BoxDecoration(
                         color: AppTheme.primaryBlue,
                         shape: BoxShape.circle,
                       ),
-                      markerDecoration: BoxDecoration(
+                      markerDecoration: const BoxDecoration(
                         color: AppTheme.primaryOrange,
                         shape: BoxShape.circle,
                       ),
@@ -676,7 +676,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                     const SizedBox(width: 4),
                     Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: AppTheme.primaryBlue,
                         shape: BoxShape.circle,
                       ),
@@ -737,7 +737,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                     final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
                     final device = cameraDevicesProvider.getDeviceForCamera(camera);
                     
-                    final recordingUrl = device != null ? 'http://${device.ipv4}:8080/Rec/${camera.name}/${recording}' : '';
+                    final recordingUrl = device != null ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$recording' : '';
                     
                     final isSelected = _isMultiSelectionMode ? 
                       _selectedForDownload.contains(recordingUrl) :

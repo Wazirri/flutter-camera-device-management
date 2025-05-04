@@ -12,7 +12,7 @@ typedef MessageHandler = void Function(Map<String, dynamic> message);
 class WebSocketService with ChangeNotifier {
   WebSocketChannel? _channel;
   bool _isConnected = false;
-  List<String> _messageLog = [];
+  final List<String> _messageLog = [];
   SystemInfo? _systemInfo;
   bool _monitorCommandSent = false;
   MessageHandler? _onParsedMessage;
@@ -105,7 +105,7 @@ class WebSocketService with ChangeNotifier {
   void _startHeartbeat() {
     _stopHeartbeat(); // Stop existing timer if any
     
-    _heartbeatTimer = Timer.periodic(Duration(seconds: heartbeatInterval), (timer) {
+    _heartbeatTimer = Timer.periodic(const Duration(seconds: heartbeatInterval), (timer) {
       if (!_isConnected) {
         _stopHeartbeat();
         return;
@@ -115,7 +115,7 @@ class WebSocketService with ChangeNotifier {
       final now = DateTime.now();
       final lastMessageDuration = _lastMessageTime != null 
         ? now.difference(_lastMessageTime!) 
-        : Duration(seconds: heartbeatInterval * 2);
+        : const Duration(seconds: heartbeatInterval * 2);
       
       // If it's been too long since a message was received, consider the connection dead
       if (lastMessageDuration.inSeconds > heartbeatInterval * 2) {
@@ -258,7 +258,7 @@ class WebSocketService with ChangeNotifier {
   // Send the "DO MONITORECS" command
   void sendMonitorCommand() async {
     if (_channel != null && _isConnected) {
-      final monitorCommand = 'Monitor ecs_slaves';
+      const monitorCommand = 'Monitor ecs_slaves';
       _channel!.sink.add(monitorCommand);
       
       // Log the command
@@ -310,9 +310,9 @@ class WebSocketService with ChangeNotifier {
     
     _reconnectAttempts++;
     
-    print('Scheduling reconnect attempt ${_reconnectAttempts}/$maxReconnectAttempts in $reconnectDelay seconds...');
+    print('Scheduling reconnect attempt $_reconnectAttempts/$maxReconnectAttempts in $reconnectDelay seconds...');
     
-    _reconnectTimer = Timer(Duration(seconds: reconnectDelay), () {
+    _reconnectTimer = Timer(const Duration(seconds: reconnectDelay), () {
       _reconnectTimer = null;
       if (_shouldReconnect && !_isConnected) {
         print('Attempting to reconnect...');

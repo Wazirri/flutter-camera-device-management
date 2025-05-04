@@ -104,25 +104,25 @@ class _DevicesScreenState extends State<DevicesScreen> {
         children: [
           _buildFilterChip('All', _selectedFilter == 'All'),
           _buildFilterChip('Online', _selectedFilter == 'Online',
-              leadingIcon: StatusIndicator(
+              leadingIcon: const StatusIndicator(
                 status: DeviceStatus.online,
                 size: 10,
                 padding: EdgeInsets.zero,
               )),
           _buildFilterChip('Offline', _selectedFilter == 'Offline',
-              leadingIcon: StatusIndicator(
+              leadingIcon: const StatusIndicator(
                 status: DeviceStatus.offline,
                 size: 10,
                 padding: EdgeInsets.zero,
               )),
           _buildFilterChip('Warning', _selectedFilter == 'Warning',
-              leadingIcon: StatusIndicator(
+              leadingIcon: const StatusIndicator(
                 status: DeviceStatus.warning,
                 size: 10,
                 padding: EdgeInsets.zero,
               )),
           _buildFilterChip('Error', _selectedFilter == 'Error',
-              leadingIcon: StatusIndicator(
+              leadingIcon: const StatusIndicator(
                 status: DeviceStatus.error,
                 size: 10,
                 padding: EdgeInsets.zero,
@@ -161,7 +161,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
     final devicesList = devicesByMac.values.toList();
     
     if (devicesList.isEmpty) {
-      return Center(
+      return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -170,7 +170,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
               size: 64,
               color: AppTheme.darkTextSecondary,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               'No devices found',
               style: TextStyle(
@@ -178,7 +178,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                 color: AppTheme.darkTextSecondary,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               'Connect to the server to discover devices',
               style: TextStyle(
@@ -321,25 +321,25 @@ class _DevicesScreenState extends State<DevicesScreen> {
       case 'All':
         return const Icon(Icons.all_inclusive);
       case 'Online':
-        return StatusIndicator(
+        return const StatusIndicator(
           status: DeviceStatus.online,
           size: 12,
           padding: EdgeInsets.zero,
         );
       case 'Offline':
-        return StatusIndicator(
+        return const StatusIndicator(
           status: DeviceStatus.offline,
           size: 12,
           padding: EdgeInsets.zero,
         );
       case 'Warning':
-        return StatusIndicator(
+        return const StatusIndicator(
           status: DeviceStatus.warning,
           size: 12,
           padding: EdgeInsets.zero,
         );
       case 'Error':
-        return StatusIndicator(
+        return const StatusIndicator(
           status: DeviceStatus.error,
           size: 12,
           padding: EdgeInsets.zero,
@@ -421,7 +421,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                       color: AppTheme.primaryBlue.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.router_rounded,
                       color: AppTheme.primaryBlue,
                     ),
@@ -442,7 +442,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                         const SizedBox(height: 4),
                         Text(
                           'MAC: ${device.macAddress}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             color: AppTheme.darkTextSecondary,
                           ),
@@ -491,7 +491,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
               },
             ),
             ListTile(
-              leading: Icon(
+              leading: const Icon(
                 Icons.delete_outline,
                 color: AppTheme.error,
               ),
@@ -537,7 +537,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                     color: AppTheme.primaryBlue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       'Temel Bilgiler',
                       style: TextStyle(
@@ -568,7 +568,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                     color: AppTheme.primaryOrange.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       'Sistem Bilgileri',
                       style: TextStyle(
@@ -626,7 +626,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
             flex: 2,
             child: Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppTheme.darkTextSecondary,
                 fontWeight: FontWeight.w500,
               ),
@@ -732,7 +732,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
           backgroundColor: AppTheme.darkSurface,
           title: const Text('Remove Device'),
           content: Text(
-            'Are you sure you want to remove ${device.deviceType.isEmpty ? 'Device ' + device.macAddress : device.deviceType}? This action cannot be undone.',
+            'Are you sure you want to remove ${device.deviceType.isEmpty ? 'Device ${device.macAddress}' : device.deviceType}? This action cannot be undone.',
           ),
           actions: [
             TextButton(
@@ -750,7 +750,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                 Navigator.pop(context);
                 // UI only for now - show a snackbar to indicate action
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
+                  const SnackBar(
                     content: Text('Device removal is disabled in this version'),
                     backgroundColor: AppTheme.primaryBlue,
                   ),

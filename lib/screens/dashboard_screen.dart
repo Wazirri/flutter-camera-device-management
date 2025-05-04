@@ -74,7 +74,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  const Text(
                     'Here\'s what\'s happening with your cameras and devices',
                     style: TextStyle(
                       fontSize: 14,
@@ -93,9 +93,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
+                          children: [
                             Icon(Icons.add_circle_outline_rounded),
                             SizedBox(width: 8),
                             Text('Add Device'),
@@ -109,12 +109,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppTheme.primaryBlue,
-                          side: BorderSide(color: AppTheme.primaryBlue),
+                          side: const BorderSide(color: AppTheme.primaryBlue),
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
+                          children: [
                             Icon(Icons.camera_enhance_rounded),
                             SizedBox(width: 8),
                             Text('Camera Devices'),
@@ -226,7 +226,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 8),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: AppTheme.darkTextSecondary,
               ),
@@ -256,8 +256,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               onPressed: () {
                 Navigator.pushNamed(context, '/camera-devices');
               },
-              child: Row(
-                children: const [
+              child: const Row(
+                children: [
                   Text('View All'),
                   SizedBox(width: 4),
                   Icon(Icons.arrow_forward, size: 16),
@@ -339,7 +339,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.access_time,
                   size: 14,
                   color: AppTheme.darkTextSecondary,
@@ -347,7 +347,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(width: 4),
                 Text(
                   timestamp,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppTheme.darkTextSecondary,
                   ),
@@ -391,8 +391,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               onPressed: () {
                 Navigator.pushNamed(context, '/devices');
               },
-              child: Row(
-                children: const [
+              child: const Row(
+                children: [
                   Text('View All'),
                   SizedBox(width: 4),
                   Icon(Icons.arrow_forward, size: 16),
@@ -438,7 +438,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         Row(
           children: [
-            Expanded(
+            const Expanded(
               flex: 3,
               child: Text(
                 'Device Name',
@@ -448,7 +448,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-            Expanded(
+            const Expanded(
               flex: 2,
               child: Text(
                 'Type',
@@ -458,7 +458,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-            Expanded(
+            const Expanded(
               flex: 2,
               child: Text(
                 'Status',
@@ -469,7 +469,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             if (!ResponsiveHelper.isMobile(context))
-              Expanded(
+              const Expanded(
                 flex: 2,
                 child: Text(
                   'Last Active',
@@ -733,7 +733,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       children: [
                         Text(
                           label,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             color: AppTheme.darkTextSecondary,
                             fontWeight: FontWeight.w500,

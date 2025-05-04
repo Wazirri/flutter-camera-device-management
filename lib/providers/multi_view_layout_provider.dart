@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:convert';
 import '../models/camera_layout.dart';
 import '../models/camera_device.dart';
 

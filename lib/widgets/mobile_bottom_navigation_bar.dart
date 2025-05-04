@@ -213,8 +213,8 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                   ),
                 ),
                 
-                Padding(
-                  padding: const EdgeInsets.only(left: 16, top: 8, bottom: 16),
+                const Padding(
+                  padding: EdgeInsets.only(left: 16, top: 8, bottom: 16),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -268,7 +268,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                 
                 _buildAnimatedMoreMenuItem(
                   context,
-                  Icon(Icons.logout, color: Colors.red),
+                  const Icon(Icons.logout, color: Colors.red),
                   'Logout',
                   '/login',
                   3,

@@ -17,7 +17,7 @@ class CameraLayout {
     required this.slots,
     required this.description,
     Map<String, int>? cameraAssignments,
-  }) : this.cameraAssignments = cameraAssignments ?? {};
+  }) : cameraAssignments = cameraAssignments ?? {};
 
   // Deep copy constructor
   CameraLayout.copy(CameraLayout source)

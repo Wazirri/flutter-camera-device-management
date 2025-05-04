@@ -60,12 +60,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           },
         ),
         const SizedBox(width: 8),
-        Padding(
-          padding: const EdgeInsets.only(right: 16.0),
+        const Padding(
+          padding: EdgeInsets.only(right: 16.0),
           child: CircleAvatar(
             radius: 16,
             backgroundColor: AppTheme.primaryOrange,
-            child: const Text(
+            child: Text(
               'A',
               style: TextStyle(
                 color: Colors.white,

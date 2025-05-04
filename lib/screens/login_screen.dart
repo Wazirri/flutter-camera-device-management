@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:movita_ecs/providers/websocket_provider.dart';
-import 'package:movita_ecs/screens/dashboard_screen.dart';
 import 'package:movita_ecs/theme/app_theme.dart';
 import 'package:movita_ecs/widgets/custom_button.dart';
 import 'package:movita_ecs/widgets/custom_text_field.dart';

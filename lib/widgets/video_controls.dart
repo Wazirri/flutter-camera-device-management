@@ -71,10 +71,10 @@ class _VideoControlsState extends State<VideoControls> {
   }
   
   void _updatePlaybackState() async {
-    final playing = await widget.player.state.playing;
-    final position = await widget.player.state.position;
-    final duration = await widget.player.state.duration;
-    final volume = await widget.player.state.volume;
+    final playing = widget.player.state.playing;
+    final position = widget.player.state.position;
+    final duration = widget.player.state.duration;
+    final volume = widget.player.state.volume;
     
     if (mounted) {
       setState(() {

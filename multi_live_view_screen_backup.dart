@@ -305,13 +305,13 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> with Automati
                       
                       // Error indicator
                       if (_errorStates[index])
-                        Center(
+                        const Center(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.error_outline, color: Colors.red, size: 32),
-                              const SizedBox(height: 8),
-                              const Text(
+                              Icon(Icons.error_outline, color: Colors.red, size: 32),
+                              SizedBox(height: 8),
+                              Text(
                                 'Stream Error',
                                 style: TextStyle(color: Colors.red),
                               ),

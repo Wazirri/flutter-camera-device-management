@@ -208,9 +208,9 @@ class _LiveViewScreenState extends State<LiveViewScreen> with SingleTickerProvid
       return Scaffold(
         body: _buildPlayer(),
         floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.fullscreen_exit),
           mini: true,
           onPressed: _toggleFullScreen,
+          child: const Icon(Icons.fullscreen_exit),
         ),
       );
     }

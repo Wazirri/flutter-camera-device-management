@@ -210,11 +210,11 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
                 const Divider(height: 1),
                 // Logout button
                 ListTile(
-                  leading: Icon(
+                  leading: const Icon(
                     Icons.logout,
                     color: AppTheme.darkTextSecondary,
                   ),
-                  title: Text(
+                  title: const Text(
                     'Logout',
                     style: TextStyle(
                       color: AppTheme.darkTextPrimary,

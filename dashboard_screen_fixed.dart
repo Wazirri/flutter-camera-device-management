@@ -91,9 +91,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
+                          children: [
                             Icon(Icons.add_circle_outline_rounded),
                             SizedBox(width: 8),
                             Text('Add Device'),
@@ -110,9 +110,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           side: BorderSide(color: AppTheme.primaryBlue),
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
+                          children: [
                             Icon(Icons.camera_enhance_rounded),
                             SizedBox(width: 8),
                             Text('Camera Devices'),
@@ -252,8 +252,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               onPressed: () {
                 Navigator.pushNamed(context, '/camera-devices');
               },
-              child: Row(
-                children: const [
+              child: const Row(
+                children: [
                   Text('View All'),
                   SizedBox(width: 4),
                   Icon(Icons.arrow_forward, size: 16),
@@ -387,8 +387,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               onPressed: () {
                 // No implementation, UI only
               },
-              child: Row(
-                children: const [
+              child: const Row(
+                children: [
                   Text('View All'),
                   SizedBox(width: 4),
                   Icon(Icons.arrow_forward, size: 16),

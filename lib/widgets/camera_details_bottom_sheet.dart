@@ -39,7 +39,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   color: AppTheme.primaryBlue.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.videocam,
                   color: AppTheme.primaryBlue,
                   size: 24,
@@ -255,7 +255,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                         width: 120,
                         child: Text(
                           detail.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             color: AppTheme.darkTextSecondary,
                           ),

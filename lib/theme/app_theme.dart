@@ -47,12 +47,10 @@ class AppTheme {
       primary: primaryBlue,
       secondary: primaryOrange,
       surface: darkSurface,
-      background: darkBackground,
       error: darkError,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onSurface: darkTextPrimary,
-      onBackground: darkTextPrimary,
       onError: Colors.white,
     ),
     appBarTheme: const AppBarTheme(
@@ -128,15 +126,15 @@ class AppTheme {
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: darkSurface,
       indicatorColor: primaryBlue.withOpacity(0.24),
-      labelTextStyle: MaterialStateProperty.all(
+      labelTextStyle: WidgetStateProperty.all(
         const TextStyle(
           color: darkTextPrimary,
           fontSize: 12,
           fontWeight: FontWeight.w500,
         ),
       ),
-      iconTheme: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const IconThemeData(color: primaryBlue);
         }
         return const IconThemeData(color: darkTextSecondary);
@@ -175,35 +173,35 @@ class AppTheme {
       type: BottomNavigationBarType.fixed,
     ),
     switchTheme: SwitchThemeData(
-      thumbColor: MaterialStateProperty.resolveWith<Color>((states) {
-        if (states.contains(MaterialState.selected)) {
+      thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+        if (states.contains(WidgetState.selected)) {
           return primaryBlue;
         }
         return darkTextSecondary;
       }),
-      trackColor: MaterialStateProperty.resolveWith<Color>((states) {
-        if (states.contains(MaterialState.selected)) {
+      trackColor: WidgetStateProperty.resolveWith<Color>((states) {
+        if (states.contains(WidgetState.selected)) {
           return primaryBlue.withOpacity(0.5);
         }
         return darkTextSecondary.withOpacity(0.3);
       }),
     ),
     checkboxTheme: CheckboxThemeData(
-      fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-        if (states.contains(MaterialState.selected)) {
+      fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+        if (states.contains(WidgetState.selected)) {
           return primaryBlue;
         }
         return Colors.transparent;
       }),
-      checkColor: MaterialStateProperty.all(Colors.white),
+      checkColor: WidgetStateProperty.all(Colors.white),
       side: const BorderSide(color: darkTextSecondary),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4),
       ),
     ),
     radioTheme: RadioThemeData(
-      fillColor: MaterialStateProperty.resolveWith<Color>((states) {
-        if (states.contains(MaterialState.selected)) {
+      fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+        if (states.contains(WidgetState.selected)) {
           return primaryBlue;
         }
         return darkTextSecondary;
@@ -229,9 +227,9 @@ class AppTheme {
         borderRadius: BorderRadius.circular(16),
       ),
     ),
-    bottomSheetTheme: BottomSheetThemeData(
+    bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: darkSurface,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
     ),

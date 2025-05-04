@@ -42,7 +42,7 @@ class StatusIndicator extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               _getLabelForStatus(status),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 color: AppTheme.darkTextSecondary,
                 fontWeight: FontWeight.w500,

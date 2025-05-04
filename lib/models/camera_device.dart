@@ -54,8 +54,8 @@ class CameraDevice {
     List<Camera>? cameras,
   }) {
     return CameraDevice(
-      macAddress: this.macAddress,
-      macKey: this.macKey,
+      macAddress: macAddress,
+      macKey: macKey,
       ipv4: ipv4 ?? this.ipv4,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
       connected: connected ?? this.connected,
@@ -249,7 +249,7 @@ class Camera {
     bool? recording,
   }) {
     return Camera(
-      index: this.index,
+      index: index,
       health: health ?? this.health,
       temperature: temperature ?? this.temperature,
       reportError: reportError ?? this.reportError,
@@ -282,8 +282,8 @@ class Camera {
       disconnected: disconnected ?? this.disconnected,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
       recording: recording ?? this.recording,
-      soundRec: this.soundRec,
-      xAddr: this.xAddr,
+      soundRec: soundRec,
+      xAddr: xAddr,
     );
   }
   

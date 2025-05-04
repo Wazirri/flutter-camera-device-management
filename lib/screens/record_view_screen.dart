@@ -55,9 +55,9 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   // Recording URLs
   String? _recordingsUrl;
   bool _isLoadingDates = false;
-  bool _isLoadingRecordings = false;
+  final bool _isLoadingRecordings = false;
   String _loadingError = '';
-  Map<DateTime, List<String>> _recordingEvents = {};
+  final Map<DateTime, List<String>> _recordingEvents = {};
 
   @override
   void initState() {
@@ -196,7 +196,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     });
     
     // Debug logging
-    print('Loading recordings for day: ${_selectedDay}');
+    print('Loading recordings for day: $_selectedDay');
     print('Using recordings URL: $_recordingsUrl');
     
     try {
@@ -439,7 +439,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                   title: Text(_camera != null 
                     ? 'Recordings: ${_camera!.name}' 
                     : 'Camera Recordings',
-                    style: TextStyle(color: Colors.white)
+                    style: const TextStyle(color: Colors.white)
                   ),
                   actions: [
                     IconButton(
@@ -565,7 +565,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                                             shape: BoxShape.circle,
                                           ),
                                         ),
-                                        headerStyle: HeaderStyle(
+                                        headerStyle: const HeaderStyle(
                                           formatButtonVisible: false,
                                           titleCentered: true,
                                           titleTextStyle: TextStyle(
@@ -588,7 +588,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                                               valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
                                             ),
                                             const SizedBox(height: 8),
-                                            Text(
+                                            const Text(
                                               'Loading recordings...',
                                               style: TextStyle(color: Colors.white70),
                                             ),
@@ -607,7 +607,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                                             borderRadius: BorderRadius.circular(8),
                                           ),
                                           child: Text(_loadingError, 
-                                            style: TextStyle(color: Colors.white),
+                                            style: const TextStyle(color: Colors.white),
                                             textAlign: TextAlign.center,
                                           ),
                                         ),
@@ -627,7 +627,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                                                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                                                   child: Text(
                                                     'Recordings for ${_selectedDay != null ? DateFormat('MMMM d, yyyy').format(_selectedDay!) : "Today"}',
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       color: Colors.white,
                                                       fontWeight: FontWeight.bold,
                                                     ),
@@ -647,9 +647,9 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                                                           ? AppTheme.primaryColor.withOpacity(0.2)
                                                           : Colors.grey.shade800.withOpacity(0.5),
                                                         child: ListTile(
-                                                          title: Text(recording, style: TextStyle(color: Colors.white)),
+                                                          title: Text(recording, style: const TextStyle(color: Colors.white)),
                                                           trailing: IconButton(
-                                                            icon: Icon(Icons.download, color: Colors.white70),
+                                                            icon: const Icon(Icons.download, color: Colors.white70),
                                                             onPressed: () => _downloadRecording(recording),
                                                           ),
                                                           selected: isSelected,

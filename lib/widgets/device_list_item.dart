@@ -52,7 +52,7 @@ class DeviceListItem extends StatelessWidget {
                             color: AppTheme.primaryBlue.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.router_rounded,
                             color: AppTheme.primaryBlue,
                           ),
@@ -74,7 +74,7 @@ class DeviceListItem extends StatelessWidget {
                               const SizedBox(height: 4),
                               Text(
                                 model,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: AppTheme.darkTextSecondary,
                                   fontSize: 12,
                                 ),
@@ -106,7 +106,7 @@ class DeviceListItem extends StatelessWidget {
                   // Status
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.circle,
                         size: 8,
                         color: AppTheme.darkTextSecondary,
@@ -143,7 +143,7 @@ class DeviceListItem extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
             color: AppTheme.darkTextSecondary,
           ),

@@ -11,7 +11,7 @@ class CameraDevicesProvider with ChangeNotifier {
   final Map<String, CameraDevice> _devices = {};
   CameraDevice? _selectedDevice;
   int _selectedCameraIndex = 0;
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   Map<String, CameraDevice> get devices => _devices;
   List<CameraDevice> get devicesList => _devices.values.toList();

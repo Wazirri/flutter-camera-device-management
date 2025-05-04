@@ -23,8 +23,8 @@ class DesktopSideMenu extends StatelessWidget {
         elevation: 0,
         child: Column(
           children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
+            const DrawerHeader(
+              decoration: BoxDecoration(
                 color: AppTheme.darkBackground,
               ),
               child: Center(
@@ -36,8 +36,8 @@ class DesktopSideMenu extends StatelessWidget {
                       size: 48,
                       color: AppTheme.primaryOrange,
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
+                    SizedBox(height: 16),
+                    Text(
                       'Camera Device Manager',
                       style: TextStyle(
                         color: Colors.white,

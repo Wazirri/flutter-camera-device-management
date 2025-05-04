@@ -163,41 +163,41 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         initialRoute: '/login',
         routes: {
           '/login': (context) => const LoginScreen(),
-          '/dashboard': (context) => AppShell(
+          '/dashboard': (context) => const AppShell(
               currentRoute: '/dashboard',
-              child: const DashboardScreen(),
+              child: DashboardScreen(),
             ),
-          '/live-view': (context) => AppShell(
+          '/live-view': (context) => const AppShell(
               currentRoute: '/live-view',
-              child: const LiveViewScreen(),
+              child: LiveViewScreen(),
             ),
-          '/recordings': (context) => AppShell(
+          '/recordings': (context) => const AppShell(
               currentRoute: '/recordings',
-              child: const RecordViewScreen(),
+              child: RecordViewScreen(),
             ),
-          '/multi-live-view': (context) => AppShell(
+          '/multi-live-view': (context) => const AppShell(
               currentRoute: '/multi-live-view',
-              child: const MultiLiveViewScreen(),
+              child: MultiLiveViewScreen(),
             ),
-          '/multi-recordings': (context) => AppShell(
+          '/multi-recordings': (context) => const AppShell(
               currentRoute: '/multi-recordings',
-              child: const MultiRecordingsScreen(),
+              child: MultiRecordingsScreen(),
             ),
-          '/cameras': (context) => AppShell(
+          '/cameras': (context) => const AppShell(
               currentRoute: '/cameras',
-              child: const CamerasScreen(),
+              child: CamerasScreen(),
             ),
-          '/devices': (context) => AppShell(
+          '/devices': (context) => const AppShell(
               currentRoute: '/devices',
-              child: const DevicesScreen(),
+              child: DevicesScreen(),
             ),
-          '/camera-devices': (context) => AppShell(
+          '/camera-devices': (context) => const AppShell(
               currentRoute: '/camera-devices',
-              child: const CameraDevicesScreen(),
+              child: CameraDevicesScreen(),
             ),
-          '/settings': (context) => AppShell(
+          '/settings': (context) => const AppShell(
               currentRoute: '/settings',
-              child: const SettingsScreen(),
+              child: SettingsScreen(),
             ),
           '/websocket-logs': (context) => const WebSocketLogScreen(),
         },
