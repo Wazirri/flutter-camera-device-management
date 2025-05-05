@@ -62,6 +62,19 @@ class CameraDevicesProvider with ChangeNotifier {
     return null;
   }
   
+  // Get device MAC address for a camera
+  String? getDeviceMacForCamera(Camera camera) {
+    for (var entry in _devices.entries) {
+      String macKey = entry.key;
+      CameraDevice device = entry.value;
+      
+      if (device.cameras.any((c) => c.index == camera.index)) {
+        return macKey;
+      }
+    }
+    return null;
+  }
+  
   // Set the selected device
   void selectDevice(String macKey, {int cameraIndex = 0}) {
     if (_devices.containsKey(macKey)) {

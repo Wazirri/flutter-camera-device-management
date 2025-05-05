@@ -269,8 +269,8 @@ class WebSocketProvider with ChangeNotifier {
   }
   
   // Kameraya grup ekle
-  Future<bool> addGroupToCamera(String cameraName, String groupName) {
-    final command = 'DO SCRIPT add_group_to_cam "$cameraName" "$groupName"';
+  Future<bool> addGroupToCamera(String deviceMac, String cameraMac, String groupName) {
+    final command = 'ADD_GROUP_TO_CAM $deviceMac $cameraMac $groupName';
     return sendCommand(command);
   }
   

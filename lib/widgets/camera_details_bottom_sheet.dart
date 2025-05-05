@@ -379,7 +379,25 @@ void _showAddGroupDialog(BuildContext context, Camera camera, WebSocketProvider 
             onPressed: () async {
               final groupName = groupNameController.text.trim();
               if (groupName.isNotEmpty) {
-                final success = await provider.addGroupToCamera(camera.name, groupName);
+                // Kamera MAC formatını oluştur
+                String cameraMac = 'me${camera.ip.replaceAll('.', '_')}';
+                
+                // Kameranın bağlı olduğu cihazın MAC adresini al
+                final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                String deviceMac = devicesProvider.getDeviceMacForCamera(camera) ?? '';
+                
+                if (deviceMac.isEmpty) {
+                  // Eğer cihaz MAC'i bulunamazsa uyarı göster
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Could not determine device for camera'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                
+                final success = await provider.addGroupToCamera(deviceMac, cameraMac, groupName);
                 
                 if (!context.mounted) return;
                 Navigator.pop(dialogContext);
