@@ -211,6 +211,38 @@ class DeviceCard extends StatelessWidget {
                   style: const TextStyle(fontSize: 14),
                 ),
               ],
+              // ADDED: Explicit display for device.online and device.connected
+              const SizedBox(height: 8),
+              Row(
+                children: <Widget>[
+                  Icon(
+                    device.online ? Icons.power_settings_new : Icons.power_off,
+                    color: device.online ? AppTheme.online : AppTheme.offline,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Powered: ${device.online ? "On" : "Off"}',
+                    style: TextStyle(fontSize: 14, color: AppTheme.darkTextSecondary),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4), // Space between the two new rows
+              Row(
+                children: <Widget>[
+                  Icon(
+                    device.connected ? Icons.link : Icons.link_off,
+                    color: device.connected ? AppTheme.online : AppTheme.offline,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Connection: ${device.connected ? "Active" : "Inactive"}',
+                    style: TextStyle(fontSize: 14, color: AppTheme.darkTextSecondary),
+                  ),
+                ],
+              ),
+              // END ADDED
               const SizedBox(height: 8),
               Text(
                 'Last seen: ${device.lastSeenAt}',
@@ -343,6 +375,69 @@ class DeviceDetailsSheet extends StatelessWidget {
               InfoRow(label: 'Uptime', value: device.formattedUptime),
               InfoRow(label: 'Firmware', value: device.firmwareVersion),
               InfoRow(label: 'Record Path', value: device.recordPath),
+              // ADDED: Explicit display for device.online and device.connected in Details Sheet
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const SizedBox(
+                      width: 100,
+                      child: Text(
+                        'Powered',
+                        style: TextStyle(
+                          color: Colors.grey, // Using grey like InfoRow label
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      device.online ? Icons.power_settings_new : Icons.power_off,
+                      color: device.online ? AppTheme.online : AppTheme.offline,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        device.online ? "On" : "Off",
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const SizedBox(
+                      width: 100,
+                      child: Text(
+                        'Connection',
+                        style: TextStyle(
+                          color: Colors.grey, // Using grey like InfoRow label
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      device.connected ? Icons.link : Icons.link_off,
+                      color: device.connected ? AppTheme.online : AppTheme.offline,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        device.connected ? "Active" : "Inactive",
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // END ADDED
             ],
           ),
         ),

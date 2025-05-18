@@ -116,9 +116,11 @@ class CameraDevice {
   // Get the device status
   DeviceStatus get status {
     debugPrint('CameraDevice status getter invoked for $macAddress');
-    debugPrint('DeviceStatus: Evaluating status for device $macAddress. Device connected property: $connected, Device online property: $online'); // MODIFIED
-    if (!connected || !online) { // MODIFIED
-      debugPrint('DeviceStatus: Device $macAddress determined as OFFLINE because device.connected is $connected or device.online is $online.'); // MODIFIED
+    // MODIFIED: Primary check for offline status is now solely based on 'connected'.
+    // 'online' (powered state) is secondary; if not connected, it's offline to the system.
+    debugPrint('DeviceStatus: Evaluating status for device $macAddress. Device connected property: $connected, Device online property: $online');
+    if (!connected) { 
+      debugPrint('DeviceStatus: Device $macAddress determined as OFFLINE because device.connected is $connected.');
       return DeviceStatus.offline;
     }
     
@@ -136,6 +138,7 @@ class CameraDevice {
       if (!camera.connected) {
         hasWarning = true;
         debugPrint('DeviceStatus: Camera ${camera.name} for device $macAddress is disconnected. Setting hasWarning to true.');
+        break; // Optimization: if one camera causes a warning, no need to check further.
       }
     }
     
@@ -144,7 +147,7 @@ class CameraDevice {
     //   return DeviceStatus.error;
     // } else 
     if (hasWarning) {
-      debugPrint('DeviceStatus: Device $macAddress determined as WARNING because one or more cameras are disconnected.');
+      debugPrint('DeviceStatus: Device $macAddress determined as WARNING because device.connected is true, but one or more cameras are disconnected.');
       return DeviceStatus.warning;
     } else {
       debugPrint('DeviceStatus: Device $macAddress determined as ONLINE because device.connected is true and all cameras are connected.');

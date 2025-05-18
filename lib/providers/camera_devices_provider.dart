@@ -309,10 +309,24 @@ class CameraDevicesProvider with ChangeNotifier {
   // Kamera verilerini işle
   Future<void> _processCameraData(CameraDevice device, String camIndexPath, List<String> properties, dynamic value) async {
     // Kamera indeksini çıkar: cam[0] -> 0
-    String indexStr = camIndexPath.substring(4, camIndexPath.indexOf(']'));
-    int cameraIndex = int.tryParse(indexStr) ?? -1;
+    // String indexStr = camIndexPath.substring(4, camIndexPath.indexOf(']'));
+    // int cameraIndex = int.tryParse(indexStr) ?? -1;
+
+    int cameraIndex = -1;
+    if (camIndexPath.startsWith('cam[') && camIndexPath.endsWith(']')) {
+      // Ensure there's something between cam[ and ]
+      if (camIndexPath.length > 5) { // "cam[]".length is 5
+        String indexStr = camIndexPath.substring(4, camIndexPath.length - 1);
+        cameraIndex = int.tryParse(indexStr) ?? -1;
+      } else {
+        debugPrint("CDP: _processCameraData: Invalid camIndexPath format (empty index): $camIndexPath");
+      }
+    } else {
+      debugPrint("CDP: _processCameraData: Invalid camIndexPath format (missing brackets or prefix): $camIndexPath");
+    }
     
     if (cameraIndex < 0) {
+      debugPrint("CDP: _processCameraData: Could not parse valid camera index from $camIndexPath. Discarding update.");
       return;
     }
     
