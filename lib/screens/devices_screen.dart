@@ -240,12 +240,13 @@ class _DevicesScreenState extends State<DevicesScreen> {
       itemCount: filteredDevices.length,
       itemBuilder: (context, index) {
         final device = filteredDevices[index];
-        
+
         // Determine device status
-        DeviceStatus status = device.connected 
-          ? DeviceStatus.online 
+        DeviceStatus status = device.connected
+          ? DeviceStatus.online
           : DeviceStatus.offline;
-        
+        debugPrint('DevicesScreen: Building item for ${device.macAddress}. Connected: ${device.connected}, Status: $status');
+
         // For more sophisticated status logic, we could look at other device properties
         // such as warning conditions, errors, etc.
         
@@ -518,17 +519,18 @@ class _DevicesScreenState extends State<DevicesScreen> {
   }
   
   void _showDeviceDetails(int deviceIndex, CameraDevice device) {
-    // Dialog'u göster
+    // Dialog\'u göster
     showDialog(
       context: context,
       builder: (dialogContext) {
-        // CameraDevicesProvider'dan gelen güncellemeleri dinle
+        // CameraDevicesProvider\'dan gelen güncellemeleri dinle
         return Consumer<CameraDevicesProvider>(
           builder: (context, devicesProvider, child) {
             // Cihazı güncel verilerle al
             final updatedDevice = devicesProvider.devices[device.macKey] ?? device;
             final statusText = updatedDevice.connected ? 'Online' : 'Offline';
-            
+            debugPrint('DevicesScreen: DeviceDetailsDialog for ${updatedDevice.macAddress}. Connected: ${updatedDevice.connected}');
+
             return AlertDialog(
               backgroundColor: AppTheme.darkSurface,
               title: Text(updatedDevice.deviceType.isEmpty ? 'Device Details' : '${updatedDevice.deviceType} Details'),
@@ -663,7 +665,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
           Flexible(
             child: Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppTheme.darkTextSecondary,
               ),
               textAlign: TextAlign.end,

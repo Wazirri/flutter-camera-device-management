@@ -242,7 +242,7 @@ class WebSocketProvider with ChangeNotifier {
       _logMessage('Sent GET CAMERAS command');
     } else {
       _logMessage('Cannot start monitoring: Not connected or not logged in');
-      debugPrint('Cannot start monitoring: connected=${_isConnected}, logged in=${_isLoggedIn}');
+      debugPrint('Cannot start monitoring: connected=$_isConnected, logged in=$_isLoggedIn');
     }
   }
   
@@ -287,17 +287,17 @@ class WebSocketProvider with ChangeNotifier {
   }
 
   // Handle incoming WebSocket messages
-  void _handleMessage(dynamic message) {
+  void _handleMessage(dynamic rawMessage) { // Renamed parameter to rawMessage
     try {
-      if (message is String) {
+      if (rawMessage is String) {
         // Log the message (truncate if too long)
-        final logMsg = message.length > 500 ? '${message.substring(0, 500)}...' : message;
+        final logMsg = rawMessage.length > 500 ? '${rawMessage.substring(0, 500)}...' : rawMessage;
         _logMessage('Received: $logMsg');
         
         // Debug için data path bilgisini çıkarmaya çalış
-        if (message.contains('"data"') && message.contains('"val"')) {
+        if (rawMessage.contains('"data"') && rawMessage.contains('"val"')) {
           try {
-            final jsonData = jsonDecode(message);
+            final jsonData = jsonDecode(rawMessage);
             final dataPath = jsonData['data']; 
             debugPrint('⚡ WebSocket data path: $dataPath');
           } catch (e) {
@@ -305,17 +305,19 @@ class WebSocketProvider with ChangeNotifier {
           }
         }
         
-        if (message == 'PONG') {
+        if (rawMessage == 'PONG') {
           // Handle heartbeat response
           return;
         }
 
         // Try to parse JSON message
         try {
-          final jsonData = jsonDecode(message);
-          _processJsonMessage(jsonData);
+          final jsonData = jsonDecode(rawMessage);
+          // Pass jsonData to _processJsonMessage, but the original rawMessage (string) 
+          // to the camera devices provider if the command is 'changed'.
+          _processJsonMessage(jsonData, rawMessage); 
         } catch (e) {
-          debugPrint('Not a JSON message: $message');
+          debugPrint('Not a JSON message: $rawMessage');
         }
       }
     } catch (e) {
@@ -325,9 +327,8 @@ class WebSocketProvider with ChangeNotifier {
   }
   
   // JSON mesajlarını işle
-  void _processJsonMessage(Map<String, dynamic> jsonData) {
+  void _processJsonMessage(Map<String, dynamic> jsonData, String rawMessageString) { // Added rawMessageString parameter
     try {
-      // Son gelen mesajı kaydet
       _lastMessage = jsonData;
       
       final command = jsonData['c'];
@@ -370,7 +371,7 @@ class WebSocketProvider with ChangeNotifier {
         case 'changed':
           // Forward camera device updates to the CameraDevicesProvider
           if (_cameraDevicesProvider != null) {
-            _cameraDevicesProvider!.processWebSocketMessage(jsonData);
+            _cameraDevicesProvider!.processWebSocketMessage(rawMessageString); // Use rawMessageString here
             _logMessage('Received camera device update');
           }
           break;

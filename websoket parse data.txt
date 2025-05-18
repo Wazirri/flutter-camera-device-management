@@ -1,0 +1,163 @@
+ecs_slaves.$mac_address -> do parse for now: its field for each device: 
+firsttime
+connected
+name
+current_time
+version
+smartweb_version
+cpuTemp
+ipv4
+ipv6
+last_seen_at
+isMaster
+last_ts
+online
+app_ready
+system_ready
+cam_ready
+configuration_ready
+camreports_ready
+movita_ready
+cam_count
+
+ecs_slaves.$mac_address.cameras -> do not parse for now
+ecs_slaves.$mac_address.app -> do not parse for now
+ecs_slaves.$mac_address.system -> do not parse for now
+ecs_slaves.$mac_address.cam[$index] -> do parse for now: its field for each camera: 
+xAddrs
+username
+mac
+record
+password
+ip
+name
+brand
+hw
+manufacturer
+country
+recordcodec
+subcodec
+recordwith
+recordheight
+subwidth
+subheight
+cameraRawIp
+subUri
+recordUri
+remoteUri
+mediaUri
+subSnapShot
+mainSnapShot
+recordPath
+soundRec
+cameraIp
+recordwidth
+xAddr
+ecs_slaves.$mac_address.configuration -> do not parse for now
+ecs_slaves.$mac_address.camreports.$name(which you get from ecs_slaves.$mac_address.cam[$index] this data ) ->do parse for now: its field for each camera: 
+disconnected
+connected
+last_seen_at
+recording
+last_restart_time
+reported
+ecs_slaves.$mac_address.movita -> do not parse for now
+ecs_slaves.$mac_address.sysinfo -> do parse for now: its field for each device: 
+cpuTemp
+upTime
+srvTime
+totalRam
+freeRam
+totalconns
+sessions
+eth0
+ppp0
+thermal[0].soc-thermal
+thermal[1].gpu-thermal
+gps.lat
+gps.lon
+gps.speed
+ecs_slaves.$mac_address.test.error[$index] -> do not parse for now
+ecs_slaves.$mac_address.test.is_error -> do not parse for now
+
+
+$mac_address -> Kamera cihazı, yani kamera kayıt cihazı parse etmen gereken alanlar;
+ecs_slaves.$mac_address.firsttime
+ecs_slaves.$mac_address.connected
+ecs_slaves.$mac_address.name
+ecs_slaves.$mac_address.current_time
+ecs_slaves.$mac_address.version
+ecs_slaves.$mac_address.smartweb_version
+ecs_slaves.$mac_address.cpuTemp
+ecs_slaves.$mac_address.ipv4
+ecs_slaves.$mac_address.ipv6
+ecs_slaves.$mac_address.last_seen_at
+ecs_slaves.$mac_address.isMaster
+ecs_slaves.$mac_address.last_ts
+ecs_slaves.$mac_address.online
+ecs_slaves.$mac_address.app_ready
+ecs_slaves.$mac_address.system_ready
+ecs_slaves.$mac_address.cam_ready
+ecs_slaves.$mac_address.configuration_ready
+ecs_slaves.$mac_address.camreports_ready
+ecs_slaves.$mac_address.movita_ready
+ecs_slaves.$mac_address.cam_count
+
+
+$mac_address li kamera kayıt cihazına ait kameraların özellikleri her $index bir kamerayı ifade etmektedir;
+ecs_slaves.$mac_address.cam[$index].xAddrs
+ecs_slaves.$mac_address.cam[$index].username
+ecs_slaves.$mac_address.cam[$index].mac
+ecs_slaves.$mac_address.cam[$index].record
+ecs_slaves.$mac_address.cam[$index].password
+ecs_slaves.$mac_address.cam[$index].ip
+ecs_slaves.$mac_address.cam[$index].name
+ecs_slaves.$mac_address.cam[$index].brand
+ecs_slaves.$mac_address.cam[$index].hw
+ecs_slaves.$mac_address.cam[$index].manufacturer
+ecs_slaves.$mac_address.cam[$index].country
+ecs_slaves.$mac_address.cam[$index].recordcodec
+ecs_slaves.$mac_address.cam[$index].subcodec
+ecs_slaves.$mac_address.cam[$index].recordwith
+ecs_slaves.$mac_address.cam[$index].recordheight
+ecs_slaves.$mac_address.cam[$index].subwidth
+ecs_slaves.$mac_address.cam[$index].subheight
+ecs_slaves.$mac_address.cam[$index].cameraRawIp
+ecs_slaves.$mac_address.cam[$index].subUri
+ecs_slaves.$mac_address.cam[$index].recordUri
+ecs_slaves.$mac_address.cam[$index].remoteUri
+ecs_slaves.$mac_address.cam[$index].mediaUri
+ecs_slaves.$mac_address.cam[$index].subSnapShot
+ecs_slaves.$mac_address.cam[$index].mainSnapShot
+ecs_slaves.$mac_address.cam[$index].recordPath
+ecs_slaves.$mac_address.cam[$index].soundRec
+ecs_slaves.$mac_address.cam[$index].cameraIp
+ecs_slaves.$mac_address.cam[$index].recordwidth
+ecs_slaves.$mac_address.cam[$index].xAddr
+
+
+$mac_address li kamera kayıt cihazlarının @camreports daki $name li kameralarının bilgileridir;
+
+ecs_slaves.$mac_address.camreports.$name.disconnected
+ecs_slaves.$mac_address.camreports.$name.connected
+ecs_slaves.$mac_address.camreports.$name.last_seen_at
+ecs_slaves.$mac_address.camreports.$name.recording
+ecs_slaves.$mac_address.camreports.$name.last_restart_time
+ecs_slaves.$mac_address.camreports.$name.reported
+
+
+$mac_address li kamera kayıt cihazlarının @sysinfo li bilgileridir;
+ecs_slaves.$mac_address.sysinfo.cpuTemp
+ecs_slaves.$mac_address.sysinfo.upTime
+ecs_slaves.$mac_address.sysinfo.srvTime
+ecs_slaves.$mac_address.sysinfo.totalRam
+ecs_slaves.$mac_address.sysinfo.freeRam
+ecs_slaves.$mac_address.sysinfo.totalconns
+ecs_slaves.$mac_address.sysinfo.sessions
+ecs_slaves.$mac_address.sysinfo.eth0
+ecs_slaves.$mac_address.sysinfo.ppp0
+ecs_slaves.$mac_address.sysinfo.thermal[0].soc-thermal
+ecs_slaves.$mac_address.sysinfo.thermal[1].gpu-thermal
+ecs_slaves.$mac_address.sysinfo.gps.lat
+ecs_slaves.$mac_address.sysinfo.gps.lon
+ecs_slaves.$mac_address.sysinfo.gps.speed

@@ -29,6 +29,7 @@ import 'providers/camera_devices_provider.dart';
 import 'providers/multi_view_layout_provider.dart';
 
 Future<void> main() async {
+  debugPrint('TEST_LOG: main() function started.'); // <-- BU SATIRI EKLEYİN
   // This captures errors that happen during initialization
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -165,41 +166,41 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         routes: {
           '/': (context) => const LoginScreen(),
           '/login': (context) => const LoginScreen(),
-          '/dashboard': (context) => AppShell(
+          '/dashboard': (context) => const AppShell(
             currentRoute: '/dashboard',
-            child: const DashboardScreen(),
+            child: DashboardScreen(),
           ),
-          '/cameras': (context) => AppShell(
+          '/cameras': (context) => const AppShell(
             currentRoute: '/cameras',
-            child: const CamerasScreen(),
+            child: CamerasScreen(),
           ),
-          '/camera-groups': (context) => AppShell(
+          '/camera-groups': (context) => const AppShell(
             currentRoute: '/camera-groups',
-            child: const CameraGroupsScreen(),
+            child: CameraGroupsScreen(),
           ),
-          '/devices': (context) => AppShell(
+          '/devices': (context) => const AppShell(
             currentRoute: '/devices',
-            child: const DevicesScreen(),
+            child: DevicesScreen(),
           ),
-          '/settings': (context) => AppShell(
+          '/settings': (context) => const AppShell(
             currentRoute: '/settings',
-            child: const SettingsScreen(),
+            child: SettingsScreen(),
           ),
-          '/camera-devices': (context) => AppShell(
+          '/camera-devices': (context) => const AppShell(
             currentRoute: '/camera-devices',
-            child: const CameraDevicesScreen(),
+            child: CameraDevicesScreen(),
           ),
-          '/websocket-logs': (context) => AppShell(
+          '/websocket-logs': (context) => const AppShell(
             currentRoute: '/websocket-logs',
-            child: const WebSocketLogScreen(),
+            child: WebSocketLogScreen(),
           ),
-          '/multi-live-view': (context) => AppShell(
+          '/multi-live-view': (context) => const AppShell(
             currentRoute: '/multi-live-view',
-            child: const MultiLiveViewScreen(),
+            child: MultiLiveViewScreen(),
           ),
-          '/multi-recordings': (context) => AppShell(
+          '/multi-recordings': (context) => const AppShell(
             currentRoute: '/multi-recordings',
-            child: const MultiRecordingsScreen(),
+            child: MultiRecordingsScreen(),
           ),
           '/live-view': (context) => const AppShell(
               currentRoute: '/live-view',

@@ -1,4 +1,4 @@
-import 'dart:convert';
+import 'package:flutter/foundation.dart';
 
 enum DeviceStatus {
   online,
@@ -15,6 +15,8 @@ class CameraDevice {
   String ipv4;
   String lastSeenAt;
   bool connected;
+  bool online; // ADDED
+  String firstTime; // ADDED
   String uptime;
   String deviceType;
   String firmwareVersion;
@@ -35,6 +37,8 @@ class CameraDevice {
     required this.ipv4,
     required this.lastSeenAt,
     required this.connected,
+    this.online = false, // ADDED default
+    this.firstTime = '', // ADDED default
     required this.uptime,
     required this.deviceType,
     required this.firmwareVersion,
@@ -47,6 +51,8 @@ class CameraDevice {
     String? ipv4,
     String? lastSeenAt,
     bool? connected,
+    bool? online, // ADDED
+    String? firstTime, // ADDED
     String? uptime,
     String? deviceType,
     String? firmwareVersion,
@@ -59,6 +65,8 @@ class CameraDevice {
       ipv4: ipv4 ?? this.ipv4,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
       connected: connected ?? this.connected,
+      online: online ?? this.online, // ADDED
+      firstTime: firstTime ?? this.firstTime, // ADDED
       uptime: uptime ?? this.uptime,
       deviceType: deviceType ?? this.deviceType,
       firmwareVersion: firmwareVersion ?? this.firmwareVersion,
@@ -75,6 +83,8 @@ class CameraDevice {
       ipv4: json['ipv4'] ?? '',
       lastSeenAt: json['lastSeenAt'] ?? '',
       connected: json['connected'] ?? false,
+      online: json['online'] ?? false, // ADDED
+      firstTime: json['firstTime'] ?? '', // ADDED
       uptime: json['uptime'] ?? '',
       deviceType: json['deviceType'] ?? '',
       firmwareVersion: json['firmwareVersion'] ?? '',
@@ -93,6 +103,8 @@ class CameraDevice {
       'ipv4': ipv4,
       'lastSeenAt': lastSeenAt,
       'connected': connected,
+      'online': online, // ADDED
+      'firstTime': firstTime, // ADDED
       'uptime': uptime,
       'deviceType': deviceType,
       'firmwareVersion': firmwareVersion,
@@ -103,32 +115,78 @@ class CameraDevice {
   
   // Get the device status
   DeviceStatus get status {
-    if (!connected) {
+    debugPrint('CameraDevice status getter invoked for $macAddress');
+    debugPrint('DeviceStatus: Evaluating status for device $macAddress. Device connected property: $connected, Device online property: $online'); // MODIFIED
+    if (!connected || !online) { // MODIFIED
+      debugPrint('DeviceStatus: Device $macAddress determined as OFFLINE because device.connected is $connected or device.online is $online.'); // MODIFIED
       return DeviceStatus.offline;
     }
     
-    // Check if any cameras have issues
+    // If there are no cameras, and the device itself is connected, consider it online.
+    if (cameras.isEmpty) {
+      debugPrint('DeviceStatus: Device $macAddress has no cameras. Reporting as ONLINE because device.connected is true and no cameras to check.');
+      return DeviceStatus.online;
+    }
+
     bool hasWarning = false;
-    bool hasError = false;
-    
+    // bool hasError = false; // This was previously unused. If error conditions for a device (not just camera) exist, logic to set this should be added.
+
     for (final camera in cameras) {
+      debugPrint('DeviceStatus: Checking camera ${camera.name} (index ${camera.index}) for device $macAddress. Camera connected property: ${camera.connected}');
       if (!camera.connected) {
         hasWarning = true;
+        debugPrint('DeviceStatus: Camera ${camera.name} for device $macAddress is disconnected. Setting hasWarning to true.');
       }
     }
     
-    if (hasError) {
-      return DeviceStatus.error;
-    } else if (hasWarning) {
+    // if (hasError) { // This block is currently unreachable as hasError is never true.
+    //   debugPrint('DeviceStatus: Device $macAddress has error. Returning DeviceStatus.error.');
+    //   return DeviceStatus.error;
+    // } else 
+    if (hasWarning) {
+      debugPrint('DeviceStatus: Device $macAddress determined as WARNING because one or more cameras are disconnected.');
       return DeviceStatus.warning;
     } else {
+      debugPrint('DeviceStatus: Device $macAddress determined as ONLINE because device.connected is true and all cameras are connected.');
       return DeviceStatus.online;
     }
   }
+  
+  // Force status update - can be called when connected status changes
+  void updateStatus() {
+    // This method exists solely to make it clear when the status should be recalculated
+    // The status is calculated on-demand via the getter
+    debugPrint('Status updated for device $macAddress: ${connected ? "Online" : "Offline"}');
+  }
 
+  // Helper method to format uptime in a human-readable format
+  String get formattedUptime {
+    // Try parsing as seconds (numeric format)
+    final int? seconds = int.tryParse(uptime);
+    if (seconds != null) {
+      final int days = seconds ~/ 86400;
+      final int hours = (seconds % 86400) ~/ 3600;
+      final int minutes = (seconds % 3600) ~/ 60;
+      final int remainingSeconds = seconds % 60;
+      
+      if (days > 0) {
+        return '${days}d ${hours}h ${minutes}m';
+      } else if (hours > 0) {
+        return '${hours}h ${minutes}m ${remainingSeconds}s';
+      } else if (minutes > 0) {
+        return '${minutes}m ${remainingSeconds}s';
+      } else {
+        return '${remainingSeconds}s';
+      }
+    }
+    
+    // If it's already formatted or can't be parsed, return as is
+    return uptime;
+  }
+  
   @override
   String toString() {
-    return 'CameraDevice{macAddress: $macAddress, ipv4: $ipv4, connected: $connected, cameras: ${cameras.length}}';
+    return 'CameraDevice{macAddress: $macAddress, ipv4: $ipv4, connected: $connected, online: $online, firstTime: $firstTime, cameras: ${cameras.length}}'; // MODIFIED
   }
 }
 
@@ -139,7 +197,7 @@ class Camera {
   String reportError;         // camreports.reported hatası (error: 1000 gibi)
   String lastRestartTime;     // camreports.last_restart_time
   String reportName;          // camreports için rapor adı (KAMERA1 gibi)
-  final int index;            // Index of the camera in the device's cameras array
+  final int index;            // Index of the camera in the device\'s cameras array
   String name;                // User-friendly name (e.g., KAMERA1)
   String ip;                  // IP address of the camera (cameraIp)
   int rawIp;                  // Raw IP address integer (cameraRawIp)
@@ -365,47 +423,135 @@ class Camera {
   
   // Get the appropriate RTSP URI for streaming
   String get rtspUri {
-    // Öncelikle sadece subUri'yi kullan (talep üzerine değiştirildi)
-    if (subUri.isNotEmpty) {
-      return _addCredentialsToUrl(subUri);
-    } else if (mediaUri.isNotEmpty) {
-      return _addCredentialsToUrl(mediaUri);
-    } else if (remoteUri.isNotEmpty) {
-      return _addCredentialsToUrl(remoteUri);
-    } else if (recordUri.isNotEmpty) {
-      return _addCredentialsToUrl(recordUri);
+    try {
+      String result = "";
+      debugPrint('RTSP_URI_LOG: Camera $name ($ip) - Evaluating RTSP URI. subUri: "$subUri", mediaUri: "$mediaUri", remoteUri: "$remoteUri", recordUri: "$recordUri"');
+
+      // Prefer subUri when available
+      if (subUri.isNotEmpty) {
+        result = _addCredentialsToUrl(subUri);
+        debugPrint('RTSP_URI_LOG: Camera $name - Using subUri. Initial: "$subUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
+      } else if (mediaUri.isNotEmpty) {
+        result = _addCredentialsToUrl(mediaUri);
+        debugPrint('RTSP_URI_LOG: Camera $name - Using mediaUri. Initial: "$mediaUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
+      } else if (remoteUri.isNotEmpty) {
+        result = _addCredentialsToUrl(remoteUri);
+        debugPrint('RTSP_URI_LOG: Camera $name - Using remoteUri. Initial: "$remoteUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
+      } else if (recordUri.isNotEmpty) {
+        result = _addCredentialsToUrl(recordUri);
+        debugPrint('RTSP_URI_LOG: Camera $name - Using recordUri. Initial: "$recordUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
+      } else {
+        debugPrint('RTSP_URI_LOG: Camera $name - No suitable URI found (all URI fields are empty).');
+      }
+      
+      // Final validation to prevent empty or malformed URLs
+      if (result.isEmpty) {
+        debugPrint('RTSP_URI_LOG: Camera $name - Final RTSP URI is empty.');
+        return "";
+      }
+      
+      debugPrint('RTSP_URI_LOG: Camera $name - Final RTSP URI to be used: "${_sanitizeUrlForLogging(result)}"');
+      return result;
+    } catch (e) {
+      debugPrint('RTSP_URI_LOG: Camera $name - Error getting RTSP URI: $e');
+      return ""; // Return empty string on error
     }
-    return ""; // Return empty string if no URI is available
+  }
+  
+  // Sanitize URL for logging by hiding credentials
+  String _sanitizeUrlForLogging(String url) {
+    if (url.isEmpty) return "";
+    try {
+      if (url.contains('@')) {
+        // Hide credentials in URL pattern rtsp://user:pass@host:port/path
+        final parts = url.split('@');
+        if (parts.length >= 2) {
+          // Create URL with hidden credentials
+          return "rtsp://[CREDENTIALS_HIDDEN]@${parts.sublist(1).join('@')}";
+        }
+      }
+      return url;
+    } catch (e) {
+      return "[URL_PROCESSING_ERROR]";
+    }
   }
   
   // Add username and password to RTSP URL
   String _addCredentialsToUrl(String url) {
-    if (url.isEmpty || !url.startsWith('rtsp://')) {
+    debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl called with URL: "$url"');
+    // If URL is empty, return empty string to avoid null issues
+    if (url.isEmpty) {
+      debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Empty URL provided.');
+      return "";
+    }
+    
+    // If URL doesn\\'t start with rtsp://, return as is but log a warning
+    if (!url.startsWith('rtsp://')) {
+      debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Non-RTSP URL provided: "$url"');
       return url;
     }
     
-    // Eğer zaten kimlik bilgileri varsa, URL'i olduğu gibi döndür
-    if (url.contains('@')) {
-      return url;
+    try {
+      // If credentials are already in the URL, return as is
+      if (url.contains('@')) {
+        debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: URL already contains credentials: "${_sanitizeUrlForLogging(url)}"');
+        return url;
+      }
+      
+      // If username or password is empty, return URL as is
+      if (username.isEmpty || password.isEmpty) {
+        debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Missing credentials (username: "$username", password: "${password.isNotEmpty ? "******" : ""}"). Returning original URL: "$url"');
+        return url;
+      }
+      
+      // Encode username and password to handle special characters
+      final encodedUsername = Uri.encodeComponent(username);
+      final encodedPassword = Uri.encodeComponent(password);
+      
+      // Extract protocol and rest of the URL
+      final urlWithoutProtocol = url.substring(7);
+      
+      // Create URL with encoded credentials
+      final resultUrl = 'rtsp://$encodedUsername:$encodedPassword@$urlWithoutProtocol';
+      debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Successfully added credentials. Result: "${_sanitizeUrlForLogging(resultUrl)}"');
+      return resultUrl;
+    } catch (e) {
+      debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Error formatting RTSP URL: $e, Original URL: "$url"');
+      // Return original URL on error to prevent null values
+      return url.isNotEmpty ? url : "";
     }
-    
-    // Kullanıcı adı veya şifre boşsa, URL'i olduğu gibi döndür
-    if (username.isEmpty || password.isEmpty) {
-      return url;
-    }
-    
-    // rtsp:// kısmını çıkar
-    final urlWithoutProtocol = url.substring(7);
-    
-    // Kullanıcı adı ve şifreyi URL'e ekle
-    return 'rtsp://$username:$password@$urlWithoutProtocol';
   }
   
   // Added getter for compatibility
   bool get isConnected => connected;
   
+  // Setter for connected status to handle various input types
+  void setConnectedStatus(dynamic value) {
+    if (value is bool) {
+      connected = value;
+    } else if (value is num) {
+      connected = value == 1;
+    } else if (value is String) {
+      final lowerValue = value.toLowerCase();
+      connected = lowerValue == '1' || lowerValue == 'true';
+    } else {
+      // Default to false if type is unknown or null
+      connected = false;
+    }
+  }
+  
   // Added getter for compatibility
   bool get isRecording => recording;
+  
+  // Set connected status with proper type conversion
+  set isConnected(dynamic value) {
+    if (value is bool) {
+      connected = value;
+    } else {
+      final valueStr = value.toString();
+      connected = valueStr == '1' || valueStr.toLowerCase() == 'true';
+    }
+  }
   
   // Get the camera status
   DeviceStatus get status {

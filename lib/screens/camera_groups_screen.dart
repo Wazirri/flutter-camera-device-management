@@ -319,7 +319,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
               : filteredGroups.isEmpty 
                   ? Center(
                       child: Text(
-                        'No camera groups match "${_searchQuery}"',
+                        'No camera groups match "$_searchQuery"',
                         textAlign: TextAlign.center,
                       ),
                     )

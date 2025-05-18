@@ -6,7 +6,6 @@ import '../providers/camera_devices_provider.dart';
 import '../providers/multi_view_layout_provider.dart';
 import '../models/camera_device.dart';
 import '../models/camera_layout.dart';
-import '../utils/responsive_helper.dart';
 import 'dart:math' as math;
 
 class MultiLiveViewScreen extends StatefulWidget {

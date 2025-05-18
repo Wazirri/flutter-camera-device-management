@@ -12,7 +12,6 @@ import '../providers/camera_devices_provider.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
-import '../utils/responsive_helper.dart';
 
 class MultiRecordingsScreen extends StatefulWidget {
   const MultiRecordingsScreen({Key? key}) : super(key: key);

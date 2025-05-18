@@ -81,7 +81,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
 class DeviceCard extends StatelessWidget {
   final CameraDevice device;
   final VoidCallback onTap;
-  
+
   const DeviceCard({
     Key? key,
     required this.device,
@@ -90,6 +90,36 @@ class DeviceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('DeviceCard build START for ${device.macAddress}');
+    final theme = Theme.of(context);
+    final provider = Provider.of<CameraDevicesProvider>(context, listen: false);
+
+    // Determine status text and color
+    String statusText;
+    Color statusColor;
+
+    // Access status via the getter, which now includes logging
+    final currentStatus = device.status; 
+    debugPrint('DeviceCard build: ${device.macAddress}, connected: ${device.connected}, online: ${device.online}, firstTime: ${device.firstTime}, status from getter: $currentStatus'); // MODIFIED
+
+    switch (currentStatus) {
+      case DeviceStatus.online:
+        statusText = 'Online';
+        statusColor = Colors.green;
+        break;
+      case DeviceStatus.offline:
+        statusText = 'Offline';
+        statusColor = Colors.red;
+        break;
+      case DeviceStatus.warning:
+        statusText = 'Warning';
+        statusColor = Colors.orange;
+        break;
+      default:
+        statusText = 'Unknown';
+        statusColor = Colors.grey;
+    }
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 4,
@@ -128,13 +158,15 @@ class DeviceCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: device.connected 
-                          ? AppTheme.primaryColor 
+                      color: device.connected
+                          ? AppTheme.primaryColor
                           : Colors.grey,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
-                      device.connected ? 'Online' : 'Offline',
+                      // Use device.status to determine online/offline text
+                      device.status == DeviceStatus.online ? 'Online' : 
+                      (device.status == DeviceStatus.warning ? 'Warning' : 'Offline'),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -168,7 +200,7 @@ class DeviceCard extends StatelessWidget {
               if (device.uptime.isNotEmpty) ...[
                 const SizedBox(height: 4),
                 Text(
-                  'Uptime: ${device.uptime}',
+                  'Uptime: ${device.formattedUptime}',
                   style: const TextStyle(fontSize: 14),
                 ),
               ],
@@ -198,7 +230,7 @@ class DeviceCard extends StatelessWidget {
 class DeviceDetailsSheet extends StatelessWidget {
   final CameraDevice device;
   final ScrollController scrollController;
-  
+
   const DeviceDetailsSheet({
     Key? key,
     required this.device,
@@ -207,6 +239,34 @@ class DeviceDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('DeviceDetailsSheet build START for ${device.macAddress}');
+    final theme = Theme.of(context);
+
+    // Determine status text and color
+    String statusText;
+    Color statusColor;
+    
+    final currentStatus = device.status; // Access status via the getter
+    debugPrint('DeviceDetailsSheet build: ${device.macAddress}, connected: ${device.connected}, online: ${device.online}, firstTime: ${device.firstTime}, status from getter: $currentStatus'); // MODIFIED
+
+    switch (currentStatus) {
+      case DeviceStatus.online:
+        statusText = 'Online';
+        statusColor = Colors.green;
+        break;
+      case DeviceStatus.offline:
+        statusText = 'Offline';
+        statusColor = Colors.red;
+        break;
+      case DeviceStatus.warning:
+        statusText = 'Warning';
+        statusColor = Colors.orange;
+        break;
+      default:
+        statusText = 'Unknown';
+        statusColor = Colors.grey;
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -245,13 +305,15 @@ class DeviceDetailsSheet extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: device.connected 
-                      ? AppTheme.primaryColor 
+                  color: device.connected
+                      ? AppTheme.primaryColor
                       : Colors.grey,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
-                  device.connected ? 'Online' : 'Offline',
+                  // Use device.status to determine online/offline text
+                  device.status == DeviceStatus.online ? 'Online' : 
+                  (device.status == DeviceStatus.warning ? 'Warning' : 'Offline'),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -278,7 +340,7 @@ class DeviceDetailsSheet extends StatelessWidget {
               const SizedBox(height: 12),
               InfoRow(label: 'IP Address', value: device.ipv4),
               InfoRow(label: 'Last Seen', value: device.lastSeenAt),
-              InfoRow(label: 'Uptime', value: device.uptime),
+              InfoRow(label: 'Uptime', value: device.formattedUptime),
               InfoRow(label: 'Firmware', value: device.firmwareVersion),
               InfoRow(label: 'Record Path', value: device.recordPath),
             ],

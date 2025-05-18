@@ -7,7 +7,6 @@ import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
 import '../utils/responsive_helper.dart';
-import '../utils/page_transitions.dart';
 
 class LiveViewScreen extends StatefulWidget {
   final Camera? camera; // Make camera optional so the route can work without a parameter

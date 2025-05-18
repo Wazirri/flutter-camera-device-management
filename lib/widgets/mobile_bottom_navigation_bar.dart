@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../utils/page_transitions.dart';
 
 class MobileBottomNavigationBar extends StatefulWidget {
   final String currentRoute;

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
 import '../models/system_info.dart';
-import '../utils/file_logger.dart';
 
 typedef MessageHandler = void Function(Map<String, dynamic> message);
 
@@ -46,13 +45,8 @@ class WebSocketService with ChangeNotifier {
   
   // Connect to WebSocket server
   Future<bool> connect(String address, String port, String username, String password) async {
-    // Initialize file logger
-    await FileLogger.init();
-    await FileLogger.log('Starting connection to WebSocket server', tag: 'CONNECTION');
-    
     if (_isConnected) {
       print('Already connected to WebSocket server');
-      await FileLogger.log('Already connected to WebSocket server', tag: 'CONNECTION');
       return true;
     }
     
@@ -71,7 +65,6 @@ class WebSocketService with ChangeNotifier {
       // Add to message log
       final timestamp = DateTime.now().toString();
       _addToLog('[$timestamp] Connecting to WebSocket server: ${uri.toString()}');
-      await FileLogger.log('Connecting to WebSocket server: ${uri.toString()}', tag: 'CONNECTION');
       
       // Listen for messages
       _channel!.stream.listen(
@@ -89,11 +82,9 @@ class WebSocketService with ChangeNotifier {
       notifyListeners();
       
       print('Connected to WebSocket server: ${uri.toString()}');
-      await FileLogger.log('Successfully connected to WebSocket server: ${uri.toString()}', tag: 'CONNECTION');
       return true;
     } catch (e) {
       print('WebSocket connection failed: $e');
-      await FileLogger.log('WebSocket connection failed: $e', tag: 'ERROR');
       _isConnected = false;
       notifyListeners();
       _scheduleReconnect();
@@ -172,9 +163,6 @@ class WebSocketService with ChangeNotifier {
       final rawLogMessage = '[$timestamp] Received: ${jsonEncode(data)}';
       _addToLog(rawLogMessage);
       
-      // Log raw message to file
-      await FileLogger.log('Received raw message: ${jsonEncode(data)}', tag: 'WS_RAW');
-      
       // Reset reconnect attempts as we're receiving messages
       _reconnectAttempts = 0;
       
@@ -183,16 +171,12 @@ class WebSocketService with ChangeNotifier {
       final jsonLogMessage = '[$timestamp] Processed JSON: ${jsonEncode(jsonMessage)}';
       _addToLog(jsonLogMessage);
       
-      // Log the JSON data to file
-      await FileLogger.logWebSocketMessage(jsonMessage, tag: 'WS_JSON');
-      
       // Check for login message
       if (jsonMessage['c'] == 'login' && 
           (jsonMessage['msg'] == 'Oturum açılmamış!' || 
            jsonMessage['msg'].toString().contains('Oturum açılmamış'))) {
         
         // If we receive this specific login message, send login credentials
-        await FileLogger.log('Received login required message. Sending credentials.', tag: 'LOGIN');
         sendLoginMessage(_username, _password);
         // Reset monitor command flag on new login
         _monitorCommandSent = false;
@@ -205,7 +189,6 @@ class WebSocketService with ChangeNotifier {
         
         // Send the monitor command only once after login
         if (!_monitorCommandSent) {
-          await FileLogger.log('Sending monitor command after login', tag: 'MONITOR');
           sendMonitorCommand();
           _monitorCommandSent = true;
         }
@@ -213,8 +196,6 @@ class WebSocketService with ChangeNotifier {
         // Her sysinfo mesajında notifyListeners çağrılıyor
         // Bu sayede arayüzdeki sistem bilgileri gerçek zamanlı güncelleniyor
         print('✅ Sistem bilgileri güncellendi: CPU Sıcaklığı=${_systemInfo?.cpuTemp}°C, RAM Kullanımı=${_systemInfo?.ramUsagePercentage.toStringAsFixed(1)}%');
-        await FileLogger.log('System info updated: CPU Temp=${_systemInfo?.cpuTemp}°C, RAM Usage=${_systemInfo?.ramUsagePercentage.toStringAsFixed(1)}%', tag: 'SYSINFO');
-        notifyListeners();
       }
       
       // Pass the message to the handler if provided
@@ -230,28 +211,21 @@ class WebSocketService with ChangeNotifier {
           // Add detailed debug info for camera device messages
           if (dataPath.startsWith('ecs_slaves.m_')) {
             print('📦 Device message: ${jsonMessage['data']} = ${jsonMessage['val']}');
-            await FileLogger.log('Device message data path: $dataPath', tag: 'DEVICE');
-            await FileLogger.log('Device message value: $value (${value.runtimeType})', tag: 'DEVICE');
-            await FileLogger.log('Full message for $dataPath:', tag: 'DEVICE');
-            await FileLogger.logWebSocketMessage(jsonMessage, tag: 'DEVICE_DATA');
             _onParsedMessage!(jsonMessage);
           }
         } 
         // Handle login success
         else if (jsonMessage['c'] == 'loginok') {
           print('👤 Successfully logged in: ${jsonMessage['username']}');
-          await FileLogger.log('Successfully logged in: ${jsonMessage['username']}', tag: 'LOGIN');
           _onParsedMessage!(jsonMessage);
         }
         // Handle any other message type
         else {
-          await FileLogger.log('Other message type: ${jsonMessage['c']}', tag: 'OTHER');
           _onParsedMessage!(jsonMessage);
         }
       }
     } catch (e) {
       print('Error handling message: $e');
-      await FileLogger.log('Error handling WebSocket message: $e', tag: 'ERROR');
     }
   }
   
@@ -266,7 +240,6 @@ class WebSocketService with ChangeNotifier {
       final logMessage = '[$timestamp] Sent: $monitorCommand';
       _addToLog(logMessage);
       print(logMessage);
-      await FileLogger.log('Sent monitor command: $monitorCommand', tag: 'COMMAND');
     }
   }
   

@@ -7,7 +7,7 @@ class CameraGroup {
   CameraGroup({
     required this.name,
     List<String>? cameraMacs,
-  }) : this.cameraMacs = cameraMacs ?? [];
+  }) : cameraMacs = cameraMacs ?? [];
 
   // Gruba kamera ekle
   void addCamera(String cameraMac) {
