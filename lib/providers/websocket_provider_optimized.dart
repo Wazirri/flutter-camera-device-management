@@ -238,6 +238,15 @@ class WebSocketProviderOptimized with ChangeNotifier {
     }
   }
 
+  /// Logout user: close socket and reset login state
+  Future<void> logout() async {
+    await disconnect();
+    _lastUsername = null;
+    _lastPassword = null;
+    _isLoggedIn = false;
+    notifyListeners();
+  }
+
   // Start monitoring ECS system after login
   void startEcsMonitoring() {
     if (_isConnected && _isLoggedIn && _socket != null) {
@@ -280,10 +289,11 @@ class WebSocketProviderOptimized with ChangeNotifier {
     }
   }
   
-  // Add group to camera
-  Future<bool> addGroupToCamera(String deviceMac, String cameraMac, String groupName) {
-    final command = 'ADD_GROUP_TO_CAM $deviceMac $cameraMac $groupName';
-    return sendCommand(command);
+  /// Assign a camera to a group via WebSocket command
+  Future<bool> sendAddGroupToCamera(String cameraKey, String groupName) async {
+    final command = "ADD_GROUP_TO_CAM $cameraKey $groupName";
+    debugPrint('WebSocketProvider: Sending group assignment command: $command');
+    return await sendCommand(command);
   }
   
   // Move camera to device
@@ -438,19 +448,20 @@ class WebSocketProviderOptimized with ChangeNotifier {
 
   // Schedule reconnection attempt
   void _scheduleReconnect() {
+    // Don't auto-reconnect unless user is logged in
+    if (!_isLoggedIn) {
+      debugPrint('Reconnect suppressed: user not logged in.');
+      return;
+    }
     _stopReconnectTimer(); // Stop existing timer if any
 
     // Try to reconnect if we were previously connected and have credentials
     if (_lastUsername != null && _lastPassword != null) {
       _reconnectTimer = Timer(const Duration(seconds: 5), () {
-        if (!_isConnected && !_isConnecting) {
-          debugPrint('Attempting to reconnect...');
-          _logMessage('Attempting to reconnect...', isImportant: true);
-          connect(_serverIp, _serverPort,
-              username: _lastUsername,
-              password: _lastPassword,
-              rememberMe: _rememberMe);
-        }
+        debugPrint('Attempting to reconnect...');
+        _logMessage('Attempting to reconnect...', isImportant: true);
+        connect(_serverIp, _serverPort,
+            username: _lastUsername!, password: _lastPassword!, rememberMe: _rememberMe);
       });
     }
   }

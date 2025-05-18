@@ -268,6 +268,13 @@ class WebSocketProvider with ChangeNotifier {
     }
   }
   
+  /// Assign a camera to a group via WebSocket command
+  Future<bool> sendAddGroupToCamera(String cameraKey, String groupName) async {
+    final command = "ADD_GROUP_TO_CAM $cameraKey $groupName";
+    _logMessage('Sending group assignment command: $command');
+    return await sendCommand(command);
+  }
+  
   // Kameraya grup ekle
   Future<bool> addGroupToCamera(String deviceMac, String cameraMac, String groupName) {
     final command = 'ADD_GROUP_TO_CAM $deviceMac $cameraMac $groupName';
@@ -547,6 +554,15 @@ class WebSocketProvider with ChangeNotifier {
       debugPrint('Error clearing credentials: $e');
       _logMessage('Error clearing credentials: $e');
     }
+  }
+
+  /// Logout user: close socket and reset login state
+  Future<void> logout() async {
+    await disconnect();
+    _lastUsername = null;
+    _lastPassword = null;
+    _isLoggedIn = false;
+    notifyListeners();
   }
 
   // Clean up resources
