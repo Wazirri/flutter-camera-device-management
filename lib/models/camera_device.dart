@@ -10,109 +10,190 @@ enum DeviceStatus {
 }
 
 class CameraDevice {
-  final String macAddress; // The actual MAC address in standard format (e.g., 26:C1:7A:0B:1F:19)
-  final String macKey;     // The key used in the WebSocket messages (e.g., m_26_C1_7A_0B_1F_19)
+  final String macAddress; // Original field
+  final String macKey; // Original field, used as a unique key
   String ipv4;
   String lastSeenAt;
   bool connected;
-  bool online; // ADDED
-  String firstTime; // ADDED
+  bool online; // WebSocket field: online
+  String firstTime; // WebSocket field: firsttime
   String uptime;
-  String deviceType;
-  String firmwareVersion;
-  String recordPath;
+  String deviceType; // Example: 'NVR', 'IPC' - might need to parse from other data
+  String firmwareVersion; // WebSocket field: version
+  String recordPath; // Usually from camera specific data, but can be a device default
+
+  // Newly added fields from WebSocket data
+  String? deviceName; // WebSocket field: name
+  String? currentTime; // WebSocket field: current_time
+  String? smartwebVersion; // WebSocket field: smartweb_version
+  double cpuTemp; // WebSocket field: cpuTemp
+  String? ipv6; // WebSocket field: ipv6
+  bool? isMaster; // WebSocket field: isMaster or is_master
+  String? lastTs; // WebSocket field: last_ts
+  int camCount; // WebSocket field: cam_count
+
+  // Fields for system information
+  int totalRam;
+  int freeRam;
+  String? networkInfo;
+  int totalConnections;
+  int totalSessions;
+
   List<Camera> cameras;
-  
-  // SysInfo bilgileri
-  double cpuTemp = 0.0; // İşlemci sıcaklığı
-  int totalRam = 0;     // Toplam RAM (byte)
-  int freeRam = 0;      // Boş RAM (byte)
-  String networkInfo = ''; // Ağ adresi bilgisi (eth0)
-  int totalConnections = 0; // Toplam bağlantı sayısı
-  int totalSessions = 0;    // Toplam oturum sayısı
-  
+
   CameraDevice({
     required this.macAddress,
     required this.macKey,
     required this.ipv4,
     required this.lastSeenAt,
     required this.connected,
-    this.online = false, // ADDED default
-    this.firstTime = '', // ADDED default
+    required this.online,
+    required this.firstTime,
     required this.uptime,
     required this.deviceType,
     required this.firmwareVersion,
     required this.recordPath,
-    required this.cameras,
-  });
-  
+    this.deviceName,
+    this.currentTime,
+    this.smartwebVersion,
+    this.cpuTemp = 0.0,
+    this.ipv6,
+    this.isMaster,
+    this.lastTs,
+    this.camCount = 0,
+    this.totalRam = 0,
+    this.freeRam = 0,
+    this.networkInfo,
+    this.totalConnections = 0,
+    this.totalSessions = 0,
+    List<Camera>? cameras,
+  }) : cameras = cameras ?? [];
+
   // Copy with method for immutable updates
   CameraDevice copyWith({
+    String? macAddress,
+    String? macKey,
     String? ipv4,
     String? lastSeenAt,
     bool? connected,
-    bool? online, // ADDED
-    String? firstTime, // ADDED
+    bool? online,
+    String? firstTime,
     String? uptime,
     String? deviceType,
     String? firmwareVersion,
     String? recordPath,
     List<Camera>? cameras,
+    String? deviceName,
+    String? currentTime,
+    String? smartwebVersion,
+    double? cpuTemp,
+    String? ipv6,
+    bool? isMaster,
+    String? lastTs,
+    int? camCount,
+    int? totalRam,
+    int? freeRam,
+    String? networkInfo,
+    int? totalConnections,
+    int? totalSessions,
   }) {
     return CameraDevice(
-      macAddress: macAddress,
-      macKey: macKey,
+      macAddress: macAddress ?? this.macAddress,
+      macKey: macKey ?? this.macKey,
       ipv4: ipv4 ?? this.ipv4,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
       connected: connected ?? this.connected,
-      online: online ?? this.online, // ADDED
-      firstTime: firstTime ?? this.firstTime, // ADDED
+      online: online ?? this.online,
+      firstTime: firstTime ?? this.firstTime,
       uptime: uptime ?? this.uptime,
       deviceType: deviceType ?? this.deviceType,
       firmwareVersion: firmwareVersion ?? this.firmwareVersion,
       recordPath: recordPath ?? this.recordPath,
       cameras: cameras ?? this.cameras,
+      deviceName: deviceName ?? this.deviceName,
+      currentTime: currentTime ?? this.currentTime,
+      smartwebVersion: smartwebVersion ?? this.smartwebVersion,
+      cpuTemp: cpuTemp ?? this.cpuTemp,
+      ipv6: ipv6 ?? this.ipv6,
+      isMaster: isMaster ?? this.isMaster,
+      lastTs: lastTs ?? this.lastTs,
+      camCount: camCount ?? this.camCount,
+      totalRam: totalRam ?? this.totalRam,
+      freeRam: freeRam ?? this.freeRam,
+      networkInfo: networkInfo ?? this.networkInfo,
+      totalConnections: totalConnections ?? this.totalConnections,
+      totalSessions: totalSessions ?? this.totalSessions,
     );
   }
-  
+
   // Convert from JSON
   factory CameraDevice.fromJson(Map<String, dynamic> json) {
+    var camerasList = <Camera>[];
+    if (json['cameras'] != null) {
+      camerasList = List<Camera>.from(
+          json['cameras'].map((camJson) => Camera.fromJson(camJson as Map<String, dynamic>)));
+    }
+
     return CameraDevice(
-      macAddress: json['macAddress'],
-      macKey: json['macKey'],
-      ipv4: json['ipv4'] ?? '',
-      lastSeenAt: json['lastSeenAt'] ?? '',
-      connected: json['connected'] ?? false,
-      online: json['online'] ?? false, // ADDED
-      firstTime: json['firstTime'] ?? '', // ADDED
-      uptime: json['uptime'] ?? '',
-      deviceType: json['deviceType'] ?? '',
-      firmwareVersion: json['firmwareVersion'] ?? '',
-      recordPath: json['recordPath'] ?? '',
-      cameras: (json['cameras'] as List<dynamic>?)
-          ?.map((e) => Camera.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [],
+      macAddress: json['macAddress'] as String,
+      macKey: json['macKey'] as String,
+      ipv4: json['ipv4'] as String? ?? '',
+      lastSeenAt: json['lastSeenAt'] as String? ?? '',
+      connected: json['connected'] as bool? ?? false,
+      online: json['online'] as bool? ?? false,
+      firstTime: json['firstTime'] as String? ?? '',
+      uptime: json['uptime'] as String? ?? '',
+      deviceType: json['deviceType'] as String? ?? '',
+      firmwareVersion: json['firmwareVersion'] as String? ?? '', // Corresponds to 'version' in WS
+      recordPath: json['recordPath'] as String? ?? '',
+      
+      deviceName: json['name'] as String?, // WebSocket 'name'
+      currentTime: json['current_time'] as String?,
+      smartwebVersion: json['smartweb_version'] as String?,
+      cpuTemp: (json['cpuTemp'] as num?)?.toDouble() ?? 0.0,
+      ipv6: json['ipv6'] as String?,
+      isMaster: json['isMaster'] as bool?,
+      lastTs: json['last_ts'] as String?,
+      camCount: json['cam_count'] as int? ?? 0,
+      cameras: camerasList,
+      totalRam: json['totalRam'] as int? ?? 0,
+      freeRam: json['freeRam'] as int? ?? 0,
+      networkInfo: json['networkInfo'] as String?,
+      totalConnections: json['totalConnections'] as int? ?? 0,
+      totalSessions: json['totalSessions'] as int? ?? 0,
     );
   }
-  
+
   // Convert to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'macAddress': macAddress,
-      'macKey': macKey,
-      'ipv4': ipv4,
-      'lastSeenAt': lastSeenAt,
-      'connected': connected,
-      'online': online, // ADDED
-      'firstTime': firstTime, // ADDED
-      'uptime': uptime,
-      'deviceType': deviceType,
-      'firmwareVersion': firmwareVersion,
-      'recordPath': recordPath,
-      'cameras': cameras.map((e) => e.toJson()).toList(),
-    };
-  }
-  
+  Map<String, dynamic> toJson() => {
+        'macAddress': macAddress,
+        'macKey': macKey,
+        'ipv4': ipv4,
+        'lastSeenAt': lastSeenAt,
+        'connected': connected,
+        'online': online,
+        'firstTime': firstTime,
+        'uptime': uptime,
+        'deviceType': deviceType,
+        'firmwareVersion': firmwareVersion, // Corresponds to 'version' in WS
+        'recordPath': recordPath,
+        
+        'name': deviceName, // WebSocket 'name'
+        'current_time': currentTime,
+        'smartweb_version': smartwebVersion,
+        'cpuTemp': cpuTemp,
+        'ipv6': ipv6,
+        'isMaster': isMaster,
+        'last_ts': lastTs,
+        'cam_count': camCount,
+        'cameras': cameras.map((camera) => camera.toJson()).toList(),
+        'totalRam': totalRam,
+        'freeRam': freeRam,
+        'networkInfo': networkInfo,
+        'totalConnections': totalConnections,
+        'totalSessions': totalSessions,
+      };
+
   // Get the device status
   DeviceStatus get status {
     debugPrint('CameraDevice status getter invoked for $macAddress');
@@ -189,7 +270,7 @@ class CameraDevice {
   
   @override
   String toString() {
-    return 'CameraDevice{macAddress: $macAddress, ipv4: $ipv4, connected: $connected, online: $online, firstTime: $firstTime, cameras: ${cameras.length}}'; // MODIFIED
+    return 'CameraDevice(macAddress: $macAddress, macKey: $macKey, ipv4: $ipv4, connected: $connected, online: $online, firstTime: $firstTime, uptime: $uptime, deviceName: $deviceName, firmwareVersion: $firmwareVersion, currentTime: $currentTime, smartwebVersion: $smartwebVersion, cpuTemp: $cpuTemp, ipv6: $ipv6, isMaster: $isMaster, lastTs: $lastTs, camCount: $camCount, totalRam: $totalRam, freeRam: $freeRam, networkInfo: $networkInfo, totalConnections: $totalConnections, totalSessions: $totalSessions, cameras: ${cameras.length})';
   }
 }
 
@@ -308,6 +389,8 @@ class Camera {
     String? disconnected,
     String? lastSeenAt,
     bool? recording,
+    bool? soundRec, // Added missing parameter
+    String? xAddr,   // Added missing parameter
   }) {
     return Camera(
       index: index,
@@ -343,8 +426,8 @@ class Camera {
       disconnected: disconnected ?? this.disconnected,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
       recording: recording ?? this.recording,
-      soundRec: soundRec,
-      xAddr: xAddr,
+      soundRec: soundRec ?? this.soundRec, // Applied to constructor
+      xAddr: xAddr ?? this.xAddr,       // Applied to constructor
     );
   }
   

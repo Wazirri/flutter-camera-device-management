@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/camera_devices_provider.dart';
+import 'package:intl/intl.dart'; // Added import for DateFormat
+
 import '../models/camera_device.dart';
-import '../theme/app_theme.dart';
+import '../providers/camera_devices_provider.dart';
+import '../theme/app_theme.dart'; // Fixed import for AppTheme
+import '../l10n/app_localizations.dart'; // Uncommented for proper localization
 
 class CameraDevicesScreen extends StatefulWidget {
   const CameraDevicesScreen({Key? key}) : super(key: key);

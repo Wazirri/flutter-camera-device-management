@@ -532,6 +532,9 @@ class CameraDevicesProvider with ChangeNotifier {
       case 'ipv4':
         device.ipv4 = value.toString();
         break;
+      case 'ipv6': // ADDED
+        device.ipv6 = value.toString(); // ADDED
+        break;
       case 'lastseenat':
       case 'last_seen_at':
         device.lastSeenAt = value.toString();
@@ -539,26 +542,40 @@ class CameraDevicesProvider with ChangeNotifier {
       case 'connected':
         device.connected = value is bool ? value : (value.toString().toLowerCase() == 'true' || value.toString() == '1'); // MODIFIED to handle '1'
         break;
-      case 'online': // ADDED
-        device.online = value is bool ? value : (value.toString().toLowerCase() == 'true' || value.toString() == '1'); // ADDED
+      case 'online': 
+        device.online = value is bool ? value : (value.toString().toLowerCase() == 'true' || value.toString() == '1'); 
         break;
-      case 'firsttime': // ADDED
-        device.firstTime = value.toString(); // ADDED
+      case 'firsttime': 
+        device.firstTime = value.toString(); 
         break;
       case 'uptime':
         device.uptime = value.toString();
         break;
-      case 'version':
+      case 'version': // This is firmware version
         device.firmwareVersion = value.toString();
         break;
-      case 'current_time':
-      case 'firsttime':
-      case 'name':
-      case 'smartweb_version':
-      case 'cputemp':
-      case 'ismaster':
-      case 'is_master':
-      case 'last_ts':
+      case 'name': // ADDED - This is deviceName
+        device.deviceName = value.toString(); // ADDED
+        break;
+      case 'current_time': // ADDED
+        device.currentTime = value.toString(); // ADDED
+        break;
+      case 'smartweb_version': // ADDED
+        device.smartwebVersion = value.toString(); // ADDED
+        break;
+      case 'cputemp': // ADDED
+        device.cpuTemp = double.tryParse(value.toString()) ?? 0.0; // ADDED
+        break;
+      case 'ismaster': // ADDED
+      case 'is_master': // ADDED
+        device.isMaster = value is bool ? value : (value.toString().toLowerCase() == 'true' || value.toString() == '1'); // ADDED
+        break;
+      case 'last_ts': // ADDED
+        device.lastTs = value.toString(); // ADDED
+        break;
+      case 'cam_count': // ADDED
+        device.camCount = int.tryParse(value.toString()) ?? 0; // ADDED
+        break;
       // case 'online': // REMOVED from here as it's handled above
       case 'app_ready':
       case 'system_ready':

@@ -270,14 +270,18 @@ class WebSocketProvider with ChangeNotifier {
   
   /// Assign a camera to a group via WebSocket command
   Future<bool> sendAddGroupToCamera(String cameraKey, String groupName) async {
-    final command = "ADD_GROUP_TO_CAM $cameraKey $groupName";
+    // Format should be: ADD_CAMERA_TO_GROUP <cameraKey> <groupName>
+    final command = "ADD_CAMERA_TO_GROUP $cameraKey $groupName";
     _logMessage('Sending group assignment command: $command');
     return await sendCommand(command);
   }
   
-  // Kameraya grup ekle
-  Future<bool> addGroupToCamera(String deviceMac, String cameraMac, String groupName) {
-    final command = 'ADD_GROUP_TO_CAM $deviceMac $cameraMac $groupName';
+  // Kameraya grup ekle - fixed format with more parameters
+  Future<bool> addGroupToCamera(String deviceMac, String cameraIndex, String groupName) {
+    // Format: ADD_CAMERA_TO_GROUP <deviceMac>:<cameraIndex> <groupName>
+    final cameraKey = "$deviceMac:$cameraIndex";
+    final command = 'ADD_CAMERA_TO_GROUP $cameraKey $groupName';
+    _logMessage('Adding camera to group: $command');
     return sendCommand(command);
   }
   
@@ -450,15 +454,23 @@ class WebSocketProvider with ChangeNotifier {
     _stopReconnectTimer(); // Stop existing timer if any
 
     // Try to reconnect if we were previously connected and have credentials
+    // AND if the user didn't explicitly log out (in which case _lastUsername would be null)
     if (_lastUsername != null && _lastPassword != null) {
+      // Store the current state of isLoggedIn to prevent reconnection after logout
+      final wasLoggedIn = _isLoggedIn;
+      
       _reconnectTimer = Timer(const Duration(seconds: 5), () {
-        if (!_isConnected && !_isConnecting) {
+        // Only attempt reconnection if the user was logged in and didn't explicitly log out
+        if (!_isConnected && !_isConnecting && wasLoggedIn && _lastUsername != null) {
           debugPrint('Attempting to reconnect...');
           _logMessage('Attempting to reconnect...');
           connect(_serverIp, _serverPort,
               username: _lastUsername,
               password: _lastPassword,
               rememberMe: _rememberMe);
+        } else {
+          debugPrint('Skipping reconnection attempt - user logged out or reconnection not needed');
+          _logMessage('Skipping reconnection attempt');
         }
       });
     }
@@ -558,11 +570,30 @@ class WebSocketProvider with ChangeNotifier {
 
   /// Logout user: close socket and reset login state
   Future<void> logout() async {
+    // First stop any active reconnection attempts
+    _stopReconnectTimer();
+    
+    // Send LOGOUT command if connected
+    if (_isConnected && _socket != null) {
+      try {
+        _socket!.add('LOGOUT');
+        _logMessage('Sent LOGOUT command');
+      } catch (e) {
+        debugPrint('Error sending logout command: $e');
+      }
+    }
+    
+    // Then disconnect
     await disconnect();
+    
+    // Clear credentials to prevent auto-reconnect
     _lastUsername = null;
     _lastPassword = null;
     _isLoggedIn = false;
+    
+    // Notify listeners about state change
     notifyListeners();
+    debugPrint('User logged out. Auto-reconnect disabled.');
   }
 
   // Clean up resources
