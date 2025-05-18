@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import '../models/camera_device.dart';
 import '../models/camera_layout_config.dart';
 import '../providers/multi_camera_view_provider.dart';
@@ -258,7 +260,7 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
   }
 }
 
-class CameraGridView extends StatelessWidget {
+class CameraGridView extends StatefulWidget {
   final CameraLayoutConfig layout;
   final Map<int, int> cameraAssignments;
   final List<Camera> availableCameras;
@@ -273,6 +275,143 @@ class CameraGridView extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<CameraGridView> createState() => _CameraGridViewState();
+}
+
+class _CameraGridViewState extends State<CameraGridView> {
+  // Maps camera positions to Player instances
+  final Map<int, Player> _players = {};
+  final Map<int, VideoController> _controllers = {};
+  final Map<int, bool> _loadingStates = {};
+  final Map<int, bool> _errorStates = {};
+  
+  @override
+  void initState() {
+    super.initState();
+    _initializePlayers();
+  }
+  
+  @override
+  void didUpdateWidget(CameraGridView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // If camera assignments changed, update streams
+    if (widget.cameraAssignments != oldWidget.cameraAssignments ||
+        widget.availableCameras != oldWidget.availableCameras) {
+      _updateStreams();
+    }
+  }
+  
+  void _initializePlayers() {
+    // Create players for each camera location
+    for (final location in widget.layout.cameraLoc) {
+      // Initialize loading and error states
+      _loadingStates[location.cameraCode] = false;
+      _errorStates[location.cameraCode] = false;
+      
+      // Create a player for this location
+      final player = Player();
+      _players[location.cameraCode] = player;
+      _controllers[location.cameraCode] = VideoController(player);
+      
+      // Set up event listeners
+      player.stream.buffering.listen((buffering) {
+        if (mounted) {
+          setState(() {
+            _loadingStates[location.cameraCode] = buffering;
+          });
+        }
+      });
+      
+      player.stream.error.listen((error) {
+        if (mounted) {
+          setState(() {
+            _errorStates[location.cameraCode] = true;
+            _loadingStates[location.cameraCode] = false;
+          });
+          print('Player error at position ${location.cameraCode}: $error');
+        }
+      });
+    }
+    
+    // Start streaming for all assigned cameras
+    _updateStreams();
+  }
+  
+  void _updateStreams() {
+    // For each camera location
+    for (final location in widget.layout.cameraLoc) {
+      final cameraPosition = location.cameraCode;
+      final cameraIndex = widget.cameraAssignments[cameraPosition] ?? 0;
+      
+      // Reset states
+      setState(() {
+        _errorStates[cameraPosition] = false;
+      });
+      
+      // If there's a camera assigned
+      if (cameraIndex > 0 && cameraIndex <= widget.availableCameras.length) {
+        final camera = widget.availableCameras[cameraIndex - 1];
+        _streamCamera(cameraPosition, camera);
+      } else {
+        // No camera assigned, stop any existing stream
+        if (_players.containsKey(cameraPosition)) {
+          _players[cameraPosition]!.stop();
+        }
+      }
+    }
+  }
+  
+  void _streamCamera(int positionCode, Camera camera) {
+    if (!mounted || !_players.containsKey(positionCode)) return;
+    
+    setState(() {
+      _errorStates[positionCode] = false;
+      _loadingStates[positionCode] = true;
+    });
+    
+    final player = _players[positionCode]!;
+    
+    // Check if camera has RTSP URL
+    if (camera.rtspUri.isNotEmpty) {
+      try {
+        // Only open if player is not already playing this stream
+        if (player.state.playlist.medias.isEmpty || 
+            (player.state.playlist.medias.isNotEmpty && 
+             player.state.playlist.medias.first.uri != camera.rtspUri)) {
+          // Stop previous stream before loading new one
+          player.stop();
+          // Open new stream
+          player.open(Media(camera.rtspUri));
+        }
+      } catch (e) {
+        print('Error opening stream for camera ${camera.name} at position $positionCode: $e');
+        if (mounted) {
+          setState(() {
+            _errorStates[positionCode] = true;
+            _loadingStates[positionCode] = false;
+          });
+        }
+      }
+    } else {
+      // No valid stream URL
+      setState(() {
+        _errorStates[positionCode] = true;
+        _loadingStates[positionCode] = false;
+      });
+    }
+  }
+  
+  @override
+  void dispose() {
+    // Dispose all players
+    for (final player in _players.values) {
+      player.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -280,7 +419,7 @@ class CameraGridView extends StatelessWidget {
         final height = constraints.maxHeight;
         
         return Stack(
-          children: layout.cameraLoc.map((location) {
+          children: widget.layout.cameraLoc.map((location) {
             // Kamera konumu hesaplama (yüzde değerlerini piksel değerlerine dönüştür)
             final double left = location.x1 * width / 100;
             final double top = location.y1 * height / 100;
@@ -288,12 +427,12 @@ class CameraGridView extends StatelessWidget {
             final double bottom = location.y2 * height / 100;
             
             // Bu konuma atanmış kamera indeksini al
-            final int cameraIndex = cameraAssignments[location.cameraCode] ?? 0;
+            final int cameraIndex = widget.cameraAssignments[location.cameraCode] ?? 0;
             
             // Bu indekse karşılık gelen kamerayı bul
             Camera? camera;
-            if (cameraIndex > 0 && cameraIndex <= availableCameras.length) {
-              camera = availableCameras[cameraIndex - 1];
+            if (cameraIndex > 0 && cameraIndex <= widget.availableCameras.length) {
+              camera = widget.availableCameras[cameraIndex - 1];
             }
             
             return Positioned(
@@ -302,7 +441,7 @@ class CameraGridView extends StatelessWidget {
               width: right - left,
               height: bottom - top,
               child: GestureDetector(
-                onTap: onCameraAssign != null
+                onTap: widget.onCameraAssign != null
                     ? () => _showCameraSelector(context, location.cameraCode)
                     : null,
                 child: Container(
@@ -314,7 +453,7 @@ class CameraGridView extends StatelessWidget {
                     color: Colors.black,
                   ),
                   child: camera != null
-                      ? CameraPreviewPlaceholder(camera: camera)
+                      ? _buildCameraView(location.cameraCode, camera)
                       : const Center(
                           child: Text(
                             'No Camera',
@@ -329,9 +468,96 @@ class CameraGridView extends StatelessWidget {
       },
     );
   }
+  
+  Widget _buildCameraView(int positionCode, Camera camera) {
+    // Check if we have a player for this position
+    if (!_controllers.containsKey(positionCode)) {
+      return CameraPreviewPlaceholder(camera: camera);
+    }
+    
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Video player
+        ClipRect(
+          child: RepaintBoundary(
+            child: Video(
+              controller: _controllers[positionCode]!,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        
+        // Loading indicator
+        if (_loadingStates[positionCode] == true)
+          const Center(
+            child: CircularProgressIndicator(),
+          ),
+        
+        // Error indicator
+        if (_errorStates[positionCode] == true)
+          const Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.error_outline, color: Colors.red, size: 32),
+                SizedBox(height: 8),
+                Text(
+                  'Stream Error',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ],
+            ),
+          ),
+        
+        // Camera name overlay
+        Positioned(
+          top: 4,
+          left: 4,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              camera.name,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ),
+        
+        // Camera status overlay
+        Positioned(
+          bottom: 4,
+          right: 4,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: camera.recording
+                  ? Colors.red.withOpacity(0.7)
+                  : Colors.green.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              camera.recording ? 'REC' : 'LIVE',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
   void _showCameraSelector(BuildContext context, int cameraPosition) {
-    if (onCameraAssign == null) return;
+    if (widget.onCameraAssign == null) return;
     
     showModalBottomSheet(
       context: context,
@@ -358,30 +584,30 @@ class CameraGridView extends StatelessWidget {
             const Divider(height: 1),
             Expanded(
               child: ListView.builder(
-                itemCount: availableCameras.length + 1, // +1 for "No Camera" option
+                itemCount: widget.availableCameras.length + 1, // +1 for "No Camera" option
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     // "No Camera" option
                     return ListTile(
                       title: const Text('No Camera'),
                       leading: const Icon(Icons.videocam_off),
-                      selected: cameraAssignments[cameraPosition] == null ||
-                          cameraAssignments[cameraPosition] == 0,
+                      selected: widget.cameraAssignments[cameraPosition] == null ||
+                          widget.cameraAssignments[cameraPosition] == 0,
                       onTap: () {
-                        onCameraAssign!(cameraPosition, 0);
+                        widget.onCameraAssign!(cameraPosition, 0);
                         Navigator.pop(context);
                       },
                     );
                   } else {
                     // Camera options
-                    final camera = availableCameras[index - 1];
+                    final camera = widget.availableCameras[index - 1];
                     return ListTile(
                       title: Text(camera.name),
                       subtitle: Text('${camera.brand} ${camera.hw}'),
                       leading: const Icon(Icons.videocam),
-                      selected: cameraAssignments[cameraPosition] == index,
+                      selected: widget.cameraAssignments[cameraPosition] == index,
                       onTap: () {
-                        onCameraAssign!(cameraPosition, index);
+                        widget.onCameraAssign!(cameraPosition, index);
                         Navigator.pop(context);
                       },
                     );
@@ -406,7 +632,7 @@ class CameraPreviewPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Gerçek kamera görüntüsü entegrasyonu henüz yapılmadığı için placeholder kullanıyoruz
+    // Placeholder for when no video stream is available
     return Stack(
       fit: StackFit.expand,
       children: [
