@@ -5,7 +5,7 @@ import 'package:intl/intl.dart'; // Added import for DateFormat
 import '../models/camera_device.dart';
 import '../providers/camera_devices_provider.dart';
 import '../theme/app_theme.dart'; // Fixed import for AppTheme
-import '../l10n/app_localizations.dart'; // Uncommented for proper localization
+// Removed app_localizations import to fix build error
 
 class CameraDevicesScreen extends StatefulWidget {
   const CameraDevicesScreen({Key? key}) : super(key: key);
@@ -302,206 +302,260 @@ class DeviceDetailsSheet extends StatelessWidget {
         statusColor = Colors.grey;
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Header
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      device.deviceType.isEmpty 
-                          ? 'Device ${device.macAddress}' 
-                          : device.deviceType,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+    return DefaultTabController(
+      length: 2, // İki tab için: Cihaz Bilgileri ve Kameralar
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        device.deviceType.isEmpty 
+                            ? 'Device ${device.macAddress}' 
+                            : device.deviceType,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'MAC: ${device.macAddress}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade400,
+                      const SizedBox(height: 4),
+                      Text(
+                        'MAC: ${device.macAddress}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade400,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: device.connected
-                      ? AppTheme.primaryColor
-                      : Colors.grey,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  // Use device.status to determine online/offline text
-                  device.status == DeviceStatus.online ? 'Online' : 
-                  (device.status == DeviceStatus.warning ? 'Warning' : 'Offline'),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                    ],
                   ),
                 ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: device.connected
+                        ? AppTheme.primaryColor
+                        : Colors.grey,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    // Use device.status to determine online/offline text
+                    device.status == DeviceStatus.online ? 'Online' : 
+                    (device.status == DeviceStatus.warning ? 'Warning' : 'Offline'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          // Tab Bar
+          TabBar(
+            tabs: const [
+              Tab(
+                icon: Icon(Icons.info_outline),
+                text: 'Device Info',
+              ),
+              Tab(
+                icon: Icon(Icons.videocam_outlined),
+                text: 'Cameras',
               ),
             ],
+            labelColor: AppTheme.primaryColor,
+            unselectedLabelColor: Colors.grey,
+            indicatorColor: AppTheme.primaryColor,
           ),
-        ),
-        const Divider(),
-        // Device Info
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Device Information',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 12),
-              InfoRow(label: 'IP Address', value: device.ipv4),
-              InfoRow(label: 'Last Seen', value: device.lastSeenAt),
-              InfoRow(label: 'Uptime', value: device.formattedUptime),
-              InfoRow(label: 'Firmware', value: device.firmwareVersion),
-              InfoRow(label: 'Record Path', value: device.recordPath),
-              // ADDED: Explicit display for device.online and device.connected in Details Sheet
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const SizedBox(
-                      width: 100,
-                      child: Text(
-                        'Powered',
-                        style: TextStyle(
-                          color: Colors.grey, // Using grey like InfoRow label
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      device.online ? Icons.power_settings_new : Icons.power_off,
-                      color: device.online ? AppTheme.online : AppTheme.offline,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        device.online ? "On" : "Off",
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const SizedBox(
-                      width: 100,
-                      child: Text(
-                        'Connection',
-                        style: TextStyle(
-                          color: Colors.grey, // Using grey like InfoRow label
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      device.connected ? Icons.link : Icons.link_off,
-                      color: device.connected ? AppTheme.online : AppTheme.offline,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        device.connected ? "Active" : "Inactive",
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // END ADDED
-            ],
-          ),
-        ),
-        const Divider(),
-        // Cameras List
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 8,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Cameras (${device.cameras.length})',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (device.cameras.isNotEmpty && device.connected)
-                TextButton.icon(
-                  icon: const Icon(Icons.visibility),
-                  label: const Text('View All'),
-                  onPressed: () {
-                    // TODO: Navigate to live view screen with all cameras from this device
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, '/live-view');
-                  },
-                ),
-            ],
-          ),
-        ),
-        // Camera Cards
-        Expanded(
-          child: device.cameras.isEmpty
-              ? const Center(
-                  child: Text('No cameras found for this device'),
-                )
-              : ListView.builder(
+          
+          // Tab Bar View
+          Expanded(
+            child: TabBarView(
+              children: [
+                // İlk Tab: Cihaz Bilgileri
+                SingleChildScrollView(
                   controller: scrollController,
                   padding: const EdgeInsets.all(16),
-                  itemCount: device.cameras.length,
-                  itemBuilder: (context, index) {
-                    final camera = device.cameras[index];
-                    return CameraCard(
-                      camera: camera,
-                      onTap: () {
-                        // Set the selected camera
-                        Provider.of<CameraDevicesProvider>(context, listen: false)
-                            .setSelectedCameraIndex(index);
-                            
-                        // Navigate to live view screen
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, '/live-view');
-                      },
-                    );
-                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Device Information',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      // Temel Bilgiler
+                      InfoRow(label: 'Device Name', value: device.deviceName ?? 'Unknown'),
+                      InfoRow(label: 'IP Address (IPv4)', value: device.ipv4),
+                      if (device.ipv6 != null && device.ipv6!.isNotEmpty)
+                        InfoRow(label: 'IP Address (IPv6)', value: device.ipv6!),
+                      InfoRow(label: 'MAC Address', value: device.macAddress),
+                      InfoRow(label: 'First Seen', value: device.firstTime),
+                      InfoRow(label: 'Last Seen', value: device.lastSeenAt),
+                      InfoRow(label: 'Current Time', value: device.currentTime ?? 'Unknown'),
+                      InfoRow(label: 'Uptime', value: device.formattedUptime),
+                      InfoRow(label: 'Firmware Version', value: device.firmwareVersion),
+                      if (device.smartwebVersion != null && device.smartwebVersion!.isNotEmpty)
+                        InfoRow(label: 'SmartWeb Version', value: device.smartwebVersion!),
+                      InfoRow(label: 'CPU Temperature', value: '${device.cpuTemp.toStringAsFixed(1)}°C'),
+                      InfoRow(label: 'Master Status', value: device.isMaster == true ? 'Master' : 'Slave'),
+                      InfoRow(label: 'Last Timestamp', value: device.lastTs ?? 'Unknown'),
+                      InfoRow(label: 'Record Path', value: device.recordPath),
+                      InfoRow(label: 'Camera Count', value: '${device.camCount}'),
+                      InfoRow(label: 'Total RAM', value: '${device.totalRam} bytes'),
+                      InfoRow(label: 'Free RAM', value: '${device.freeRam} bytes'),
+                      InfoRow(label: 'Network Info', value: device.networkInfo ?? 'Unknown'),
+                      InfoRow(label: 'Total Connections', value: '${device.totalConnections}'),
+                      InfoRow(label: 'Total Sessions', value: '${device.totalSessions}'),
+                      
+                      // Powered ve Connection status
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Status Information',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            const SizedBox(
+                              width: 100,
+                              child: Text(
+                                'Powered',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              device.online ? Icons.power_settings_new : Icons.power_off,
+                              color: device.online ? AppTheme.online : AppTheme.offline,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                device.online ? "On" : "Off",
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            const SizedBox(
+                              width: 100,
+                              child: Text(
+                                'Connection',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              device.connected ? Icons.link : Icons.link_off,
+                              color: device.connected ? AppTheme.online : AppTheme.offline,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                device.connected ? "Active" : "Inactive",
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-        ),
-      ],
+                
+                // İkinci Tab: Kameralar
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Cameras (${device.cameras.length})',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          if (device.cameras.isNotEmpty && device.connected)
+                            TextButton.icon(
+                              icon: const Icon(Icons.visibility),
+                              label: const Text('View All'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                Navigator.pushNamed(context, '/live-view');
+                              },
+                            ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: device.cameras.isEmpty
+                          ? const Center(
+                              child: Text('No cameras found for this device'),
+                            )
+                          : ListView.builder(
+                              controller: scrollController,
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              itemCount: device.cameras.length,
+                              itemBuilder: (context, index) {
+                                final camera = device.cameras[index];
+                                return CameraCard(
+                                  camera: camera,
+                                  onTap: () {
+                                    // Set the selected camera
+                                    Provider.of<CameraDevicesProvider>(context, listen: false)
+                                        .setSelectedCameraIndex(index);
+                                        
+                                    // Navigate to live view screen
+                                    Navigator.pop(context);
+                                    Navigator.pushNamed(context, '/live-view');
+                                  },
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

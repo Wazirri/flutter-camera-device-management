@@ -2,6 +2,7 @@
 // Eventually, this should be replaced with proper Flutter localization support
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart' show BuildContext;
 
 class AppLocalizations {
   final Locale locale;
@@ -35,5 +36,3 @@ class Locale {
     return languageCode;
   }
 }
-
-class BuildContext {}

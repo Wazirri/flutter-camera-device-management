@@ -559,13 +559,22 @@ class _DevicesScreenState extends State<DevicesScreen> {
                     ),
                     const SizedBox(height: 8),
                     _buildDetailRow('Device Type', updatedDevice.deviceType.isEmpty ? 'Unknown' : updatedDevice.deviceType),
-                    _buildDetailRow('IP Address', updatedDevice.ipv4.isEmpty ? 'Unknown' : updatedDevice.ipv4),
+                    _buildDetailRow('Device Name', updatedDevice.deviceName ?? 'Unknown'),
+                    _buildDetailRow('IP Address (IPv4)', updatedDevice.ipv4.isEmpty ? 'Unknown' : updatedDevice.ipv4),
+                    if (updatedDevice.ipv6 != null && updatedDevice.ipv6!.isNotEmpty)
+                      _buildDetailRow('IP Address (IPv6)', updatedDevice.ipv6!),
                     _buildDetailRow('MAC Address', updatedDevice.macAddress),
-                    _buildDetailRow('Firmware', updatedDevice.firmwareVersion.isEmpty ? 'Unknown' : updatedDevice.firmwareVersion),
-                    _buildDetailRow('Last Active', updatedDevice.lastSeenAt.isEmpty ? 'Unknown' : updatedDevice.lastSeenAt),
+                    _buildDetailRow('First Seen', updatedDevice.firstTime),
+                    _buildDetailRow('Last Seen', updatedDevice.lastSeenAt.isEmpty ? 'Unknown' : updatedDevice.lastSeenAt),
+                    _buildDetailRow('Current Time', updatedDevice.currentTime ?? 'Unknown'),
+                    _buildDetailRow('Uptime', updatedDevice.formattedUptime),
+                    _buildDetailRow('Firmware Version', updatedDevice.firmwareVersion.isEmpty ? 'Unknown' : updatedDevice.firmwareVersion),
+                    if (updatedDevice.smartwebVersion != null && updatedDevice.smartwebVersion!.isNotEmpty)
+                      _buildDetailRow('SmartWeb Version', updatedDevice.smartwebVersion!),
                     _buildDetailRow('Status', statusText),
-                    _buildDetailRow('Uptime', updatedDevice.uptime.isEmpty ? 'Unknown' : '${updatedDevice.uptime} saniye'),
                     _buildDetailRow('Cameras', '${updatedDevice.cameras.length}'),
+                    _buildDetailRow('Master Status', updatedDevice.isMaster == true ? 'Master' : 'Slave'),
+                    _buildDetailRow('Last Timestamp', updatedDevice.lastTs ?? 'Unknown'),
                     if (updatedDevice.recordPath.isNotEmpty)
                       _buildDetailRow('Recording Path', updatedDevice.recordPath),
                     
