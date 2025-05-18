@@ -19,6 +19,7 @@ import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
 import 'screens/multi_live_view_screen.dart';  // New multi-camera view screen
 import 'screens/multi_recordings_screen.dart';  // New multi-recordings screen
+import 'screens/multi_camera_view_screen.dart'; // Yeni multi camera view screen
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
 import 'utils/page_transitions.dart';
@@ -27,6 +28,7 @@ import 'widgets/mobile_bottom_navigation_bar.dart';
 import 'providers/websocket_provider.dart';
 import 'providers/camera_devices_provider.dart';
 import 'providers/multi_view_layout_provider.dart';
+import 'providers/multi_camera_view_provider.dart'; // Yeni provider
 
 Future<void> main() async {
   debugPrint('TEST_LOG: main() function started.'); // <-- BU SATIRI EKLEYİN
@@ -61,6 +63,7 @@ Future<void> main() async {
     final webSocketProvider = WebSocketProvider();
     final cameraDevicesProvider = CameraDevicesProvider();
     final multiViewLayoutProvider = MultiViewLayoutProvider();
+    final multiCameraViewProvider = MultiCameraViewProvider();
     
     // Connect the providers
     webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
@@ -72,6 +75,7 @@ Future<void> main() async {
           ChangeNotifierProvider<WebSocketProvider>.value(value: webSocketProvider),
           ChangeNotifierProvider<CameraDevicesProvider>.value(value: cameraDevicesProvider),
           ChangeNotifierProvider<MultiViewLayoutProvider>.value(value: multiViewLayoutProvider),
+          ChangeNotifierProvider<MultiCameraViewProvider>.value(value: multiCameraViewProvider),
         ],
         child: const MyApp(),
       ),
@@ -201,6 +205,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           '/multi-recordings': (context) => const AppShell(
             currentRoute: '/multi-recordings',
             child: MultiRecordingsScreen(),
+          ),
+          '/multi-camera-view': (context) => const AppShell(
+            currentRoute: '/multi-camera-view',
+            child: MultiCameraViewScreen(),
           ),
           '/live-view': (context) => const AppShell(
               currentRoute: '/live-view',

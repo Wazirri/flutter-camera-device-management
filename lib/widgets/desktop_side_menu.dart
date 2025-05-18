@@ -37,6 +37,11 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
       'route': '/multi-live-view',
     },
     {
+      'title': 'Multi Camera Layout',
+      'icon': Icons.grid_on,
+      'route': '/multi-camera-view',
+    },
+    {
       'title': 'Recordings',
       'icon': Icons.video_library,
       'route': '/recordings',

@@ -1,0 +1,31 @@
+Size "Multi Camera View" sayfası için bir implementasyon önerisi sunacağım. Anladığım kadarıyla, kullanıcıların birden fazla kamerayı aynı anda izleyebilecekleri bir sayfa istiyorsunuz ve bu sayfa için layout bilgileri cameraLayout.json dosyasından alınacak.
+
+## Önerilen Çözüm Özeti:
+
+1. **Multi Camera View Sayfası**: Birden fazla kamerayı aynı anda görüntüleyebilecek bir sayfa.
+
+2. **Layout Sistemi**:
+   - Kamera yerleşim düzenleri cameraLayout.json dosyasından yüklenecek
+   - Kullanıcı farklı düzen şablonları arasında geçiş yapabilecek (2x2, 3x3, vb.)
+
+3. **Kamera Kodları Atama**:
+   - İki farklı mod olacak:
+     - **Otomatik Mod**: Cameras menüsündeki sıralama kullanılarak otomatik olarak 1'den başlayarak kameralar yerleştirilecek
+     - **Manuel Mod**: Kullanıcı belirli kameraları belirli konumlara manuel olarak atayabilecek
+
+4. **Sayfa Değiştirme**:
+   - Kullanıcı, sayfalar arasında geçiş yapabilecek
+   - Her sayfa için farklı bir layout ve kamera düzeni seçilebilecek
+   - Sayfa sayısı dinamik olarak artırılabilecek
+
+5. **Responsive Tasarım**:
+   - Kamera görüntüleri, cameraLayout.json dosyasındaki yüzde değerlerine göre konumlandırılacak
+
+Bu implementasyon için aşağıdaki adımları izlememiz gerekecek:
+1. Multi Camera View ekranını oluşturma
+2. Layout modelini oluşturma (JSON'dan parse etme)
+3. Sayfa değiştirme ve yönetme sistemi ekleme
+4. Kamera kodları atama mekanizması oluşturma
+5. Responsive kamera yerleşim düzeni implementasyonu
+
+Onayınıza sunuyorum. Devam edersek bu özellikleri uygulamaya ekleyebiliriz. Eğer istediğiniz özellikler bunlarsa ve başka detay eklemek isterseniz, lütfen belirtin.
