@@ -126,7 +126,7 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
   
   Widget _buildLayoutSelector(List<CameraLayoutConfig> layouts, int selectedCode) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppTheme.darkSurface,
         border: Border(bottom: BorderSide(color: Colors.grey.shade800)),
@@ -134,17 +134,41 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Select Layout:',
-            style: TextStyle(fontWeight: FontWeight.bold),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.grid_view, size: 16),
+                  SizedBox(width: 8),
+                  Text(
+                    'Select Layout:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              // Add count indicator to show how many layouts are available
+              Text(
+                '${layouts.length} layouts available',
+                style: TextStyle(
+                  fontSize: 12, 
+                  color: Colors.grey.shade400,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: layouts.map((layout) {
+          SizedBox(
+            height: 110, // Slightly increased fixed height to prevent overflow
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: layouts.length,
+              itemBuilder: (context, index) {
+                final layout = layouts[index];
+                final isSelected = selectedCode == layout.layoutCode;
+                
                 return Padding(
-                  padding: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.only(right: 10),
                   child: InkWell(
                     onTap: () {
                       setState(() {
@@ -153,33 +177,63 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
                     },
                     borderRadius: BorderRadius.circular(8),
                     child: Container(
-                      width: 100,
-                      height: 70,
+                      width: 90, // Slightly reduced width for better fit
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: _selectedLayoutCode == layout.layoutCode
+                          color: isSelected
                               ? AppTheme.primaryColor
                               : Colors.grey.shade600,
-                          width: _selectedLayoutCode == layout.layoutCode ? 2 : 1,
+                          width: isSelected ? 2 : 1,
                         ),
                         borderRadius: BorderRadius.circular(8),
+                        // Add a light background highlighting for selected layout
+                        color: isSelected 
+                            ? AppTheme.primaryColor.withOpacity(0.1)
+                            : null,
+                        // Add subtle shadow for selected layout
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: AppTheme.primaryColor.withOpacity(0.3),
+                                  spreadRadius: 1,
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 1),
+                                )
+                              ]
+                            : null,
                       ),
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Layout icon or preview
-                          _buildLayoutPreviewGrid(layout),
-                          const SizedBox(height: 4),
+                          // Layout preview
+                          Expanded(
+                            child: _buildLayoutPreviewGrid(layout),
+                          ),
+                          const SizedBox(height: 6),
+                          // Layout name
                           Text(
                             'Layout ${layout.layoutCode}',
                             style: TextStyle(
-                              fontWeight: _selectedLayoutCode == layout.layoutCode
+                              fontSize: 11,
+                              fontWeight: isSelected
                                   ? FontWeight.bold
                                   : FontWeight.normal,
-                              color: _selectedLayoutCode == layout.layoutCode
+                              color: isSelected
                                   ? AppTheme.primaryColor
                                   : Colors.grey,
+                            ),
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          // Camera count
+                          Text(
+                            '${layout.maxCameraNumber} cameras',
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: Colors.grey.shade500,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -188,7 +242,7 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
                     ),
                   ),
                 );
-              }).toList(),
+              },
             ),
           ),
         ],
@@ -206,25 +260,48 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Select Page:',
-            style: TextStyle(fontWeight: FontWeight.bold),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.view_carousel, size: 16),
+                  SizedBox(width: 8),
+                  Text(
+                    'Select Page:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              // Add count indicator to show how many pages are available
+              Text(
+                '$pageCount pages available',
+                style: TextStyle(
+                  fontSize: 12, 
+                  color: Colors.grey.shade400,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: List.generate(
-                pageCount,
-                (index) => Padding(
-                  padding: const EdgeInsets.only(right: 8),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 60, // Fixed height for consistent layout
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: pageCount,
+              itemBuilder: (context, index) {
+                final provider = Provider.of<MultiCameraViewProvider>(context, listen: false);
+                final isSelected = selectedIndex == index;
+                int? layoutCode = index < provider.pageLayouts.length ? provider.pageLayouts[index] : null;
+                
+                return Padding(
+                  padding: const EdgeInsets.only(right: 12),
                   child: InkWell(
                     onTap: () {
                       setState(() {
                         _selectedPageIndex = index;
                         
                         // Update the selected layout when changing pages
-                        final provider = Provider.of<MultiCameraViewProvider>(context, listen: false);
                         if (index < provider.pageLayouts.length) {
                           _selectedLayoutCode = provider.pageLayouts[index];
                         }
@@ -232,29 +309,80 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
                     },
                     borderRadius: BorderRadius.circular(24),
                     child: Container(
-                      width: 48,
-                      height: 48,
+                      width: 52,
+                      height: 52,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: _selectedPageIndex == index
+                        color: isSelected
                             ? AppTheme.primaryColor
                             : Colors.grey.shade800,
+                        // Add subtle shadow for selected page
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: AppTheme.primaryColor.withOpacity(0.3),
+                                  spreadRadius: 1,
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 1),
+                                )
+                              ]
+                            : null,
                       ),
-                      child: Center(
-                        child: Text(
-                          '${index + 1}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: _selectedPageIndex == index
-                                ? Colors.white
-                                : Colors.grey,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Page number
+                          Text(
+                            '${index + 1}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: isSelected
+                                  ? Colors.white
+                                  : Colors.grey,
+                            ),
                           ),
-                        ),
+                          
+                          // Layout code indicator (small badge)
+                          if (layoutCode != null)
+                            Positioned(
+                              right: 4,
+                              bottom: 4,
+                              child: Container(
+                                width: 18,
+                                height: 18,
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? Colors.white 
+                                      : AppTheme.primaryColor,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? AppTheme.primaryColor
+                                        : Colors.white,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '$layoutCode',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: isSelected
+                                          ? AppTheme.primaryColor
+                                          : Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -290,11 +418,18 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
             
             return Stack(
               children: [
-                // Background grid (for visual reference)
-                GridPaper(
-                  color: Colors.white.withOpacity(0.05),
-                  divisions: 2,
-                  subdivisions: 1,
+                // Background gradient for better appearance
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      colors: [
+                        Colors.black.withOpacity(0.3),
+                        AppTheme.darkBackground.withOpacity(0.9),
+                      ],
+                      radius: 1.0,
+                      center: Alignment.center,
+                    ),
+                  ),
                 ),
                 
                 // Positions
@@ -513,18 +648,31 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
   }
   
   Widget _buildLayoutPreviewGrid(CameraLayoutConfig layout) {
+    final isSelected = _selectedLayoutCode == layout.layoutCode;
+    
     return Container(
-      height: 60,
       width: 60,
+      height: 55,
       decoration: BoxDecoration(
         color: AppTheme.darkBackground,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: _selectedLayoutCode == layout.layoutCode
+          color: isSelected
               ? AppTheme.primaryColor
               : Colors.grey.shade700,
-          width: _selectedLayoutCode == layout.layoutCode ? 2 : 1,
+          width: isSelected ? 2 : 1,
         ),
+        // Add subtle shadow for depth
+        boxShadow: isSelected 
+            ? [
+                BoxShadow(
+                  color: AppTheme.primaryColor.withOpacity(0.3),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
+                )
+              ] 
+            : null,
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -548,10 +696,27 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: _selectedLayoutCode == layout.layoutCode
+                        color: isSelected
                             ? AppTheme.primaryColor
                             : Colors.grey.shade500,
-                        width: 0.5,
+                        width: 0.7, // Slightly thicker for better visibility
+                      ),
+                      // Add subtle fill color for better visualization
+                      color: isSelected
+                          ? AppTheme.primaryColor.withOpacity(0.1)
+                          : Colors.black.withOpacity(0.2),
+                    ),
+                    // Add camera position number
+                    child: Center(
+                      child: Text(
+                        '${location.cameraCode}',
+                        style: TextStyle(
+                          fontSize: 8,
+                          color: isSelected
+                              ? AppTheme.primaryColor
+                              : Colors.grey.shade400,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
