@@ -134,9 +134,9 @@ class _CameraSelectorPanelState extends State<CameraSelectorPanel> {
         // Header with filtering options
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: AppTheme.darkBackground,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
           ),
           child: Column(
             children: [

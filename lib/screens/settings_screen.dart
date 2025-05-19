@@ -716,31 +716,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           },
         ),
         const Divider(),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ElevatedButton.icon(
-                icon: const Icon(Icons.autorenew),
-                label: const Text('Quick Setup'),
-                onPressed: () => _showQuickSetupDialog(context, multiCameraProvider),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryBlue,
-                ),
-              ),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.restore),
-                label: const Text('Reset Layouts'),
-                onPressed: () => _showResetLayoutsDialog(context, multiCameraProvider),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.error,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const Divider(),
         ListTile(
           title: const Text('Default Layout'),
           subtitle: Text('Current layout: ${multiCameraProvider.pageLayouts.isNotEmpty ? multiCameraProvider.pageLayouts[multiCameraProvider.activePageIndex] : 5}'),
@@ -829,20 +804,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         );
                       },
                     ),
-                  ActionChip(
-                    avatar: const Icon(Icons.autorenew, size: 18),
-                    label: const Text('Quick Setup'),
-                    onPressed: () {
-                      _showQuickSetupDialog(context, multiCameraProvider);
-                    },
-                  ),
-                  ActionChip(
-                    avatar: const Icon(Icons.restore, size: 18),
-                    label: const Text('Reset Layouts'),
-                    onPressed: () {
-                      _showResetLayoutsDialog(context, multiCameraProvider);
-                    },
-                  ),
                 ],
               ),
             ),

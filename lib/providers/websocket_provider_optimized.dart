@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:movita_ecs/models/system_info.dart';
-import '../utils/file_logger_optimized.dart';
 import 'camera_devices_provider_optimized.dart';
 
 class WebSocketProviderOptimized with ChangeNotifier {
