@@ -4,6 +4,7 @@ import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
 import '../providers/websocket_provider.dart';
+import '../providers/multi_camera_view_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -49,6 +50,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       _buildGeneralSettingsSection(context),
                       const SizedBox(height: 16),
+                      _buildCameraLayoutSettingsSection(context),
+                      const SizedBox(height: 16),
                       _buildStorageSection(context),
                     ],
                   ),
@@ -76,6 +79,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   List<Widget> _buildSettingSections(BuildContext context) {
     return [
       _buildGeneralSettingsSection(context),
+      const SizedBox(height: 16),
+      _buildCameraLayoutSettingsSection(context),
       const SizedBox(height: 16),
       _buildNotificationSection(context),
       const SizedBox(height: 16),
@@ -691,6 +696,692 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildCameraLayoutSettingsSection(BuildContext context) {
+    final multiCameraProvider = Provider.of<MultiCameraViewProvider>(context);
+    
+    return _buildSettingCard(
+      title: 'Camera Layout Settings',
+      icon: Icons.grid_view,
+      children: [
+        SwitchListTile(
+          title: const Text('Auto-Assignment Mode'),
+          subtitle: const Text('Automatically assign cameras in sequence'),
+          value: multiCameraProvider.isAutoAssignmentMode,
+          activeColor: AppTheme.primaryBlue,
+          onChanged: (value) {
+            multiCameraProvider.toggleAssignmentMode();
+          },
+        ),
+        const Divider(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton.icon(
+                icon: const Icon(Icons.autorenew),
+                label: const Text('Quick Setup'),
+                onPressed: () => _showQuickSetupDialog(context, multiCameraProvider),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryBlue,
+                ),
+              ),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.restore),
+                label: const Text('Reset Layouts'),
+                onPressed: () => _showResetLayoutsDialog(context, multiCameraProvider),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.error,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text('Default Layout'),
+          subtitle: Text('Current layout: ${multiCameraProvider.pageLayouts.isNotEmpty ? multiCameraProvider.pageLayouts[multiCameraProvider.activePageIndex] : 5}'),
+          trailing: ElevatedButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/camera-layout-assignment');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryBlue,
+            ),
+            child: const Text('Edit'),
+          ),
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text('Manage Layout Presets'),
+          subtitle: Text('${multiCameraProvider.presetNames.length} saved presets'),
+          trailing: IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              _showPresetManagerFromSettings(context, multiCameraProvider);
+            },
+          ),
+        ),
+        const Divider(),
+        // Quick action buttons for layout management
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton.icon(
+                icon: const Icon(Icons.autorenew, size: 16),
+                label: const Text('Quick Setup'),
+                onPressed: () => _showQuickSetupDialog(context, multiCameraProvider),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryBlue,
+                ),
+              ),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.restore, size: 16),
+                label: const Text('Reset Layouts'),
+                onPressed: () => _showResetLayoutsDialog(context, multiCameraProvider),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.error,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const Divider(),
+        ExpansionTile(
+          title: const Text('Layout Customization'),
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  ActionChip(
+                    avatar: const Icon(Icons.edit, size: 18),
+                    label: const Text('Edit Layouts'),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/camera-layout-assignment');
+                    },
+                  ),
+                  ActionChip(
+                    avatar: const Icon(Icons.add_circle_outline, size: 18),
+                    label: const Text('Add Page'),
+                    onPressed: () {
+                      multiCameraProvider.addPage();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('New page added'))
+                      );
+                    },
+                  ),
+                  if (multiCameraProvider.pageLayouts.length > 1)
+                    ActionChip(
+                      avatar: const Icon(Icons.remove_circle_outline, size: 18),
+                      label: const Text('Remove Page'),
+                      onPressed: () {
+                        multiCameraProvider.removePage();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Page removed'))
+                        );
+                      },
+                    ),
+                  ActionChip(
+                    avatar: const Icon(Icons.autorenew, size: 18),
+                    label: const Text('Quick Setup'),
+                    onPressed: () {
+                      _showQuickSetupDialog(context, multiCameraProvider);
+                    },
+                  ),
+                  ActionChip(
+                    avatar: const Icon(Icons.restore, size: 18),
+                    label: const Text('Reset Layouts'),
+                    onPressed: () {
+                      _showResetLayoutsDialog(context, multiCameraProvider);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _showDefaultLayoutDialog(BuildContext context, MultiCameraViewProvider provider) {
+    // Mevcut düzeni gösteren bir dialog
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Default Layout'),
+          backgroundColor: AppTheme.darkSurface,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('This is the current default layout for cameras.'),
+              const SizedBox(height: 16),
+              // Mevcut düzenin önizlemesi
+              Container(
+                height: 200,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: AppTheme.darkBackground,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Text(
+                    'Layout ${provider.pageLayouts[provider.activePageIndex]}',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'You can change the default layout in the Camera Layout Settings section.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showPresetManagerFromSettings(BuildContext context, MultiCameraViewProvider provider) {
+    final TextEditingController presetNameController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Camera Assignment Presets'),
+              backgroundColor: AppTheme.darkSurface,
+              content: SizedBox(
+                width: double.maxFinite,
+                height: 300,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Save new preset section
+                    if (provider.presetNames.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Text(
+                            'No saved presets yet',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    if (provider.presetNames.isNotEmpty) ...[
+                      const Text(
+                        'Saved Presets:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      
+                      Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: provider.presetNames.length,
+                          itemBuilder: (context, index) {
+                            final presetName = provider.presetNames[index];
+                            return ListTile(
+                              title: Text(presetName),
+                              leading: const Icon(Icons.photo_library),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.play_arrow),
+                                    onPressed: () {
+                                      provider.loadPreset(presetName);
+                                      Navigator.pop(context);
+                                      
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Preset "$presetName" loaded')),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          backgroundColor: AppTheme.darkSurface,
+                                          title: const Text('Delete Preset'),
+                                          content: Text('Are you sure you want to delete "$presetName"?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(context),
+                                              child: const Text('Cancel'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                provider.deletePreset(presetName);
+                                                Navigator.pop(context);
+                                                setState(() {}); // Refresh the list
+                                                
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(content: Text('Preset "$presetName" deleted')),
+                                                );
+                                              },
+                                              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                              onTap: () {
+                                provider.loadPreset(presetName);
+                                Navigator.pop(context);
+                                
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Preset "$presetName" loaded')),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                    
+                    const Divider(),
+                    const SizedBox(height: 8),
+                    
+                    const Text(
+                      'Save Current Layout:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: presetNameController,
+                            decoration: const InputDecoration(
+                              hintText: 'Enter preset name',
+                              border: OutlineInputBorder(),
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            if (presetNameController.text.isNotEmpty) {
+                              provider.savePresetWithName(presetNameController.text);
+                              presetNameController.clear();
+                              setState(() {}); // Refresh the list
+                              
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Preset saved successfully')),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Please enter a preset name')),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.primaryBlue,
+                          ),
+                          child: const Text('Save'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('Close'),
+                ),
+              ],
+            );
+          }
+        );
+      },
+    );
+  }
+
+  void _showEditPresetDialog(BuildContext context, MultiCameraViewProvider provider, String presetName) {
+    final TextEditingController controller = TextEditingController(text: presetName);
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Edit Layout Preset'),
+          backgroundColor: AppTheme.darkSurface,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Update the name of the layout preset:'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  labelText: 'Preset Name',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.edit),
+                ),
+                autofocus: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final newName = controller.text.trim();
+                if (newName.isNotEmpty) {
+                  // Ön ayarı güncelle
+                  provider.updatePresetName(presetName, newName);
+                  Navigator.pop(dialogContext);
+                } else {
+                  // Boş isim uyarısı
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Preset name cannot be empty'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+              ),
+              child: const Text('Update Preset'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeletePresetDialog(BuildContext context, MultiCameraViewProvider provider, String presetName) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete Layout Preset'),
+          backgroundColor: AppTheme.darkSurface,
+          content: const Text('Are you sure you want to delete this layout preset? This action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Ön ayarı sil
+                provider.deletePreset(presetName);
+                Navigator.pop(dialogContext);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.error,
+              ),
+              child: const Text('Delete Preset'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSavePresetDialog(BuildContext context, MultiCameraViewProvider provider) {
+    final TextEditingController controller = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Save New Layout Preset'),
+          backgroundColor: AppTheme.darkSurface,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Enter a name for the new layout preset:'),
+              const SizedBox(height: 16),
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  labelText: 'Preset Name',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.save),
+                ),
+                autofocus: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final presetName = controller.text.trim();
+                if (presetName.isNotEmpty) {
+                  // Yeni ön ayar kaydet
+                  provider.savePreset(presetName);
+                  Navigator.pop(dialogContext);
+                } else {
+                  // Boş isim uyarısı
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Preset name cannot be empty'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+              ),
+              child: const Text('Save Preset'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showQuickSetupDialog(BuildContext context, MultiCameraViewProvider provider) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Quick Setup'),
+          backgroundColor: AppTheme.darkSurface,
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('This will automatically set up the camera layout with optimal settings.'),
+              SizedBox(height: 8),
+              Text(
+                'The system will:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text('• Reset to the default layout (2x2 grid)'),
+              Text('• Auto-assign cameras if automatic mode is enabled'),
+              Text('• Clear any custom layouts'),
+              SizedBox(height: 8),
+              Text(
+                'This operation cannot be undone.',
+                style: TextStyle(color: Colors.amber),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final success = await provider.sendCommand('DO SCRIPT quick_setup');
+                
+                if (!context.mounted) return;
+                Navigator.pop(dialogContext);
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                        ? 'Camera layout configured successfully'
+                        : 'Failed to configure camera layout',
+                    ),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+              ),
+              child: const Text('Apply Quick Setup'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showResetLayoutsDialog(BuildContext context, MultiCameraViewProvider provider) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Reset Layouts'),
+          backgroundColor: AppTheme.darkSurface,
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Are you sure you want to reset all camera layouts to default?'),
+              SizedBox(height: 8),
+              Text(
+                'This will:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text('• Clear all custom layouts'),
+              Text('• Reset to a single page with 2x2 grid'),
+              Text('• Clear all camera assignments'),
+              SizedBox(height: 8),
+              Text(
+                'This operation cannot be undone.',
+                style: TextStyle(color: Colors.red),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final success = await provider.sendCommand('DO SCRIPT reset_layouts');
+                
+                if (!context.mounted) return;
+                Navigator.pop(dialogContext);
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                        ? 'Camera layouts reset successfully'
+                        : 'Failed to reset camera layouts',
+                    ),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.error,
+              ),
+              child: const Text('Reset Layouts'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Add quick actions to the UI
+  Widget _buildQuickActionButtons(BuildContext context, MultiCameraViewProvider provider) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        ElevatedButton.icon(
+          icon: const Icon(Icons.autorenew),
+          label: const Text('Quick Setup'),
+          onPressed: () => _showQuickSetupDialog(context, provider),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.primaryBlue,
+          ),
+        ),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.restore),
+          label: const Text('Reset Layouts'),
+          onPressed: () => _showResetLayoutsDialog(context, provider),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.error,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -344,8 +344,14 @@ class MultiCameraViewProvider with ChangeNotifier {
       });
       
       _savedPresets[presetName] = presetData;
+      _savePresetsToPreferences(); // Save changes to persistent storage
       notifyListeners();
     }
+  }
+
+  // Save current camera assignments under an existing preset name
+  void savePreset(String presetName) {
+    savePresetWithName(presetName);
   }
 
   // Load a saved preset by name
@@ -371,7 +377,19 @@ class MultiCameraViewProvider with ChangeNotifier {
   // Delete a saved preset
   void deletePreset(String presetName) {
     _savedPresets.remove(presetName);
+    _savePresetsToPreferences(); // Save changes to persistent storage
     notifyListeners();
+  }
+
+  // Update the name of a saved preset
+  void updatePresetName(String oldName, String newName) {
+    if (oldName != newName && _savedPresets.containsKey(oldName) && !_savedPresets.containsKey(newName)) {
+      final presetData = _savedPresets[oldName];
+      _savedPresets.remove(oldName);
+      _savedPresets[newName] = presetData!;
+      _savePresetsToPreferences(); // Save changes to persistent storage
+      notifyListeners();
+    }
   }
 
   // Export presets to JSON string
@@ -414,6 +432,44 @@ class MultiCameraViewProvider with ChangeNotifier {
     } catch (e) {
       debugPrint('Error importing presets: $e');
       throw Exception('Invalid preset format');
+    }
+  }
+  
+  // Send a command to the system
+  // This method would typically communicate with a backend service
+  // or another provider like WebSocketProvider to send the actual command
+  Future<bool> sendCommand(String command) async {
+    try {
+      // For now, we're simulating successful command execution
+      debugPrint('Sending command: $command');
+      
+      // Handle special commands related to layouts
+      if (command.contains('quick_setup')) {
+        // Simulate quick setup by resetting to default layout
+        _pageLayouts = [5]; // Reset to default 2x2 grid
+        _activePageIndex = 0;
+        _cameraAssignments = {0: {}};
+        
+        if (_isAutoAssignmentMode) {
+          _autoAssignCameras();
+        }
+        
+      } else if (command.contains('reset_layouts')) {
+        // Reset all layouts to default
+        _pageLayouts = [5]; // Reset to default 2x2 grid
+        _activePageIndex = 0;
+        _cameraAssignments = {0: {}};
+        
+        if (_isAutoAssignmentMode) {
+          _autoAssignCameras();
+        }
+      }
+      
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint('Error sending command: $e');
+      return false;
     }
   }
 }
