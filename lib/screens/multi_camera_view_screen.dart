@@ -55,6 +55,14 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
             tooltip: 'Change Layout',
             onPressed: () => _showLayoutSelector(context),
           ),
+          // Kamera eşleştirme ayar sayfasına gitme butonu
+          IconButton(
+            icon: const Icon(Icons.settings_input_component),
+            tooltip: 'Advanced Camera Assignment',
+            onPressed: () {
+              Navigator.pushNamed(context, '/camera-layout-assignment');
+            },
+          ),
           // Kamera atama modu değiştirme butonu
           Consumer<MultiCameraViewProvider>(
             builder: (context, provider, child) {
@@ -200,6 +208,25 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
                           : null,
                     ),
                   ],
+                ),
+              ),
+              
+              // Gelişmiş Kamera Atama Butonu
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                color: AppTheme.darkBackground,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.settings_input_component),
+                  label: const Text('Advanced Camera Assignment'),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/camera-layout-assignment');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: AppTheme.primaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
                 ),
               ),
               

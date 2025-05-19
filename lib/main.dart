@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart'; // Import for MediaKit
 
 import 'utils/keyboard_fix.dart'; // Import keyboard fix utilities
-import 'utils/keyboard_fix.dart'; // Import keyboard fix utilities
 import 'screens/cameras_screen.dart';
 import 'screens/camera_devices_screen.dart';
 import 'screens/camera_groups_screen.dart';  // New camera groups screen
@@ -20,6 +19,7 @@ import 'screens/websocket_log_screen.dart';
 import 'screens/multi_live_view_screen.dart';  // New multi-camera view screen
 import 'screens/multi_recordings_screen.dart';  // New multi-recordings screen
 import 'screens/multi_camera_view_screen.dart'; // Yeni multi camera view screen
+import 'screens/camera_layout_assignment_screen.dart'; // Yeni kamera layout atama ekranı
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
 import 'utils/page_transitions.dart';
@@ -209,6 +209,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           '/multi-camera-view': (context) => const AppShell(
             currentRoute: '/multi-camera-view',
             child: MultiCameraViewScreen(),
+          ),
+          '/camera-layout-assignment': (context) => const AppShell(
+            currentRoute: '/camera-layout-assignment',
+            child: CameraLayoutAssignmentScreen(),
           ),
           '/live-view': (context) => const AppShell(
               currentRoute: '/live-view',
