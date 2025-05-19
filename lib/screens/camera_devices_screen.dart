@@ -226,7 +226,7 @@ class DeviceCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     'Powered: ${device.online ? "On" : "Off"}',
-                    style: TextStyle(fontSize: 14, color: AppTheme.darkTextSecondary),
+                    style: const TextStyle(fontSize: 14, color: AppTheme.darkTextSecondary),
                   ),
                 ],
               ),
@@ -241,7 +241,7 @@ class DeviceCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     'Connection: ${device.connected ? "Active" : "Inactive"}',
-                    style: TextStyle(fontSize: 14, color: AppTheme.darkTextSecondary),
+                    style: const TextStyle(fontSize: 14, color: AppTheme.darkTextSecondary),
                   ),
                 ],
               ),
