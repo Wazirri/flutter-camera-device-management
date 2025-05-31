@@ -601,6 +601,35 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     }
   }
   
+  // WebSocket'ten gelen CAM_GROUP_ADD komutunu işle
+  void addGroupFromWebSocket(String groupName) {
+    try {
+      if (groupName.isEmpty) {
+        debugPrint("CDP_OPT: Ignoring empty group name from WebSocket.");
+        return;
+      }
+      
+      // Grup zaten varsa, uyarı ver ama hata verme
+      if (_cameraGroups.containsKey(groupName)) {
+        debugPrint("CDP_OPT: Group '$groupName' already exists, skipping creation.");
+        return;
+      }
+      
+      // Yeni grup oluştur
+      _cameraGroups[groupName] = CameraGroup(name: groupName);
+      debugPrint("CDP_OPT: Created new group from WebSocket CAM_GROUP_ADD: '$groupName'");
+      
+      // Cache'i temizle
+      _cachedGroupsList = null;
+      
+      // UI'ı güncelle
+      _batchNotifyListeners();
+      
+    } catch (e) {
+      debugPrint("CDP_OPT: Error in addGroupFromWebSocket: $e");
+    }
+  }
+
   // Batch notifications to reduce UI rebuilds
   void _batchNotifyListeners() {
     _needsNotification = true;

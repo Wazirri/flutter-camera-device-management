@@ -325,7 +325,8 @@ class WebSocketProviderOptimized with ChangeNotifier {
           final jsonData = jsonDecode(message);
           _processJsonMessage(jsonData);
         } catch (e) {
-          // Not a JSON message, probably text-based protocol
+          // Not a JSON message, check if it's a string command
+          _processStringMessage(message);
         }
       }
     } catch (e) {
@@ -392,6 +393,50 @@ class WebSocketProviderOptimized with ChangeNotifier {
     } catch (e) {
       debugPrint('Error processing JSON message: $e');
       _logMessage('Error processing JSON message: $e', isImportant: true);
+    }
+  }
+
+  // String mesajlarını işle
+  void _processStringMessage(String message) {
+    try {
+      final parts = message.trim().split(' ');
+      if (parts.isEmpty) return;
+      
+      final command = parts[0];
+      
+      switch (command) {
+        case 'CAM_GROUP_ADD':
+          if (parts.length >= 2) {
+            final groupName = parts.sublist(1).join(' '); // Join all parts after command as group name
+            _handleCamGroupAdd(groupName);
+          }
+          break;
+        default:
+          _logMessage('Received unknown string command: $command');
+          break;
+      }
+    } catch (e) {
+      _logMessage('Error processing string message: $e', isImportant: true);
+    }
+  }
+  
+  // CAM_GROUP_ADD komutunu işle
+  void _handleCamGroupAdd(String groupName) {
+    try {
+      if (groupName.isEmpty) {
+        debugPrint('CAM_GROUP_ADD: Empty group name received');
+        return;
+      }
+      
+      // CameraDevicesProvider'a grup ekleme mesajı gönder
+      if (_cameraDevicesProvider != null) {
+        _cameraDevicesProvider!.addGroupFromWebSocket(groupName);
+        _logMessage('CAM_GROUP_ADD: Added group "$groupName"', isImportant: true);
+      }
+      
+      _batchNotifyListeners();
+    } catch (e) {
+      _logMessage('Error handling CAM_GROUP_ADD: $e', isImportant: true);
     }
   }
 

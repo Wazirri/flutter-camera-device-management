@@ -328,7 +328,8 @@ class WebSocketProvider with ChangeNotifier {
           // to the camera devices provider if the command is 'changed'.
           _processJsonMessage(jsonData, rawMessage); 
         } catch (e) {
-          debugPrint('Not a JSON message: $rawMessage');
+          // Not a JSON message, check if it's a string command
+          _processStringMessage(rawMessage);
         }
       }
     } catch (e) {
@@ -395,6 +396,53 @@ class WebSocketProvider with ChangeNotifier {
     } catch (e) {
       debugPrint('Error processing JSON message: $e');
       _logMessage('Error processing JSON message: $e');
+    }
+  }
+
+  // String mesajlarını işle
+  void _processStringMessage(String message) {
+    try {
+      final parts = message.trim().split(' ');
+      if (parts.isEmpty) return;
+      
+      final command = parts[0];
+      
+      switch (command) {
+        case 'CAM_GROUP_ADD':
+          if (parts.length >= 2) {
+            final groupName = parts.sublist(1).join(' '); // Join all parts after command as group name
+            _handleCamGroupAdd(groupName);
+          }
+          break;
+        default:
+          debugPrint('Unknown string command: $command');
+          _logMessage('Received unknown string command: $command');
+          break;
+      }
+    } catch (e) {
+      debugPrint('Error processing string message: $e');
+      _logMessage('Error processing string message: $e');
+    }
+  }
+  
+  // CAM_GROUP_ADD komutunu işle
+  void _handleCamGroupAdd(String groupName) {
+    try {
+      if (groupName.isEmpty) {
+        debugPrint('CAM_GROUP_ADD: Empty group name received');
+        return;
+      }
+      
+      // CameraDevicesProvider'a grup ekleme mesajı gönder
+      if (_cameraDevicesProvider != null) {
+        _cameraDevicesProvider!.addGroupFromWebSocket(groupName);
+        _logMessage('CAM_GROUP_ADD: Added group "$groupName"');
+      }
+      
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error handling CAM_GROUP_ADD: $e');
+      _logMessage('Error handling CAM_GROUP_ADD: $e');
     }
   }
 

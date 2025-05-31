@@ -589,6 +589,33 @@ class CameraDevicesProvider with ChangeNotifier {
     }
   }
   
+  // WebSocket'ten gelen CAM_GROUP_ADD komutunu işle
+  void addGroupFromWebSocket(String groupName) {
+    try {
+      if (groupName.isEmpty) {
+        debugPrint("CDP: Ignoring empty group name from WebSocket.");
+        return;
+      }
+      
+      // Grup zaten varsa, uyarı ver ama hata verme
+      if (_cameraGroups.containsKey(groupName)) {
+        debugPrint("CDP: Group '$groupName' already exists, skipping creation.");
+        return;
+      }
+      
+      // Yeni grup oluştur
+      _cameraGroups[groupName] = CameraGroup(name: groupName);
+      debugPrint("CDP: Created new group from WebSocket CAM_GROUP_ADD: '$groupName'");
+      
+      // UI'ı güncelle
+      notifyListeners();
+      
+    } catch (e, s) {
+      debugPrint("CDP: Error in addGroupFromWebSocket: $e");
+      debugPrint("CDP: Stacktrace: $s");
+    }
+  }
+
   // Kamera oluşturma (SADECE BELLİ BİR İNDEKS İÇİN)
   Future<void> _createCamera(CameraDevice device, int cameraIndex, String initialPropertyName, dynamic initialValue) async {
     // Mevcut kamera sayısı ile hedef indeks arasında boşluk var mı kontrol et
