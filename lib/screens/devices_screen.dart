@@ -954,7 +954,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
               Text('CPU Temp: ${device.cpuTemp}°C', style: textTheme.bodySmall),
               Text('IPv4: ${device.ipv4}', style: textTheme.bodySmall),
               if (device.ipv6 != null) Text('IPv6: ${device.ipv6}', style: textTheme.bodySmall),
-              Text('Last Seen: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.parse(device.lastSeenAt!))}', style: textTheme.bodySmall),
+              Text('Last Seen: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.parse(device.lastSeenAt))}', style: textTheme.bodySmall),
               if (device.isMaster != null) Text('Master: ${device.isMaster! ? "Yes" : "No"}', style: textTheme.bodySmall),
               Text('Cameras: ${device.camCount}', style: textTheme.bodySmall),
               Text('Total RAM: ${device.totalRam} MB', style: textTheme.bodySmall),

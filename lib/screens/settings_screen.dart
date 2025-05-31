@@ -157,7 +157,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: const Text('Enable Notifications'),
           subtitle: const Text('Receive alerts for important events'),
           value: _notificationsEnabled,
-          activeColor: AppTheme.primaryBlue,
+          activeThumbColor: AppTheme.primaryBlue,
           onChanged: (value) {
             setState(() {
               _notificationsEnabled = value;
@@ -169,7 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: const Text('Email Alerts'),
           subtitle: const Text('Receive alerts via email'),
           value: _emailAlertsEnabled,
-          activeColor: AppTheme.primaryBlue,
+          activeThumbColor: AppTheme.primaryBlue,
           onChanged: (value) {
             setState(() {
               _emailAlertsEnabled = value;
@@ -520,7 +520,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
   
-  // DO SCRIPT add_camera_group "grup1" komutu için dialog
+  // CAM_GROUP_ADD group_name komutu için dialog
   void _showAddCameraGroupDialog(BuildContext context, WebSocketProvider provider) {
     _groupNameController.clear(); // Her seferinde text field'i temizle
     
@@ -546,7 +546,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'This will execute: DO SCRIPT add_camera_group "[group_name]"',
+                'This will execute: CAM_GROUP_ADD [group_name]',
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],
@@ -566,7 +566,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 final groupName = _groupNameController.text.trim();
                 if (groupName.isNotEmpty) {
                   // WebSocket üzerinden komutu gönder
-                  final command = 'DO SCRIPT add_camera_group "$groupName"';
+                  final command = 'CAM_GROUP_ADD $groupName';
                   final success = await provider.sendCommand(command);
                   
                   if (!context.mounted) return;
@@ -710,7 +710,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: const Text('Auto-Assignment Mode'),
           subtitle: const Text('Automatically assign cameras in sequence'),
           value: multiCameraProvider.isAutoAssignmentMode,
-          activeColor: AppTheme.primaryBlue,
+          activeThumbColor: AppTheme.primaryBlue,
           onChanged: (value) {
             multiCameraProvider.toggleAssignmentMode();
           },

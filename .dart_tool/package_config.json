@@ -3,7 +3,7 @@
   "packages": [
     {
       "name": "archive",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/archive-4.0.5",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/archive-4.0.7",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -69,9 +69,9 @@
     },
     {
       "name": "ffi",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/ffi-2.1.3",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/ffi-2.1.4",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "3.7"
     },
     {
       "name": "file",
@@ -99,7 +99,7 @@
     },
     {
       "name": "flutter_svg",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/flutter_svg-2.0.17",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/flutter_svg-2.1.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -117,15 +117,15 @@
     },
     {
       "name": "http",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/http-1.3.0",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/http-1.4.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
       "name": "http_parser",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/http_parser-4.0.2",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/http_parser-4.1.2",
       "packageUri": "lib/",
-      "languageVersion": "2.12"
+      "languageVersion": "3.4"
     },
     {
       "name": "image",
@@ -141,19 +141,19 @@
     },
     {
       "name": "leak_tracker",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/leak_tracker-10.0.9",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/leak_tracker-11.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
     {
       "name": "leak_tracker_flutter_testing",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/leak_tracker_flutter_testing-3.0.9",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/leak_tracker_flutter_testing-3.0.10",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
     {
       "name": "leak_tracker_testing",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/leak_tracker_testing-3.0.1",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/leak_tracker_testing-3.0.2",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -255,9 +255,9 @@
     },
     {
       "name": "path_provider_android",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/path_provider_android-2.2.10",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/path_provider_android-2.2.17",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.6"
     },
     {
       "name": "path_provider_foundation",
@@ -285,21 +285,21 @@
     },
     {
       "name": "permission_handler",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/permission_handler-11.3.1",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/permission_handler-11.4.0",
       "packageUri": "lib/",
-      "languageVersion": "2.15"
+      "languageVersion": "3.5"
     },
     {
       "name": "permission_handler_android",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/permission_handler_android-12.0.13",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/permission_handler_android-12.1.0",
       "packageUri": "lib/",
-      "languageVersion": "2.15"
+      "languageVersion": "3.5"
     },
     {
       "name": "permission_handler_apple",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/permission_handler_apple-9.4.6",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/permission_handler_apple-9.4.7",
       "packageUri": "lib/",
-      "languageVersion": "2.15"
+      "languageVersion": "2.18"
     },
     {
       "name": "permission_handler_html",
@@ -309,9 +309,9 @@
     },
     {
       "name": "permission_handler_platform_interface",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/permission_handler_platform_interface-4.2.3",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/permission_handler_platform_interface-4.3.0",
       "packageUri": "lib/",
-      "languageVersion": "2.14"
+      "languageVersion": "3.5"
     },
     {
       "name": "permission_handler_windows",
@@ -321,9 +321,9 @@
     },
     {
       "name": "petitparser",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/petitparser-6.0.2",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/petitparser-6.1.0",
       "packageUri": "lib/",
-      "languageVersion": "3.2"
+      "languageVersion": "3.5"
     },
     {
       "name": "platform",
@@ -339,13 +339,13 @@
     },
     {
       "name": "posix",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/posix-6.0.1",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/posix-6.0.2",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
     {
       "name": "provider",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/provider-6.1.4",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/provider-6.1.5",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -393,15 +393,15 @@
     },
     {
       "name": "shared_preferences",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/shared_preferences-2.3.3",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/shared_preferences-2.5.3",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.5"
     },
     {
       "name": "shared_preferences_android",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/shared_preferences_android-2.3.2",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.10",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.6"
     },
     {
       "name": "shared_preferences_foundation",
@@ -477,9 +477,9 @@
     },
     {
       "name": "synchronized",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/synchronized-3.1.0+1",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/synchronized-3.3.1",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.7"
     },
     {
       "name": "table_calendar",
@@ -501,9 +501,9 @@
     },
     {
       "name": "typed_data",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/typed_data-1.3.2",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/typed_data-1.4.0",
       "packageUri": "lib/",
-      "languageVersion": "2.17"
+      "languageVersion": "3.5"
     },
     {
       "name": "universal_platform",
@@ -561,13 +561,13 @@
     },
     {
       "name": "wakelock_plus",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/wakelock_plus-1.2.11",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/wakelock_plus-1.3.2",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
       "name": "wakelock_plus_platform_interface",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/wakelock_plus_platform_interface-1.2.2",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/wakelock_plus_platform_interface-1.2.3",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -585,9 +585,9 @@
     },
     {
       "name": "win32",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/win32-5.5.4",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/win32-5.13.0",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.7"
     },
     {
       "name": "xdg_directories",
@@ -609,8 +609,8 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.8.0-265.0.dev",
+  "generatorVersion": "3.9.0-97.0.dev",
   "flutterRoot": "file:///Users/smarteq/Flutter/flutter",
-  "flutterVersion": "3.31.0-1.0.pre.418",
+  "flutterVersion": "3.32.0-1.0.pre.465",
   "pubCache": "file:///Users/smarteq/.pub-cache"
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart'; // Added import for DateFormat
+// Added import for DateFormat
 
 import '../models/camera_device.dart';
 import '../providers/camera_devices_provider.dart';
