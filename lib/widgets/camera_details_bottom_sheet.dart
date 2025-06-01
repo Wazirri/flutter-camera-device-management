@@ -106,8 +106,8 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   title: 'Basic Information',
                   details: [
                     DetailItem(name: 'Name', value: camera.name),
-                    DetailItem(name: 'Camera IP', value: camera.ip),
-                    DetailItem(name: 'Raw IP', value: camera.rawIp.toString()),
+                    DetailItem(name: 'IP Address', value: camera.ip),
+                    DetailItem(name: 'MAC Address', value: camera.mac), // Changed from camera.macKey to camera.mac
                     DetailItem(name: 'Username', value: camera.username),
                     DetailItem(name: 'Password', value: camera.password),
                     DetailItem(name: 'Connected', value: camera.connected ? 'Yes' : 'No'),
