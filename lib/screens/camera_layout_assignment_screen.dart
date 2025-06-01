@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
 import '../models/camera_layout_config.dart';
 import '../providers/multi_camera_view_provider.dart';
-import '../providers/camera_devices_provider.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 import '../theme/app_theme.dart';
 import 'camera_selector_panel.dart';
 
@@ -65,7 +65,7 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
           ),
         ],
       ),
-      body: Consumer2<MultiCameraViewProvider, CameraDevicesProvider>(
+      body: Consumer2<MultiCameraViewProvider, CameraDevicesProviderOptimized>(
         builder: (context, layoutProvider, cameraProvider, child) {
           final allCameras = cameraProvider.cameras;
           

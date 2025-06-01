@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/menu_item.dart';
 import '../theme/app_theme.dart';
-import '../providers/websocket_provider.dart';
 
 class DesktopSideMenu extends StatelessWidget {
   final String currentRoute;

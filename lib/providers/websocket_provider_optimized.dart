@@ -185,6 +185,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
 
   // Disconnect from WebSocket server
   Future<void> disconnect() async {
+    debugPrint('[${DateTime.now().toString().split('.').first}] disconnect() called'); // CORRECTED THIS LINE
     _stopHeartbeat();
     _stopReconnectTimer();
 
@@ -242,6 +243,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
 
   /// Logout user: close socket and reset login state
   Future<void> logout() async {
+    debugPrint('[${DateTime.now().toString().split('.').first}] logout() called'); // CORRECTED THIS LINE
     await disconnect();
     _lastUsername = null;
     _lastPassword = null;
@@ -307,13 +309,15 @@ class WebSocketProviderOptimized with ChangeNotifier {
 
   // Handle incoming WebSocket messages
   void _handleMessage(dynamic message) {
+    final now = DateTime.now().toIso8601String();
+    debugPrint('[$now] FSA AAAAAWebSocket raw message: $message');
     try {
       if (message is String) {
         // Skip detailed logging for heartbeat messages
         if (message == 'PONG') {
           return;
         }
-        final now = DateTime.now().toIso8601String();
+        
         debugPrint('[$now] WebSocket raw message: $message');
         // Log the message (truncate if too long)
         final logMsg = message.length > 500 ? '${message.substring(0, 500)}...' : message;
@@ -482,11 +486,10 @@ class WebSocketProviderOptimized with ChangeNotifier {
     debugPrint('WebSocket disconnected');
     debugPrint('[${DateTime.now().toString().split('.').first}] WebSocket disconnected');
     _isConnected = false;
-    _isLoggedIn = false;
     _isWaitingForChangedone = false;
     _batchNotifyListeners();
 
-    // Try to reconnect
+    // Try to reconnect (login state korunur)
     _scheduleReconnect();
   }
 
@@ -500,7 +503,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
     _isWaitingForChangedone = false;
     _batchNotifyListeners();
 
-    // Try to reconnect
+    // Try to reconnect (login state korunur)
     _scheduleReconnect();
   }
 

@@ -242,82 +242,87 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       // Parse data path
       final parts = dataPath.split('.');
       if (parts.length < 2) {
+        debugPrint('CDP_OPT: Path too short, skipping: $dataPath');
         return;
       }
       
-      // Get MAC address
-      final macKey = parts[1];
-      final macAddress = macKey.startsWith('m_') ? macKey.substring(2).replaceAll('_', ':') : macKey;
+      String pathDeviceIdentifier = parts[1];
+      String canonicalMacAddress;
+
+      RegExp macRegex = RegExp(r'([0-9A-Fa-f]{2}[_:]){5}([0-9A-Fa-f]{2})');
+      Match? macMatch = macRegex.firstMatch(pathDeviceIdentifier);
+
+      if (macMatch != null) {
+        canonicalMacAddress = macMatch.group(0)!.replaceAll('_', ':');
+        if (canonicalMacAddress.length != 17) {
+           debugPrint('CDP_OPT: Extracted MAC "$canonicalMacAddress" from "$pathDeviceIdentifier" has invalid length. Skipping message.');
+           return;
+        }
+      } else {
+        debugPrint('CDP_OPT: Could not extract MAC address from path component: "$pathDeviceIdentifier". Skipping message.');
+        return;
+      }
       
-      // Get or create device
-      final device = _getOrCreateDevice(macKey, macAddress);
+      final device = _getOrCreateDevice(canonicalMacAddress, pathDeviceIdentifier);
       
       // Special case for common device properties that might get missed in categorization
+      // These should be handled before the general categorization switch
       if (parts.length >= 3) {
-        // Special case for online property
         if (parts[2] == 'online') {
           final onlineValue = value.toString();
           final bool previousStatus = device.connected;
           final bool newStatus = value is bool ? value : (onlineValue == '1' || onlineValue.toLowerCase() == 'true');
           
-          // If device is coming online from offline, clear existing cameras to prevent duplicates
           if (!previousStatus && newStatus) {
-            debugPrint('Device ${device.macAddress} coming online - clearing existing cameras to prevent duplicates');
-            clearDeviceCameras(macKey);
+            debugPrint('Device ${device.macAddress} coming online - potential camera clear logic was here');
           }
           
           device.connected = newStatus;
-          device.updateStatus(); // Ensure status is recalculated
+          device.updateStatus();
           debugPrint('Direct online handling: Device ${device.macAddress} online status changed from $previousStatus to ${device.connected} (value: $onlineValue)');
           _cachedDevicesList = null;
           _batchNotifyListeners();
-          return;
+          return; // Return after handling
         }
         
-        // Special case for connected property
         if (parts[2] == 'connected') {
           final connectedValue = value.toString();
           final bool previousStatus = device.connected;
           final bool newStatus = value is bool ? value : (connectedValue == '1' || connectedValue.toLowerCase() == 'true');
           
-          // If device is connecting from disconnected, clear existing cameras to prevent duplicates
           if (!previousStatus && newStatus) {
-            debugPrint('Device ${device.macAddress} connecting - clearing existing cameras to prevent duplicates');
-            clearDeviceCameras(macKey);
+            debugPrint('Device ${device.macAddress} connecting - potential camera clear logic was here');
           }
           
           device.connected = newStatus;
-          device.updateStatus(); // Ensure status is recalculated
+          device.updateStatus();
           debugPrint('Direct connected handling: Device ${device.macAddress} connected status changed from $previousStatus to ${device.connected} (value: $connectedValue)');
           _cachedDevicesList = null;
           _batchNotifyListeners();
-          return;
+          return; // Return after handling
         }
         
-        // Special case for firsttime property
         if (parts[2] == 'firsttime') {
           device.uptime = value.toString();
           debugPrint('Direct firsttime handling: Device ${device.macAddress} firsttime set to: ${value.toString()}');
           _cachedDevicesList = null;
           _batchNotifyListeners();
-          return;
+          return; // Return after handling
         }
         
-        // Special case for current_time property
         if (parts[2] == 'current_time') {
           device.lastSeenAt = value.toString();
           debugPrint('Direct current_time handling: Device ${device.macAddress} current_time set to: ${value.toString()}');
           _cachedDevicesList = null;
           _batchNotifyListeners();
-          return;
+          return; // Return after handling
         }
-      }
-      
-      // Categorize and process message
+      } // End of early handling for specific device properties
+
+      // Categorize and process message if not handled above
       if (parts.length >= 3) {
         final messageCategory = _categorizeMessage(parts[2], parts.length > 3 ? parts.sublist(3) : []);
         
-        // Process based on category
         switch (messageCategory) {
           case MessageCategory.camera:
             await _processCameraData(device, parts[2], parts.length > 3 ? parts.sublist(3) : [], value);
@@ -331,48 +336,43 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
           case MessageCategory.configuration:
             await _processConfiguration(device, parts.length > 3 ? parts.sublist(3) : [], value);
             break;
-          case MessageCategory.basicProperty:
+          case MessageCategory.basicProperty: // This will be hit if not one of the special cases above
             await _processBasicDeviceProperty(device, parts[2], value);
-            // Force immediate UI update for critical properties
-            if (parts[2] == 'online' || parts[2] == 'connected') {
-              _batchNotifyListeners();
-            }
+            // Note: The original code had a specific check here:
+            // if (parts[2] == 'online' || parts[2] == 'connected') { _batchNotifyListeners(); }
+            // This is now handled by the early returns above for 'online' and 'connected'.
+            // If other basic properties need immediate notification, that logic would go here.
             break;
           case MessageCategory.cameraGroupAssignment:
             if (parts.length > 3 && parts[2].startsWith('cam')) {
-              final cameraIndex = parts[2].replaceAll('cam', '').replaceAll(RegExp(r'\[|\]'), '');
+              final cameraIndex = parts[2].replaceAll('cam', '').replaceAll(RegExp(r'\\[|\\]'), '');
               await _processCameraGroupAssignment(device, cameraIndex, value.toString());
             }
             break;
           case MessageCategory.cameraGroupDefinition:
             if (parts.length > 3 && parts[2] == 'configuration' && parts[3].startsWith('cameraGroups')) {
-              final groupIndex = parts[3].replaceAll('cameraGroups', '').replaceAll(RegExp(r'\[|\]'), '');
+              final groupIndex = parts[3].replaceAll('cameraGroups', '').replaceAll(RegExp(r'\\[|\\]'), '');
               await _processGroupDefinition(device, groupIndex, value.toString());
             }
             break;
           case MessageCategory.unknown:
             // Legacy format support
             if (parts.length > 3 && parts[2] == 'cam' && parts.length > 4 && parts[4] == 'group') {
-              final cameraIndex = parts[3].replaceAll(RegExp(r'\[|\]'), '');
+              final cameraIndex = parts[3].replaceAll(RegExp(r'\\[|\\]'), '');
               await _processCameraGroupAssignment(device, cameraIndex, value.toString());
             }
-            // Legacy group definition support
             else if (parts.length > 3 && parts[2] == 'configuration' && parts[3].startsWith('cameraGroups')) {
-              final groupIndex = parts[3].replaceAll('cameraGroups', '').replaceAll(RegExp(r'\[|\]'), '');
+              final groupIndex = parts[3].replaceAll('cameraGroups', '').replaceAll(RegExp(r'\\[|\\]'), '');
               await _processGroupDefinition(device, groupIndex, value.toString());
             }
             break;
         }
         
-        // Clear caches when device data changes
         _cachedDevicesList = null;
-        
-        // Batch notifications
         _batchNotifyListeners();
-      }
-    } catch (e) {
-      // Log error but don't crash
-      debugPrint('Error processing WebSocket message: $e');
+      } // End of if (parts.length >= 3) for categorization
+    } catch (e) { // This catch block should correctly follow the try block
+      debugPrint('CDP_OPT: Error processing WebSocket message: $e. Message: $message');
     }
   }
   
@@ -416,11 +416,12 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   }
   
   // Get or create device
-  CameraDevice _getOrCreateDevice(String macKey, String macAddress) {
-    if (!_devices.containsKey(macKey)) {
-      _devices[macKey] = CameraDevice(
-        macAddress: macAddress,
-        macKey: macKey,
+  CameraDevice _getOrCreateDevice(String canonicalDeviceMac, String originalPathMacKey) {
+    // Use canonicalDeviceMac as the key for the _devices map
+    if (!_devices.containsKey(canonicalDeviceMac)) {
+      _devices[canonicalDeviceMac] = CameraDevice(
+        macAddress: canonicalDeviceMac, // Store the canonical MAC
+        macKey: originalPathMacKey,     // Store the original key from path
         ipv4: '',
         lastSeenAt: '',
         connected: false,
@@ -434,76 +435,77 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       );
       _cachedDevicesList = null;
     }
-    return _devices[macKey]!;
+    return _devices[canonicalDeviceMac]!;
   }
   
   // Process camera data
   Future<void> _processCameraData(CameraDevice device, String camIndexPath, List<String> properties, dynamic value) async {
     // Extract camera index
-    String indexStr = camIndexPath.substring(4, camIndexPath.indexOf(']'));
+    String indexStr = camIndexPath.substring(4, camIndexPath.indexOf(']')); // e.g., "0" from "cam[0]"
     int cameraIndex = int.tryParse(indexStr) ?? -1;
     
     if (cameraIndex < 0) {
+      debugPrint('CDP_OPT: Invalid camera index $cameraIndex from $camIndexPath. Skipping.');
       return;
     }
     
     // Skip if no properties
     if (properties.isEmpty) {
+      debugPrint('CDP_OPT: No properties for camera index $cameraIndex in $camIndexPath. Skipping.');
       return;
     }
     
     String propertyName = properties[0];
     
-    debugPrint('Processing camera data: device=${device.macAddress}, index=$cameraIndex, property=$propertyName, value=$value, current_cameras=${device.cameras.length}');
-    
-    // Check if camera exists at this index
-    if (cameraIndex >= device.cameras.length) {
-      // Check if this property is essential enough to create a new camera
-      bool isEssential = _isEssentialCameraProperty(propertyName, value);
+    debugPrint('CDP_OPT: Processing camera data: device=${device.macAddress}, index=$cameraIndex, property=$propertyName, value=$value, current_cameras_count=${device.cameras.length}');
+
+    // Find existing camera or create a new one
+    Camera? cameraToProcess;
+    int existingCameraObjectIndex = device.cameras.indexWhere((c) => c.index == cameraIndex);
+
+    if (existingCameraObjectIndex != -1) {
+      cameraToProcess = device.cameras[existingCameraObjectIndex];
+      debugPrint('CDP_OPT: Found existing camera at object index $existingCameraObjectIndex for logical index $cameraIndex on device ${device.macAddress}.');
+    } else {
+      debugPrint('CDP_OPT: No camera found for logical index $cameraIndex on device ${device.macAddress}. Creating new one.');
+      // _createCamera will add the camera to device.cameras list.
+      await _createCamera(device, cameraIndex); 
       
-      if (!isEssential) {
-        debugPrint('Skipping non-essential property $propertyName for non-existent camera $cameraIndex');
-        return;
-      }
-      
-      // Fill missing camera slots up to the needed index
-      while (device.cameras.length <= cameraIndex) {
-        await _createCamera(device, device.cameras.length);
+      // After creation, find it again to ensure it was added correctly.
+      int newCameraObjectIndex = device.cameras.indexWhere((c) => c.index == cameraIndex);
+      if (newCameraObjectIndex != -1) {
+          cameraToProcess = device.cameras[newCameraObjectIndex];
+          debugPrint('CDP_OPT: Successfully created and retrieved camera for logical index $cameraIndex on device ${device.macAddress}.');
+      } else {
+          // This indicates a problem with _createCamera or concurrent modification.
+          debugPrint('CDP_OPT: CRITICAL ERROR - _createCamera was called for index $cameraIndex but camera not found afterwards in device ${device.macAddress}. Skipping update for property $propertyName.');
+          return; 
       }
     }
     
-    // Update camera property
-    if (cameraIndex < device.cameras.length) {
-      await _updateCameraProperty(device.cameras[cameraIndex], propertyName, properties, value);
+    // At this point, cameraToProcess should be non-null if everything worked.
+    if (cameraToProcess != null) {
+      await _updateCameraProperty(cameraToProcess, propertyName, properties, value);
+    } else {
+      // This case should ideally not be reached if the logic above is sound.
+      debugPrint('CDP_OPT: CRITICAL ERROR - cameraToProcess is null for index $cameraIndex on device ${device.macAddress} before updating property $propertyName. Path: $camIndexPath');
     }
   }
 
-  // Check if property is essential for camera creation
-  bool _isEssentialCameraProperty(String propertyName, dynamic value) {
-    // Very strict: Only create camera for these critical properties
-    const criticalProperties = [
-      'name', 'cameraip', 'ip'  // Only name, IP properties are truly essential
-    ];
-    
-    // Also check if the value is meaningful (not empty/null)
-    if (value == null || value.toString().trim().isEmpty) {
-      return false;
-    }
-    
-    bool isEssential = criticalProperties.contains(propertyName.toLowerCase());
-    debugPrint('Property $propertyName with value "$value" is ${isEssential ? "ESSENTIAL" : "NOT essential"} for camera creation');
-    return isEssential;
-  }
-  
   // Create a new camera at specific index
   Future<void> _createCamera(CameraDevice device, int cameraIndex) async {
-    debugPrint('Creating new camera at index $cameraIndex for device ${device.macAddress}');
+    debugPrint('CDP_OPT: _createCamera attempting for index $cameraIndex on device ${device.macAddress}');
     
-    // Create only one camera at the specified index
+    // Defensive check: ensure we are not accidentally adding a duplicate index.
+    if (device.cameras.any((c) => c.index == cameraIndex)) {
+        debugPrint('CDP_OPT: WARNING in _createCamera - Camera with logical index $cameraIndex already exists on device ${device.macAddress}. Not creating another.');
+        return; 
+    }
+
     final newCamera = Camera(
       index: cameraIndex,
       connected: false,
-      name: 'Camera $cameraIndex',
+      name: 'Camera $cameraIndex', // Default name, will be updated by properties if 'name' comes through
       ip: '',
       username: '',
       password: '',
@@ -523,7 +525,8 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       mac: '${device.macAddress}_cam$cameraIndex', // Generate MAC format for camera
     );
     device.cameras.add(newCamera);
-    debugPrint('Camera created: ${newCamera.name} with index $cameraIndex for device ${device.macAddress}');
+    _cachedDevicesList = null; // Invalidate cache as device's camera list has changed
+    debugPrint('CDP_OPT: Camera created and added: ${newCamera.name} with index $cameraIndex for device ${device.macAddress}');
   }
   
   // Update camera property
@@ -539,26 +542,50 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         debugPrint('Camera ${camera.name} connected status changed from $previousStatus to ${camera.connected} (value: $value)');
         break;
       case 'name':
-        // Find which device this camera belongs to and update the index
-        String? deviceMac;
-        for (var entry in _devices.entries) {
+        // Find which device this camera belongs to
+        String? deviceMacOwner; 
+        // The 'camera' object knows its parent device implicitly via the list it's in.
+        // We need the device's canonical MAC for the _cameraNameToDeviceMap.
+        // This loop is a bit inefficient but necessary if camera doesn't store parent MAC.
+        // A better approach might be to pass the ownerDevice directly to _updateCameraProperty.
+        for (var entry in _devices.entries) { // _devices uses canonical MAC as key
           if (entry.value.cameras.contains(camera)) {
-            deviceMac = entry.key;
+            deviceMacOwner = entry.key; 
             break;
           }
         }
         
-        // Remove old mapping if camera had a name
-        if (camera.name.isNotEmpty) {
+        // Remove old mapping if camera had a name and was previously mapped
+        if (camera.name.isNotEmpty && _cameraNameToDeviceMap.containsKey(camera.name)) {
+          // Only remove if it was mapped to THIS device.
+          // This check might be overly cautious if names are globally unique in the map,
+          // or if the map stores deviceMacOwner along with the camera.
+          // For now, assume simple removal is okay, or that deviceMacOwner check is implicit.
           _cameraNameToDeviceMap.remove(camera.name);
         }
         
-        // Update camera name
-        camera.name = value.toString();
+        String newName = value.toString();
+
+        // Check for name conflicts within the same device
+        if (deviceMacOwner != null) {
+            CameraDevice? ownerDevice = _devices[deviceMacOwner];
+            if (ownerDevice != null) {
+                for (var otherCamera in ownerDevice.cameras) {
+                    // If another camera (not this one) in the same device already has the new name
+                    if (otherCamera != camera && otherCamera.name == newName) {
+                        debugPrint("CDP_OPT: Name conflict. Camera with index ${camera.index} and camera with index ${otherCamera.index} in device ${ownerDevice.macAddress} both want name '$newName'. Appending index to new name for cam ${camera.index}.");
+                        newName = "$newName (cam ${camera.index})"; 
+                        break; 
+                    }
+                }
+            }
+        }
+
+        camera.name = newName; // Assign potentially modified name
         
-        // Add new mapping
-        if (deviceMac != null && camera.name.isNotEmpty) {
-          _cameraNameToDeviceMap[camera.name] = deviceMac;
+        // Add new mapping using the canonical device MAC
+        if (deviceMacOwner != null && camera.name.isNotEmpty) {
+          _cameraNameToDeviceMap[camera.name] = deviceMacOwner;
         }
         break;
       case 'username':
@@ -665,21 +692,22 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     String? deviceMacFromIndex = _cameraNameToDeviceMap[cameraName];
     Camera? targetCamera;
     
-    if (deviceMacFromIndex != null && deviceMacFromIndex == device.macKey) {
+    // device.macAddress is already the canonical one here
+    if (deviceMacFromIndex != null && deviceMacFromIndex == device.macAddress) {
       // Fast path: find camera directly using index
       targetCamera = device.cameras.firstWhere(
         (camera) => camera.name == cameraName,
-        orElse: () => null as Camera,
+        orElse: () => null as Camera, // Explicitly cast to Camera? or Camera
       );
     }
     
     // Fallback: search through all cameras if index lookup failed
     if (targetCamera == null) {
-      for (var camera in device.cameras) {
-        if (camera.name == cameraName) {
-          targetCamera = camera;
-          // Update the index for future lookups
-          _cameraNameToDeviceMap[cameraName] = device.macKey;
+      for (var cam in device.cameras) { // Changed variable name from camera to cam to avoid conflict
+        if (cam.name == cameraName) {
+          targetCamera = cam;
+          // Update the index for future lookups using canonical MAC
+          _cameraNameToDeviceMap[cameraName] = device.macAddress;
           break;
         }
       }
@@ -723,9 +751,9 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       device.cameras.add(newCamera);
       targetCamera = newCamera;
       
-      // Update the index
-      _cameraNameToDeviceMap[cameraName] = device.macKey;
-      debugPrint('Created new camera from report: $cameraName in device ${device.macAddress}');
+      // Update the index with canonical MAC
+      _cameraNameToDeviceMap[cameraName] = device.macAddress;
+      debugPrint('CDP_OPT: Created new camera from report: $cameraName in device ${device.macAddress}');
     }
     
     // If camera still not found, skip
@@ -910,23 +938,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     }
   }
 
-  // Clear cameras for a device (useful when device reconnects)
-  void clearDeviceCameras(String macKey) {
-    if (_devices.containsKey(macKey)) {
-      final device = _devices[macKey]!;
-      // Remove camera name mappings
-      for (var camera in device.cameras) {
-        if (camera.name.isNotEmpty) {
-          _cameraNameToDeviceMap.remove(camera.name);
-        }
-      }
-      // Clear cameras list
-      device.cameras.clear();
-      debugPrint('Cleared all cameras for device $macKey');
-      _cachedDevicesList = null;
-      _batchNotifyListeners();
-    }
-  }
+  // clearDeviceCameras kaldırıldı. Kameralar asla topluca silinmez.
 
   // Batch notifications to reduce UI rebuilds
   void _batchNotifyListeners() {
