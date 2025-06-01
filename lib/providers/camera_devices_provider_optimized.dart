@@ -680,89 +680,58 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   
   // Process camera report - optimized with camera name index
   Future<void> _processCameraReport(CameraDevice device, List<String> properties, dynamic value) async {
-    if (properties.isEmpty) return;
+    if (properties.isEmpty) {
+      debugPrint('CDP_OPT: ProcessCameraReport - No properties, skipping. Device: ${device.macAddress}');
+      return;
+    }
     
-    // Extract camera name from first property (the camera identifier)
     final cameraName = properties[0];
-    if (properties.length < 2) return;
+    if (properties.length < 2) {
+      debugPrint('CDP_OPT: ProcessCameraReport - Not enough properties for $cameraName on device ${device.macAddress}. Skipping.');
+      return;
+    }
     
     final reportProperty = properties[1].toLowerCase();
     
-    // Use fast lookup via camera name mapping first
-    String? deviceMacFromIndex = _cameraNameToDeviceMap[cameraName];
+    debugPrint('CDP_OPT: Processing camera report: device=${device.macAddress}, cameraNameInReport=$cameraName, property=$reportProperty, value=$value');
+
     Camera? targetCamera;
+    String? deviceMacFromIndex = _cameraNameToDeviceMap[cameraName];
     
-    // device.macAddress is already the canonical one here
     if (deviceMacFromIndex != null && deviceMacFromIndex == device.macAddress) {
-      // Fast path: find camera directly using index
-      targetCamera = device.cameras.firstWhere(
-        (camera) => camera.name == cameraName,
-        orElse: () => null as Camera, // Explicitly cast to Camera? or Camera
-      );
+      // If the camera name is in our map and belongs to the current device,
+      // try to find it in the device's actual camera list.
+      try {
+        targetCamera = device.cameras.firstWhere((cam) => cam.name == cameraName);
+        // If firstWhere completes, camera is found and targetCamera is non-null.
+        debugPrint('CDP_OPT: ProcessCameraReport - Found camera "$cameraName" via _cameraNameToDeviceMap (and confirmed in device.cameras) for device ${device.macAddress}.');
+      } catch (e) {
+        // Element not found in device.cameras, even if map suggested it.
+        // This could happen if the camera was removed or its name changed after the map was populated.
+        targetCamera = null; 
+        debugPrint('CDP_OPT: ProcessCameraReport - Camera "$cameraName" was in _cameraNameToDeviceMap but NOT found in device.cameras list for ${device.macAddress}. Map might be stale or name changed.');
+      }
     }
     
-    // Fallback: search through all cameras if index lookup failed
+    // Fallback: if not found via map (or if map was stale/incorrect), iterate all cameras for this device.
+    // This also covers the case where deviceMacFromIndex was null (camera name not in map).
     if (targetCamera == null) {
-      for (var cam in device.cameras) { // Changed variable name from camera to cam to avoid conflict
-        if (cam.name == cameraName) {
-          targetCamera = cam;
-          // Update the index for future lookups using canonical MAC
-          _cameraNameToDeviceMap[cameraName] = device.macAddress;
+      debugPrint('CDP_OPT: ProcessCameraReport - Camera "$cameraName" not found via map or map was stale. Iterating all cameras for device ${device.macAddress}.');
+      for (var camInLoop in device.cameras) {
+        if (camInLoop.name == cameraName) {
+          targetCamera = camInLoop;
+          debugPrint('CDP_OPT: ProcessCameraReport - Found camera "$cameraName" by iterating all cameras for device ${device.macAddress}.');
           break;
         }
       }
     }
     
-    // If camera still not found, try to create it if this is a connection report
-    if (targetCamera == null && (reportProperty == 'connected' || reportProperty == 'last_seen_at')) {
-      // Create a new camera for this report
-      final newCamera = Camera(
-        index: device.cameras.length,
-        connected: false,
-        name: cameraName,
-        ip: '',
-        username: '',
-        password: '',
-        brand: '',
-        mediaUri: '',
-        recordUri: '',
-        subUri: '',
-        remoteUri: '',
-        hw: '',
-        manufacturer: '',
-        country: '',
-        xAddrs: '',
-        xAddr: '',
-        mainSnapShot: '',
-        subSnapShot: '',
-        recordPath: '',
-        recordWidth: 0,
-        recordHeight: 0,
-        subWidth: 0,
-        subHeight: 0,
-        recordCodec: '',
-        subCodec: '',
-        rawIp: 0,
-        soundRec: false,
-        lastSeenAt: '',
-        recording: false,
-        mac: '${device.macAddress}_${cameraName}',
-      );
-      device.cameras.add(newCamera);
-      targetCamera = newCamera;
-      
-      // Update the index with canonical MAC
-      _cameraNameToDeviceMap[cameraName] = device.macAddress;
-      debugPrint('CDP_OPT: Created new camera from report: $cameraName in device ${device.macAddress}');
-    }
-    
-    // If camera still not found, skip
     if (targetCamera == null) {
-      debugPrint('Camera report: Camera $cameraName not found in device ${device.macAddress}');
+      debugPrint('CDP_OPT: ProcessCameraReport - Camera "$cameraName" not found on device ${device.macAddress} and will NOT be created from report. Report for property $reportProperty skipped.');
       return;
     }
     
-    // Update camera report properties
+    // Update camera report properties for the found targetCamera
     switch (reportProperty) {
       case 'disconnected':
         targetCamera.disconnected = value.toString();
