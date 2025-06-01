@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../models/camera_device.dart';
 import '../models/camera_group.dart';
-import '../providers/camera_devices_provider.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 import '../theme/app_theme.dart';
 import 'live_view_screen.dart';
 import 'record_view_screen.dart';
@@ -220,7 +220,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<CameraDevicesProvider>(context);
+    final provider = Provider.of<CameraDevicesProviderOptimized>(context);
     final cameraGroups = provider.cameraGroupsList;
     
     debugPrint("CameraGroupsScreen: Rendering ${cameraGroups.length} groups: ${cameraGroups.map((g) => g.name).toList()}");

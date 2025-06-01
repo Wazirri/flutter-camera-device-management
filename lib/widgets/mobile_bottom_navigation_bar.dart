@@ -1,3 +1,4 @@
+import '../providers/websocket_provider_optimized.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
@@ -331,7 +332,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
           if (route == '/login') {
             try {
               // Close WebSocket connection before logout
-              final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
+              final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
               await webSocketProvider.logout();
             } catch (e) {
               debugPrint('Error during logout: $e');

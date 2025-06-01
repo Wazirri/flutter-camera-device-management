@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../providers/camera_devices_provider.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
@@ -130,7 +130,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   }
   
   void _loadAvailableCameras() {
-    final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
     final cameras = cameraDevicesProvider.cameras;
     
     setState(() {
@@ -163,7 +163,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     
     for (var camera in _availableCameras) {
       // Kamera device'ını bul
-      final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+      final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
       final device = cameraDevicesProvider.getDeviceForCamera(camera);
       
       if (device != null) {
@@ -243,7 +243,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     setState(() {
       if (_isMultiSelectionMode) {
         // Çoklu seçim modunda
-        final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+        final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
         final device = cameraDevicesProvider.getDeviceForCamera(camera);
         
         if (device != null) {
@@ -267,7 +267,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   }
   
   CameraDevice? _getDeviceForCamera(Camera camera) {
-    final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
     return cameraDevicesProvider.getDeviceForCamera(camera);
   }
   
@@ -733,7 +733,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                       print('Error parsing timestamp: $e');
                     }
                     
-                    final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
                     final device = cameraDevicesProvider.getDeviceForCamera(camera);
                     
                     final recordingUrl = device != null ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$recording' : '';

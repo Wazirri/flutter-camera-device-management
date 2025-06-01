@@ -12,7 +12,7 @@ import 'screens/camera_groups_screen.dart';  // New camera groups screen
 import 'screens/dashboard_screen.dart';
 import 'screens/devices_screen.dart';
 import 'screens/live_view_screen.dart';
-import 'screens/login_screen.dart';
+import 'screens/login_screen_optimized.dart';
 import 'screens/record_view_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
@@ -25,8 +25,8 @@ import 'utils/responsive_helper.dart';
 import 'utils/page_transitions.dart';
 import 'widgets/desktop_side_menu.dart';
 import 'widgets/mobile_bottom_navigation_bar.dart';
-import 'providers/websocket_provider.dart';
-import 'providers/camera_devices_provider.dart';
+import 'providers/websocket_provider_optimized.dart';
+import 'providers/camera_devices_provider_optimized.dart';
 import 'providers/multi_view_layout_provider.dart';
 import 'providers/multi_camera_view_provider.dart'; // Yeni provider
 
@@ -60,8 +60,8 @@ Future<void> main() async {
     }
     
     // Create providers first
-    final webSocketProvider = WebSocketProvider();
-    final cameraDevicesProvider = CameraDevicesProvider();
+    final webSocketProvider = WebSocketProviderOptimized();
+    final cameraDevicesProvider = CameraDevicesProviderOptimized();
     final multiViewLayoutProvider = MultiViewLayoutProvider();
     final multiCameraViewProvider = MultiCameraViewProvider();
     
@@ -72,8 +72,8 @@ Future<void> main() async {
     runApp(
       MultiProvider(
         providers: [
-          ChangeNotifierProvider<WebSocketProvider>.value(value: webSocketProvider),
-          ChangeNotifierProvider<CameraDevicesProvider>.value(value: cameraDevicesProvider),
+          ChangeNotifierProvider<WebSocketProviderOptimized>.value(value: webSocketProvider),
+          ChangeNotifierProvider<CameraDevicesProviderOptimized>.value(value: cameraDevicesProvider),
           ChangeNotifierProvider<MultiViewLayoutProvider>.value(value: multiViewLayoutProvider),
           ChangeNotifierProvider<MultiCameraViewProvider>.value(value: multiCameraViewProvider),
         ],
@@ -168,8 +168,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         debugShowCheckedModeBanner: false,
         initialRoute: '/login',
         routes: {
-          '/': (context) => const LoginScreen(),
-          '/login': (context) => const LoginScreen(),
+          '/': (context) => const LoginScreenOptimized(),
+          '/login': (context) => const LoginScreenOptimized(),
           '/dashboard': (context) => const AppShell(
             currentRoute: '/dashboard',
             child: DashboardScreen(),

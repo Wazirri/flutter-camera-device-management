@@ -8,8 +8,8 @@ import '../widgets/custom_app_bar.dart';
 import '../widgets/device_list_item.dart';
 import '../widgets/status_indicator.dart';
 import '../models/camera_device.dart';
-import '../providers/camera_devices_provider.dart';
-import '../providers/websocket_provider.dart';
+import '../providers/camera_devices_provider_optimized.dart';
+import '../providers/websocket_provider_optimized.dart';
 
 class DevicesScreen extends StatefulWidget {
   const DevicesScreen({Key? key}) : super(key: key);
@@ -158,7 +158,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
   }
 
   Widget _buildDevicesList() {
-    final devicesProvider = Provider.of<CameraDevicesProvider>(context);
+    final devicesProvider = Provider.of<CameraDevicesProviderOptimized>(context);
     final devicesByMac = devicesProvider.devicesByMacAddress;
     final devicesList = devicesByMac.values.toList();
     
@@ -479,7 +479,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                 leading: const Icon(Icons.videocam),
                 title: Text('Cameras (${device.cameras.length})'),
                 onTap: () {
-                  final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                  final devicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
                   devicesProvider.setSelectedDevice(device.macKey);
                   Navigator.pop(context);
                   Navigator.pushNamed(context, '/cameras');
@@ -524,11 +524,11 @@ class _DevicesScreenState extends State<DevicesScreen> {
     showDialog(
       context: context,
       builder: (dialogContext) {
-        // CameraDevicesProvider\'dan gelen güncellemeleri dinle
-        return Consumer<CameraDevicesProvider>(
+        // CameraDevicesProviderOptimized'dan gelen güncellemeleri dinle
+        return Consumer<CameraDevicesProviderOptimized>(
           builder: (context, devicesProvider, child) {
             // Cihazı güncel verilerle al
-            final updatedDevice = devicesProvider.devices[device.macKey] ?? device;
+            final updatedDevice = devicesProvider.devicesByMacAddress[device.macKey] ?? device;
             final statusText = updatedDevice.connected ? 'Online' : 'Offline';
             debugPrint('DevicesScreen: DeviceDetailsDialog for ${updatedDevice.macAddress}. Connected: ${updatedDevice.connected}');
 
@@ -624,7 +624,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                     if (updatedDevice.cameras.isNotEmpty)
                       TextButton(
                         onPressed: () {
-                          final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                          final devicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
                           devicesProvider.setSelectedDevice(updatedDevice.macKey);
                           Navigator.pop(dialogContext);
                           Navigator.pushNamed(context, '/cameras');
@@ -636,7 +636,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
                       ),
                     
                     // WiFi Ayarları Butonu
-                    Consumer<WebSocketProvider>(
+                    Consumer<WebSocketProviderOptimized>(
                       builder: (context, wsProvider, child) {
                         return TextButton.icon(
                           icon: const Icon(Icons.wifi),
@@ -691,7 +691,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
   }
   
   // WiFi ayarlarını değiştirme dialog'u
-  void _showChangeWifiDialog(BuildContext context, CameraDevice device, WebSocketProvider provider) {
+  void _showChangeWifiDialog(BuildContext context, CameraDevice device, WebSocketProviderOptimized provider) {
     final TextEditingController nameController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
     
@@ -881,7 +881,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
             ),
             TextButton(
               onPressed: () {
-                final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                final devicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
                 // In a real app, we would remove from the backend first
                 // For now, just remove from the local state
                 // devicesProvider.removeDevice(device.macKey);

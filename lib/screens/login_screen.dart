@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:movita_ecs/providers/websocket_provider.dart';
+import 'package:movita_ecs/providers/websocket_provider_optimized.dart';
 import 'package:movita_ecs/theme/app_theme.dart';
 import 'package:movita_ecs/widgets/custom_button.dart';
 import 'package:movita_ecs/widgets/custom_text_field.dart';
@@ -135,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
+      final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
       
       // Save credentials if remember me is checked
       await _saveCredentials();

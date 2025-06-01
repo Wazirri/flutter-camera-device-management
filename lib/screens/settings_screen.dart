@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
-import '../providers/websocket_provider.dart';
+import '../providers/websocket_provider_optimized.dart';
 import '../providers/multi_camera_view_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -321,7 +321,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildSystemSection(BuildContext context) {
-    final wsProvider = Provider.of<WebSocketProvider>(context);
+    final wsProvider = Provider.of<WebSocketProviderOptimized>(context);
     final isConnected = wsProvider.isConnected;
     
     return _buildSettingCard(
@@ -521,7 +521,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
   
   // CAM_GROUP_ADD group_name komutu için dialog
-  void _showAddCameraGroupDialog(BuildContext context, WebSocketProvider provider) {
+  void _showAddCameraGroupDialog(BuildContext context, WebSocketProviderOptimized provider) {
     _groupNameController.clear(); // Her seferinde text field'i temizle
     
     showDialog(
@@ -602,7 +602,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   // DO SCRIPT "wifichange" "new_name" "new_pw" komutu için dialog
-  void _showChangeWiFiDialog(BuildContext context, WebSocketProvider provider) {
+  void _showChangeWiFiDialog(BuildContext context, WebSocketProviderOptimized provider) {
     final TextEditingController nameController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
     

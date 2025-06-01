@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/websocket_provider.dart';
-import '../providers/camera_devices_provider.dart';
+import '../providers/websocket_provider_optimized.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
@@ -21,7 +21,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final isDesktop = ResponsiveHelper.isDesktop(context);
     // Provider değişkenini burada tanımlayalım
-    final websocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
+    final websocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
     
     return Scaffold(
       backgroundColor: AppTheme.darkBackground,
@@ -417,7 +417,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildDeviceTable(BuildContext context) {
-    final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context);
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context);
     final devicesList = cameraDevicesProvider.devicesList;
     
     // Tabloyu boş göstermemek için
@@ -581,7 +581,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildSystemInfoSection(BuildContext context, WebSocketProvider websocketProvider) {
+  Widget _buildSystemInfoSection(BuildContext context, WebSocketProviderOptimized websocketProvider) {
     // Get system info from websocket provider
     final systemInfo = websocketProvider.systemInfo;
     
@@ -611,7 +611,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 16),
             // Wrap in Consumer to rebuild when system info changes
-            Consumer<WebSocketProvider>(
+            Consumer<WebSocketProviderOptimized>(
               builder: (context, provider, child) {
                 final systemInfo = provider.systemInfo;
                 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/camera_device.dart';
 import '../widgets/camera_grid_item.dart';
-import '../providers/camera_devices_provider.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import 'live_view_screen.dart';
@@ -167,7 +167,7 @@ class _CamerasScreenState extends State<CamerasScreen> {
             ),
         ],
       ),
-      body: Consumer<CameraDevicesProvider>(
+      body: Consumer<CameraDevicesProviderOptimized>(
         builder: (context, provider, child) {
           // If loading, show a spinner
           if (provider.isLoading) {
@@ -528,7 +528,7 @@ class CameraSearchDelegate extends SearchDelegate<Camera> {
   }
   
   Widget _buildSearchResults(BuildContext context) {
-    final provider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
     final cameras = provider.cameras;
     
     if (query.isEmpty) {

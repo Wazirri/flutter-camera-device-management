@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
-import '../providers/camera_devices_provider.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 
 class CameraGridItem extends StatelessWidget {
   final Camera camera;
@@ -177,7 +177,7 @@ class CameraGridItem extends StatelessWidget {
                       builder: (dialogContext) {
                         // Parent device'ı bul (mac adresine göre)
                         String? macKey;
-                        for (var entry in Provider.of<CameraDevicesProvider>(context, listen: false).devices.entries) {
+                        for (var entry in Provider.of<CameraDevicesProviderOptimized>(context, listen: false).devices.entries) {
                           if (entry.value.cameras.any((c) => c.index == camera.index)) {
                             macKey = entry.key;
                             break;
@@ -185,7 +185,7 @@ class CameraGridItem extends StatelessWidget {
                         }
                         
                         // CameraDevicesProvider'dan gelen kamera güncellemelerini dinle
-                        return Consumer<CameraDevicesProvider>(builder: (context, devicesProvider, child) {
+                        return Consumer<CameraDevicesProviderOptimized>(builder: (context, devicesProvider, child) {
                           // Kamera verilerini güncel olarak al
                           Camera updatedCamera = camera;
                           

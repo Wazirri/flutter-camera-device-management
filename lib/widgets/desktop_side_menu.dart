@@ -1,3 +1,4 @@
+import '../providers/websocket_provider_optimized.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' show min;
@@ -235,7 +236,7 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
                   onTap: () async {
                     try {
                       // First close WebSocket connection
-                      final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
+                      final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
                       await webSocketProvider.logout();
                       
                       // Then navigate to login

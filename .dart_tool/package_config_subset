@@ -382,6 +382,10 @@ xml
 3.2
 file:///Users/smarteq/.pub-cache/hosted/pub.dev/xml-6.5.0/
 file:///Users/smarteq/.pub-cache/hosted/pub.dev/xml-6.5.0/lib/
+movita_ecs
+3.0
+file:///Users/smarteq/Desktop/Projects/Flutter/flutter-camera-device-management/
+file:///Users/smarteq/Desktop/Projects/Flutter/flutter-camera-device-management/lib/
 sky_engine
 3.7
 file:///Users/smarteq/Flutter/flutter/bin/cache/pkg/sky_engine/
@@ -398,8 +402,4 @@ flutter_web_plugins
 3.7
 file:///Users/smarteq/Flutter/flutter/packages/flutter_web_plugins/
 file:///Users/smarteq/Flutter/flutter/packages/flutter_web_plugins/lib/
-movita_ecs
-3.0
-file:///Volumes/yedekler/Projects/Flutter/flutter-camera-device-management/
-file:///Volumes/yedekler/Projects/Flutter/flutter-camera-device-management/lib/
 2

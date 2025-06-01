@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
-import '../providers/websocket_provider.dart';
-import '../providers/camera_devices_provider.dart';
+import '../providers/websocket_provider_optimized.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 
 class CameraDetailsBottomSheet extends StatelessWidget {
   final Camera camera;
@@ -217,7 +217,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                 const SizedBox(height: 12),
                 
                 // Kamera Yönetim Komutları
-                Consumer<WebSocketProvider>(
+                Consumer<WebSocketProviderOptimized>(
                   builder: (context, websocketProvider, child) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -338,7 +338,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
 }
 
 // Kameraya grup ekleme dialog'u
-void _showAddGroupDialog(BuildContext context, Camera camera, WebSocketProvider provider) {
+void _showAddGroupDialog(BuildContext context, Camera camera, WebSocketProviderOptimized provider) {
   final TextEditingController groupNameController = TextEditingController();
 
   showDialog(
@@ -383,7 +383,7 @@ void _showAddGroupDialog(BuildContext context, Camera camera, WebSocketProvider 
                 String cameraMac = 'me${camera.ip.replaceAll('.', '_')}';
                 
                 // Kameranın bağlı olduğu cihazın MAC adresini al
-                final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+                final devicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
                 String deviceMac = devicesProvider.getDeviceMacForCamera(camera) ?? '';
                 
                 if (deviceMac.isEmpty) {
@@ -397,7 +397,7 @@ void _showAddGroupDialog(BuildContext context, Camera camera, WebSocketProvider 
                   return;
                 }
                 
-                final success = await provider.addGroupToCamera(deviceMac, cameraMac, groupName);
+                final success = await provider.sendAddGroupToCamera(cameraMac, groupName);
                 
                 if (!context.mounted) return;
                 Navigator.pop(dialogContext);
@@ -424,9 +424,9 @@ void _showAddGroupDialog(BuildContext context, Camera camera, WebSocketProvider 
 }
 
 // Kamerayı cihaza taşıma dialog'u
-void _showMoveCameraDialog(BuildContext context, Camera camera, WebSocketProvider provider) {
+void _showMoveCameraDialog(BuildContext context, Camera camera, WebSocketProviderOptimized provider) {
   // Tüm cihazları almak için CameraDevicesProvider kullan
-  final devicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+  final devicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
   final devices = devicesProvider.devicesList;
   String? selectedDeviceMac;
 

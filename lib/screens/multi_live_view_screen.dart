@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import '../providers/camera_devices_provider.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 import '../providers/multi_view_layout_provider.dart';
 import '../models/camera_device.dart';
 import '../models/camera_layout.dart';
@@ -78,7 +78,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> with Automati
       _initialized = true;
       
       // Get available cameras from provider
-      final cameraProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+      final cameraProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
       final cameras = cameraProvider.cameras;
       
       // Get layout from provider if available
@@ -205,7 +205,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> with Automati
     
     final size = MediaQuery.of(context).size;
     final theme = Theme.of(context);
-    final cameraProvider = Provider.of<CameraDevicesProvider>(context);
+    final cameraProvider = Provider.of<CameraDevicesProviderOptimized>(context);
     final layoutProvider = Provider.of<MultiViewLayoutProvider>(context);
     
     // Watch for layout changes (but don't update in didChangeDependencies)

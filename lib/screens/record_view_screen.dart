@@ -9,7 +9,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../providers/camera_devices_provider.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 import '../models/camera_device.dart';
 
 import '../theme/app_theme.dart';
@@ -113,7 +113,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   
   void _initializeCamera() {
     // Get camera device to fetch recording URL
-    final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
     final device = cameraDevicesProvider.getDeviceForCamera(_camera!);
     
     if (device != null) {
@@ -135,7 +135,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   }
   
   void _loadAvailableCameras() {
-    final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
     List<Camera> cameras = [];
     
     // Collect all cameras from all devices

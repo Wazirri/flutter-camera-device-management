@@ -100,33 +100,32 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
   }
 
   void _handleLogin() async {
-    // Validate inputs
-    if (_serverAddressController.text.isEmpty ||
-        _serverPortController.text.isEmpty ||
-        _emailController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please fill all required fields'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-      _isConnecting = true;
-    });
-
+    final now = DateTime.now().toIso8601String();
+    debugPrint('[$now] Login button pressed');
     try {
+      // Validate inputs
+      if (_serverAddressController.text.isEmpty ||
+          _serverPortController.text.isEmpty ||
+          _emailController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please fill all required fields'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      setState(() {
+        _isLoading = true;
+        _isConnecting = true;
+      });
+
       final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
-      
       // Save credentials if remember me is checked
       await _saveCredentials();
-      
       // Show connecting overlay
       _showConnectionProgress(context);
-      
       // Connect to WebSocket server
       final connected = await webSocketProvider.connect(
         _serverAddressController.text,
@@ -136,31 +135,99 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
         rememberMe: _rememberMe,
       );
 
+      if (!connected) {
+        // Close the connecting overlay
+        if (mounted && Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Connection failed: ${webSocketProvider.errorMessage.isNotEmpty ? webSocketProvider.errorMessage : "Please check server address and port."}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Listen for login state changes
+      bool loginCompleted = false;
+      bool loginFailed = false;
+      String? errorMessage;
+
+      void loginListener() {
+        debugPrint('Login listener: connected=${webSocketProvider.isConnected}, loggedIn=${webSocketProvider.isLoggedIn}, waitingForChangedone=${webSocketProvider.isWaitingForChangedone}, error=${webSocketProvider.errorMessage}');
+        if (webSocketProvider.lastMessage != null) {
+          debugPrint('Last WebSocket message: ${webSocketProvider.lastMessage}');
+        }
+        // Check for login failure (any error message)
+        if (webSocketProvider.errorMessage.isNotEmpty) {
+          debugPrint('Login failed - error: ${webSocketProvider.errorMessage}');
+          loginFailed = true;
+          errorMessage = webSocketProvider.errorMessage;
+        } 
+        // Check for successful login completion (changedone received)
+        else if (webSocketProvider.isLoggedIn && !webSocketProvider.isWaitingForChangedone) {
+          debugPrint('Login completed successfully');
+          loginCompleted = true;
+        }
+        // Check if connection was lost during login
+        else if (!webSocketProvider.isConnected && webSocketProvider.errorMessage.isNotEmpty) {
+          debugPrint('Connection lost during login');
+          loginFailed = true;
+          errorMessage = webSocketProvider.errorMessage;
+        }
+      }
+
+      webSocketProvider.addListener(loginListener);
+
+      // Wait for login completion or failure with timeout
+      int waitTime = 0;
+      const maxWaitTime = 30000; // 30 seconds timeout
+      const checkInterval = 100; // Check every 100ms
+
+      while (!loginCompleted && !loginFailed && mounted && waitTime < maxWaitTime) {
+        await Future.delayed(const Duration(milliseconds: checkInterval));
+        waitTime += checkInterval;
+      }
+
+      webSocketProvider.removeListener(loginListener);
+
+      // Handle timeout
+      if (waitTime >= maxWaitTime && !loginCompleted && !loginFailed) {
+        loginFailed = true;
+        errorMessage = 'Login timeout. Please try again.';
+      }
+
       // Close the connecting overlay
       if (mounted && Navigator.canPop(context)) {
         Navigator.pop(context);
       }
 
-      if (connected && mounted) {
+      if (loginCompleted && mounted) {
         // Pre-load data before navigation for smoother transition
         _preloadDashboardData();
         
-        // Navigate to dashboard with loading indicator
+        // Navigate to dashboard
         Navigator.pushReplacementNamed(context, '/dashboard');
-      } else if (mounted) {
+      } else if (loginFailed && mounted) {
+        // Disconnect on login failure to reset state
+        await webSocketProvider.disconnect();
+        
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Connection failed. Please check your credentials.'),
+          SnackBar(
+            content: Text(errorMessage ?? 'Login failed'),
             backgroundColor: Colors.red,
           ),
         );
       }
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('LOGIN ERROR: $e\n$stack');
       // Close the connecting overlay if it's showing
       if (mounted && _isConnecting && Navigator.canPop(context)) {
         Navigator.pop(context);
       }
-      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -189,17 +256,28 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
       builder: (BuildContext context) {
         return WillPopScope(
           onWillPop: () async => false,
-          child: const AlertDialog(
+          child: AlertDialog(
             backgroundColor: AppTheme.darkSurface,
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(height: 16),
-                CircularProgressIndicator(),
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
+                ),
                 SizedBox(height: 24),
                 Text(
-                  'Connecting to the server...',
+                  'Connecting and logging in...',
                   style: TextStyle(color: AppTheme.darkTextPrimary),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Please wait while we establish connection and verify credentials',
+                  style: TextStyle(
+                    color: AppTheme.darkTextSecondary,
+                    fontSize: 12,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(height: 16),
@@ -227,6 +305,10 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
 
   @override
   Widget build(BuildContext context) {
+    print('DEBUG: LoginScreenOptimized build çalıştı');
+    print('DEBUG: _handleLogin fonksiyonu çağrıldı');
+    debugPrint('[DEBUG] LoginScreenOptimized build() called');
+    debugPrint('[DEBUG] _handleLogin() called');
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -294,32 +376,32 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
                             // Server Address
                             CustomTextField(
                               controller: _serverAddressController,
-                              labelText: 'Server Address',
-                              prefixIcon: Icons.dns_rounded,
+                              hintText: 'Server Address',
+                              icon: Icons.dns_rounded,
                               keyboardType: TextInputType.url,
                             ),
                             const SizedBox(height: 16),
                             // Server Port
                             CustomTextField(
                               controller: _serverPortController,
-                              labelText: 'Server Port',
-                              prefixIcon: Icons.settings_ethernet_rounded,
+                              hintText: 'Server Port',
+                              icon: Icons.settings_ethernet_rounded,
                               keyboardType: TextInputType.number,
                             ),
                             const SizedBox(height: 16),
                             // Email/Username
                             CustomTextField(
                               controller: _emailController,
-                              labelText: 'Username',
-                              prefixIcon: Icons.person_rounded,
+                              hintText: 'Username',
+                              icon: Icons.person_rounded,
                               keyboardType: TextInputType.emailAddress,
                             ),
                             const SizedBox(height: 16),
                             // Password
                             CustomTextField(
                               controller: _passwordController,
-                              labelText: 'Password',
-                              prefixIcon: Icons.lock_rounded,
+                              hintText: 'Password',
+                              icon: Icons.lock_rounded,
                               isPassword: true,
                             ),
                             const SizedBox(height: 24),
@@ -353,7 +435,7 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
                             CustomButton(
                               text: 'Login',
                               isLoading: _isLoading,
-                              onPressed: _isLoading ? null : _handleLogin,
+                              onPressed: _isLoading ? null : () => _handleLogin(),
                             ),
                           ],
                         ),

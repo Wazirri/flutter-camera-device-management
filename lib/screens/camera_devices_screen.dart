@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 // Added import for DateFormat
 
 import '../models/camera_device.dart';
-import '../providers/camera_devices_provider.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 import '../theme/app_theme.dart'; // Fixed import for AppTheme
 // Removed app_localizations import to fix build error
 
@@ -22,7 +22,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
         title: const Text('Camera Devices'),
         backgroundColor: AppTheme.darkBackground,
       ),
-      body: Consumer<CameraDevicesProvider>(
+      body: Consumer<CameraDevicesProviderOptimized>(
         builder: (context, provider, child) {
           final devices = provider.devicesList;
           
@@ -95,7 +95,7 @@ class DeviceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     debugPrint('DeviceCard build START for ${device.macAddress}');
     final theme = Theme.of(context);
-    final provider = Provider.of<CameraDevicesProvider>(context, listen: false);
+    final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
 
     // Determine status text and color
     String statusText;
@@ -538,7 +538,7 @@ class DeviceDetailsSheet extends StatelessWidget {
                                   camera: camera,
                                   onTap: () {
                                     // Set the selected camera
-                                    Provider.of<CameraDevicesProvider>(context, listen: false)
+                                    Provider.of<CameraDevicesProviderOptimized>(context, listen: false)
                                         .setSelectedCameraIndex(index);
                                         
                                     // Navigate to live view screen

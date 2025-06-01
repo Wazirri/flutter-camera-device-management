@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/websocket_provider.dart';
+import '../providers/websocket_provider_optimized.dart';
 import '../theme/app_theme.dart';
 
 class WebSocketLogScreen extends StatelessWidget {
@@ -26,13 +26,13 @@ class WebSocketLogScreen extends StatelessWidget {
             icon: const Icon(Icons.delete_outline),
             onPressed: () {
               // Clear WebSocket logs
-              Provider.of<WebSocketProvider>(context, listen: false).clearLog();
+              Provider.of<WebSocketProviderOptimized>(context, listen: false).clearLog();
             },
             tooltip: 'Clear logs',
           ),
         ],
       ),
-      body: Consumer<WebSocketProvider>(
+      body: Consumer<WebSocketProviderOptimized>(
         builder: (context, provider, child) {
           final isConnected = provider.isConnected;
           final logs = provider.messageLog;

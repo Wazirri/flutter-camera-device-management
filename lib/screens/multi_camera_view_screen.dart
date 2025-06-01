@@ -5,7 +5,7 @@ import 'package:media_kit_video/media_kit_video.dart';
 import '../models/camera_device.dart';
 import '../models/camera_layout_config.dart';
 import '../providers/multi_camera_view_provider.dart';
-import '../providers/camera_devices_provider.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 import '../theme/app_theme.dart';
 
 class MultiCameraViewScreen extends StatefulWidget {
@@ -23,7 +23,7 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
     super.initState();
     // Sayfa açıldığında mevcut kameraları provider'a aktar
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final cameraDevicesProvider = Provider.of<CameraDevicesProvider>(context, listen: false);
+      final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
       final multiCameraProvider = Provider.of<MultiCameraViewProvider>(context, listen: false);
       
       // Tüm cihazlardan tüm kameraları topla

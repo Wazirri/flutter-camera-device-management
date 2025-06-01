@@ -90,20 +90,20 @@ class WebSocketProvider with ChangeNotifier {
   }
 
   // Add message to log
-  void _logMessage(String message) {
-    // Add timestamp to message
-    final timestamp = DateTime.now().toString().split('.').first;
-    final logEntry = '[$timestamp] $message';
+  // void _logMessage(String message) {
+  //   // Add timestamp to message
+  //   final timestamp = DateTime.now().toString().split('.').first;
+  //   final logEntry = '[$timestamp] $message';
     
-    _messageLog.add(logEntry);
+  //   _messageLog.add(logEntry);
     
-    // Keep log size manageable (max 100 messages)
-    if (_messageLog.length > 100) {
-      _messageLog.removeAt(0);
-    }
+  //   // Keep log size manageable (max 100 messages)
+  //   if (_messageLog.length > 100) {
+  //     _messageLog.removeAt(0);
+  //   }
     
-    notifyListeners();
-  }
+  //   notifyListeners();
+  // }
 
   // Connect to WebSocket server
   Future<bool> connect(String serverIp, int serverPort,
@@ -132,7 +132,7 @@ class WebSocketProvider with ChangeNotifier {
       final wsScheme = _isSecureConnection() ? 'wss' : 'ws';
       final url = '$wsScheme://$_serverIp:$_serverPort/ws';
       debugPrint('Connecting to WebSocket: $url');
-      _logMessage('Connecting to $url');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Connecting to $url');
 
       // Connect to WebSocket server
       _socket = await WebSocket.connect(url).timeout(
@@ -152,7 +152,7 @@ class WebSocketProvider with ChangeNotifier {
 
       _isConnected = true;
       _isConnecting = false;
-      _logMessage('Connected successfully');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Connected successfully');
       notifyListeners();
 
       // Start heartbeat
@@ -178,10 +178,10 @@ class WebSocketProvider with ChangeNotifier {
     if (_socket != null) {
       try {
         await _socket!.close();
-        _logMessage('Disconnected from server');
+        debugPrint('[${DateTime.now().toString().split('.').first}] Disconnected from server');
       } catch (e) {
         debugPrint('Error closing socket: $e');
-        _logMessage('Error closing socket: $e');
+        debugPrint('[${DateTime.now().toString().split('.').first}] Error closing socket: $e');
       }
       _socket = null;
     }
@@ -198,7 +198,7 @@ class WebSocketProvider with ChangeNotifier {
   Future<bool> login(String username, String password, [bool rememberMe = false]) async {
     if (!_isConnected || _socket == null) {
       _errorMessage = 'Not connected to server';
-      _logMessage('Login failed: Not connected to server');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Login failed: Not connected to server');
       notifyListeners();
       return false;
     }
@@ -219,25 +219,25 @@ class WebSocketProvider with ChangeNotifier {
       // Send login command
       final loginCommand = 'LOGIN "$username" "$password"';
       _socket!.add(loginCommand);
-      _logMessage('Sending login request');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Sending login request');
 
       // Wait for login response with timeout
       try {
         final result = await _loginCompleter!.future.timeout(
           const Duration(seconds: 10),
           onTimeout: () {
-            _logMessage('Login timeout - no response from server');
+            debugPrint('[${DateTime.now().toString().split('.').first}] Login timeout - no response from server');
             return false;
           },
         );
         return result;
       } catch (e) {
-        _logMessage('Login wait error: $e');
+        debugPrint('[${DateTime.now().toString().split('.').first}] Login wait error: $e');
         return false;
       }
     } catch (e) {
       _errorMessage = 'Login error: $e';
-      _logMessage('Login error: $e');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Login error: $e');
       notifyListeners();
       return false;
     }
@@ -246,19 +246,13 @@ class WebSocketProvider with ChangeNotifier {
   // Start monitoring ECS system after login
   void startEcsMonitoring() {
     if (_isConnected && _isLoggedIn && _socket != null) {
-      // Önce sistem bilgilerini al
-      _socket!.add('GET SYSINFO');
-      _logMessage('Sent GET SYSINFO command');
-      
+
       // Yeni format: ecs_slaves.m_X formatını kullan
       _socket!.add('Monitor ecs_slaves');
-      _logMessage('Started monitoring ecs_slaves (using new format)');
-      
-      // Kamera ve cihaz bilgilerini al
-      _socket!.add('GET CAMERAS');
-      _logMessage('Sent GET CAMERAS command');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Started monitoring ecs_slaves (using new format)');
+  
     } else {
-      _logMessage('Cannot start monitoring: Not connected or not logged in');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Cannot start monitoring: Not connected or not logged in');
       debugPrint('Cannot start monitoring: connected=$_isConnected, logged in=$_isLoggedIn');
     }
   }
@@ -267,18 +261,18 @@ class WebSocketProvider with ChangeNotifier {
   Future<bool> sendCommand(String command) async {
     if (!_isConnected || _socket == null) {
       _errorMessage = 'WebSocket bağlantısı yok. Komut gönderilemedi.';
-      _logMessage(_errorMessage);
+      debugPrint('[${DateTime.now().toString().split('.').first}] $_errorMessage');
       notifyListeners();
       return false;
     }
     
     try {
       _socket!.add(command);
-      _logMessage('Komut gönderildi: $command');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Komut gönderildi: $command');
       return true;
     } catch (e) {
       _errorMessage = 'Komut gönderirken hata: $e';
-      _logMessage(_errorMessage);
+      debugPrint('[${DateTime.now().toString().split('.').first}] $_errorMessage');
       debugPrint(_errorMessage);
       notifyListeners();
       return false;
@@ -289,7 +283,7 @@ class WebSocketProvider with ChangeNotifier {
   Future<bool> sendAddGroupToCamera(String cameraKey, String groupName) async {
     // Format should be: ADD_CAMERA_TO_GROUP <cameraKey> <groupName>
     final command = "ADD_CAMERA_TO_GROUP $cameraKey $groupName";
-    _logMessage('Sending group assignment command: $command');
+    debugPrint('[${DateTime.now().toString().split('.').first}] Sending group assignment command: $command');
     return await sendCommand(command);
   }
   
@@ -298,7 +292,7 @@ class WebSocketProvider with ChangeNotifier {
     // Format: ADD_CAMERA_TO_GROUP <deviceMac>:<cameraIndex> <groupName>
     final cameraKey = "$deviceMac:$cameraIndex";
     final command = 'ADD_CAMERA_TO_GROUP $cameraKey $groupName';
-    _logMessage('Adding camera to group: $command');
+    debugPrint('[${DateTime.now().toString().split('.').first}] Adding camera to group: $command');
     return sendCommand(command);
   }
   
@@ -320,7 +314,7 @@ class WebSocketProvider with ChangeNotifier {
       if (rawMessage is String) {
         // Log the message (truncate if too long)
         final logMsg = rawMessage.length > 500 ? '${rawMessage.substring(0, 500)}...' : rawMessage;
-        _logMessage('Received: $logMsg');
+        debugPrint('[${DateTime.now().toString().split('.').first}] Received: $logMsg');
         
         // Debug için data path bilgisini çıkarmaya çalış
         if (rawMessage.contains('"data"') && rawMessage.contains('"val"')) {
@@ -351,7 +345,7 @@ class WebSocketProvider with ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error handling message: $e');
-      _logMessage('Error handling message: $e');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Error handling message: $e');
     }
   }
   
@@ -374,7 +368,7 @@ class WebSocketProvider with ChangeNotifier {
           if (code == 100) {
             // Login failed - wrong password/username
             _errorMessage = message;
-            _logMessage('Login failed: $_errorMessage');
+            debugPrint('[${DateTime.now().toString().split('.').first}] Login failed: $_errorMessage');
             
             // Complete the login with failure
             if (_loginCompleter != null && !_loginCompleter!.isCompleted) {
@@ -389,12 +383,12 @@ class WebSocketProvider with ChangeNotifier {
           } else {
             // Regular login required message
             _errorMessage = message;
-            _logMessage('Login status: $_errorMessage');
+            debugPrint('[${DateTime.now().toString().split('.').first}] Login status: $_errorMessage');
             
             // Auto-login when we receive a login message if we have credentials
             // but only if we're not already in a login process
             if (_lastUsername != null && _lastPassword != null && _loginCompleter == null) {
-              _logMessage('Auto-login triggered by login message');
+              debugPrint('[${DateTime.now().toString().split('.').first}] Auto-login triggered by login message');
               login(_lastUsername!, _lastPassword!, _rememberMe);
             }
           }
@@ -406,7 +400,7 @@ class WebSocketProvider with ChangeNotifier {
           // Login successful
           _isLoggedIn = true;
           _errorMessage = '';
-          _logMessage('Login successful');
+          debugPrint('[${DateTime.now().toString().split('.').first}] Login successful');
           
           // Complete the login with success
           if (_loginCompleter != null && !_loginCompleter!.isCompleted) {
@@ -423,7 +417,7 @@ class WebSocketProvider with ChangeNotifier {
           // System information update
           _systemInfo = SystemInfo.fromJson(jsonData);
           _systemInfoController.add(_systemInfo!);
-          _logMessage('Received system info update');
+          debugPrint('[${DateTime.now().toString().split('.').first}] Received system info update');
           notifyListeners();
           break;
 
@@ -431,18 +425,18 @@ class WebSocketProvider with ChangeNotifier {
           // Forward camera device updates to the CameraDevicesProvider
           if (_cameraDevicesProvider != null) {
             _cameraDevicesProvider!.processWebSocketMessage(rawMessageString); // Use rawMessageString here
-            _logMessage('Received camera device update');
+            debugPrint('[${DateTime.now().toString().split('.').first}] Received camera device update');
           }
           break;
 
         default:
           debugPrint('Unknown command: $command');
-          _logMessage('Received unknown command: $command');
+          debugPrint('[${DateTime.now().toString().split('.').first}] Received unknown command: $command');
           break;
       }
     } catch (e) {
       debugPrint('Error processing JSON message: $e');
-      _logMessage('Error processing JSON message: $e');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Error processing JSON message: $e');
     }
   }
 
@@ -477,12 +471,12 @@ class WebSocketProvider with ChangeNotifier {
           break;
         default:
           debugPrint('Unknown string command: $command');
-          _logMessage('Received unknown string command: $command');
+          debugPrint('[${DateTime.now().toString().split('.').first}] Received unknown string command: $command');
           break;
       }
     } catch (e) {
       debugPrint('Error processing string message: $e');
-      _logMessage('Error processing string message: $e');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Error processing string message: $e');
     }
   }
   
@@ -497,13 +491,13 @@ class WebSocketProvider with ChangeNotifier {
       // CameraDevicesProvider'a grup ekleme mesajı gönder
       if (_cameraDevicesProvider != null) {
         _cameraDevicesProvider!.addGroupFromWebSocket(groupName);
-        _logMessage('CAM_GROUP_ADD: Added group "$groupName"');
+        debugPrint('[${DateTime.now().toString().split('.').first}] CAM_GROUP_ADD: Added group "$groupName"');
       }
       
       notifyListeners();
     } catch (e) {
       debugPrint('Error handling CAM_GROUP_ADD: $e');
-      _logMessage('Error handling CAM_GROUP_ADD: $e');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Error handling CAM_GROUP_ADD: $e');
     }
   }
 
@@ -518,13 +512,13 @@ class WebSocketProvider with ChangeNotifier {
       // CameraDevicesProvider'a kamerayı gruba ekleme mesajı gönder
       if (_cameraDevicesProvider != null) {
         _cameraDevicesProvider!.addCameraToGroupFromWebSocket(cameraMac, groupName);
-        _logMessage('ADD_GROUP_TO_CAM: Added camera "$cameraMac" to group "$groupName"');
+        debugPrint('[${DateTime.now().toString().split('.').first}] ADD_GROUP_TO_CAM: Added camera "$cameraMac" to group "$groupName"');
       }
       
       notifyListeners();
     } catch (e) {
       debugPrint('Error handling ADD_GROUP_TO_CAM: $e');
-      _logMessage('Error handling ADD_GROUP_TO_CAM: $e');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Error handling ADD_GROUP_TO_CAM: $e');
     }
   }
 
@@ -539,20 +533,20 @@ class WebSocketProvider with ChangeNotifier {
       // CameraDevicesProvider'a kamerayı gruptan çıkarma mesajı gönder
       if (_cameraDevicesProvider != null) {
         _cameraDevicesProvider!.removeCameraFromGroupFromWebSocket(cameraMac, groupName);
-        _logMessage('REMOVE_GROUP_FROM_CAM: Removed camera "$cameraMac" from group "$groupName"');
+        debugPrint('[${DateTime.now().toString().split('.').first}] REMOVE_GROUP_FROM_CAM: Removed camera "$cameraMac" from group "$groupName"');
       }
       
       notifyListeners();
     } catch (e) {
       debugPrint('Error handling REMOVE_GROUP_FROM_CAM: $e');
-      _logMessage('Error handling REMOVE_GROUP_FROM_CAM: $e');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Error handling REMOVE_GROUP_FROM_CAM: $e');
     }
   }
 
   // Handle WebSocket disconnection
   void _handleDisconnect() {
     debugPrint('WebSocket disconnected');
-    _logMessage('WebSocket disconnected');
+    debugPrint('[${DateTime.now().toString().split('.').first}] WebSocket disconnected');
     _isConnected = false;
     _isLoggedIn = false;
     notifyListeners();
@@ -564,7 +558,7 @@ class WebSocketProvider with ChangeNotifier {
   // Handle WebSocket errors
   void _handleError(dynamic error) {
     debugPrint('WebSocket error: $error');
-    _logMessage('WebSocket error: $error');
+    debugPrint('[${DateTime.now().toString().split('.').first}] WebSocket error: $error');
     _errorMessage = error.toString();
     _isConnected = false;
     _isConnecting = false;
@@ -582,10 +576,10 @@ class WebSocketProvider with ChangeNotifier {
       if (_isConnected && _socket != null) {
         try {
           _socket!.add('PING');
-          _logMessage('Sending heartbeat ping');
+          debugPrint('[${DateTime.now().toString().split('.').first}] Sending heartbeat ping');
         } catch (e) {
           debugPrint('Error sending heartbeat: $e');
-          _logMessage('Error sending heartbeat: $e');
+          debugPrint('[${DateTime.now().toString().split('.').first}] Error sending heartbeat: $e');
           _handleDisconnect();
         }
       } else {
@@ -614,14 +608,14 @@ class WebSocketProvider with ChangeNotifier {
         // Only attempt reconnection if the user was logged in and didn't explicitly log out
         if (!_isConnected && !_isConnecting && wasLoggedIn && _lastUsername != null) {
           debugPrint('Attempting to reconnect...');
-          _logMessage('Attempting to reconnect...');
+          debugPrint('[${DateTime.now().toString().split('.').first}] Attempting to reconnect...');
           connect(_serverIp, _serverPort,
               username: _lastUsername,
               password: _lastPassword,
               rememberMe: _rememberMe);
         } else {
           debugPrint('Skipping reconnection attempt - user logged out or reconnection not needed');
-          _logMessage('Skipping reconnection attempt');
+          debugPrint('[${DateTime.now().toString().split('.').first}] Skipping reconnection attempt');
         }
       });
     }
@@ -672,7 +666,7 @@ class WebSocketProvider with ChangeNotifier {
       // This allows for proper initialization before attempting connection
     } catch (e) {
       debugPrint('Error loading settings: $e');
-      _logMessage('Error loading settings: $e');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Error loading settings: $e');
     }
   }
 
@@ -696,7 +690,7 @@ class WebSocketProvider with ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error saving settings: $e');
-      _logMessage('Error saving settings: $e');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Error saving settings: $e');
     }
   }
 
@@ -715,7 +709,7 @@ class WebSocketProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint('Error clearing credentials: $e');
-      _logMessage('Error clearing credentials: $e');
+      debugPrint('[${DateTime.now().toString().split('.').first}] Error clearing credentials: $e');
     }
   }
 
@@ -728,7 +722,7 @@ class WebSocketProvider with ChangeNotifier {
     if (_isConnected && _socket != null) {
       try {
         _socket!.add('LOGOUT');
-        _logMessage('Sent LOGOUT command');
+        debugPrint('[${DateTime.now().toString().split('.').first}] Sent LOGOUT command');
       } catch (e) {
         debugPrint('Error sending logout command: $e');
       }
