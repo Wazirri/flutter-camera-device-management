@@ -275,8 +275,8 @@ class CameraDevice {
 }
 
 class Camera {
-  final String health;              // camreports için sağlık bilgisi
-  final double temperature;         // camreports için sıcaklık bilgisi
+  String health;              // camreports için sağlık bilgisi (changed from final)
+  double temperature;         // camreports için sıcaklık bilgisi (changed from final)
   String reportError;         // camreports.reported hatası (error: 1000 gibi)
   String lastRestartTime;     // camreports.last_restart_time
   String reportName;          // camreports için rapor adı (KAMERA1 gibi)
@@ -312,7 +312,7 @@ class Camera {
   String xAddr;
   
   // Additional properties for group management
-  final String mac;                 // Camera MAC address for group assignment
+  String mac;                       // Camera MAC address for group assignment (changed from final)
   final List<String> groups;        // Groups this camera belongs to
 
   Camera({
