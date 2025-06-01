@@ -96,10 +96,10 @@ class CameraDetailsBottomSheet extends StatelessWidget {
           const SizedBox(height: 16),
           const Divider(),
           
-          // Detaylar
+          // Detaylar (Scrollable Area)
           Expanded(
             child: ListView(
-              controller: scrollController,
+              controller: scrollController, // This ListView will scroll
               children: [
                 _buildDetailGroup(
                   context: context,
@@ -157,6 +157,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                     DetailItem(name: 'Recording', value: camera.recording ? 'Yes' : 'No'),
                   ],
                 ),
+                // _buildDetailGroup for Recording Information
                 _buildDetailGroup(
                   context: context,
                   title: 'Recording Information',
@@ -168,97 +169,92 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                     DetailItem(name: 'Sub Resolution', value: '${camera.subWidth}x${camera.subHeight}'),
                   ],
                 ),
-                const SizedBox(height: 16),
-                
-                // Video Butonları
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.play_arrow),
-                        label: const Text('Live View'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryBlue,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          // Live view sayfasına git (mevcut implemenatasyonunuza göre düzenleyin)
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        icon: const Icon(Icons.history),
-                        label: const Text('Recordings'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.primaryOrange,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          // Recordings sayfasına git (mevcut implemenatasyonunuza göre düzenleyin)
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                
-                const SizedBox(height: 24),
-                const Text(
-                  'Advanced Commands',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.darkTextPrimary,
+                // SizedBox to provide some spacing before the non-scrolling buttons if needed,
+                // but generally, the buttons will be outside this Expanded ListView.
+                // const SizedBox(height: 16), 
+              ], // End of children for ListView
+            ), // End of Expanded ListView for scrollable details
+          ),
+
+          // Sabit Butonlar (Non-Scrollable Area)
+          // These buttons will be at the bottom and will not scroll with the ListView above.
+          const SizedBox(height: 16), // Spacing before buttons
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text('Live View'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryBlue,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                ),
-                const SizedBox(height: 12),
-                
-                // Kamera Yönetim Komutları
-                Consumer<WebSocketProviderOptimized>(
-                  builder: (context, websocketProvider, child) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Kameraya Grup Ekle
-                        OutlinedButton.icon(
-                          icon: const Icon(Icons.group_add),
-                          label: const Text('Add Group to Camera'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: AppTheme.primaryBlue,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          onPressed: () {
-                            // Grup ekleme dialog'unu göster
-                            _showAddGroupDialog(context, camera, websocketProvider);
-                          },
-                        ),
-                        
-                        const SizedBox(height: 8),
-                        
-                        // Kamerayı cihaza taşı
-                        OutlinedButton.icon(
-                          icon: const Icon(Icons.swap_horiz),
-                          label: const Text('Move Camera to Device'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.green,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          onPressed: () {
-                            // Cihaza taşıma dialog'unu göster
-                            _showMoveCameraDialog(context, camera, websocketProvider);
-                          },
-                        ),
-                      ],
-                    );
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // Live view sayfasına git (mevcut implemenatasyonunuza göre düzenleyin)
                   },
                 ),
-                const SizedBox(height: 24),
-              ],
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.history),
+                  label: const Text('Recordings'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppTheme.primaryOrange,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // Recordings sayfasına git (mevcut implemenatasyonunuza göre düzenleyin)
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12), // Spacing between button rows
+          const Text(
+            'Advanced Commands',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: AppTheme.darkTextPrimary,
             ),
           ),
+          const SizedBox(height: 12),
+          Consumer<WebSocketProviderOptimized>(
+            builder: (context, websocketProvider, child) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.group_add),
+                    label: const Text('Add Group to Camera'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.primaryBlue,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      _showAddGroupDialog(context, camera, websocketProvider);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    icon: const Icon(Icons.swap_horiz),
+                    label: const Text('Move Camera to Device'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onPressed: () {
+                      _showMoveCameraDialog(context, camera, websocketProvider);
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 16), // Bottom padding after buttons
         ],
       ),
     );
