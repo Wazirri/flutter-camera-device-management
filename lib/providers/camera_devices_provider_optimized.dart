@@ -72,21 +72,20 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   
   // Get all cameras as a flat list
   List<Camera> get allCameras {
-    List<Camera> camerasList = [];
-    for (var device in _devices.values) {
-      camerasList.addAll(device.cameras);
-    }
-    return camerasList;
+    return _macDefinedCameras.values.toList();
   }
   
   // Get devices grouped by MAC
   Map<String, List<Camera>> getCamerasByMacAddress() {
     Map<String, List<Camera>> result = {};
     
-    for (var deviceEntry in _devices.entries) {
-      String macAddress = deviceEntry.key;
-      CameraDevice device = deviceEntry.value;
-      result[macAddress] = device.cameras;
+    // Group cameras by their parent device MAC
+    for (var camera in _macDefinedCameras.values) {
+      final parentMac = camera.parentDeviceMacKey;
+      if (parentMac != null) {
+        result[parentMac] ??= [];
+        result[parentMac]!.add(camera);
+      }
     }
     
     return result;
@@ -154,29 +153,12 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       return [];
     }
     
-    final group = _cameraGroups[groupName]!;
     final List<Camera> camerasInGroup = [];
     
-    // Scan all devices
-    for (final deviceEntry in _devices.entries) {
-      final deviceMac = deviceEntry.key;
-      final device = deviceEntry.value;
-      
-      // For each camera
-      for (int i = 0; i < device.cameras.length; i++) {
-        final Camera camera = device.cameras[i];
-        
-        // Check if camera is in group in any format
-        final String simpleIndex = i.toString();
-        final String camFormat = "cam[$i]";
-        final String fullFormat = "$deviceMac.cam[$i]";
-        
-        if (group.cameraMacs.contains(simpleIndex) || 
-            group.cameraMacs.contains(camFormat) || 
-            group.cameraMacs.contains(fullFormat)) {
-          
-          camerasInGroup.add(camera);
-        }
+    // Scan all mac-defined cameras for ones that belong to this group
+    for (final camera in _macDefinedCameras.values) {
+      if (camera.groups.contains(groupName)) {
+        camerasInGroup.add(camera);
       }
     }
     
@@ -251,7 +233,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     debugPrint('CDP_OPT: Updating MAC-cam ${camera.mac}: $propertyName = $value');
 
     if (propertyName.startsWith('group[')) {
-      Match? match = RegExp(r'group\\\\[(\\\\d+)\\\\]').firstMatch(propertyName);
+      Match? match = RegExp(r'group\[(\d+)\]').firstMatch(propertyName);
       if (match != null) {
         try {
           int groupIndex = int.parse(match.group(1)!);
@@ -264,7 +246,17 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
           
           camera.groups[groupIndex] = groupValue; // Assign value (can be empty)
           
-          debugPrint('CDP_OPT: Camera ${camera.mac} group at index $groupIndex updated. Groups: ${camera.groups}');
+          debugPrint('CDP_OPT: Camera ${camera.mac} group at index $groupIndex updated to "$groupValue". Groups: ${camera.groups}');
+          
+          // Create or update the camera group if it doesn't exist
+          if (groupValue.isNotEmpty && !_cameraGroups.containsKey(groupValue)) {
+            _cameraGroups[groupValue] = CameraGroup(
+              name: groupValue,
+              cameraMacs: []
+            );
+            _cachedGroupsList = null;
+            debugPrint('CDP_OPT: Created new camera group: $groupValue');
+          }
         } catch (e) {
           debugPrint('CDP_OPT: Error parsing group index from $propertyName: $e');
         }
