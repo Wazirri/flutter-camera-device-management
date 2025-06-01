@@ -148,6 +148,8 @@ class CameraDevicesProvider with ChangeNotifier {
         ipv4: '',
         lastSeenAt: '',
         connected: false,
+        online: false,
+        firstTime: '',
         uptime: '',
         deviceType: '',
         firmwareVersion: '',

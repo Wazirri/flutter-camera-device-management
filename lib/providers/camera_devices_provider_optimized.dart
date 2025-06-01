@@ -402,6 +402,8 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         ipv4: '',
         lastSeenAt: '',
         connected: false,
+        online: false,
+        firstTime: '',
         uptime: '',
         deviceType: '',
         firmwareVersion: '',
@@ -477,6 +479,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         subHeight: 0,
         lastSeenAt: '',
         recording: false,
+        mac: '${device.macAddress}_cam${device.cameras.length}', // Generate MAC format for camera
       );
       device.cameras.add(newCamera);
     }
@@ -591,10 +594,22 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   
   // Process group definition
   Future<void> _processGroupDefinition(CameraDevice device, String groupIndex, String groupName) async {
+    // Daha sıkı filtreleme: boş, null, sadece whitespace olanları reddet
+    if (groupName.isEmpty || groupName.trim().isEmpty) {
+      return;
+    }
+    
+    // Çok kısa grup isimlerini de reddet
+    if (groupName.trim().length < 2) {
+      return;
+    }
+    
+    final String cleanGroupName = groupName.trim();
+    
     // Create group if it doesn't exist
-    if (!_cameraGroups.containsKey(groupName) && groupName.isNotEmpty) {
-      _cameraGroups[groupName] = CameraGroup(
-        name: groupName,
+    if (!_cameraGroups.containsKey(cleanGroupName) && cleanGroupName.isNotEmpty) {
+      _cameraGroups[cleanGroupName] = CameraGroup(
+        name: cleanGroupName,
         cameraMacs: [],
       );
       _cachedGroupsList = null;
@@ -604,20 +619,29 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   // WebSocket'ten gelen CAM_GROUP_ADD komutunu işle
   void addGroupFromWebSocket(String groupName) {
     try {
-      if (groupName.isEmpty) {
-        debugPrint("CDP_OPT: Ignoring empty group name from WebSocket.");
+      // Daha sıkı filtreleme: boş, null, sadece whitespace olanları reddet
+      if (groupName.isEmpty || groupName.trim().isEmpty) {
+        debugPrint("CDP_OPT: Ignoring empty or whitespace-only group name from WebSocket.");
         return;
       }
       
+      // Çok kısa grup isimlerini de reddet
+      if (groupName.trim().length < 2) {
+        debugPrint("CDP_OPT: Ignoring too short group name from WebSocket: '$groupName'");
+        return;
+      }
+      
+      final String cleanGroupName = groupName.trim();
+      
       // Grup zaten varsa, uyarı ver ama hata verme
-      if (_cameraGroups.containsKey(groupName)) {
-        debugPrint("CDP_OPT: Group '$groupName' already exists, skipping creation.");
+      if (_cameraGroups.containsKey(cleanGroupName)) {
+        debugPrint("CDP_OPT: Group '$cleanGroupName' already exists, skipping creation.");
         return;
       }
       
       // Yeni grup oluştur
-      _cameraGroups[groupName] = CameraGroup(name: groupName);
-      debugPrint("CDP_OPT: Created new group from WebSocket CAM_GROUP_ADD: '$groupName'");
+      _cameraGroups[cleanGroupName] = CameraGroup(name: cleanGroupName);
+      debugPrint("CDP_OPT: Created new group from WebSocket CAM_GROUP_ADD: '$cleanGroupName'");
       
       // Cache'i temizle
       _cachedGroupsList = null;

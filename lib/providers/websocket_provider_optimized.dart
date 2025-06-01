@@ -347,13 +347,31 @@ class WebSocketProviderOptimized with ChangeNotifier {
         case 'login':
           // Login required or failed
           _isLoggedIn = false;
-          _errorMessage = jsonData['msg'] ?? 'Login required';
-          _logMessage('Login status: $_errorMessage', isImportant: true);
           
-          // Auto-login when we receive a login message if we have credentials
-          if (_lastUsername != null && _lastPassword != null) {
-            _logMessage('Auto-login triggered by login message');
-            login(_lastUsername!, _lastPassword!, _rememberMe);
+          // Check if this is a login failure response with error code
+          final int? code = jsonData['code'];
+          final String message = jsonData['msg'] ?? 'Login required';
+          
+          if (code == 100) {
+            // Login failed - wrong password/username
+            _errorMessage = message;
+            _logMessage('Login failed: $_errorMessage', isImportant: true);
+            
+            // Close WebSocket connection on login failure
+            disconnect();
+            
+            _batchNotifyListeners();
+            return; // Don't auto-login on failure
+          } else {
+            // Regular login required message
+            _errorMessage = message;
+            _logMessage('Login status: $_errorMessage', isImportant: true);
+            
+            // Auto-login when we receive a login message if we have credentials
+            if (_lastUsername != null && _lastPassword != null) {
+              _logMessage('Auto-login triggered by login message');
+              login(_lastUsername!, _lastPassword!, _rememberMe);
+            }
           }
           
           _batchNotifyListeners();

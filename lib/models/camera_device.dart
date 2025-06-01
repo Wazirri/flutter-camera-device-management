@@ -275,13 +275,12 @@ class CameraDevice {
 }
 
 class Camera {
-  // ... mevcut alanlar ...
-  String health;              // camreports için sağlık bilgisi
-  double temperature;         // camreports için sıcaklık bilgisi
+  final String health;              // camreports için sağlık bilgisi
+  final double temperature;         // camreports için sıcaklık bilgisi
   String reportError;         // camreports.reported hatası (error: 1000 gibi)
   String lastRestartTime;     // camreports.last_restart_time
   String reportName;          // camreports için rapor adı (KAMERA1 gibi)
-  final int index;            // Index of the camera in the device\'s cameras array
+  final int index;                  // Index of the camera in the device's cameras array
   String name;                // User-friendly name (e.g., KAMERA1)
   String ip;                  // IP address of the camera (cameraIp)
   int rawIp;                  // Raw IP address integer (cameraRawIp)
@@ -309,10 +308,13 @@ class Camera {
   String disconnected;        // Disconnection info
   String lastSeenAt;          // When the camera was last seen
   bool recording;             // Whether the camera is currently recording
-  
   bool soundRec;
   String xAddr;
   
+  // Additional properties for group management
+  final String mac;                 // Camera MAC address for group assignment
+  final List<String> groups;        // Groups this camera belongs to
+
   Camera({
     required this.index,
     this.health = '',
@@ -320,36 +322,38 @@ class Camera {
     this.reportError = '',
     this.lastRestartTime = '',
     this.reportName = '',
-    required this.name,
-    required this.ip,
+    this.name = '',
+    this.ip = '',
     this.rawIp = 0,
-    required this.username,
-    required this.password,
-    required this.brand,
+    this.username = '',
+    this.password = '',
+    this.brand = '',
     this.hw = '',
     this.manufacturer = '',
     this.country = '',
     this.xAddrs = '',
-    required this.mediaUri,
-    required this.recordUri,
-    required this.subUri,
-    required this.remoteUri,
-    required this.mainSnapShot,
-    required this.subSnapShot,
+    this.mediaUri = '',
+    this.recordUri = '',
+    this.subUri = '',
+    this.remoteUri = '',
+    this.mainSnapShot = '',
+    this.subSnapShot = '',
     this.recordPath = '',
     this.recordCodec = '',
-    required this.recordWidth,
-    required this.recordHeight,
+    this.recordWidth = 0,
+    this.recordHeight = 0,
     this.subCodec = '',
-    required this.subWidth,
-    required this.subHeight,
-    required this.connected,
+    this.subWidth = 0,
+    this.subHeight = 0,
+    this.connected = false,
     this.disconnected = '-',
-    required this.lastSeenAt,
-    required this.recording,
+    this.lastSeenAt = '',
+    this.recording = false,
     this.soundRec = false,
     this.xAddr = '',
-  });
+    this.mac = '',
+    List<String>? groups,
+  }) : groups = groups ?? [];
   
   // Added id getter to uniquely identify cameras
   // Using a combination of name and index as id
@@ -389,8 +393,10 @@ class Camera {
     String? disconnected,
     String? lastSeenAt,
     bool? recording,
-    bool? soundRec, // Added missing parameter
-    String? xAddr,   // Added missing parameter
+    bool? soundRec,
+    String? xAddr,
+    String? mac,
+    List<String>? groups,
   }) {
     return Camera(
       index: index,
@@ -426,8 +432,10 @@ class Camera {
       disconnected: disconnected ?? this.disconnected,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
       recording: recording ?? this.recording,
-      soundRec: soundRec ?? this.soundRec, // Applied to constructor
-      xAddr: xAddr ?? this.xAddr,       // Applied to constructor
+      soundRec: soundRec ?? this.soundRec,
+      xAddr: xAddr ?? this.xAddr,
+      mac: mac ?? this.mac,
+      groups: groups ?? List<String>.from(this.groups),
     );
   }
   
@@ -466,6 +474,8 @@ class Camera {
       xAddr: json['xAddr'] ?? '',
       health: json['health'] ?? '',
       temperature: (json['temperature'] is num) ? (json['temperature'] as num).toDouble() : double.tryParse(json['temperature']?.toString() ?? '') ?? 0.0,
+      mac: json['mac'] ?? '',
+      groups: (json['groups'] as List<dynamic>?)?.cast<String>() ?? [],
     );
   }
   
@@ -504,6 +514,8 @@ class Camera {
       'recording': recording,
       'soundRec': soundRec,
       'xAddr': xAddr,
+      'mac': mac,
+      'groups': groups,
     };
   }
   

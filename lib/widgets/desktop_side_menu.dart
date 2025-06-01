@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:math' show min;
 import '../theme/app_theme.dart';
+import '../providers/websocket_provider.dart';
 
 class DesktopSideMenu extends StatefulWidget {
   final String currentRoute;
@@ -230,7 +232,20 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
                       color: AppTheme.darkTextPrimary,
                     ),
                   ),
-                  onTap: () => widget.onDestinationSelected('/login'),
+                  onTap: () async {
+                    try {
+                      // First close WebSocket connection
+                      final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
+                      await webSocketProvider.logout();
+                      
+                      // Then navigate to login
+                      widget.onDestinationSelected('/login');
+                    } catch (e) {
+                      debugPrint('Error during logout: $e');
+                      // Fallback to just navigation
+                      widget.onDestinationSelected('/login');
+                    }
+                  },
                 ),
                 const SizedBox(height: 16),
                 Text(

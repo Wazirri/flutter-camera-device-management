@@ -45,11 +45,27 @@ class _LoginScreenState extends State<LoginScreen> {
           _serverAddressController.text = prefs.getString('serverAddress') ?? '';
           
           // Handle both string and int cases for server port to fix type mismatch
-          var serverPort = prefs.getString('serverPort');
-          if (serverPort == null) {
-            // Try to get it as an int and convert to string
-            final portInt = prefs.getInt('serverPort');
-            serverPort = portInt?.toString() ?? '';
+          String serverPort = '';
+          try {
+            // First try to get as string
+            serverPort = prefs.getString('serverPort') ?? '';
+          } catch (e) {
+            // If that fails, try to get as int and convert to string
+            try {
+              final portInt = prefs.getInt('serverPort');
+              serverPort = portInt?.toString() ?? '';
+            } catch (e2) {
+              serverPort = '';
+            }
+          }
+          // If still empty, try the int approach as fallback
+          if (serverPort.isEmpty) {
+            try {
+              final portInt = prefs.getInt('serverPort');
+              serverPort = portInt?.toString() ?? '';
+            } catch (e) {
+              serverPort = '';
+            }
           }
           _serverPortController.text = serverPort;
           
@@ -68,10 +84,11 @@ class _LoginScreenState extends State<LoginScreen> {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('rememberMe', true);
         await prefs.setString('serverAddress', _serverAddressController.text);
-        await prefs.setString('serverPort', _serverPortController.text);
+        
         // Remove any old int value that might be causing the type mismatch
-        await prefs.remove('serverPort'); // Remove potential int value
+        await prefs.remove('serverPort'); // Remove potential int value first
         await prefs.setString('serverPort', _serverPortController.text); // Save as string
+        
         await prefs.setString('username', _emailController.text);
         // We intentionally don't save the password for security reasons
       } catch (e) {
@@ -133,13 +150,32 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (connected && mounted) {
-        // Navigate to dashboard on successful connection using named route
-        // This ensures proper AppShell wrapping
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        // Check if we're still logged in after the login attempt
+        if (webSocketProvider.isLoggedIn) {
+          // Navigate to dashboard on successful login using named route
+          Navigator.pushReplacementNamed(context, '/dashboard');
+        } else {
+          // Show error message from the provider
+          final errorMsg = webSocketProvider.errorMessage.isNotEmpty 
+              ? webSocketProvider.errorMessage 
+              : 'Login failed. Please check your credentials.';
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMsg),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       } else if (mounted) {
+        // Connection failed
+        final errorMsg = webSocketProvider.errorMessage.isNotEmpty 
+            ? webSocketProvider.errorMessage 
+            : 'Connection failed. Please check your server settings.';
+            
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Connection failed. Please check your credentials.'),
+          SnackBar(
+            content: Text(errorMsg),
             backgroundColor: Colors.red,
           ),
         );

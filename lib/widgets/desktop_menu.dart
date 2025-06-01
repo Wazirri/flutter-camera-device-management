@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/menu_item.dart';
 import '../theme/app_theme.dart';
+import '../providers/websocket_provider.dart';
 
 class DesktopSideMenu extends StatelessWidget {
   final String currentRoute;
@@ -88,6 +90,8 @@ class DesktopSideMenu extends StatelessWidget {
                 try {
                   // Use Future.delayed to prevent immediate navigation which can cause issues
                   Future.delayed(Duration.zero, () {
+                    // Call the logout method from WebSocketProvider
+                    Provider.of<WebSocketProvider>(context, listen: false).logout();
                     // Navigate to login screen with all routes cleared from stack
                     Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
                   });

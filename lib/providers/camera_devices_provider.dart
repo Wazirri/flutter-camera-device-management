@@ -23,7 +23,10 @@ class CameraDevicesProvider with ChangeNotifier {
   
   // Kamera grupları ile ilgili getters
   Map<String, CameraGroup> get cameraGroups => _cameraGroups;
-  List<CameraGroup> get cameraGroupsList => _cameraGroups.values.toList();
+  List<CameraGroup> get cameraGroupsList {
+    debugPrint("CDP: cameraGroupsList called. Groups: ${_cameraGroups.keys.toList()}");
+    return _cameraGroups.values.toList();
+  }
   String? get selectedGroupName => _selectedGroupName;
   CameraGroup? get selectedGroup => _selectedGroupName != null ? _cameraGroups[_selectedGroupName] : null;
   
@@ -592,26 +595,73 @@ class CameraDevicesProvider with ChangeNotifier {
   // WebSocket'ten gelen CAM_GROUP_ADD komutunu işle
   void addGroupFromWebSocket(String groupName) {
     try {
-      if (groupName.isEmpty) {
-        debugPrint("CDP: Ignoring empty group name from WebSocket.");
+      debugPrint("CDP: addGroupFromWebSocket called with groupName='$groupName' (length: ${groupName.length})");
+      
+      // Daha sıkı filtreleme: boş, null, sadece whitespace olanları reddet
+      if (groupName.isEmpty || groupName.trim().isEmpty) {
+        debugPrint("CDP: Ignoring empty or whitespace-only group name from WebSocket.");
         return;
       }
       
+      // Çok kısa grup isimlerini de reddet (1 karakter gibi)
+      if (groupName.trim().length < 2) {
+        debugPrint("CDP: Ignoring too short group name from WebSocket: '$groupName'");
+        return;
+      }
+      
+      final String cleanGroupName = groupName.trim();
+      
       // Grup zaten varsa, uyarı ver ama hata verme
-      if (_cameraGroups.containsKey(groupName)) {
-        debugPrint("CDP: Group '$groupName' already exists, skipping creation.");
+      if (_cameraGroups.containsKey(cleanGroupName)) {
+        debugPrint("CDP: Group '$cleanGroupName' already exists, skipping creation.");
         return;
       }
       
       // Yeni grup oluştur
-      _cameraGroups[groupName] = CameraGroup(name: groupName);
-      debugPrint("CDP: Created new group from WebSocket CAM_GROUP_ADD: '$groupName'");
+      _cameraGroups[cleanGroupName] = CameraGroup(name: cleanGroupName);
+      debugPrint("CDP: Created new group from WebSocket CAM_GROUP_ADD: '$cleanGroupName' (Total groups: ${_cameraGroups.length})");
       
       // UI'ı güncelle
       notifyListeners();
       
     } catch (e, s) {
       debugPrint("CDP: Error in addGroupFromWebSocket: $e");
+      debugPrint("CDP: Stacktrace: $s");
+    }
+  }
+
+  // Process group definition (WebSocket)
+  Future<void> _processGroupDefinition(CameraDevice device, String groupIndex, String groupName) async {
+    try {
+      // Daha sıkı filtreleme: boş, null, sadece whitespace olanları reddet
+      if (groupName.isEmpty || groupName.trim().isEmpty) {
+        debugPrint("CDP: Ignoring empty or whitespace-only group name from WebSocket.");
+        return;
+      }
+      
+      // Çok kısa grup isimlerini de reddet (1 karakter gibi)
+      if (groupName.trim().length < 2) {
+        debugPrint("CDP: Ignoring too short group name from WebSocket: '$groupName'");
+        return;
+      }
+      
+      final String cleanGroupName = groupName.trim();
+      
+      // Grup zaten varsa, uyarı ver ama hata verme
+      if (_cameraGroups.containsKey(cleanGroupName)) {
+        debugPrint("CDP: Group '$cleanGroupName' already exists from configuration.");
+        return;
+      }
+      
+      // Yeni grup oluştur
+      _cameraGroups[cleanGroupName] = CameraGroup(name: cleanGroupName);
+      debugPrint("CDP: Created new group from configuration: '$cleanGroupName'");
+      
+      // UI'ı güncelle
+      notifyListeners();
+      
+    } catch (e, s) {
+      debugPrint("CDP: Error in _processGroupDefinition: $e");
       debugPrint("CDP: Stacktrace: $s");
     }
   }
@@ -667,6 +717,7 @@ class CameraDevicesProvider with ChangeNotifier {
           disconnected: '-',
           lastSeenAt: '',
           recording: false,
+          mac: '',
         ));
       }
     }
@@ -696,6 +747,7 @@ class CameraDevicesProvider with ChangeNotifier {
       disconnected: '-',
       lastSeenAt: '',
       recording: false,
+      mac: '${device.macAddress}_cam$cameraIndex', // Generate MAC format for camera
     );
     
     // Kamerayi ekle veya guncelle
@@ -900,23 +952,106 @@ class CameraDevicesProvider with ChangeNotifier {
     }
   }
   
-  Future<void> _processGroupDefinition(CameraDevice device, String groupIndex, String groupName) async {
+  // WebSocket'ten gelen ADD_GROUP_TO_CAM komutunu işle
+  void addCameraToGroupFromWebSocket(String cameraMac, String groupName) {
     try {
-      if (groupName.isEmpty) {
-        debugPrint("CDP: Ignoring empty group name for definition.");
+      debugPrint("CDP: addCameraToGroupFromWebSocket called with cameraMac='$cameraMac', groupName='$groupName'");
+      
+      // Parametreleri kontrol et
+      if (cameraMac.isEmpty || groupName.isEmpty) {
+        debugPrint("CDP: Ignoring ADD_GROUP_TO_CAM with empty parameters.");
         return;
       }
       
-      if (!_cameraGroups.containsKey(groupName)) {
-        _cameraGroups[groupName] = CameraGroup(name: groupName);
-        debugPrint("CDP: Defined new group from configuration: $groupName");
-      } else {
-        debugPrint("CDP: Group $groupName already defined.");
+      final String cleanCameraMac = cameraMac.trim();
+      final String cleanGroupName = groupName.trim();
+      
+      // Grup var mı kontrol et, yoksa oluştur
+      if (!_cameraGroups.containsKey(cleanGroupName)) {
+        _cameraGroups[cleanGroupName] = CameraGroup(name: cleanGroupName);
+        debugPrint("CDP: Created new group '$cleanGroupName' for camera assignment");
       }
       
+      // MAC adresine göre kamerayı bul
+      Camera? targetCamera;
+      String? deviceMacKey;
+      
+      for (final device in _devices.values) {
+        for (final camera in device.cameras) {
+          if (camera.mac == cleanCameraMac) {
+            targetCamera = camera;
+            deviceMacKey = device.macKey;
+            break;
+          }
+        }
+        if (targetCamera != null) break;
+      }
+      
+      if (targetCamera != null) {
+        // Kamerayı gruba ekle
+        if (!targetCamera.groups.contains(cleanGroupName)) {
+          targetCamera.groups.add(cleanGroupName);
+          debugPrint("CDP: Added camera '${targetCamera.name}' (${targetCamera.mac}) to group '$cleanGroupName'");
+        } else {
+          debugPrint("CDP: Camera '${targetCamera.name}' (${targetCamera.mac}) already in group '$cleanGroupName'");
+        }
+      } else {
+        debugPrint("CDP: Camera with MAC '$cleanCameraMac' not found for group assignment");
+      }
+      
+      // UI'ı güncelle
       notifyListeners();
+      
     } catch (e, s) {
-      debugPrint("CDP: Error in _processGroupDefinition: $e");
+      debugPrint("CDP: Error in addCameraToGroupFromWebSocket: $e");
+      debugPrint("CDP: Stacktrace: $s");
+    }
+  }
+
+  // WebSocket'ten gelen REMOVE_GROUP_FROM_CAM komutunu işle
+  void removeCameraFromGroupFromWebSocket(String cameraMac, String groupName) {
+    try {
+      debugPrint("CDP: removeCameraFromGroupFromWebSocket called with cameraMac='$cameraMac', groupName='$groupName'");
+      
+      // Parametreleri kontrol et
+      if (cameraMac.isEmpty || groupName.isEmpty) {
+        debugPrint("CDP: Ignoring REMOVE_GROUP_FROM_CAM with empty parameters.");
+        return;
+      }
+      
+      final String cleanCameraMac = cameraMac.trim();
+      final String cleanGroupName = groupName.trim();
+      
+      // MAC adresine göre kamerayı bul
+      Camera? targetCamera;
+      
+      for (final device in _devices.values) {
+        for (final camera in device.cameras) {
+          if (camera.mac == cleanCameraMac) {
+            targetCamera = camera;
+            break;
+          }
+        }
+        if (targetCamera != null) break;
+      }
+      
+      if (targetCamera != null) {
+        // Kamerayı gruptan çıkar
+        if (targetCamera.groups.contains(cleanGroupName)) {
+          targetCamera.groups.remove(cleanGroupName);
+          debugPrint("CDP: Removed camera '${targetCamera.name}' (${targetCamera.mac}) from group '$cleanGroupName'");
+        } else {
+          debugPrint("CDP: Camera '${targetCamera.name}' (${targetCamera.mac}) not in group '$cleanGroupName'");
+        }
+      } else {
+        debugPrint("CDP: Camera with MAC '$cleanCameraMac' not found for group removal");
+      }
+      
+      // UI'ı güncelle
+      notifyListeners();
+      
+    } catch (e, s) {
+      debugPrint("CDP: Error in removeCameraFromGroupFromWebSocket: $e");
       debugPrint("CDP: Stacktrace: $s");
     }
   }

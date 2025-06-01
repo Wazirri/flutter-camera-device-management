@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
+import '../providers/websocket_provider.dart';
 
 class MobileBottomNavigationBar extends StatefulWidget {
   final String currentRoute;
@@ -322,8 +324,20 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        onTap: () {
+        onTap: () async {
           Navigator.pop(context);
+          
+          // Special handling for logout
+          if (route == '/login') {
+            try {
+              // Close WebSocket connection before logout
+              final webSocketProvider = Provider.of<WebSocketProvider>(context, listen: false);
+              await webSocketProvider.logout();
+            } catch (e) {
+              debugPrint('Error during logout: $e');
+            }
+          }
+          
           widget.onDestinationSelected(route);
         },
       ),

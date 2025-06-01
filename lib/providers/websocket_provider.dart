@@ -191,6 +191,9 @@ class WebSocketProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Add a completer to track login completion
+  Completer<bool>? _loginCompleter;
+
   // Login to server
   Future<bool> login(String username, String password, [bool rememberMe = false]) async {
     if (!_isConnected || _socket == null) {
@@ -210,14 +213,28 @@ class WebSocketProvider with ChangeNotifier {
         await _saveSettings();
       }
 
+      // Create a completer to wait for the actual login response
+      _loginCompleter = Completer<bool>();
+
       // Send login command
       final loginCommand = 'LOGIN "$username" "$password"';
       _socket!.add(loginCommand);
       _logMessage('Sending login request');
 
-      // Wait for login response (handled in _handleMessage)
-      // We'll return true for now and let the message handler update the state
-      return true;
+      // Wait for login response with timeout
+      try {
+        final result = await _loginCompleter!.future.timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            _logMessage('Login timeout - no response from server');
+            return false;
+          },
+        );
+        return result;
+      } catch (e) {
+        _logMessage('Login wait error: $e');
+        return false;
+      }
     } catch (e) {
       _errorMessage = 'Login error: $e';
       _logMessage('Login error: $e');
@@ -349,13 +366,37 @@ class WebSocketProvider with ChangeNotifier {
         case 'login':
           // Login required or failed
           _isLoggedIn = false;
-          _errorMessage = jsonData['msg'] ?? 'Login required';
-          _logMessage('Login status: $_errorMessage');
           
-          // Auto-login when we receive a login message if we have credentials
-          if (_lastUsername != null && _lastPassword != null) {
-            _logMessage('Auto-login triggered by login message');
-            login(_lastUsername!, _lastPassword!, _rememberMe);
+          // Check if this is a login failure response with error code
+          final int? code = jsonData['code'];
+          final String message = jsonData['msg'] ?? 'Login required';
+          
+          if (code == 100) {
+            // Login failed - wrong password/username
+            _errorMessage = message;
+            _logMessage('Login failed: $_errorMessage');
+            
+            // Complete the login with failure
+            if (_loginCompleter != null && !_loginCompleter!.isCompleted) {
+              _loginCompleter!.complete(false);
+            }
+            
+            // Close WebSocket connection on login failure
+            disconnect();
+            
+            notifyListeners();
+            return; // Don't auto-login on failure
+          } else {
+            // Regular login required message
+            _errorMessage = message;
+            _logMessage('Login status: $_errorMessage');
+            
+            // Auto-login when we receive a login message if we have credentials
+            // but only if we're not already in a login process
+            if (_lastUsername != null && _lastPassword != null && _loginCompleter == null) {
+              _logMessage('Auto-login triggered by login message');
+              login(_lastUsername!, _lastPassword!, _rememberMe);
+            }
           }
           
           notifyListeners();
@@ -366,6 +407,12 @@ class WebSocketProvider with ChangeNotifier {
           _isLoggedIn = true;
           _errorMessage = '';
           _logMessage('Login successful');
+          
+          // Complete the login with success
+          if (_loginCompleter != null && !_loginCompleter!.isCompleted) {
+            _loginCompleter!.complete(true);
+          }
+          
           notifyListeners();
 
           // Start monitoring after successful login
@@ -414,6 +461,20 @@ class WebSocketProvider with ChangeNotifier {
             _handleCamGroupAdd(groupName);
           }
           break;
+        case 'ADD_GROUP_TO_CAM':
+          if (parts.length >= 3) {
+            final cameraMac = parts[1];
+            final groupName = parts.sublist(2).join(' '); // Join remaining parts as group name
+            _handleAddGroupToCam(cameraMac, groupName);
+          }
+          break;
+        case 'REMOVE_GROUP_FROM_CAM':
+          if (parts.length >= 3) {
+            final cameraMac = parts[1];
+            final groupName = parts.sublist(2).join(' '); // Join remaining parts as group name
+            _handleRemoveGroupFromCam(cameraMac, groupName);
+          }
+          break;
         default:
           debugPrint('Unknown string command: $command');
           _logMessage('Received unknown string command: $command');
@@ -443,6 +504,48 @@ class WebSocketProvider with ChangeNotifier {
     } catch (e) {
       debugPrint('Error handling CAM_GROUP_ADD: $e');
       _logMessage('Error handling CAM_GROUP_ADD: $e');
+    }
+  }
+
+  // ADD_GROUP_TO_CAM komutunu işle
+  void _handleAddGroupToCam(String cameraMac, String groupName) {
+    try {
+      if (cameraMac.isEmpty || groupName.isEmpty) {
+        debugPrint('ADD_GROUP_TO_CAM: Empty camera MAC or group name received');
+        return;
+      }
+      
+      // CameraDevicesProvider'a kamerayı gruba ekleme mesajı gönder
+      if (_cameraDevicesProvider != null) {
+        _cameraDevicesProvider!.addCameraToGroupFromWebSocket(cameraMac, groupName);
+        _logMessage('ADD_GROUP_TO_CAM: Added camera "$cameraMac" to group "$groupName"');
+      }
+      
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error handling ADD_GROUP_TO_CAM: $e');
+      _logMessage('Error handling ADD_GROUP_TO_CAM: $e');
+    }
+  }
+
+  // REMOVE_GROUP_FROM_CAM komutunu işle
+  void _handleRemoveGroupFromCam(String cameraMac, String groupName) {
+    try {
+      if (cameraMac.isEmpty || groupName.isEmpty) {
+        debugPrint('REMOVE_GROUP_FROM_CAM: Empty camera MAC or group name received');
+        return;
+      }
+      
+      // CameraDevicesProvider'a kamerayı gruptan çıkarma mesajı gönder
+      if (_cameraDevicesProvider != null) {
+        _cameraDevicesProvider!.removeCameraFromGroupFromWebSocket(cameraMac, groupName);
+        _logMessage('REMOVE_GROUP_FROM_CAM: Removed camera "$cameraMac" from group "$groupName"');
+      }
+      
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error handling REMOVE_GROUP_FROM_CAM: $e');
+      _logMessage('Error handling REMOVE_GROUP_FROM_CAM: $e');
     }
   }
 
