@@ -280,7 +280,7 @@ class Camera {
   String reportError;         // camreports.reported hatası (error: 1000 gibi)
   String lastRestartTime;     // camreports.last_restart_time
   String reportName;          // camreports için rapor adı (KAMERA1 gibi)
-  final int index;                  // Index of the camera in the device's cameras array
+  int index;                  // Index of the camera in the device\'s cameras array
   String name;                // User-friendly name (e.g., KAMERA1)
   String ip;                  // IP address of the camera (cameraIp)
   int rawIp;                  // Raw IP address integer (cameraRawIp)
@@ -314,6 +314,17 @@ class Camera {
   // Additional properties for group management
   String mac;                       // Camera MAC address for group assignment (changed from final)
   final List<String> groups;        // Groups this camera belongs to
+
+  // New fields from cameras_mac data
+  String? macFirstSeen;
+  String? macLastDetected;
+  int? macPort;
+  String? macReportedError;
+  String? macStatus;
+
+  // Field to store the MAC key of the parent device this camera is associated with
+  String? parentDeviceMacKey;
+
 
   Camera({
     required this.index,
@@ -353,6 +364,12 @@ class Camera {
     this.xAddr = '',
     this.mac = '',
     List<String>? groups,
+    this.macFirstSeen,
+    this.macLastDetected,
+    this.macPort,
+    this.macReportedError,
+    this.macStatus,
+    this.parentDeviceMacKey,
   }) : groups = groups ?? [];
   
   // Added id getter to uniquely identify cameras
@@ -361,6 +378,7 @@ class Camera {
   
   // Copy with method for immutable updates
   Camera copyWith({
+    int? index, // Added index to copyWith
     String? name,
     String? health,
     double? temperature,
@@ -397,9 +415,15 @@ class Camera {
     String? xAddr,
     String? mac,
     List<String>? groups,
+    String? macFirstSeen,
+    String? macLastDetected,
+    int? macPort,
+    String? macReportedError,
+    String? macStatus,
+    String? parentDeviceMacKey, // Added parentDeviceMacKey to copyWith
   }) {
     return Camera(
-      index: index,
+      index: index ?? this.index, // Updated index in copyWith
       health: health ?? this.health,
       temperature: temperature ?? this.temperature,
       reportError: reportError ?? this.reportError,
@@ -436,6 +460,12 @@ class Camera {
       xAddr: xAddr ?? this.xAddr,
       mac: mac ?? this.mac,
       groups: groups ?? List<String>.from(this.groups),
+      macFirstSeen: macFirstSeen ?? this.macFirstSeen,
+      macLastDetected: macLastDetected ?? this.macLastDetected,
+      macPort: macPort ?? this.macPort,
+      macReportedError: macReportedError ?? this.macReportedError,
+      macStatus: macStatus ?? this.macStatus,
+      parentDeviceMacKey: parentDeviceMacKey ?? this.parentDeviceMacKey, // Updated parentDeviceMacKey
     );
   }
   
@@ -476,6 +506,12 @@ class Camera {
       temperature: (json['temperature'] is num) ? (json['temperature'] as num).toDouble() : double.tryParse(json['temperature']?.toString() ?? '') ?? 0.0,
       mac: json['mac'] ?? '',
       groups: (json['groups'] as List<dynamic>?)?.cast<String>() ?? [],
+      macFirstSeen: json['macFirstSeen'] as String?,
+      macLastDetected: json['macLastDetected'] as String?,
+      macPort: json['macPort'] as int?,
+      macReportedError: json['macReportedError'] as String?,
+      macStatus: json['macStatus'] as String?,
+      parentDeviceMacKey: json['parentDeviceMacKey'] as String?,
     );
   }
   
@@ -516,6 +552,12 @@ class Camera {
       'xAddr': xAddr,
       'mac': mac,
       'groups': groups,
+      'macFirstSeen': macFirstSeen,
+      'macLastDetected': macLastDetected,
+      'macPort': macPort,
+      'macReportedError': macReportedError,
+      'macStatus': macStatus,
+      'parentDeviceMacKey': parentDeviceMacKey,
     };
   }
   

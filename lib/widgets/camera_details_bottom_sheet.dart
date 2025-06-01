@@ -334,86 +334,107 @@ class CameraDetailsBottomSheet extends StatelessWidget {
 }
 
 // Kameraya grup ekleme dialog'u
-void _showAddGroupDialog(BuildContext context, Camera camera, WebSocketProviderOptimized provider) {
-  final TextEditingController groupNameController = TextEditingController();
+void _showAddGroupDialog(BuildContext context, Camera camera, WebSocketProviderOptimized wsProvider) {
+  // Mevcut grupları almak için CameraDevicesProvider kullan
+  final devicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+  final existingGroups = devicesProvider.cameraGroupsList; // veya groupsList, hangisi uygunsa
+  String? selectedGroupName;
 
   showDialog(
     context: context,
     builder: (dialogContext) {
-      return AlertDialog(
-        backgroundColor: AppTheme.darkSurface,
-        title: const Text('Add Group to Camera'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Add camera ${camera.name} to a group',
-              style: const TextStyle(color: AppTheme.darkTextSecondary),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: groupNameController,
-              decoration: const InputDecoration(
-                labelText: 'Group Name',
-                border: OutlineInputBorder(),
-                hintText: 'Enter group name',
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-            },
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryBlue,
-            ),
-            onPressed: () async {
-              final groupName = groupNameController.text.trim();
-              if (groupName.isNotEmpty) {
-                // Kamera MAC formatını oluştur
-                String cameraMac = 'me${camera.ip.replaceAll('.', '_')}';
-                
-                // Kameranın bağlı olduğu cihazın MAC adresini al
-                final devicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
-                String deviceMac = devicesProvider.getDeviceMacForCamera(camera) ?? '';
-                
-                if (deviceMac.isEmpty) {
-                  // Eğer cihaz MAC'i bulunamazsa uyarı göster
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Could not determine device for camera'),
-                      backgroundColor: Colors.red,
+      return StatefulBuilder( // Dropdown değişikliğini yansıtmak için StatefulBuilder
+        builder: (context, setStateDialog) {
+          return AlertDialog(
+            backgroundColor: AppTheme.darkSurface,
+            title: const Text('Add Camera to Group'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Add camera ${camera.name} to an existing group:',
+                  style: const TextStyle(color: AppTheme.darkTextSecondary),
+                ),
+                const SizedBox(height: 24),
+                if (existingGroups.isEmpty)
+                  const Text('No groups available. Create a group first.', style: TextStyle(color: Colors.orangeAccent))
+                else
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      labelText: 'Select Group',
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
-                  );
-                  return;
-                }
-                
-                final success = await provider.sendAddGroupToCamera(cameraMac, groupName);
-                
-                if (!context.mounted) return;
-                Navigator.pop(dialogContext);
-                
-                // Sonuç bildirimi göster
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      success
-                        ? 'Camera ${camera.name} added to group $groupName'
-                        : 'Failed to add camera to group',
-                    ),
-                    backgroundColor: success ? Colors.green : Colors.red,
+                    hint: const Text('Choose a group'),
+                    value: selectedGroupName,
+                    onChanged: (value) {
+                      setStateDialog(() { // Dialog state'ini güncelle
+                        selectedGroupName = value;
+                      });
+                    },
+                    items: existingGroups.map((group) {
+                      return DropdownMenuItem<String>(
+                        value: group.name, // Grup adını değer olarak kullan
+                        child: Text(group.name),
+                      );
+                    }).toList(),
                   ),
-                );
-              }
-            },
-            child: const Text('Add to Group'),
-          ),
-        ],
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                },
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryBlue,
+                ),
+                // Grup seçilmediyse veya grup yoksa butonu devre dışı bırak
+                onPressed: selectedGroupName == null || existingGroups.isEmpty
+                  ? null 
+                  : () async {
+                      // Kamera MAC'i burada camera.mac'ten alınmalı.
+                      // WebSocket komutunun beklediği format "ADD_GROUP_TO_CAM <camera_mac> <group_name>"
+                      // camera.mac zaten doğru formatta olmalı (örn: "00:11:22:33:44:55_cam0")
+                      // Eğer değilse, burada wsProvider.sendAddGroupToCamera göndermeden önce formatlamanız gerekir.
+                      // Şimdilik camera.mac'in doğru olduğunu varsayıyoruz.
+                      final String cameraIdentifier = camera.mac; // Doğrudan camera.mac kullanılıyor
+                      
+                      if (cameraIdentifier.isEmpty) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Camera MAC address is missing.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      final success = await wsProvider.sendAddGroupToCamera(cameraIdentifier, selectedGroupName!);
+                      
+                      if (!context.mounted) return;
+                      Navigator.pop(dialogContext);
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            success
+                              ? 'Camera ${camera.name} added to group $selectedGroupName'
+                              : 'Failed to add camera ${camera.name} to group $selectedGroupName',
+                          ),
+                          backgroundColor: success ? Colors.green : Colors.red,
+                        ),
+                      );
+                    },
+                child: const Text('Add to Group'),
+              ),
+            ],
+          );
+        },
       );
     }
   );
