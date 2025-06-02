@@ -18,6 +18,7 @@ import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
 import 'screens/multi_live_view_screen.dart';  // New multi-camera view screen
 import 'screens/multi_recordings_screen.dart';  // New multi-recordings screen
+import 'screens/activities_screen.dart';  // New activities screen
 import 'screens/multi_camera_view_screen.dart'; // Yeni multi camera view screen
 import 'screens/camera_layout_assignment_screen.dart'; // Yeni kamera layout atama ekranı
 import 'theme/app_theme.dart';
@@ -205,6 +206,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           '/multi-recordings': (context) => const AppShell(
             currentRoute: '/multi-recordings',
             child: MultiRecordingsScreen(),
+          ),
+          '/activities': (context) => const AppShell(
+            currentRoute: '/activities',
+            child: ActivitiesScreen(),
           ),
           '/multi-camera-view': (context) => const AppShell(
             currentRoute: '/multi-camera-view',
