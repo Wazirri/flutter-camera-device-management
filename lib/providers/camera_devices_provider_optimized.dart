@@ -69,6 +69,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   }
   String? get selectedGroupName => _selectedGroupName;
   CameraGroup? get selectedGroup => _selectedGroupName != null ? _cameraGroups[_selectedGroupName] : null;
+  CameraDevice? get selectedDevice => _selectedDevice;
   
   // Get all cameras as a flat list
   List<Camera> get allCameras {
@@ -733,21 +734,100 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     
     final property = properties[0].toLowerCase();
     
-    // Handle uptime in all formats (uptime, upTime)
-    if (property == 'uptime' || property == 'uptime') {
-      device.uptime = value.toString();
-    } else if (property == 'connected') {
-      final bool previousStatus = device.connected;
-      device.connected = value is bool ? value : (value.toString() == '1' || value.toString().toLowerCase() == 'true');
-      device.updateStatus(); // Force status update
-      debugPrint('System info update: Device ${device.macAddress} connected status changed from $previousStatus to ${device.connected}');
-    } else if (property == 'online') {
-      final bool previousStatus = device.connected;
-      device.connected = value is bool ? value : (value.toString() == '1' || value.toString().toLowerCase() == 'true');
-      device.updateStatus(); // Force status update
-      debugPrint('System info update: Device ${device.macAddress} online status changed from $previousStatus to ${device.connected}');
-    } else if (property == 'lastupdate' || property == 'lastseen') {
-      device.lastSeenAt = value.toString();
+    debugPrint('CDP_OPT: Processing sysinfo property: $property = $value for device ${device.macAddress}');
+    
+    switch (property) {
+      case 'cputemp':
+        final temp = double.tryParse(value.toString()) ?? 0.0;
+        device.cpuTemp = temp;
+        debugPrint('CDP_OPT: *** UPDATED device ${device.macAddress} CPU temp to $temp°C ***');
+        break;
+      
+      case 'uptime':
+        device.uptime = value.toString();
+        break;
+        
+      case 'srvtime':
+        // Store service time - could be added to device model if needed
+        debugPrint('CDP_OPT: Device ${device.macAddress} service time: ${value.toString()}');
+        break;
+        
+      case 'totalram':
+        final ram = int.tryParse(value.toString()) ?? 0;
+        device.totalRam = ram;
+        debugPrint('CDP_OPT: Updated device ${device.macAddress} total RAM to ${(ram / (1024 * 1024)).toStringAsFixed(2)} MB');
+        break;
+        
+      case 'freeram':
+        final ram = int.tryParse(value.toString()) ?? 0;
+        device.freeRam = ram;
+        debugPrint('CDP_OPT: Updated device ${device.macAddress} free RAM to ${(ram / (1024 * 1024)).toStringAsFixed(2)} MB');
+        break;
+        
+      case 'totalconns':
+        final conns = int.tryParse(value.toString()) ?? 0;
+        device.totalConnections = conns;
+        debugPrint('CDP_OPT: Updated device ${device.macAddress} total connections to $conns');
+        break;
+        
+      case 'sessions':
+        final sessions = int.tryParse(value.toString()) ?? 0;
+        device.totalSessions = sessions;
+        debugPrint('CDP_OPT: Updated device ${device.macAddress} sessions to $sessions');
+        break;
+        
+      case 'eth0':
+        // Update IPv4 address from eth0
+        device.ipv4 = value.toString();
+        debugPrint('CDP_OPT: Updated device ${device.macAddress} IPv4 (eth0) to ${value.toString()}');
+        break;
+        
+      case 'ppp0':
+        // Store PPP connection info - could be added to device model if needed
+        debugPrint('CDP_OPT: Device ${device.macAddress} PPP0 status: ${value.toString()}');
+        break;
+        
+      case 'thermal':
+        // Handle thermal array - this is a complex structure
+        if (properties.length > 1) {
+          final thermalIndex = properties[1];
+          final thermalProperty = properties.length > 2 ? properties[2] : '';
+          debugPrint('CDP_OPT: Device ${device.macAddress} thermal[$thermalIndex].$thermalProperty = $value');
+          // Could store thermal data in device if model is extended
+        }
+        break;
+        
+      case 'gps':
+        // Handle GPS data
+        if (properties.length > 1) {
+          final gpsProperty = properties[1];
+          debugPrint('CDP_OPT: Device ${device.macAddress} GPS.$gpsProperty = $value');
+          // Could store GPS data in device if model is extended
+        }
+        break;
+        
+      case 'connected':
+        final bool previousStatus = device.connected;
+        device.connected = value is bool ? value : (value.toString() == '1' || value.toString().toLowerCase() == 'true');
+        device.updateStatus(); // Force status update
+        debugPrint('System info update: Device ${device.macAddress} connected status changed from $previousStatus to ${device.connected}');
+        break;
+        
+      case 'online':
+        final bool previousStatus = device.connected;
+        device.connected = value is bool ? value : (value.toString() == '1' || value.toString().toLowerCase() == 'true');
+        device.updateStatus(); // Force status update
+        debugPrint('System info update: Device ${device.macAddress} online status changed from $previousStatus to ${device.connected}');
+        break;
+        
+      case 'lastupdate':
+      case 'lastseen':
+        device.lastSeenAt = value.toString();
+        break;
+        
+      default:
+        debugPrint('CDP_OPT: Unhandled sysinfo property: $property = $value for device ${device.macAddress}');
+        break;
     }
   }
   
@@ -770,6 +850,12 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       case 'firmware':
       case 'version':
         device.firmwareVersion = value.toString();
+        break;
+      case 'cputemp':
+        // Handle direct cpuTemp messages like "ecs_slaves.m_XX_XX_XX_XX_XX_XX.cpuTemp"
+        final temp = double.tryParse(value.toString()) ?? 0.0;
+        device.cpuTemp = temp;
+        debugPrint('CDP_OPT: *** BASIC PROPERTY - Updated device ${device.macAddress} CPU temp to $temp°C ***');
         break;
       case 'connected':
         final bool previousStatus = device.connected;
@@ -906,3 +992,4 @@ extension FirstWhereOrNullExtension<E> on Iterable<E> {
     return null;
   }
 }
+

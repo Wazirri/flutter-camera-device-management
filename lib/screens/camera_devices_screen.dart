@@ -41,8 +41,10 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
             itemCount: devices.length,
             itemBuilder: (context, index) {
               final device = devices[index];
+              final isSelected = provider.selectedDevice?.macKey == device.macKey;
               return DeviceCard(
                 device: device,
+                isSelected: isSelected,
                 onTap: () {
                   provider.setSelectedDevice(device.macKey);
                   _showDeviceDetails(context, device);
@@ -84,57 +86,40 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
 class DeviceCard extends StatelessWidget {
   final CameraDevice device;
   final VoidCallback onTap;
+  final bool isSelected;
 
   const DeviceCard({
     Key? key,
     required this.device,
     required this.onTap,
+    this.isSelected = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     debugPrint('DeviceCard build START for ${device.macAddress}');
-    final theme = Theme.of(context);
-    final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
-
-    // Determine status text and color
-    String statusText;
-    Color statusColor;
 
     // Access status via the getter, which now includes logging
     final currentStatus = device.status; 
     debugPrint('DeviceCard build: ${device.macAddress}, connected: ${device.connected}, online: ${device.online}, firstTime: ${device.firstTime}, status from getter: $currentStatus'); // MODIFIED
 
-    switch (currentStatus) {
-      case DeviceStatus.online:
-        statusText = 'Online';
-        statusColor = Colors.green;
-        break;
-      case DeviceStatus.offline:
-        statusText = 'Offline';
-        statusColor = Colors.red;
-        break;
-      case DeviceStatus.warning:
-        statusText = 'Warning';
-        statusColor = Colors.orange;
-        break;
-      default:
-        statusText = 'Unknown';
-        statusColor = Colors.grey;
-    }
-
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 4,
+      elevation: isSelected ? 8 : 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: device.connected 
-              ? AppTheme.primaryColor
-              : Theme.of(context).dividerColor,
-          width: device.connected ? 2 : 1,
+          color: isSelected 
+              ? AppTheme.primaryColor.withOpacity(0.8)
+              : (device.connected 
+                  ? AppTheme.primaryColor
+                  : Theme.of(context).dividerColor),
+          width: isSelected ? 3 : (device.connected ? 2 : 1),
         ),
       ),
+      color: isSelected 
+          ? AppTheme.primaryColor.withOpacity(0.1)
+          : null,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -146,13 +131,30 @@ class DeviceCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    device.deviceType.isEmpty 
-                        ? 'Device ${device.macAddress}' 
-                        : device.deviceType,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        if (isSelected) ...[
+                          Icon(
+                            Icons.check_circle,
+                            color: AppTheme.primaryColor,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Expanded(
+                          child: Text(
+                            device.deviceType.isEmpty 
+                                ? 'Device ${device.macAddress}' 
+                                : device.deviceType,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isSelected ? AppTheme.primaryColor : null,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Container(
@@ -275,32 +277,9 @@ class DeviceDetailsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     debugPrint('DeviceDetailsSheet build START for ${device.macAddress}');
-    final theme = Theme.of(context);
-
-    // Determine status text and color
-    String statusText;
-    Color statusColor;
     
     final currentStatus = device.status; // Access status via the getter
     debugPrint('DeviceDetailsSheet build: ${device.macAddress}, connected: ${device.connected}, online: ${device.online}, firstTime: ${device.firstTime}, status from getter: $currentStatus'); // MODIFIED
-
-    switch (currentStatus) {
-      case DeviceStatus.online:
-        statusText = 'Online';
-        statusColor = Colors.green;
-        break;
-      case DeviceStatus.offline:
-        statusText = 'Offline';
-        statusColor = Colors.red;
-        break;
-      case DeviceStatus.warning:
-        statusText = 'Warning';
-        statusColor = Colors.orange;
-        break;
-      default:
-        statusText = 'Unknown';
-        statusColor = Colors.grey;
-    }
 
     return DefaultTabController(
       length: 2, // İki tab için: Cihaz Bilgileri ve Kameralar
@@ -410,13 +389,22 @@ class DeviceDetailsSheet extends StatelessWidget {
                       InfoRow(label: 'Firmware Version', value: device.firmwareVersion),
                       if (device.smartwebVersion != null && device.smartwebVersion!.isNotEmpty)
                         InfoRow(label: 'SmartWeb Version', value: device.smartwebVersion!),
-                      InfoRow(label: 'CPU Temperature', value: '${device.cpuTemp.toStringAsFixed(1)}°C'),
+                      InfoRow(
+                        label: 'CPU Temperature', 
+                        value: device.cpuTemp > 0 ? '${device.cpuTemp.toStringAsFixed(1)}°C' : 'Not available'
+                      ),
                       InfoRow(label: 'Master Status', value: device.isMaster == true ? 'Master' : 'Slave'),
                       InfoRow(label: 'Last Timestamp', value: device.lastTs ?? 'Unknown'),
                       InfoRow(label: 'Record Path', value: device.recordPath),
                       InfoRow(label: 'Camera Count', value: '${device.camCount}'),
-                      InfoRow(label: 'Total RAM', value: '${device.totalRam} bytes'),
-                      InfoRow(label: 'Free RAM', value: '${device.freeRam} bytes'),
+                      InfoRow(
+                        label: 'Total RAM', 
+                        value: device.totalRam > 0 ? '${(device.totalRam / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB' : 'Not available'
+                      ),
+                      InfoRow(
+                        label: 'Free RAM', 
+                        value: device.freeRam > 0 ? '${(device.freeRam / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB' : 'Not available'
+                      ),
                       InfoRow(label: 'Network Info', value: device.networkInfo ?? 'Unknown'),
                       InfoRow(label: 'Total Connections', value: '${device.totalConnections}'),
                       InfoRow(label: 'Total Sessions', value: '${device.totalSessions}'),

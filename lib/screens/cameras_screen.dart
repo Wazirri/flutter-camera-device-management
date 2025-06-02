@@ -25,7 +25,16 @@ class _CamerasScreenState extends State<CamerasScreen> {
   @override
   void initState() {
     super.initState();
-    // Initial data load is handled by provider
+    // Check if there's a selected device and auto-filter cameras for that device
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+      final selectedDevice = provider.selectedDevice;
+      if (selectedDevice != null) {
+        setState(() {
+          selectedMacAddress = selectedDevice.macKey;
+        });
+      }
+    });
   }
   
   void _selectCamera(Camera camera) {
