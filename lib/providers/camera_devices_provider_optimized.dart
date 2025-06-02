@@ -97,11 +97,37 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   
   // Find parent device for a camera
   CameraDevice? getDeviceForCamera(Camera camera) {
-    for (var device in _devices.values) {
+    debugPrint('CDP_OPT: Looking for device for camera: ${camera.mac} (name: ${camera.name}, index: ${camera.index})');
+    
+    // First try to find by camera MAC in the device's cameras list
+    for (var entry in _devices.entries) {
+      CameraDevice device = entry.value;
+      
+      // Check if this device has a camera with the same MAC
+      for (var deviceCamera in device.cameras) {
+        if (deviceCamera.mac == camera.mac && deviceCamera.mac.isNotEmpty) {
+          debugPrint('CDP_OPT: Found device for camera ${camera.mac}: ${device.macAddress} (${device.ipv4})');
+          return device;
+        }
+      }
+    }
+    
+    // Fallback: try to find by index
+    for (var entry in _devices.entries) {
+      CameraDevice device = entry.value;
+      
       if (device.cameras.any((c) => c.index == camera.index)) {
+        debugPrint('CDP_OPT: Found device for camera by index ${camera.index}: ${device.macAddress} (${device.ipv4})');
         return device;
       }
     }
+    
+    debugPrint('CDP_OPT: No device found for camera: ${camera.mac} (name: ${camera.name}, index: ${camera.index})');
+    debugPrint('CDP_OPT: Available devices: ${_devices.keys.toList()}');
+    for (var entry in _devices.entries) {
+      debugPrint('CDP_OPT: Device ${entry.key}: ${entry.value.cameras.map((c) => '${c.mac}(${c.name})').toList()}');
+    }
+    
     return null;
   }
   
@@ -604,33 +630,31 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     // Now update the identified cameraToUpdate with the property from ecs_slaves
     // Be mindful of data authority: if cameras_mac also provides 'name', which one wins?
     // For now, let ecs_slaves also update.
-    if (cameraToUpdate != null) {
-      switch (propertyName) {
-        case 'name':
-          cameraToUpdate.name = value.toString();
-          // Update _cameraNameToDeviceMap if necessary
-          // _cameraNameToDeviceMap[cameraToUpdate.name] = device.macKey; // or canonicalDeviceMac?
-          break;
-        case 'ip':
-          cameraToUpdate.ip = value.toString();
-          break;
-        case 'connected': // Example, if ecs_slaves provides cam-specific connection status
-          cameraToUpdate.setConnectedStatus(value);
-          break;
-        // Handle other cam[index] specific properties from ecs_slaves if any.
-        // These are properties that are specific to the camera *in the context of this device*
-        // or are an alternative source for common camera properties.
-        default:
-          // If not 'mac', 'name', 'ip', 'connected', it might be a property for _updateCameraProperty
-          // This part needs to be mapped to your Camera model's fields carefully.
-          // For now, we assume 'mac' is the linker, and 'name'/'ip' can be updated.
-          // Other properties from ecs_slaves.cam[X] need explicit handling if they map to Camera object fields.
-          debugPrint('CDP_OPT: ecs_slaves cam[$cameraIndex] property \'$propertyName\' for ${cameraToUpdate.mac} - specific update logic may be needed.');
-      }
-      _cachedFlatCameraList = null; // Camera property changed
-      _batchNotifyListeners();
+    switch (propertyName) {
+      case 'name':
+        cameraToUpdate.name = value.toString();
+        // Update _cameraNameToDeviceMap if necessary
+        // _cameraNameToDeviceMap[cameraToUpdate.name] = device.macKey; // or canonicalDeviceMac?
+        break;
+      case 'ip':
+        cameraToUpdate.ip = value.toString();
+        break;
+      case 'connected': // Example, if ecs_slaves provides cam-specific connection status
+        cameraToUpdate.setConnectedStatus(value);
+        break;
+      // Handle other cam[index] specific properties from ecs_slaves if any.
+      // These are properties that are specific to the camera *in the context of this device*
+      // or are an alternative source for common camera properties.
+      default:
+        // If not 'mac', 'name', 'ip', 'connected', it might be a property for _updateCameraProperty
+        // This part needs to be mapped to your Camera model's fields carefully.
+        // For now, we assume 'mac' is the linker, and 'name'/'ip' can be updated.
+        // Other properties from ecs_slaves.cam[X] need explicit handling if they map to Camera object fields.
+        debugPrint('CDP_OPT: ecs_slaves cam[$cameraIndex] property \'$propertyName\' for ${cameraToUpdate.mac} - specific update logic may be needed.');
     }
-  }
+    _cachedFlatCameraList = null; // Camera property changed
+    _batchNotifyListeners();
+    }
 
   // _createCamera is likely no longer needed if cameras are created via _getOrCreateMacDefinedCamera
   // and then linked. The old _createCamera was adding to device.cameras directly.

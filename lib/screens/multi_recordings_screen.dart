@@ -23,6 +23,7 @@ class MultiRecordingsScreen extends StatefulWidget {
 class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with SingleTickerProviderStateMixin {
   // Seçilen kamera ve kayıtlar
   List<Camera> _availableCameras = [];
+  List<Camera> _selectedCameras = []; // Kullanıcının seçtiği kameralar
   final Map<Camera, List<String>> _cameraRecordings = {};
   
   // Aktif oynatılan kayıt bilgileri
@@ -139,7 +140,9 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         camera.recordUri.isNotEmpty
       ).toList();
       
-      if (_availableCameras.isNotEmpty) {
+      // Eğer hiç kamera seçilmemişse, ilk kamerayı seç
+      if (_selectedCameras.isEmpty && _availableCameras.isNotEmpty) {
+        _selectedCameras = [_availableCameras.first];
         _activeCamera = _availableCameras.first;
       }
     });
@@ -149,7 +152,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   }
   
   void _updateRecordingsForSelectedDay() {
-    if (_selectedDay == null || _availableCameras.isEmpty) return;
+    if (_selectedDay == null || _selectedCameras.isEmpty) return;
     
     setState(() {
       _isLoadingRecordings = true;
@@ -157,11 +160,13 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       _cameraRecordings.clear();
     });
     
-    // Seçili gün için tüm kameraların kayıtlarını yükle
+    debugPrint('[MultiRecordings] Loading recordings for ${_selectedCameras.length} selected cameras');
+    
+    // Seçili gün için seçili kameraların kayıtlarını yükle
     final selectedDayFormatted = DateFormat('yyyy-MM-dd').format(_selectedDay!);
     final futures = <Future>[];
     
-    for (var camera in _availableCameras) {
+    for (var camera in _selectedCameras) {
       // Kamera device'ını bul
       final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
       final device = cameraDevicesProvider.getDeviceForCamera(camera);
@@ -191,7 +196,12 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   
   Future<void> _loadRecordingsForCamera(Camera camera, String recordingsUrl, String formattedDate) async {
     try {
+      debugPrint('[MultiRecordings] Loading recordings for camera: ${camera.name}');
+      debugPrint('[MultiRecordings] Recordings URL: $recordingsUrl');
+      debugPrint('[MultiRecordings] Formatted date: $formattedDate');
+      
       final response = await http.get(Uri.parse(recordingsUrl));
+      debugPrint('[MultiRecordings] Response status: ${response.statusCode}');
       
       if (response.statusCode == 200) {
         // HTML yanıtı ayrıştır
@@ -202,9 +212,14 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         final dateMatches = dateRegExp.allMatches(html);
         final dates = dateMatches.map((m) => m.group(1)!).toList();
         
+        debugPrint('[MultiRecordings] Found dates: $dates');
+        debugPrint('[MultiRecordings] Looking for date: $formattedDate');
+        
         if (dates.contains(formattedDate)) {
           // Seçili tarih klasörünün içeriğini al
-          final dateResponse = await http.get(Uri.parse('$recordingsUrl$formattedDate/'));
+          final dateUrl = '$recordingsUrl$formattedDate/';
+          debugPrint('[MultiRecordings] Loading date folder: $dateUrl');
+          final dateResponse = await http.get(Uri.parse(dateUrl));
           
           if (dateResponse.statusCode == 200) {
             // MP4 dosyalarını bul
@@ -212,14 +227,19 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
             final fileMatches = fileRegExp.allMatches(dateResponse.body);
             final recordings = fileMatches.map((m) => m.group(1)!).toList();
             
+            debugPrint('[MultiRecordings] Found ${recordings.length} recordings for ${camera.name}: $recordings');
+            
             if (mounted) {
               setState(() {
                 _cameraRecordings[camera] = recordings;
               });
             }
+          } else {
+            debugPrint('[MultiRecordings] Failed to load date folder: ${dateResponse.statusCode}');
           }
         } else {
           // Bu tarih için kayıt yok
+          debugPrint('[MultiRecordings] No recordings found for date $formattedDate for camera ${camera.name}');
           if (mounted) {
             setState(() {
               _cameraRecordings[camera] = [];
@@ -227,9 +247,11 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           }
         }
       } else {
+        debugPrint('[MultiRecordings] Failed to load recordings URL: ${response.statusCode}');
         throw Exception('Failed to load recordings: ${response.statusCode}');
       }
     } catch (e) {
+      debugPrint('[MultiRecordings] Error loading recordings for ${camera.name}: $e');
       if (mounted) {
         setState(() {
           _loadingError = 'Error loading recordings: $e';
@@ -410,6 +432,22 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     );
   }
   
+  void _toggleCameraSelection(Camera camera, bool selected) {
+    setState(() {
+      if (selected) {
+        if (!_selectedCameras.contains(camera)) {
+          _selectedCameras.add(camera);
+        }
+      } else {
+        _selectedCameras.remove(camera);
+        _cameraRecordings.remove(camera);
+      }
+    });
+    
+    // Seçim değiştiğinde kayıtları yeniden yükle
+    _updateRecordingsForSelectedDay();
+  }
+  
   @override
   void dispose() {
     _player.dispose();
@@ -459,6 +497,9 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       ),
       body: Column(
         children: [
+          // Kamera seçim bölümü
+          _buildCameraSelectionSection(),
+          
           // Takvim bölümü
           SlideTransition(
             position: _calendarSlideAnimation,
@@ -826,6 +867,83 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                   },
                 );
               }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildCameraSelectionSection() {
+    if (_availableCameras.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    
+    return Card(
+      margin: const EdgeInsets.all(8.0),
+      child: ExpansionTile(
+        title: Text(
+          'Select Cameras (${_selectedCameras.length}/${_availableCameras.length} selected)',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        leading: const Icon(Icons.videocam),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                // Select All / Deselect All buttons
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.select_all),
+                      label: const Text('Select All'),
+                      onPressed: () {
+                        setState(() {
+                          _selectedCameras = List.from(_availableCameras);
+                        });
+                        _updateRecordingsForSelectedDay();
+                      },
+                    ),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.deselect),
+                      label: const Text('Deselect All'),
+                      onPressed: () {
+                        setState(() {
+                          _selectedCameras.clear();
+                          _cameraRecordings.clear();
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                
+                const SizedBox(height: 8),
+                
+                // Camera checkboxes
+                ..._availableCameras.map((camera) {
+                  final isSelected = _selectedCameras.contains(camera);
+                  return CheckboxListTile(
+                    title: Text(camera.name),
+                    subtitle: Text('IP: ${camera.ip}'),
+                    value: isSelected,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        if (value == true) {
+                          if (!_selectedCameras.contains(camera)) {
+                            _selectedCameras.add(camera);
+                          }
+                        } else {
+                          _selectedCameras.remove(camera);
+                          _cameraRecordings.remove(camera);
+                        }
+                      });
+                      _updateRecordingsForSelectedDay();
+                    },
+                  );
+                }).toList(),
+              ],
             ),
           ),
         ],

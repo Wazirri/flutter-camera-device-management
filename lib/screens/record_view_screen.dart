@@ -120,7 +120,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
       setState(() {
         // Create HTTP URL for recordings
         _recordingsUrl = 'http://${device.ipv4}:8080/Rec/${_camera!.name}/';
-        
+        debugPrint('Recordings URL: $_recordingsUrl');
         // Update selected day to today
         _selectedDay = DateTime.now();
       });

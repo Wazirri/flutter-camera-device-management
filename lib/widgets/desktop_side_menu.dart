@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' show min;
 import '../theme/app_theme.dart';
-import '../providers/websocket_provider_optimized.dart';
 
 class DesktopSideMenu extends StatefulWidget {
   final String currentRoute;

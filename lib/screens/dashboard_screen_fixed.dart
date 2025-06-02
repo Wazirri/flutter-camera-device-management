@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/websocket_provider_optimized.dart';
-import '../models/system_info.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
@@ -72,7 +71,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  const Text(
                     'Here\'s what\'s happening with your cameras and devices',
                     style: TextStyle(
                       fontSize: 14,
@@ -107,7 +106,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppTheme.primaryBlue,
-                          side: BorderSide(color: AppTheme.primaryBlue),
+                          side: const BorderSide(color: AppTheme.primaryBlue),
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         ),
                         child: const Row(
@@ -222,7 +221,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 8),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 color: AppTheme.darkTextSecondary,
               ),
@@ -335,7 +334,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.access_time,
                   size: 14,
                   color: AppTheme.darkTextSecondary,
@@ -343,7 +342,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(width: 4),
                 Text(
                   timestamp,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     color: AppTheme.darkTextSecondary,
                   ),
@@ -418,7 +417,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         Row(
           children: [
-            Expanded(
+            const Expanded(
               flex: 3,
               child: Text(
                 'Device Name',
@@ -428,7 +427,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-            Expanded(
+            const Expanded(
               flex: 2,
               child: Text(
                 'Type',
@@ -438,7 +437,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
-            Expanded(
+            const Expanded(
               flex: 2,
               child: Text(
                 'Status',
@@ -449,7 +448,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
             if (!ResponsiveHelper.isMobile(context))
-              Expanded(
+              const Expanded(
                 flex: 2,
                 child: Text(
                   'Last Active',
@@ -692,7 +691,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       children: [
                         Text(
                           label,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             color: AppTheme.darkTextSecondary,
                             fontWeight: FontWeight.w500,

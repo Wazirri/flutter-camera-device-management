@@ -261,18 +261,18 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
                 ),
-                SizedBox(height: 24),
-                Text(
+                const SizedBox(height: 24),
+                const Text(
                   'Connecting and logging in...',
                   style: TextStyle(color: AppTheme.darkTextPrimary),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 8),
-                Text(
+                const SizedBox(height: 8),
+                const Text(
                   'Please wait while we establish connection and verify credentials',
                   style: TextStyle(
                     color: AppTheme.darkTextSecondary,
@@ -280,7 +280,7 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
               ],
             ),
           ),
