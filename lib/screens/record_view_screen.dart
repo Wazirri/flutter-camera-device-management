@@ -42,6 +42,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   final List<Camera> _ungroupedCameras = []; // Cameras without groups
   final List<String> _groupNames = []; // List of group names for UI
   final Map<String, bool> _groupExpansionState = {}; // Track which groups are expanded
+  bool _individualCamerasExpanded = false; // Track individual cameras section expansion
   
   // Calendar related variables
   DateTime _focusedDay = DateTime.now();
@@ -390,31 +391,40 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     _ungroupedCameras.clear();
     _groupNames.clear();
     
-    // Track cameras to avoid duplicates in display
-    final Set<String> processedCameraIds = {};
+    // Set to track cameras that have been added to at least one group
+    final Set<String> camerasInGroups = {};
     
     // Group cameras
     for (final camera in _availableCameras) {
       if (camera.groups.isNotEmpty) {
-        // Camera belongs to one or more groups - add to first group only to avoid duplicates
-        final firstGroup = camera.groups.first;
-        if (!_groupedCameras.containsKey(firstGroup)) {
-          _groupedCameras[firstGroup] = [];
-          _groupNames.add(firstGroup);
-          // Initialize expansion state (default to collapsed)
-          _groupExpansionState[firstGroup] = false;
+        // Camera belongs to one or more groups - add to ALL groups
+        for (final groupName in camera.groups) {
+          if (!_groupedCameras.containsKey(groupName)) {
+            _groupedCameras[groupName] = [];
+            _groupNames.add(groupName);
+            // Initialize expansion state (default to collapsed)
+            _groupExpansionState[groupName] = false;
+          }
+          
+          // Only add camera if it's not already in this group
+          final groupCameras = _groupedCameras[groupName]!;
+          final alreadyInGroup = groupCameras.any((c) => c.id == camera.id);
+          if (!alreadyInGroup) {
+            groupCameras.add(camera);
+          }
         }
-        
-        // Only add camera if we haven't processed it yet
-        if (!processedCameraIds.contains(camera.id)) {
-          _groupedCameras[firstGroup]!.add(camera);
-          processedCameraIds.add(camera.id);
-        }
-      } else {
-        // Camera doesn't belong to any group
-        if (!processedCameraIds.contains(camera.id)) {
+        // Mark this camera as being in a group
+        camerasInGroups.add(camera.id);
+      }
+    }
+    
+    // Add cameras that are not in any group to ungrouped list
+    for (final camera in _availableCameras) {
+      if (!camerasInGroups.contains(camera.id)) {
+        // Check if camera is already in ungrouped list to avoid duplicates
+        final alreadyInUngrouped = _ungroupedCameras.any((c) => c.id == camera.id);
+        if (!alreadyInUngrouped) {
           _ungroupedCameras.add(camera);
-          processedCameraIds.add(camera.id);
         }
       }
     }
@@ -856,26 +866,47 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   }
   
   Widget _buildUngroupedCameras() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            'Individual Cameras',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8.0),
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurface.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(color: AppTheme.primaryColor.withOpacity(0.2)),
+      ),
+      child: ExpansionTile(
+        title: Text(
+          'Individual Cameras (${_ungroupedCameras.length})',
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        Wrap(
-          spacing: 8.0,
-          runSpacing: 8.0,
-          children: _ungroupedCameras.map((camera) => _buildCameraChip(camera)).toList(),
+        trailing: Icon(
+          _individualCamerasExpanded ? Icons.expand_less : Icons.expand_more,
+          color: Colors.white70,
         ),
-      ],
+        backgroundColor: Colors.transparent,
+        collapsedBackgroundColor: Colors.transparent,
+        iconColor: Colors.white70,
+        collapsedIconColor: Colors.white70,
+        initiallyExpanded: _individualCamerasExpanded,
+        onExpansionChanged: (expanded) {
+          setState(() {
+            _individualCamerasExpanded = expanded;
+          });
+        },
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              children: _ungroupedCameras.map((camera) => _buildCameraChip(camera)).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
   
