@@ -191,7 +191,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Activities'),
-        backgroundColor: AppTheme.primaryBlue,
+        backgroundColor: AppTheme.primaryOrange,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -218,12 +218,21 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
-      color: Colors.grey[100],
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurface,
+        border: Border(
+          bottom: BorderSide(
+            color: AppTheme.darkBorder,
+            width: 1.0,
+          ),
+        ),
+      ),
       child: Row(
         children: [
           if (_currentPath.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.arrow_back),
+              color: AppTheme.primaryOrange,
               onPressed: _navigateBack,
             ),
           Expanded(
@@ -232,6 +241,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
+                color: Colors.white,
               ),
             ),
           ),
@@ -456,7 +466,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
             AppBar(
               title: Text(title),
               automaticallyImplyLeading: false,
-              backgroundColor: AppTheme.primaryBlue,
+              backgroundColor: AppTheme.primaryOrange,
               foregroundColor: Colors.white,
               actions: [
                 IconButton(
@@ -528,7 +538,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        backgroundColor: AppTheme.primaryBlue,
+        backgroundColor: AppTheme.primaryOrange,
         foregroundColor: Colors.white,
       ),
       body: Center(
