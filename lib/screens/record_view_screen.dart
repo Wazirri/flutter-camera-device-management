@@ -26,12 +26,10 @@ class RecordViewScreen extends StatefulWidget {
 }
 
 class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerProviderStateMixin {
-  int _selectedCameraIndex = 0;
   Camera? _camera;
   bool _isFullScreen = false;
   late final Player _player;
   late final VideoController _controller;
-  bool _isPlaying = false;
   bool _isBuffering = false;
   bool _hasError = false;
   String _errorMessage = '';
@@ -43,6 +41,7 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   final Map<String, List<Camera>> _groupedCameras = {}; // Group name -> cameras
   final List<Camera> _ungroupedCameras = []; // Cameras without groups
   final List<String> _groupNames = []; // List of group names for UI
+  final Map<String, bool> _groupExpansionState = {}; // Track which groups are expanded
   
   // Calendar related variables
   DateTime _focusedDay = DateTime.now();
@@ -154,37 +153,14 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
       // Organize cameras by groups
       _organizeCameras();
       
-      // If a camera is provided, find its index in the list
-      if (_camera != null) {
-        final index = cameras.indexWhere((c) => c.id == _camera!.id);
-        if (index != -1) {
-          _selectedCameraIndex = index;
-        }
-      }
       // If we have cameras but no camera is selected yet, select the first one
-      else if (cameras.isNotEmpty && _camera == null) {
+      if (cameras.isNotEmpty && _camera == null) {
         _camera = cameras.first;
-        _selectedCameraIndex = 0;
         _initializeCamera(); // Initialize the first camera automatically
       }
     });
   }
 
-  void _selectCamera(int index) {
-    if (index >= 0 && index < _availableCameras.length) {
-      setState(() {
-        _selectedCameraIndex = index;
-        _camera = _availableCameras[index];
-        _selectedRecording = null;
-        _recordingsUrl = null;
-        _availableRecordings = [];
-        _loadingError = '';
-      });
-      
-      _initializeCamera();
-    }
-  }
-  
   // Calendar recordings helper methods
   List<String> _getRecordingsForDay(DateTime day) {
     return _recordingEvents[day] ?? [];
@@ -270,7 +246,6 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     try {
       await _player.open(Media(uri));
       setState(() {
-        _isPlaying = true;
         _isBuffering = false;
       });
     } catch (e) {
@@ -415,23 +390,32 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     _ungroupedCameras.clear();
     _groupNames.clear();
     
-    // Get camera devices provider to access groups
-    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    // Track cameras to avoid duplicates in display
+    final Set<String> processedCameraIds = {};
     
     // Group cameras
     for (final camera in _availableCameras) {
       if (camera.groups.isNotEmpty) {
-        // Camera belongs to one or more groups
-        for (final groupName in camera.groups) {
-          if (!_groupedCameras.containsKey(groupName)) {
-            _groupedCameras[groupName] = [];
-            _groupNames.add(groupName);
-          }
-          _groupedCameras[groupName]!.add(camera);
+        // Camera belongs to one or more groups - add to first group only to avoid duplicates
+        final firstGroup = camera.groups.first;
+        if (!_groupedCameras.containsKey(firstGroup)) {
+          _groupedCameras[firstGroup] = [];
+          _groupNames.add(firstGroup);
+          // Initialize expansion state (default to collapsed)
+          _groupExpansionState[firstGroup] = false;
+        }
+        
+        // Only add camera if we haven't processed it yet
+        if (!processedCameraIds.contains(camera.id)) {
+          _groupedCameras[firstGroup]!.add(camera);
+          processedCameraIds.add(camera.id);
         }
       } else {
         // Camera doesn't belong to any group
-        _ungroupedCameras.add(camera);
+        if (!processedCameraIds.contains(camera.id)) {
+          _ungroupedCameras.add(camera);
+          processedCameraIds.add(camera.id);
+        }
       }
     }
     
@@ -439,11 +423,6 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     _groupNames.sort();
   }
   
-  int _getCameraGlobalIndex(Camera camera) {
-    // Find the global index of a camera in the flat list
-    return _availableCameras.indexWhere((c) => c.id == camera.id);
-  }
-
   @override
   void dispose() {
     _animationController.dispose();
@@ -830,28 +809,49 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   
   Widget _buildCameraGroup(String groupName) {
     final cameras = _groupedCameras[groupName] ?? [];
+    final isExpanded = _groupExpansionState[groupName] ?? false;
     
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Text(
-            groupName,
-            style: TextStyle(
-              color: AppTheme.primaryColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8.0),
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurface.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(color: AppTheme.primaryColor.withOpacity(0.2)),
+      ),
+      child: ExpansionTile(
+        title: Text(
+          '$groupName (${cameras.length} cameras)',
+          style: TextStyle(
+            color: AppTheme.primaryColor,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        Wrap(
-          spacing: 8.0,
-          runSpacing: 8.0,
-          children: cameras.map((camera) => _buildCameraChip(camera)).toList(),
+        trailing: Icon(
+          isExpanded ? Icons.expand_less : Icons.expand_more,
+          color: AppTheme.primaryColor,
         ),
-        const SizedBox(height: 12),
-      ],
+        backgroundColor: Colors.transparent,
+        collapsedBackgroundColor: Colors.transparent,
+        iconColor: AppTheme.primaryColor,
+        collapsedIconColor: AppTheme.primaryColor,
+        initiallyExpanded: isExpanded,
+        onExpansionChanged: (expanded) {
+          setState(() {
+            _groupExpansionState[groupName] = expanded;
+          });
+        },
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              children: cameras.map((camera) => _buildCameraChip(camera)).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
   
@@ -915,18 +915,14 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   }
   
   void _selectCameraByObject(Camera camera) {
-    final index = _getCameraGlobalIndex(camera);
-    if (index != -1) {
-      setState(() {
-        _selectedCameraIndex = index;
-        _camera = camera;
-        _selectedRecording = null;
-        _recordingsUrl = null;
-        _availableRecordings = [];
-        _loadingError = '';
-      });
-      
-      _initializeCamera();
-    }
+    setState(() {
+      _camera = camera;
+      _selectedRecording = null;
+      _recordingsUrl = null;
+      _availableRecordings = [];
+      _loadingError = '';
+    });
+    
+    _initializeCamera();
   }
 }
