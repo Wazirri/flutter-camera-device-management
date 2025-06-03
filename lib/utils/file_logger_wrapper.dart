@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import '../utils/file_logger_optimized.dart';
 
 /// This file provides a compatibility layer for existing code that uses FileLogger.

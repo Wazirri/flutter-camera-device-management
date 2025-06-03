@@ -39,6 +39,11 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
   List<String> _availableRecordings = [];
   String? _selectedRecording;
   
+  // Organized camera data
+  final Map<String, List<Camera>> _groupedCameras = {}; // Group name -> cameras
+  final List<Camera> _ungroupedCameras = []; // Cameras without groups
+  final List<String> _groupNames = []; // List of group names for UI
+  
   // Calendar related variables
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -145,6 +150,9 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     
     setState(() {
       _availableCameras = cameras;
+      
+      // Organize cameras by groups
+      _organizeCameras();
       
       // If a camera is provided, find its index in the list
       if (_camera != null) {
@@ -402,6 +410,40 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
     return null;
   }
   
+  void _organizeCameras() {
+    _groupedCameras.clear();
+    _ungroupedCameras.clear();
+    _groupNames.clear();
+    
+    // Get camera devices provider to access groups
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    
+    // Group cameras
+    for (final camera in _availableCameras) {
+      if (camera.groups.isNotEmpty) {
+        // Camera belongs to one or more groups
+        for (final groupName in camera.groups) {
+          if (!_groupedCameras.containsKey(groupName)) {
+            _groupedCameras[groupName] = [];
+            _groupNames.add(groupName);
+          }
+          _groupedCameras[groupName]!.add(camera);
+        }
+      } else {
+        // Camera doesn't belong to any group
+        _ungroupedCameras.add(camera);
+      }
+    }
+    
+    // Sort group names for consistent display
+    _groupNames.sort();
+  }
+  
+  int _getCameraGlobalIndex(Camera camera) {
+    // Find the global index of a camera in the flat list
+    return _availableCameras.indexWhere((c) => c.id == camera.id);
+  }
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -448,56 +490,33 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
                   ],
                 ),
               
-              // Camera Selector (horizontal list)
+              // Camera Selector (grouped)
               if (!_isFullScreen && _availableCameras.length > 1)
                 Container(
-                  height: 80,
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    itemCount: _availableCameras.length,
-                    itemBuilder: (context, index) {
-                      final camera = _availableCameras[index];
-                      final isSelected = index == _selectedCameraIndex;
-                      
-                      return Container(
-                        width: 120,
-                        margin: const EdgeInsets.only(right: 12.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.0),
-                          color: isSelected 
-                            ? AppTheme.primaryColor.withOpacity(0.3) 
-                            : Colors.grey.shade800.withOpacity(0.3),
-                          border: Border.all(
-                            color: isSelected 
-                              ? AppTheme.primaryColor 
-                              : Colors.transparent,
-                            width: 2.0,
-                          ),
+                  margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: AppTheme.darkSurface,
+                    borderRadius: BorderRadius.circular(12.0),
+                    border: Border.all(color: AppTheme.primaryColor.withOpacity(0.3)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Select Camera',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
-                        child: InkWell(
-                          onTap: () => _selectCamera(index),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                camera.name,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: isSelected 
-                                    ? AppTheme.primaryColor 
-                                    : Colors.white,
-                                  fontWeight: isSelected 
-                                    ? FontWeight.bold 
-                                    : FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                      ),
+                      const SizedBox(height: 12),
+                      // Display grouped cameras
+                      ...(_groupNames.map((groupName) => _buildCameraGroup(groupName)).toList()),
+                      // Display ungrouped cameras
+                      if (_ungroupedCameras.isNotEmpty) _buildUngroupedCameras(),
+                    ],
                   ),
                 ),
               
@@ -807,5 +826,107 @@ class _RecordViewScreenState extends State<RecordViewScreen> with SingleTickerPr
         ),
       ],
     );
+  }
+  
+  Widget _buildCameraGroup(String groupName) {
+    final cameras = _groupedCameras[groupName] ?? [];
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            groupName,
+            style: TextStyle(
+              color: AppTheme.primaryColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Wrap(
+          spacing: 8.0,
+          runSpacing: 8.0,
+          children: cameras.map((camera) => _buildCameraChip(camera)).toList(),
+        ),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+  
+  Widget _buildUngroupedCameras() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 8.0),
+          child: Text(
+            'Individual Cameras',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Wrap(
+          spacing: 8.0,
+          runSpacing: 8.0,
+          children: _ungroupedCameras.map((camera) => _buildCameraChip(camera)).toList(),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildCameraChip(Camera camera) {
+    final isSelected = _camera?.id == camera.id;
+    
+    return InkWell(
+      onTap: () => _selectCameraByObject(camera),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+        decoration: BoxDecoration(
+          color: isSelected 
+            ? AppTheme.primaryColor.withOpacity(0.3) 
+            : Colors.grey.shade800.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(20.0),
+          border: Border.all(
+            color: isSelected 
+              ? AppTheme.primaryColor 
+              : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Text(
+          camera.name,
+          style: TextStyle(
+            color: isSelected 
+              ? AppTheme.primaryColor 
+              : Colors.white,
+            fontWeight: isSelected 
+              ? FontWeight.bold 
+              : FontWeight.normal,
+            fontSize: 13,
+          ),
+        ),
+      ),
+    );
+  }
+  
+  void _selectCameraByObject(Camera camera) {
+    final index = _getCameraGlobalIndex(camera);
+    if (index != -1) {
+      setState(() {
+        _selectedCameraIndex = index;
+        _camera = camera;
+        _selectedRecording = null;
+        _recordingsUrl = null;
+        _availableRecordings = [];
+        _loadingError = '';
+      });
+      
+      _initializeCamera();
+    }
   }
 }

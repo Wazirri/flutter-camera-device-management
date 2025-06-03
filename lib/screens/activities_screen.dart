@@ -21,7 +21,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
   final String _ftpBasePath = '/cam_detections';
   
   // Current navigation state  
-  List<String> _currentPath = [];
+  final List<String> _currentPath = [];
   List<FtpItem> _currentItems = [];
   bool _isLoading = false;
   String _loadingError = '';
@@ -225,7 +225,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppTheme.darkSurface,
         border: Border(
           bottom: BorderSide(

@@ -5,6 +5,7 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -163,7 +164,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     print('[MultiRecordings] Loading recordings for ${_selectedCameras.length} selected cameras');
     
     // Seçili gün için seçili kameraların kayıtlarını yükle
-    final selectedDayFormatted = DateFormat('yyyy-MM-dd').format(_selectedDay!);
+    final selectedDayFormatted = DateFormat('yyyy_MM_dd').format(_selectedDay!);
     final futures = <Future>[];
     
     for (var camera in _selectedCameras) {
@@ -222,9 +223,10 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           final dateResponse = await http.get(Uri.parse(dateUrl));
           
           if (dateResponse.statusCode == 200) {
-            // MP4 dosyalarını bul
-            final fileRegExp = RegExp(r'<a href="([^"]+\.mp4)"');
-            final fileMatches = fileRegExp.allMatches(dateResponse.body);
+            // MKV dosyalarını bul (single recordings screen ile aynı format)
+            final html = utf8.decode(dateResponse.bodyBytes);
+            final fileRegExp = RegExp(r'<a href="([^"]+\.mkv)"');
+            final fileMatches = fileRegExp.allMatches(html);
             final recordings = fileMatches.map((m) => m.group(1)!).toList();
             
             print('[MultiRecordings] Found ${recordings.length} recordings for ${camera.name}: $recordings');
@@ -296,8 +298,9 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   void _loadRecording(Camera camera, String recording) {
     final device = _getDeviceForCamera(camera);
     
-    if (device != null) {
-      final recordingUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/$recording';
+    if (device != null && _selectedDay != null) {
+      final selectedDayFormatted = DateFormat('yyyy_MM_dd').format(_selectedDay!);
+      final recordingUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/$selectedDayFormatted/$recording';
       
       setState(() {
         _hasError = false;
@@ -688,7 +691,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
             const SizedBox(height: 16),
             Text(
               _selectedDay != null
-                ? 'No recordings available for ${DateFormat('yyyy-MM-dd').format(_selectedDay!)}'
+                ? 'No recordings available for ${DateFormat('yyyy_MM_dd').format(_selectedDay!)}'
                 : 'No recordings available',
               style: const TextStyle(color: Colors.grey),
               textAlign: TextAlign.center,
@@ -888,62 +891,75 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         ),
         leading: const Icon(Icons.videocam),
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                // Select All / Deselect All buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.select_all),
-                      label: const Text('Select All'),
-                      onPressed: () {
-                        setState(() {
-                          _selectedCameras = List.from(_availableCameras);
-                        });
-                        _updateRecordingsForSelectedDay();
+          Container(
+            constraints: const BoxConstraints(
+              maxHeight: 400, // Maksimum yükseklik sınırı
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Select All / Deselect All buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.select_all),
+                        label: const Text('Select All'),
+                        onPressed: () {
+                          setState(() {
+                            _selectedCameras = List.from(_availableCameras);
+                          });
+                          _updateRecordingsForSelectedDay();
+                        },
+                      ),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.deselect),
+                        label: const Text('Deselect All'),
+                        onPressed: () {
+                          setState(() {
+                            _selectedCameras.clear();
+                            _cameraRecordings.clear();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  // Camera checkboxes - Scrollable list
+                  Flexible(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: _availableCameras.length,
+                      itemBuilder: (context, index) {
+                        final camera = _availableCameras[index];
+                        final isSelected = _selectedCameras.contains(camera);
+                        return CheckboxListTile(
+                          title: Text(camera.name),
+                          subtitle: Text('IP: ${camera.ip}'),
+                          value: isSelected,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              if (value == true) {
+                                if (!_selectedCameras.contains(camera)) {
+                                  _selectedCameras.add(camera);
+                                }
+                              } else {
+                                _selectedCameras.remove(camera);
+                                _cameraRecordings.remove(camera);
+                              }
+                            });
+                            _updateRecordingsForSelectedDay();
+                          },
+                        );
                       },
                     ),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.deselect),
-                      label: const Text('Deselect All'),
-                      onPressed: () {
-                        setState(() {
-                          _selectedCameras.clear();
-                          _cameraRecordings.clear();
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                
-                const SizedBox(height: 8),
-                
-                // Camera checkboxes
-                ..._availableCameras.map((camera) {
-                  final isSelected = _selectedCameras.contains(camera);
-                  return CheckboxListTile(
-                    title: Text(camera.name),
-                    subtitle: Text('IP: ${camera.ip}'),
-                    value: isSelected,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        if (value == true) {
-                          if (!_selectedCameras.contains(camera)) {
-                            _selectedCameras.add(camera);
-                          }
-                        } else {
-                          _selectedCameras.remove(camera);
-                          _cameraRecordings.remove(camera);
-                        }
-                      });
-                      _updateRecordingsForSelectedDay();
-                    },
-                  );
-                }).toList(),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
