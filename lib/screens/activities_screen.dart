@@ -190,9 +190,16 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Activities'),
-        backgroundColor: AppTheme.primaryOrange,
+        title: const Text(
+          'Activities',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: AppTheme.darkSurface,
         foregroundColor: Colors.white,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -466,8 +473,9 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
             AppBar(
               title: Text(title),
               automaticallyImplyLeading: false,
-              backgroundColor: AppTheme.primaryOrange,
+              backgroundColor: AppTheme.darkSurface,
               foregroundColor: Colors.white,
+              elevation: 0,
               actions: [
                 IconButton(
                   icon: const Icon(Icons.close),
@@ -538,8 +546,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
-        backgroundColor: AppTheme.primaryOrange,
+        backgroundColor: AppTheme.darkSurface,
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Center(
         child: AspectRatio(
