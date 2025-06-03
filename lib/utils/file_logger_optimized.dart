@@ -55,14 +55,14 @@ class FileLoggerOptimized {
       // Log initialization
       String timestamp = _getTimestamp();
       _queueLog('[$timestamp] File logger initialized. Log path: $logFilePath');
-      debugPrint('FILE LOGGER BAŞLATILDI. LOG DOSYASI: $logFilePath');
+      print('FILE LOGGER BAŞLATILDI. LOG DOSYASI: $logFilePath');
       
       _initialized = true;
       
       // Register for app lifecycle events to properly close logs
       // This helps ensure we clean up resources properly
     } catch (e) {
-      debugPrint('Error initializing file logger: $e');
+      print('Error initializing file logger: $e');
       // Set initialized to true anyway to prevent repeated init attempts
       _initialized = true;
     }
@@ -81,9 +81,9 @@ class FileLoggerOptimized {
       _queueLog('[$timestamp] [$tag] $message');
       
       // Also print to console for debug purposes
-      debugPrint('[$tag] $message');
+      print('[$tag] $message');
     } catch (e) {
-      debugPrint('Error queuing log message: $e');
+      print('Error queuing log message: $e');
     }
   }
   
@@ -102,7 +102,7 @@ class FileLoggerOptimized {
       _queueLog(formattedJson);
       _queueLog('-' * 80); // Separator for readability
     } catch (e) {
-      debugPrint('Error logging WebSocket message: $e');
+      print('Error logging WebSocket message: $e');
     }
   }
   
@@ -129,7 +129,7 @@ class FileLoggerOptimized {
       _queueLog('  Value: $value (${value.runtimeType})');
       _queueLog('-' * 80); // Separator for readability
     } catch (e) {
-      debugPrint('Error logging camera property update: $e');
+      print('Error logging camera property update: $e');
     }
   }
   
@@ -167,7 +167,7 @@ class FileLoggerOptimized {
       // Flush to disk
       await _logSink!.flush();
     } catch (e) {
-      debugPrint('Error flushing logs: $e');
+      print('Error flushing logs: $e');
     }
   }
   
@@ -221,7 +221,7 @@ class FileLoggerOptimized {
       
       _initialized = false;
     } catch (e) {
-      debugPrint('Error closing file logger: $e');
+      print('Error closing file logger: $e');
     }
   }
   
@@ -229,6 +229,6 @@ class FileLoggerOptimized {
   static void disableLogging() {
     loggingEnabled = false;
     close(); // Close any open files
-    debugPrint('File logging has been disabled');
+    print('File logging has been disabled');
   }
 }

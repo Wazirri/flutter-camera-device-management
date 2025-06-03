@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     } catch (e) {
-      debugPrint('Error loading saved credentials: $e');
+      print('Error loading saved credentials: $e');
     }
   }
 
@@ -92,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setString('username', _emailController.text);
         // We intentionally don't save the password for security reasons
       } catch (e) {
-        debugPrint('Error saving credentials: $e');
+        print('Error saving credentials: $e');
       }
     } else {
       try {
@@ -102,7 +102,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.remove('serverPort');
         await prefs.remove('username');
       } catch (e) {
-        debugPrint('Error clearing credentials: $e');
+        print('Error clearing credentials: $e');
       }
     }
   }

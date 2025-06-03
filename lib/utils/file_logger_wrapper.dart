@@ -14,7 +14,7 @@ class FileLogger {
       _initialized = true;
     } catch (e) {
       if (!_errorLogged) {
-        debugPrint('Error initializing file logger: $e');
+        print('Error initializing file logger: $e');
         _errorLogged = true;
       }
     }
@@ -26,7 +26,7 @@ class FileLogger {
       await FileLoggerOptimized.log(message, tag: tag);
     } catch (e) {
       if (!_errorLogged) {
-        debugPrint('Error writing to log file: $e');
+        print('Error writing to log file: $e');
         _errorLogged = true;
         
         // Disable logging to prevent further errors
@@ -41,7 +41,7 @@ class FileLogger {
       await FileLoggerOptimized.logWebSocketMessage(message, tag: tag);
     } catch (e) {
       if (!_errorLogged) {
-        debugPrint('Error logging WebSocket message: $e');
+        print('Error logging WebSocket message: $e');
         _errorLogged = true;
         
         // Disable logging to prevent further errors
@@ -68,7 +68,7 @@ class FileLogger {
       );
     } catch (e) {
       if (!_errorLogged) {
-        debugPrint('Error logging camera property update: $e');
+        print('Error logging camera property update: $e');
         _errorLogged = true;
         
         // Disable logging to prevent further errors
@@ -83,7 +83,7 @@ class FileLogger {
       await FileLoggerOptimized.close();
       _initialized = false;
     } catch (e) {
-      debugPrint('Error closing file logger: $e');
+      print('Error closing file logger: $e');
     }
   }
   

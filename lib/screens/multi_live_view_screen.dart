@@ -273,7 +273,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> with Automati
               final double y2 = y1 + itemHeight;
               
               // Print sağ alt köşeye göre hesaplanan koordinatlar
-              print('Slot ${i+1} (index $i):');
+              print('FSAAAA FSAAAA FSAAAA FSAAAA  Slot ${i+1} (index $i):');
               print('  Sağ alt köşeden (0,0) koordinatlar: x1=$rightBottomX1, y1=$rightBottomY1, x2=$rightBottomX2, y2=$rightBottomY2');
               print('  Karşılaştırma için Sol üst köşeden koordinatlar: x1=$x1, y1=$y1, x2=$x2, y2=$y2');
             }

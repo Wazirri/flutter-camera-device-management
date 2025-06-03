@@ -196,18 +196,18 @@ class CameraDevice {
 
   // Get the device status
   DeviceStatus get status {
-    debugPrint('CameraDevice status getter invoked for $macAddress');
+    print('CameraDevice status getter invoked for $macAddress');
     // MODIFIED: Primary check for offline status is now solely based on 'connected'.
     // 'online' (powered state) is secondary; if not connected, it's offline to the system.
-    debugPrint('DeviceStatus: Evaluating status for device $macAddress. Device connected property: $connected, Device online property: $online');
+    print('DeviceStatus: Evaluating status for device $macAddress. Device connected property: $connected, Device online property: $online');
     if (!connected) { 
-      debugPrint('DeviceStatus: Device $macAddress determined as OFFLINE because device.connected is $connected.');
+      print('DeviceStatus: Device $macAddress determined as OFFLINE because device.connected is $connected.');
       return DeviceStatus.offline;
     }
     
     // If there are no cameras, and the device itself is connected, consider it online.
     if (cameras.isEmpty) {
-      debugPrint('DeviceStatus: Device $macAddress has no cameras. Reporting as ONLINE because device.connected is true and no cameras to check.');
+      print('DeviceStatus: Device $macAddress has no cameras. Reporting as ONLINE because device.connected is true and no cameras to check.');
       return DeviceStatus.online;
     }
 
@@ -215,23 +215,23 @@ class CameraDevice {
     // bool hasError = false; // This was previously unused. If error conditions for a device (not just camera) exist, logic to set this should be added.
 
     for (final camera in cameras) {
-      debugPrint('DeviceStatus: Checking camera ${camera.name} (index ${camera.index}) for device $macAddress. Camera connected property: ${camera.connected}');
+      print('DeviceStatus: Checking camera ${camera.name} (index ${camera.index}) for device $macAddress. Camera connected property: ${camera.connected}');
       if (!camera.connected) {
         hasWarning = true;
-        debugPrint('DeviceStatus: Camera ${camera.name} for device $macAddress is disconnected. Setting hasWarning to true.');
+        print('DeviceStatus: Camera ${camera.name} for device $macAddress is disconnected. Setting hasWarning to true.');
         break; // Optimization: if one camera causes a warning, no need to check further.
       }
     }
     
     // if (hasError) { // This block is currently unreachable as hasError is never true.
-    //   debugPrint('DeviceStatus: Device $macAddress has error. Returning DeviceStatus.error.');
+    //   print('DeviceStatus: Device $macAddress has error. Returning DeviceStatus.error.');
     //   return DeviceStatus.error;
     // } else 
     if (hasWarning) {
-      debugPrint('DeviceStatus: Device $macAddress determined as WARNING because device.connected is true, but one or more cameras are disconnected.');
+      print('DeviceStatus: Device $macAddress determined as WARNING because device.connected is true, but one or more cameras are disconnected.');
       return DeviceStatus.warning;
     } else {
-      debugPrint('DeviceStatus: Device $macAddress determined as ONLINE because device.connected is true and all cameras are connected.');
+      print('DeviceStatus: Device $macAddress determined as ONLINE because device.connected is true and all cameras are connected.');
       return DeviceStatus.online;
     }
   }
@@ -240,7 +240,7 @@ class CameraDevice {
   void updateStatus() {
     // This method exists solely to make it clear when the status should be recalculated
     // The status is calculated on-demand via the getter
-    debugPrint('Status updated for device $macAddress: ${connected ? "Online" : "Offline"}');
+    print('Status updated for device $macAddress: ${connected ? "Online" : "Offline"}');
   }
 
   // Helper method to format uptime in a human-readable format
@@ -565,35 +565,35 @@ class Camera {
   String get rtspUri {
     try {
       String result = "";
-      debugPrint('RTSP_URI_LOG: Camera $name ($ip) - Evaluating RTSP URI. subUri: "$subUri", mediaUri: "$mediaUri", remoteUri: "$remoteUri", recordUri: "$recordUri"');
+      print('RTSP_URI_LOG: Camera $name ($ip) - Evaluating RTSP URI. subUri: "$subUri", mediaUri: "$mediaUri", remoteUri: "$remoteUri", recordUri: "$recordUri"');
 
       // Prefer subUri when available
       if (subUri.isNotEmpty) {
         result = _addCredentialsToUrl(subUri);
-        debugPrint('RTSP_URI_LOG: Camera $name - Using subUri. Initial: "$subUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
+        print('RTSP_URI_LOG: Camera $name - Using subUri. Initial: "$subUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
       } else if (mediaUri.isNotEmpty) {
         result = _addCredentialsToUrl(mediaUri);
-        debugPrint('RTSP_URI_LOG: Camera $name - Using mediaUri. Initial: "$mediaUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
+        print('RTSP_URI_LOG: Camera $name - Using mediaUri. Initial: "$mediaUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
       } else if (remoteUri.isNotEmpty) {
         result = _addCredentialsToUrl(remoteUri);
-        debugPrint('RTSP_URI_LOG: Camera $name - Using remoteUri. Initial: "$remoteUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
+        print('RTSP_URI_LOG: Camera $name - Using remoteUri. Initial: "$remoteUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
       } else if (recordUri.isNotEmpty) {
         result = _addCredentialsToUrl(recordUri);
-        debugPrint('RTSP_URI_LOG: Camera $name - Using recordUri. Initial: "$recordUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
+        print('RTSP_URI_LOG: Camera $name - Using recordUri. Initial: "$recordUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
       } else {
-        debugPrint('RTSP_URI_LOG: Camera $name - No suitable URI found (all URI fields are empty).');
+        print('RTSP_URI_LOG: Camera $name - No suitable URI found (all URI fields are empty).');
       }
       
       // Final validation to prevent empty or malformed URLs
       if (result.isEmpty) {
-        debugPrint('RTSP_URI_LOG: Camera $name - Final RTSP URI is empty.');
+        print('RTSP_URI_LOG: Camera $name - Final RTSP URI is empty.');
         return "";
       }
       
-      debugPrint('RTSP_URI_LOG: Camera $name - Final RTSP URI to be used: "${_sanitizeUrlForLogging(result)}"');
+      print('RTSP_URI_LOG: Camera $name - Final RTSP URI to be used: "${_sanitizeUrlForLogging(result)}"');
       return result;
     } catch (e) {
-      debugPrint('RTSP_URI_LOG: Camera $name - Error getting RTSP URI: $e');
+      print('RTSP_URI_LOG: Camera $name - Error getting RTSP URI: $e');
       return ""; // Return empty string on error
     }
   }
@@ -618,29 +618,29 @@ class Camera {
   
   // Add username and password to RTSP URL
   String _addCredentialsToUrl(String url) {
-    debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl called with URL: "$url"');
+    print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl called with URL: "$url"');
     // If URL is empty, return empty string to avoid null issues
     if (url.isEmpty) {
-      debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Empty URL provided.');
+      print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Empty URL provided.');
       return "";
     }
     
     // If URL doesn\\'t start with rtsp://, return as is but log a warning
     if (!url.startsWith('rtsp://')) {
-      debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Non-RTSP URL provided: "$url"');
+      print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Non-RTSP URL provided: "$url"');
       return url;
     }
     
     try {
       // If credentials are already in the URL, return as is
       if (url.contains('@')) {
-        debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: URL already contains credentials: "${_sanitizeUrlForLogging(url)}"');
+        print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: URL already contains credentials: "${_sanitizeUrlForLogging(url)}"');
         return url;
       }
       
       // If username or password is empty, return URL as is
       if (username.isEmpty || password.isEmpty) {
-        debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Missing credentials (username: "$username", password: "${password.isNotEmpty ? "******" : ""}"). Returning original URL: "$url"');
+        print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Missing credentials (username: "$username", password: "${password.isNotEmpty ? "******" : ""}"). Returning original URL: "$url"');
         return url;
       }
       
@@ -653,10 +653,10 @@ class Camera {
       
       // Create URL with encoded credentials
       final resultUrl = 'rtsp://$encodedUsername:$encodedPassword@$urlWithoutProtocol';
-      debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Successfully added credentials. Result: "${_sanitizeUrlForLogging(resultUrl)}"');
+      print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Successfully added credentials. Result: "${_sanitizeUrlForLogging(resultUrl)}"');
       return resultUrl;
     } catch (e) {
-      debugPrint('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Error formatting RTSP URL: $e, Original URL: "$url"');
+      print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Error formatting RTSP URL: $e, Original URL: "$url"');
       // Return original URL on error to prevent null values
       return url.isNotEmpty ? url : "";
     }

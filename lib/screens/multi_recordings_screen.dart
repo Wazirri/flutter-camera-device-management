@@ -160,7 +160,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       _cameraRecordings.clear();
     });
     
-    debugPrint('[MultiRecordings] Loading recordings for ${_selectedCameras.length} selected cameras');
+    print('[MultiRecordings] Loading recordings for ${_selectedCameras.length} selected cameras');
     
     // Seçili gün için seçili kameraların kayıtlarını yükle
     final selectedDayFormatted = DateFormat('yyyy-MM-dd').format(_selectedDay!);
@@ -196,12 +196,12 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   
   Future<void> _loadRecordingsForCamera(Camera camera, String recordingsUrl, String formattedDate) async {
     try {
-      debugPrint('[MultiRecordings] Loading recordings for camera: ${camera.name}');
-      debugPrint('[MultiRecordings] Recordings URL: $recordingsUrl');
-      debugPrint('[MultiRecordings] Formatted date: $formattedDate');
+      print('[MultiRecordings] Loading recordings for camera: ${camera.name}');
+      print('[MultiRecordings] Recordings URL: $recordingsUrl');
+      print('[MultiRecordings] Formatted date: $formattedDate');
       
       final response = await http.get(Uri.parse(recordingsUrl));
-      debugPrint('[MultiRecordings] Response status: ${response.statusCode}');
+      print('[MultiRecordings] Response status: ${response.statusCode}');
       
       if (response.statusCode == 200) {
         // HTML yanıtı ayrıştır
@@ -212,13 +212,13 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         final dateMatches = dateRegExp.allMatches(html);
         final dates = dateMatches.map((m) => m.group(1)!).toList();
         
-        debugPrint('[MultiRecordings] Found dates: $dates');
-        debugPrint('[MultiRecordings] Looking for date: $formattedDate');
+        print('[MultiRecordings] Found dates: $dates');
+        print('[MultiRecordings] Looking for date: $formattedDate');
         
         if (dates.contains(formattedDate)) {
           // Seçili tarih klasörünün içeriğini al
           final dateUrl = '$recordingsUrl$formattedDate/';
-          debugPrint('[MultiRecordings] Loading date folder: $dateUrl');
+          print('[MultiRecordings] Loading date folder: $dateUrl');
           final dateResponse = await http.get(Uri.parse(dateUrl));
           
           if (dateResponse.statusCode == 200) {
@@ -227,7 +227,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
             final fileMatches = fileRegExp.allMatches(dateResponse.body);
             final recordings = fileMatches.map((m) => m.group(1)!).toList();
             
-            debugPrint('[MultiRecordings] Found ${recordings.length} recordings for ${camera.name}: $recordings');
+            print('[MultiRecordings] Found ${recordings.length} recordings for ${camera.name}: $recordings');
             
             if (mounted) {
               setState(() {
@@ -235,11 +235,11 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
               });
             }
           } else {
-            debugPrint('[MultiRecordings] Failed to load date folder: ${dateResponse.statusCode}');
+            print('[MultiRecordings] Failed to load date folder: ${dateResponse.statusCode}');
           }
         } else {
           // Bu tarih için kayıt yok
-          debugPrint('[MultiRecordings] No recordings found for date $formattedDate for camera ${camera.name}');
+          print('[MultiRecordings] No recordings found for date $formattedDate for camera ${camera.name}');
           if (mounted) {
             setState(() {
               _cameraRecordings[camera] = [];
@@ -247,11 +247,11 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           }
         }
       } else {
-        debugPrint('[MultiRecordings] Failed to load recordings URL: ${response.statusCode}');
+        print('[MultiRecordings] Failed to load recordings URL: ${response.statusCode}');
         throw Exception('Failed to load recordings: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('[MultiRecordings] Error loading recordings for ${camera.name}: $e');
+      print('[MultiRecordings] Error loading recordings for ${camera.name}: $e');
       if (mounted) {
         setState(() {
           _loadingError = 'Error loading recordings: $e';

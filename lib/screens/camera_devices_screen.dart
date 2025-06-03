@@ -97,11 +97,11 @@ class DeviceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('DeviceCard build START for ${device.macAddress}');
+    print('DeviceCard build START for ${device.macAddress}');
 
     // Access status via the getter, which now includes logging
     final currentStatus = device.status; 
-    debugPrint('DeviceCard build: ${device.macAddress}, connected: ${device.connected}, online: ${device.online}, firstTime: ${device.firstTime}, status from getter: $currentStatus'); // MODIFIED
+    print('DeviceCard build: ${device.macAddress}, connected: ${device.connected}, online: ${device.online}, firstTime: ${device.firstTime}, status from getter: $currentStatus'); // MODIFIED
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -276,10 +276,10 @@ class DeviceDetailsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('DeviceDetailsSheet build START for ${device.macAddress}');
+    print('DeviceDetailsSheet build START for ${device.macAddress}');
     
     final currentStatus = device.status; // Access status via the getter
-    debugPrint('DeviceDetailsSheet build: ${device.macAddress}, connected: ${device.connected}, online: ${device.online}, firstTime: ${device.firstTime}, status from getter: $currentStatus'); // MODIFIED
+    print('DeviceDetailsSheet build: ${device.macAddress}, connected: ${device.connected}, online: ${device.online}, firstTime: ${device.firstTime}, status from getter: $currentStatus'); // MODIFIED
 
     return DefaultTabController(
       length: 2, // İki tab için: Cihaz Bilgileri ve Kameralar

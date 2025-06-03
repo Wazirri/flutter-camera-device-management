@@ -223,14 +223,14 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
     final provider = Provider.of<CameraDevicesProviderOptimized>(context);
     final cameraGroups = provider.cameraGroupsList;
     
-    debugPrint("CameraGroupsScreen: Rendering ${cameraGroups.length} groups: ${cameraGroups.map((g) => g.name).toList()}");
+    print("CameraGroupsScreen: Rendering ${cameraGroups.length} groups: ${cameraGroups.map((g) => g.name).toList()}");
     
     // For each group, get the cameras in that group
     final Map<CameraGroup, List<Camera>> groupedCameras = {};
     for (final group in cameraGroups) {
       final camerasInGroup = provider.getCamerasInGroup(group.name);
       groupedCameras[group] = camerasInGroup;
-      debugPrint("CameraGroupsScreen: Group '${group.name}' has ${camerasInGroup.length} cameras");
+      print("CameraGroupsScreen: Group '${group.name}' has ${camerasInGroup.length} cameras");
     }
     
     // Filter groups based on search query

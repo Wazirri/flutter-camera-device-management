@@ -19,14 +19,14 @@ void main() {
   runZonedGuarded(
     () => runApp(const LauncherApp()),
     (error, stack) {
-      debugPrint('Caught error: $error');
+      print('Caught error: $error');
       
       // Check for file system errors
       final errorString = error.toString().toLowerCase();
       if (errorString.contains('too many open files') || 
           errorString.contains('errno = 24')) {
         FileLoggerOptimized.disableLogging();
-        debugPrint('Logları dosyaya yazma işini iptal edildi. (File logging has been disabled)');
+        print('Logları dosyaya yazma işini iptal edildi. (File logging has been disabled)');
       }
     },
   );

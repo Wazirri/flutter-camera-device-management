@@ -246,7 +246,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
         DeviceStatus status = device.connected
           ? DeviceStatus.online
           : DeviceStatus.offline;
-        debugPrint('DevicesScreen: Building item for ${device.macAddress}. Connected: ${device.connected}, Status: $status');
+        print('DevicesScreen: Building item for ${device.macAddress}. Connected: ${device.connected}, Status: $status');
 
         // For more sophisticated status logic, we could look at other device properties
         // such as warning conditions, errors, etc.
@@ -530,7 +530,7 @@ class _DevicesScreenState extends State<DevicesScreen> {
             // Cihazı güncel verilerle al
             final updatedDevice = devicesProvider.devicesByMacAddress[device.macKey] ?? device;
             final statusText = updatedDevice.connected ? 'Online' : 'Offline';
-            debugPrint('DevicesScreen: DeviceDetailsDialog for ${updatedDevice.macAddress}. Connected: ${updatedDevice.connected}');
+            print('DevicesScreen: DeviceDetailsDialog for ${updatedDevice.macAddress}. Connected: ${updatedDevice.connected}');
 
             return AlertDialog(
               backgroundColor: AppTheme.darkSurface,

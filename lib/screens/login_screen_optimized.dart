@@ -58,7 +58,7 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
         });
       }
     } catch (e) {
-      debugPrint('Error loading saved credentials: $e');
+      print('Error loading saved credentials: $e');
     }
   }
 
@@ -75,7 +75,7 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
         await prefs.setString('username', _emailController.text);
         // We intentionally don't save the password for security reasons
       } catch (e) {
-        debugPrint('Error saving credentials: $e');
+        print('Error saving credentials: $e');
       }
     } else {
       try {
@@ -85,7 +85,7 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
         await prefs.remove('serverPort');
         await prefs.remove('username');
       } catch (e) {
-        debugPrint('Error clearing credentials: $e');
+        print('Error clearing credentials: $e');
       }
     }
   }
@@ -101,7 +101,7 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
 
   void _handleLogin() async {
     final now = DateTime.now().toIso8601String();
-    debugPrint('[$now] Login button pressed');
+    print('[$now] Login button pressed');
     try {
       // Validate inputs
       if (_serverAddressController.text.isEmpty ||
@@ -157,24 +157,24 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
       String? errorMessage;
 
       void loginListener() {
-        debugPrint('Login listener: connected=${webSocketProvider.isConnected}, loggedIn=${webSocketProvider.isLoggedIn}, waitingForChangedone=${webSocketProvider.isWaitingForChangedone}, error=${webSocketProvider.errorMessage}');
+        print('Login listener: connected=${webSocketProvider.isConnected}, loggedIn=${webSocketProvider.isLoggedIn}, waitingForChangedone=${webSocketProvider.isWaitingForChangedone}, error=${webSocketProvider.errorMessage}');
         if (webSocketProvider.lastMessage != null) {
-          debugPrint('Last WebSocket message: ${webSocketProvider.lastMessage}');
+          print('Last WebSocket message: ${webSocketProvider.lastMessage}');
         }
         // Check for login failure (any error message)
         if (webSocketProvider.errorMessage.isNotEmpty) {
-          debugPrint('Login failed - error: ${webSocketProvider.errorMessage}');
+          print('Login failed - error: ${webSocketProvider.errorMessage}');
           loginFailed = true;
           errorMessage = webSocketProvider.errorMessage;
         } 
         // Check for successful login completion (changedone received)
         else if (webSocketProvider.isLoggedIn && !webSocketProvider.isWaitingForChangedone) {
-          debugPrint('Login completed successfully');
+          print('Login completed successfully');
           loginCompleted = true;
         }
         // Check if connection was lost during login
         else if (!webSocketProvider.isConnected && webSocketProvider.errorMessage.isNotEmpty) {
-          debugPrint('Connection lost during login');
+          print('Connection lost during login');
           loginFailed = true;
           errorMessage = webSocketProvider.errorMessage;
         }
@@ -223,7 +223,7 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
         );
       }
     } catch (e, stack) {
-      debugPrint('LOGIN ERROR: $e\n$stack');
+      print('LOGIN ERROR: $e\n$stack');
       // Close the connecting overlay if it's showing
       if (mounted && _isConnecting && Navigator.canPop(context)) {
         Navigator.pop(context);
@@ -299,7 +299,7 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
         webSocketProvider.startEcsMonitoring();
       }
     } catch (e) {
-      debugPrint('Error preloading dashboard data: $e');
+      print('Error preloading dashboard data: $e');
     }
   }
 
@@ -307,8 +307,8 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
   Widget build(BuildContext context) {
     print('DEBUG: LoginScreenOptimized build çalıştı');
     print('DEBUG: _handleLogin fonksiyonu çağrıldı');
-    debugPrint('[DEBUG] LoginScreenOptimized build() called');
-    debugPrint('[DEBUG] _handleLogin() called');
+    print('[DEBUG] LoginScreenOptimized build() called');
+    print('[DEBUG] _handleLogin() called');
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(

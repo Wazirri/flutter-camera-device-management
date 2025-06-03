@@ -246,7 +246,7 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
                       // Then navigate to login
                       widget.onDestinationSelected('/login');
                     } catch (e) {
-                      debugPrint('Error during logout: $e');
+                      print('Error during logout: $e');
                       // Fallback to just navigation
                       widget.onDestinationSelected('/login');
                     }

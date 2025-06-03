@@ -76,11 +76,11 @@ class MultiCameraViewProvider with ChangeNotifier {
           _savedPresets[presetName] = pageAssignments;
         });
         
-        debugPrint('Loaded ${_savedPresets.length} presets from shared preferences');
+        print('Loaded ${_savedPresets.length} presets from shared preferences');
         notifyListeners();
       }
     } catch (e) {
-      debugPrint('Error loading presets from shared preferences: $e');
+      print('Error loading presets from shared preferences: $e');
     }
   }
   
@@ -90,9 +90,9 @@ class MultiCameraViewProvider with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final String presetsJson = jsonEncode(_savedPresets);
       await prefs.setString(_presetsKey, presetsJson);
-      debugPrint('Saved ${_savedPresets.length} presets to shared preferences');
+      print('Saved ${_savedPresets.length} presets to shared preferences');
     } catch (e) {
-      debugPrint('Error saving presets to shared preferences: $e');
+      print('Error saving presets to shared preferences: $e');
     }
   }
 
@@ -145,7 +145,7 @@ class MultiCameraViewProvider with ChangeNotifier {
       
       notifyListeners();
     } catch (e) {
-      debugPrint('Error loading camera layouts: $e');
+      print('Error loading camera layouts: $e');
     }
   }
   
@@ -430,7 +430,7 @@ class MultiCameraViewProvider with ChangeNotifier {
       
       notifyListeners();
     } catch (e) {
-      debugPrint('Error importing presets: $e');
+      print('Error importing presets: $e');
       throw Exception('Invalid preset format');
     }
   }
@@ -441,7 +441,7 @@ class MultiCameraViewProvider with ChangeNotifier {
   Future<bool> sendCommand(String command) async {
     try {
       // For now, we're simulating successful command execution
-      debugPrint('Sending command: $command');
+      print('Sending command: $command');
       
       // Handle special commands related to layouts
       if (command.contains('quick_setup')) {
@@ -468,7 +468,7 @@ class MultiCameraViewProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      debugPrint('Error sending command: $e');
+      print('Error sending command: $e');
       return false;
     }
   }

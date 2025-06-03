@@ -69,7 +69,7 @@ class _DashboardScreenOptimizedState extends State<DashboardScreenOptimized> {
           _isLoading = false;
         });
       }
-      debugPrint('Error loading dashboard data: $e');
+      print('Error loading dashboard data: $e');
     }
   }
 

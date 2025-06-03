@@ -96,7 +96,7 @@ class DesktopSideMenu extends StatelessWidget {
                     Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
                   });
                 } catch (e) {
-                  debugPrint('Error during logout: $e');
+                  print('Error during logout: $e');
                   // Alternative navigation method if the first one fails
                   Navigator.of(context).pushReplacementNamed('/login');
                 }

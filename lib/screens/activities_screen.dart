@@ -1,44 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'dart:io'; // Keep for Process.run
-import '../providers/websocket_provider_optimized.dart';
-
-// Enum to represent FTP item type
-enum FtpItemType { file, directory }
-
-// Class to represent an item in the FTP listing
-class FtpListItem {
-  final String name;
-  final FtpItemType type;
-  final String fullPath;
-  final DateTime? modifiedDate; // Optional: if FTP server provides it
-
-  FtpListItem({
-    required this.name,
-    required this.type,
-    required this.fullPath,
-    this.modifiedDate,
-  });
-}
-
-// Still need ActivityItem for when we display actual media files
-class ActivityItem {
-  final String id;
-  final DateTime timestamp;
-  final String type; // 'Picture' or 'Video'
-  final String cameraName;
-  final String description;
-  final String imageUrl; // For both picture and video thumbnail/link
-
-  ActivityItem({
-    required this.id,
-    required this.timestamp,
-    required this.type,
-    required this.cameraName,
-    required this.description,
-    required this.imageUrl,
-  });
-}
+import 'dart:io';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
+import 'package:path_provider/path_provider.dart';
+import '../theme/app_theme.dart';
 
 class ActivitiesScreen extends StatefulWidget {
   const ActivitiesScreen({Key? key}) : super(key: key);
@@ -48,416 +13,542 @@ class ActivitiesScreen extends StatefulWidget {
 }
 
 class _ActivitiesScreenState extends State<ActivitiesScreen> {
-  // FTP configuration data - static or from WebSocket
-  final Map<String, Map<String, String>> _ftpConfigurations = {};
-  Map<String, String>? _activeFtpConfig; // Store the selected/active FTP config
-
-  // State for FTP browsing
-  String _currentFtpPath = '/cam_detections/'; // Initial path
-  List<FtpListItem> _ftpListItems = [];
-  bool _isLoadingDirectory = false;
+  // FTP configuration
+  final String _ftpHost = '212.253.90.143';
+  final int _ftpPort = 20521;
+  final String _ftpUsername = 'dahuaftp';
+  final String _ftpPassword = 'dahuaftp';
+  final String _ftpBasePath = '/cam_detections';
+  
+  // Current navigation state  
+  List<String> _currentPath = [];
+  List<FtpItem> _currentItems = [];
+  bool _isLoading = false;
   String _loadingError = '';
-
-  // UI state (keep selectedCameraName if you plan to filter by camera later at a deeper level)
-  // String? _selectedCameraName; // Might be useful if we want to show "KAMERA2 activities"
-
+  
   @override
   void initState() {
     super.initState();
-    debugPrint('[Activities] ==> initState() called');
-    _initializeFtpAndLoadInitialDirectory();
-    debugPrint('[Activities] ==> initState() completed');
+    _loadFtpContent();
   }
-
-  Future<void> _initializeFtpAndLoadInitialDirectory() async {
-    debugPrint('[Activities] ==> _initializeFtpAndLoadInitialDirectory() called');
-    _loadFtpConfigurations(); // Load configurations (WebSocket or test) - Removed await
-    if (_ftpConfigurations.isNotEmpty) {
-      // For now, let's assume we use the first available FTP configuration
-      // Or, if you have a specific one like 'test_device', use that.
-      if (_activeFtpConfig == null && _ftpConfigurations.containsKey('test_device')) {
-        _activeFtpConfig = _ftpConfigurations['test_device'];
-        _currentFtpPath = _activeFtpConfig!['basePath'] ?? '/cam_detections/';
-         debugPrint('[Activities] Active FTP Config set to test_device. Path: $_currentFtpPath');
-      } else if (_activeFtpConfig == null && _ftpConfigurations.isNotEmpty) {
-        _activeFtpConfig = _ftpConfigurations.entries.first.value;
-        _currentFtpPath = _activeFtpConfig!['basePath'] ?? _currentFtpPath; // Use current path if base path is null
-        debugPrint('[Activities] Active FTP Config set to first available. Path: $_currentFtpPath');
-      }
-      
-      if (_activeFtpConfig != null) {
-        await _loadDirectory(_currentFtpPath);
-      } else {
-        debugPrint('[Activities] No suitable FTP configuration became active.');
-         setState(() {
-            _loadingError = 'No active FTP configuration found.';
-            _isLoadingDirectory = false;
-        });
-      }
-    } else {
-      debugPrint('[Activities] No FTP configurations loaded. Cannot browse.');
-      setState(() {
-        _loadingError = 'FTP configuration not available.';
-        _isLoadingDirectory = false;
-      });
-    }
-  }
-
-  void _loadFtpConfigurations() {
-    debugPrint('[Activities] ==> _loadFtpConfigurations() called');
-    // Attempt to load from WebSocket
-    final websocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
-    if (websocketProvider.lastMessage != null) {
-      debugPrint('[Activities] Parsing WebSocket message for FTP configurations: ${websocketProvider.lastMessage}');
-      _parseFtpConfigurationsFromWebSocket(websocketProvider.lastMessage);
-    }
-
-    // If WebSocket didn't provide any, or if you want a fallback/test:
-    if (_ftpConfigurations.isEmpty) {
-      debugPrint('[Activities] No FTP configurations from WebSocket, loading test configuration');
-      _loadTestFtpConfiguration();
-    }
-    
-    debugPrint('[Activities] Final loaded FTP configurations: ${_ftpConfigurations.keys.toList()}');
-    debugPrint('[Activities] FTP configurations details: $_ftpConfigurations');
-  }
-
-  void _parseFtpConfigurationsFromWebSocket(dynamic websocketData) {
-    debugPrint('[Activities] Parsing WebSocket data for FTP configurations...');
-    
-    if (websocketData is! Map<String, dynamic>) {
-      debugPrint('[Activities] WebSocket data is not a map');
-      return;
-    }
-    
-    for (var entry in websocketData.entries) {
-      final key = entry.key;
-      final value = entry.value;
-      
-      // FTP URL formatını kontrol et: ecs_slaves.m_AA_AA_92_EE_2F_D6.configuration.ftp.url
-      if (key.contains('.configuration.ftp.')) {
-        final parts = key.split('.');
-        if (parts.length >= 4) {
-          final deviceId = parts[1]; // m_AA_AA_92_EE_2F_D6
-          final ftpProperty = parts[4]; // url, username, password
-          
-          // FTP konfigürasyonu için device entry'si oluştur
-          _ftpConfigurations[deviceId] ??= {};
-          
-          if (ftpProperty == 'url' && value is String) {
-            debugPrint('[Activities] Found FTP URL for $deviceId: $value');
-            
-            // URL'yi parse et: ftp://212.253.90.143:20521/cam_detections
-            final uri = Uri.parse(value);
-            _ftpConfigurations[deviceId]!['host'] = uri.host;
-            _ftpConfigurations[deviceId]!['port'] = uri.port.toString();
-            _ftpConfigurations[deviceId]!['basePath'] = uri.path; // Store base path
-            
-          } else if (ftpProperty == 'username' && value is String) {
-            _ftpConfigurations[deviceId]!['username'] = value;
-            debugPrint('[Activities] Found FTP username for $deviceId: $value');
-            
-          } else if (ftpProperty == 'password' && value is String) {
-            _ftpConfigurations[deviceId]!['password'] = value;
-            debugPrint('[Activities] Found FTP password for $deviceId');
-          }
-        }
-      }
-    }
-    
-    // After parsing, if _currentFtpPath is based on a basePath, update it.
-    // For now, we assume /cam_detections/ is universal or the first config's base path.
-    if (_ftpConfigurations.isNotEmpty && _activeFtpConfig == null) {
-        _activeFtpConfig = _ftpConfigurations.entries.first.value;
-        _currentFtpPath = _activeFtpConfig!['basePath'] ?? '/cam_detections/';
-         debugPrint('[Activities] Default FTP path set to: $_currentFtpPath from first config');
-    } else if (_activeFtpConfig != null) {
-        _currentFtpPath = _activeFtpConfig!['basePath'] ?? _currentFtpPath;
-        debugPrint('[Activities] FTP path updated/confirmed: $_currentFtpPath from active config');
-    }
-
-
-    debugPrint('[Activities] Parsed ${_ftpConfigurations.length} FTP configurations');
-  }
-
-  void _loadTestFtpConfiguration() {
-    // FTP konfigürasyonu - credentials çalışıyor
-    _ftpConfigurations['test_device'] = {
-      'host': '212.253.90.143',
-      'port': '20521',
-      'username': 'dahuaftp',
-      'password': 'dahuaftp',
-      'basePath': '/cam_detections/', // Ensure this is the root you want to browse
-    };
-    // If this is the only config, make it active
-    if (_activeFtpConfig == null && _ftpConfigurations.containsKey('test_device')) {
-        _activeFtpConfig = _ftpConfigurations['test_device'];
-        _currentFtpPath = _activeFtpConfig!['basePath'] ?? '/cam_detections/';
-        debugPrint('[Activities] Test FTP configuration loaded and set as active. Path: $_currentFtpPath');
-    } else {
-        debugPrint('[Activities] Loaded test FTP configuration, but another config might be active or path already set.');
-    }
-  }
-
-  Future<void> _loadDirectory(String path) async {
-    if (_activeFtpConfig == null) {
-      debugPrint('[Activities] No active FTP configuration. Cannot load directory.');
-      setState(() {
-        _loadingError = 'FTP configuration not selected or available.';
-        _isLoadingDirectory = false;
-      });
-      return;
-    }
-
-    debugPrint('[Activities] ==> _loadDirectory() called for path: $path');
+  
+  // Load FTP content for current path
+  Future<void> _loadFtpContent() async {
     setState(() {
-      _isLoadingDirectory = true;
+      _isLoading = true;
       _loadingError = '';
-      _ftpListItems.clear(); // Clear previous items
     });
-
+    
     try {
-      final ftpHost = _activeFtpConfig!['host']!;
-      final ftpPort = int.parse(_activeFtpConfig!['port']!);
-      final username = _activeFtpConfig!['username']!;
-      final password = _activeFtpConfig!['password']!;
-      // Note: The 'path' argument to _loadDirectory is the full path from FTP root.
-      // The 'basePath' from config is the starting point.
-
-      final rawListing = await _fetchFtpDirListing(
-        ftpHost,
-        ftpPort,
-        username,
-        password,
-        path, // Use the full path for listing
-      );
-
-      final List<FtpListItem> parsedItems = [];
-      for (final line in rawListing) {
-        // A more robust parsing logic is needed here.
-        // For now, we'll assume simple names and try to guess type.
-        // A common way FTP LIST command shows directories is with a 'd' at the start of permissions,
-        // or by checking if the name contains a '.' for files (very basic).
-        // `curl --list-only` usually just gives names. We might need a different curl command
-        // or a proper FTP library for detailed listings if `curl --list-only` isn't enough.
-
-        final itemName = line.trim();
-        if (itemName.isEmpty || itemName == "." || itemName == "..") continue;
-
-        // Basic type detection: if it has an extension, assume file. Otherwise, directory.
-        // This is a simplification and might not always be correct.
-        // For Dahua, pic_001, video_001 are directories. YYYY-MM-DD are directories.
-        // .jpg, .dav are files.
-        FtpItemType itemType = FtpItemType.directory; // Default to directory
-        if (itemName.contains('.') && (itemName.endsWith('.jpg') || itemName.endsWith('.dav') || itemName.endsWith('.idx'))) {
-          itemType = FtpItemType.file;
-        }
-        // Further refinement for known directory names if they don't have extensions
-        else if (itemName.startsWith('pic_') || itemName.startsWith('video_') || RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(itemName) || RegExp(r'^\d{2}$').hasMatch(itemName) /*hour folders*/) {
-           itemType = FtpItemType.directory;
-        }
-
-
-        // Construct full path for the item
-        String itemFullPath = path.endsWith('/') ? '$path$itemName' : '$path/$itemName';
-
-
-        parsedItems.add(FtpListItem(
-          name: itemName,
-          type: itemType,
-          fullPath: itemFullPath,
-        ));
-      }
+      final currentFtpPath = _ftpBasePath + (_currentPath.isEmpty ? '' : '/${_currentPath.join('/')}');
+      print('[FTP] Loading content from: $currentFtpPath');
       
-      // Sort: directories first, then files, then by name
-      parsedItems.sort((a, b) {
-        if (a.type == FtpItemType.directory && b.type == FtpItemType.file) {
-          return -1;
-        }
-        if (a.type == FtpItemType.file && b.type == FtpItemType.directory) {
-          return 1;
-        }
-        return a.name.compareTo(b.name);
-      });
-
-
+      final items = await _fetchFtpDirListing(currentFtpPath);
+      
       setState(() {
-        _ftpListItems = parsedItems;
-        _currentFtpPath = path; // Update current path
-        _isLoadingDirectory = false;
+        _currentItems = items;
+        _isLoading = false;
       });
-      debugPrint('[Activities] Loaded ${parsedItems.length} items for path: $path');
-
+      
     } catch (e) {
       setState(() {
-        _loadingError = 'Error loading directory: $e';
-        _isLoadingDirectory = false;
+        _loadingError = 'Error loading FTP content: $e';
+        _isLoading = false;
       });
-      debugPrint('[Activities] Error in _loadDirectory: $e');
+      print('[FTP] Error: $e');
     }
   }
   
-  // FTP directory listing using curl command
-  Future<List<String>> _fetchFtpDirListing(String host, int port, String username, String password, String path) async {
+  // Fetch FTP directory listing using curl
+  Future<List<FtpItem>> _fetchFtpDirListing(String path) async {
     try {
-      debugPrint('[FTP] Attempting to list directory: ftp://$username:***@$host:$port$path');
+      print('[FTP] Fetching directory listing for: $path');
       
       final result = await Process.run('curl', [
         '-s', // Silent mode
         '--show-error', // Show errors
-        '--list-only', // List names only
-        '--ftp-ssl', // Try to use SSL/TLS for control connection if available
-        '--user', '$username:$password',
-        'ftp://$host:$port$path/', // Ensure path ends with a slash for directories
+        '--list-only', // List only
+        '--user', '$_ftpUsername:$_ftpPassword',
+        'ftp://$_ftpHost:$_ftpPort$path/',
       ]);
       
-      debugPrint('[FTP] Curl exit code: ${result.exitCode} for path $path');
-      if (result.stdout.toString().isNotEmpty) {
-         debugPrint('[FTP] Curl stdout (first 100 chars): ${result.stdout.toString().substring(0, result.stdout.toString().length > 100 ? 100 : result.stdout.toString().length)}');
-      } else {
-        debugPrint('[FTP] Curl stdout is empty.');
+      print('[FTP] Curl exit code: ${result.exitCode}');
+      print('[FTP] Curl output: ${result.stdout}');
+      
+      if (result.exitCode != 0) {
+        throw Exception('FTP connection failed: ${result.stderr}');
       }
-      if (result.stderr.toString().isNotEmpty) {
-        debugPrint('[FTP] Curl stderr: ${result.stderr}');
+      
+      final lines = result.stdout.toString().split('\n');
+      final items = <FtpItem>[];
+      
+      for (final line in lines) {
+        final trimmed = line.trim();
+        if (trimmed.isEmpty || trimmed == '.' || trimmed == '..') continue;
+        
+        // Determine if it's a file or directory by checking for common file extensions
+        final isFile = _isFileByExtension(trimmed);
+        
+        items.add(FtpItem(
+          name: trimmed,
+          isDirectory: !isFile,
+          path: '$path/$trimmed',
+        ));
       }
-
-      if (result.exitCode == 0) {
-        final lines = result.stdout.toString().split('\n');
-        final nonEmptyLines = lines.where((line) => line.trim().isNotEmpty).toList();
-        debugPrint('[FTP] Found ${nonEmptyLines.length} items in directory $path');
-        return nonEmptyLines;
-      } else {
-        // Handle common curl error codes for FTP
-        String errorMessage = 'Curl failed with exit code ${result.exitCode}.';
-        if (result.stderr.toString().contains('No such file or directory')) {
-            errorMessage = 'Directory not found or no items: $path';
-        } else if (result.stderr.toString().contains('Login denied')) {
-            errorMessage = 'FTP login denied.';
-        } else {
-            errorMessage += ' Stderr: ${result.stderr}';
-        }
-        debugPrint('[FTP] Error: $errorMessage');
-        // Instead of returning empty list, throw an error to be caught by _loadDirectory
-        throw Exception(errorMessage);
-      }
+      
+      // Sort: directories first, then files
+      items.sort((a, b) {
+        if (a.isDirectory && !b.isDirectory) return -1;
+        if (!a.isDirectory && b.isDirectory) return 1;
+        return a.name.compareTo(b.name);
+      });
+      
+      return items;
+      
     } catch (e) {
-      debugPrint('[FTP] Exception during curl for path $path: $e');
-      throw Exception('FTP command execution failed: $e'); // Re-throw to be caught
+      print('[FTP] Exception during fetch: $e');
+      rethrow;
     }
   }
-
-  // Helper to get parent directory
-  String _getParentPath(String currentPath) {
-    if (currentPath == '/' || currentPath.isEmpty || currentPath == (_activeFtpConfig?['basePath'] ?? '/cam_detections/')) {
-      return _activeFtpConfig?['basePath'] ?? '/cam_detections/'; // Already at root or base
-    }
-    var uri = Uri.parse(currentPath);
-    var segments = List<String>.from(uri.pathSegments);
-    if (segments.isNotEmpty) {
-      segments.removeLast();
-    }
-    if (segments.isEmpty) {
-        return _activeFtpConfig?['basePath'] ?? '/cam_detections/';
-    }
-    return (currentPath.startsWith('/') ? '/' : '') + segments.join('/') + '/';
+  
+  // Check if item is a file based on extension
+  bool _isFileByExtension(String name) {
+    final extensions = ['.jpg', '.jpeg', '.png', '.gif', '.mp4', '.avi', '.mov', '.dav', '.idx'];
+    return extensions.any((ext) => name.toLowerCase().endsWith(ext));
   }
-
-
-  // Placeholder for UI, will be built in the next step
+  
+  // Download file from FTP
+  Future<File?> _downloadFtpFile(String ftpPath) async {
+    try {
+      debugPrint('[FTP] Downloading file from: $ftpPath');
+      
+      // Get temporary directory
+      final tempDir = await getTemporaryDirectory();
+      final fileName = ftpPath.split('/').last;
+      final localFile = File('${tempDir.path}/$fileName');
+      
+      // URL encode the path to handle special characters
+      final encodedPath = Uri.encodeFull(ftpPath);
+      final ftpUrl = 'ftp://$_ftpHost:$_ftpPort$encodedPath';
+      
+      debugPrint('[FTP] Encoded URL: $ftpUrl');
+      
+      // Use curl to download the file with proper encoding
+      final result = await Process.run('curl', [
+        '-s', // Silent mode
+        '--show-error', // Show errors
+        '--user', '$_ftpUsername:$_ftpPassword',
+        '-o', localFile.path, // Output file
+        '--globoff', // Disable glob parsing for special characters
+        ftpUrl,
+      ]);
+      
+      if (result.exitCode != 0) {
+        debugPrint('[FTP] Download failed: ${result.stderr}');
+        return null;
+      }
+      
+      if (await localFile.exists()) {
+        debugPrint('[FTP] File downloaded successfully: ${localFile.path}');
+        return localFile;
+      }
+      
+      return null;
+    } catch (e) {
+      debugPrint('[FTP] Download error: $e');
+      return null;
+    }
+  }
+  
+  // Navigate to directory
+  void _navigateToDirectory(String dirName) {
+    setState(() {
+      _currentPath.add(dirName);
+    });
+    _loadFtpContent();
+  }
+  
+  // Navigate back
+  void _navigateBack() {
+    if (_currentPath.isNotEmpty) {
+      setState(() {
+        _currentPath.removeLast();
+      });
+      _loadFtpContent();
+    }
+  }
+  
+  // Get current path display
+  String _getCurrentPathDisplay() {
+    if (_currentPath.isEmpty) {
+      return 'cam_detections';
+    }
+    return 'cam_detections/${_currentPath.join('/')}';
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('FTP Browser'),
-            Text(
-              _currentFtpPath,
-              style: const TextStyle(fontSize: 12, color: Colors.white70),
-            ),
-          ],
-        ),
-        leading: _currentFtpPath != (_activeFtpConfig?['basePath'] ?? '/cam_detections/') && _currentFtpPath != "/"
-            ? IconButton(
-                icon: const Icon(Icons.arrow_upward),
-                onPressed: () {
-                  final parentPath = _getParentPath(_currentFtpPath);
-                  _loadDirectory(parentPath);
-                },
-              )
-            : null, // No back button if at root
+        title: const Text('Activities'),
+        backgroundColor: AppTheme.primaryBlue,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => _loadDirectory(_currentFtpPath),
+            onPressed: _loadFtpContent,
           ),
         ],
       ),
-      body: _isLoadingDirectory
-          ? const Center(child: CircularProgressIndicator())
-          : _loadingError.isNotEmpty
-              ? Center(child: Text('Error: $_loadingError', style: const TextStyle(color: Colors.red)))
-              : _ftpListItems.isEmpty
-                  ? Center(child: Text('No items found in $_currentFtpPath'))
-                  : ListView.builder(
-                      itemCount: _ftpListItems.length,
-                      itemBuilder: (context, index) {
-                        final item = _ftpListItems[index];
-                        return ListTile(
-                          leading: Icon(item.type == FtpItemType.directory ? Icons.folder : Icons.insert_drive_file),
-                          title: Text(item.name),
-                          // subtitle: Text(item.fullPath), // Optional: for debugging
-                          onTap: () {
-                            if (item.type == FtpItemType.directory) {
-                              _loadDirectory(item.fullPath);
-                            } else {
-                              // Handle file tap - e.g., show preview or download
-                              debugPrint('Tapped on file: ${item.fullPath}');
-                              // For now, just log. Later, could open a viewer.
-                              _showMediaPreview(item);
-                            }
-                          },
-                        );
-                      },
-                    ),
+      body: Column(
+        children: [
+          // Current path display
+          _buildPathDisplay(),
+          
+          // Content list
+          Expanded(
+            child: _buildContentList(),
+          ),
+        ],
+      ),
     );
   }
-
-  // Placeholder for showing media. Will need media_kit or similar.
-  void _showMediaPreview(FtpListItem item) {
-    // This is where you would integrate a media player or image viewer
-    // For now, just a dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Preview: ${item.name}'),
-          content: Text('Full path: ${item.fullPath}\\nType: ${item.type}'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+  
+  Widget _buildPathDisplay() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16.0),
+      color: Colors.grey[100],
+      child: Row(
+        children: [
+          if (_currentPath.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: _navigateBack,
+            ),
+          Expanded(
+            child: Text(
+              _getCurrentPathDisplay(),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildContentList() {
+    if (_isLoading) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Loading...'),
+          ],
+        ),
+      );
+    }
+    
+    if (_loadingError.isNotEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, color: Colors.red, size: 48),
+            const SizedBox(height: 16),
+            Text(
+              _loadingError,
+              style: const TextStyle(color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+              onPressed: _loadFtpContent,
             ),
           ],
-        );
+        ),
+      );
+    }
+    
+    if (_currentItems.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.folder_open, color: Colors.grey, size: 48),
+            SizedBox(height: 16),
+            Text(
+              'No items found in this directory',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    return ListView.builder(
+      itemCount: _currentItems.length,
+      itemBuilder: (context, index) {
+        final item = _currentItems[index];
+        return _buildItemTile(item);
       },
     );
   }
+  
+  Widget _buildItemTile(FtpItem item) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: item.isDirectory ? Colors.blue : _getFileColor(item.name),
+          child: Icon(
+            item.isDirectory ? Icons.folder : _getFileIcon(item.name),
+            color: Colors.white,
+          ),
+        ),
+        title: Text(item.name),
+        subtitle: item.isDirectory 
+            ? const Text('Directory')
+            : Text(_getFileTypeLabel(item.name)),
+        trailing: item.isDirectory 
+            ? const Icon(Icons.chevron_right)
+            : (_isMediaFile(item.name) 
+                ? const Icon(Icons.visibility) 
+                : null),
+        onTap: () {
+          if (item.isDirectory) {
+            _navigateToDirectory(item.name);
+          } else if (_isMediaFile(item.name)) {
+            _openMediaFile(item);
+          }
+        },
+      ),
+    );
+  }
+  
+  Color _getFileColor(String fileName) {
+    if (fileName.toLowerCase().endsWith('.jpg') || 
+        fileName.toLowerCase().endsWith('.jpeg') || 
+        fileName.toLowerCase().endsWith('.png')) {
+      return Colors.green;
+    } else if (fileName.toLowerCase().endsWith('.mp4') || 
+               fileName.toLowerCase().endsWith('.avi') || 
+               fileName.toLowerCase().endsWith('.mov') || 
+               fileName.toLowerCase().endsWith('.dav')) {
+      return Colors.red;
+    }
+    return Colors.grey;
+  }
+  
+  IconData _getFileIcon(String fileName) {
+    if (fileName.toLowerCase().endsWith('.jpg') || 
+        fileName.toLowerCase().endsWith('.jpeg') || 
+        fileName.toLowerCase().endsWith('.png')) {
+      return Icons.image;
+    } else if (fileName.toLowerCase().endsWith('.mp4') || 
+               fileName.toLowerCase().endsWith('.avi') || 
+               fileName.toLowerCase().endsWith('.mov') || 
+               fileName.toLowerCase().endsWith('.dav')) {
+      return Icons.videocam;
+    }
+    return Icons.insert_drive_file;
+  }
+  
+  String _getFileTypeLabel(String fileName) {
+    if (fileName.toLowerCase().endsWith('.jpg') || 
+        fileName.toLowerCase().endsWith('.jpeg') || 
+        fileName.toLowerCase().endsWith('.png')) {
+      return 'Image';
+    } else if (fileName.toLowerCase().endsWith('.mp4') || 
+               fileName.toLowerCase().endsWith('.avi') || 
+               fileName.toLowerCase().endsWith('.mov') || 
+               fileName.toLowerCase().endsWith('.dav')) {
+      return 'Video';
+    }
+    return 'File';
+  }
+  
+  bool _isMediaFile(String fileName) {
+    final mediaExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.mp4', '.avi', '.mov', '.dav'];
+    return mediaExtensions.any((ext) => fileName.toLowerCase().endsWith(ext));
+  }
+  
+  void _openMediaFile(FtpItem item) {
+    final ftpUrl = 'ftp://$_ftpUsername:$_ftpPassword@$_ftpHost:$_ftpPort${item.path}';
+    
+    if (item.name.toLowerCase().endsWith('.mp4') || 
+        item.name.toLowerCase().endsWith('.avi') || 
+        item.name.toLowerCase().endsWith('.mov') || 
+        item.name.toLowerCase().endsWith('.dav')) {
+      // Open video player
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VideoPlayerScreen(videoUrl: ftpUrl, title: item.name),
+        ),
+      );
+    } else {
+      // Download and open image viewer
+      _downloadAndShowImage(item);
+    }
+  }
+  
+  // Download and show image
+  void _downloadAndShowImage(FtpItem item) async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Dialog(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text('Downloading image...'),
+            ],
+          ),
+        ),
+      ),
+    );
+    
+    try {
+      final downloadedFile = await _downloadFtpFile(item.path);
+      
+      // Close loading dialog
+      if (mounted) Navigator.pop(context);
+      
+      if (downloadedFile != null && mounted) {
+        _showLocalImageDialog(downloadedFile.path, item.name);
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to download image')),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog
+      if (mounted) Navigator.pop(context);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error downloading image: $e')),
+        );
+      }
+    }
+  }
 
-  // Remove or comment out old methods that are no longer used
-  // Future<void> _loadActivitiesForDate(DateTime date) async { ... }
-  // Future<void> _scanFtpForCamerasAndActivities(...) async { ... }
-  // String? _parseFolderNameFromFtpLine(String ftpLine) { ... }
-  // Future<List<ActivityItem>> _scanCameraActivities(...) async { ... }
-  // ActivityItem? _parseFileToActivity(...) { ... }
-  // Widget _buildDateSelector() { ... }
-  // Widget _buildCameraFilter() { ... }
-  // Widget _buildActivitiesList() { ... }
-  // void _selectDate() async { ... }
-  // void _playVideo(String videoUrl) { ... }
-  // void _showImageDialog(String imageUrl) { ... }
+  void _showLocalImageDialog(String imagePath, String title) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AppBar(
+              title: Text(title),
+              automaticallyImplyLeading: false,
+              backgroundColor: AppTheme.primaryBlue,
+              foregroundColor: Colors.white,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            Flexible(
+              child: Image.file(
+                File(imagePath),
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Padding(
+                    padding: EdgeInsets.all(32.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.error_outline, color: Colors.red, size: 48),
+                        SizedBox(height: 16),
+                        Text('Failed to load image'),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-} // End of _ActivitiesScreenState
+class VideoPlayerScreen extends StatefulWidget {
+  final String videoUrl;
+  final String title;
+  
+  const VideoPlayerScreen({
+    Key? key, 
+    required this.videoUrl, 
+    required this.title,
+  }) : super(key: key);
+  
+  @override
+  State<VideoPlayerScreen> createState() => _VideoPlayerScreenState();
+}
+
+class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
+  late final Player player;
+  late final VideoController controller;
+  
+  @override
+  void initState() {
+    super.initState();
+    player = Player();
+    controller = VideoController(player);
+    player.open(Media(widget.videoUrl));
+  }
+  
+  @override
+  void dispose() {
+    player.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        backgroundColor: AppTheme.primaryBlue,
+        foregroundColor: Colors.white,
+      ),
+      body: Center(
+        child: AspectRatio(
+          aspectRatio: 16.0 / 9.0,
+          child: Video(controller: controller),
+        ),
+      ),
+    );
+  }
+}
+
+class FtpItem {
+  final String name;
+  final bool isDirectory;
+  final String path;
+  
+  FtpItem({
+    required this.name,
+    required this.isDirectory,
+    required this.path,
+  });
+}

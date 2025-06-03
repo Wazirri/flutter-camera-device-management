@@ -24,7 +24,7 @@ class ErrorMonitor {
   void startMonitoring() {
     if (_isMonitoring) return;
     
-    debugPrint('Starting error monitoring...');
+    print('Starting error monitoring...');
     _isMonitoring = true;
     
     FlutterError.onError = _handleFlutterError;
@@ -48,7 +48,7 @@ class ErrorMonitor {
   /// Handle Flutter errors
   void _handleFlutterError(FlutterErrorDetails details) {
     // Log the error
-    debugPrint('Flutter error: ${details.exception}');
+    print('Flutter error: ${details.exception}');
     
     // Check if it's a "too many open files" error
     final errorString = details.exception.toString().toLowerCase();
@@ -81,7 +81,7 @@ class ErrorMonitor {
     
     // Take action if we've seen multiple errors
     if (_errorCount >= 2) {
-      debugPrint('Too many open files error detected! Disabling file logging...');
+      print('Too many open files error detected! Disabling file logging...');
       
       // Disable file logging
       FileLoggerOptimized.disableLogging();
@@ -89,7 +89,7 @@ class ErrorMonitor {
       // Show the error only the first time
       if (_errorCount == 2) {
         // Display a friendly message
-        debugPrint('Logları dosyaya yazma işini iptal edildi. (File logging has been disabled)');
+        print('Logları dosyaya yazma işini iptal edildi. (File logging has been disabled)');
       }
     }
   }

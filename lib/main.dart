@@ -32,7 +32,7 @@ import 'providers/multi_view_layout_provider.dart';
 import 'providers/multi_camera_view_provider.dart'; // Yeni provider
 
 Future<void> main() async {
-  debugPrint('TEST_LOG: main() function started.'); // <-- BU SATIRI EKLEYİN
+  print('TEST_LOG: main() function started.'); // <-- BU SATIRI EKLEYİN
   // This captures errors that happen during initialization
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -53,10 +53,10 @@ Future<void> main() async {
         // Set specific platform settings
         if (Platform.isIOS || Platform.isMacOS) {
           // iOS/macOS specific settings if needed
-          debugPrint('Configuring iOS/macOS specific settings');
+          print('Configuring iOS/macOS specific settings');
         }
       } catch (e) {
-        debugPrint('Error setting orientations: $e');
+        print('Error setting orientations: $e');
       }
     }
     
@@ -83,8 +83,8 @@ Future<void> main() async {
     );
   }, (error, stackTrace) {
     // Log any errors that occur during initialization
-    debugPrint('Caught error: $error');
-    debugPrint('Stack trace: $stackTrace');
+    print('Caught error: $error');
+    print('Stack trace: $stackTrace');
   });
 }
 
@@ -139,7 +139,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Handle app lifecycle changes
-    debugPrint('App lifecycle state changed to: $state');
+    print('App lifecycle state changed to: $state');
     
     // Handle specific state changes if needed
     switch (state) {
@@ -300,7 +300,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Handle app lifecycle state changes
-    debugPrint('AppShell lifecycle state: $state');
+    print('AppShell lifecycle state: $state');
     
     if (state == AppLifecycleState.resumed) {
       // When app is resumed from background, rebuild UI if needed
@@ -378,7 +378,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
       }
     } catch (e) {
       // Handle any navigation errors
-      debugPrint('Navigation error: $e');
+      print('Navigation error: $e');
     }
   }
 }

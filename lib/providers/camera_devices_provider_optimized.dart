@@ -97,7 +97,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   
   // Find parent device for a camera
   CameraDevice? getDeviceForCamera(Camera camera) {
-    debugPrint('CDP_OPT: Looking for device for camera: ${camera.mac} (name: ${camera.name}, index: ${camera.index})');
+    print('CDP_OPT: Looking for device for camera: ${camera.mac} (name: ${camera.name}, index: ${camera.index})');
     
     // First try to find by camera MAC in the device's cameras list
     for (var entry in _devices.entries) {
@@ -106,7 +106,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       // Check if this device has a camera with the same MAC
       for (var deviceCamera in device.cameras) {
         if (deviceCamera.mac == camera.mac && deviceCamera.mac.isNotEmpty) {
-          debugPrint('CDP_OPT: Found device for camera ${camera.mac}: ${device.macAddress} (${device.ipv4})');
+          print('CDP_OPT: Found device for camera ${camera.mac}: ${device.macAddress} (${device.ipv4})');
           return device;
         }
       }
@@ -117,15 +117,15 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       CameraDevice device = entry.value;
       
       if (device.cameras.any((c) => c.index == camera.index)) {
-        debugPrint('CDP_OPT: Found device for camera by index ${camera.index}: ${device.macAddress} (${device.ipv4})');
+        print('CDP_OPT: Found device for camera by index ${camera.index}: ${device.macAddress} (${device.ipv4})');
         return device;
       }
     }
     
-    debugPrint('CDP_OPT: No device found for camera: ${camera.mac} (name: ${camera.name}, index: ${camera.index})');
-    debugPrint('CDP_OPT: Available devices: ${_devices.keys.toList()}');
+    print('CDP_OPT: No device found for camera: ${camera.mac} (name: ${camera.name}, index: ${camera.index})');
+    print('CDP_OPT: Available devices: ${_devices.keys.toList()}');
     for (var entry in _devices.entries) {
-      debugPrint('CDP_OPT: Device ${entry.key}: ${entry.value.cameras.map((c) => '${c.mac}(${c.name})').toList()}');
+      print('CDP_OPT: Device ${entry.key}: ${entry.value.cameras.map((c) => '${c.mac}(${c.name})').toList()}');
     }
     
     return null;
@@ -234,7 +234,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       // This case should ideally be prevented by upstream validation or a placeholder.
       // For now, let's log and return a temporary camera object if absolutely necessary,
       // but this indicates a data issue.
-      debugPrint("CDP_OPT: CRITICAL - Attempted to get/create camera with empty MAC.");
+      print("CDP_OPT: CRITICAL - Attempted to get/create camera with empty MAC.");
       // Returning a dummy or throwing an error might be better.
       // For now, to avoid crashing, let's create one, but it won't be useful.
       // Assign a temporary, non-colliding index. This camera is problematic anyway.
@@ -245,7 +245,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       });
     }
     return _macDefinedCameras.putIfAbsent(cameraMac, () {
-      debugPrint('CDP_OPT: Creating new MAC-defined camera: $cameraMac');
+      print('CDP_OPT: Creating new MAC-defined camera: $cameraMac');
       _cachedFlatCameraList = null; // Invalidate flat list cache
       // Assign a temporary index; it will be updated when linked to a device by _addOrUpdateCameraInDeviceList
       return Camera(mac: cameraMac, index: -1); 
@@ -257,7 +257,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     if (pathParts.length < 3) return;
     String propertyName = pathParts[2].toLowerCase(); // property name is at index 2
 
-    debugPrint('CDP_OPT: Updating MAC-cam ${camera.mac}: $propertyName = $value');
+    print('CDP_OPT: Updating MAC-cam ${camera.mac}: $propertyName = $value');
 
     if (propertyName.startsWith('group[')) {
       Match? match = RegExp(r'group\[(\d+)\]').firstMatch(propertyName);
@@ -273,7 +273,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
           
           camera.groups[groupIndex] = groupValue; // Assign value (can be empty)
           
-          debugPrint('CDP_OPT: Camera ${camera.mac} group at index $groupIndex updated to "$groupValue". Groups: ${camera.groups}');
+          print('CDP_OPT: Camera ${camera.mac} group at index $groupIndex updated to "$groupValue". Groups: ${camera.groups}');
           
           // Create or update the camera group if it doesn't exist
           if (groupValue.isNotEmpty && !_cameraGroups.containsKey(groupValue)) {
@@ -282,10 +282,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
               cameraMacs: []
             );
             _cachedGroupsList = null;
-            debugPrint('CDP_OPT: Created new camera group: $groupValue');
+            print('CDP_OPT: Created new camera group: $groupValue');
           }
         } catch (e) {
-          debugPrint('CDP_OPT: Error parsing group index from $propertyName: $e');
+          print('CDP_OPT: Error parsing group index from $propertyName: $e');
         }
       }
     } else {
@@ -342,7 +342,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         case 'record': camera.recording = value is bool ? value : (value.toString().toLowerCase() == 'true' || value.toString() == '1'); break;
         
         default:
-          debugPrint('CDP_OPT: Unhandled MAC-defined camera property: $propertyName for camera ${camera.mac}');
+          print('CDP_OPT: Unhandled MAC-defined camera property: $propertyName for camera ${camera.mac}');
       }
     }
     _cachedFlatCameraList = null;
@@ -399,10 +399,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
             final camera = _getOrCreateMacDefinedCamera(cameraMac);
             await _updateMacDefinedCameraProperty(camera, parts, value);
           } else {
-            debugPrint('CDP_OPT: Received cameras_mac message with empty camera MAC in path: $dataPath');
+            print('CDP_OPT: Received cameras_mac message with empty camera MAC in path: $dataPath');
           }
         } else {
-          debugPrint('CDP_OPT: Invalid cameras_mac path: $dataPath');
+          print('CDP_OPT: Invalid cameras_mac path: $dataPath');
         }
         return; // Message handled
       }
@@ -413,7 +413,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       
       final parts = dataPath.split('.');
       if (parts.length < 2) {
-        debugPrint('CDP_OPT: Path too short, skipping: $dataPath');
+        print('CDP_OPT: Path too short, skipping: $dataPath');
         return;
       }
       
@@ -425,11 +425,11 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       if (macMatch != null) {
         canonicalMacAddress = macMatch.group(0)!.replaceAll('_', ':');
         if (canonicalMacAddress.length != 17) {
-           debugPrint('CDP_OPT: Extracted MAC "$canonicalMacAddress" from "$pathDeviceIdentifier" has invalid length. Skipping message.');
+           print('CDP_OPT: Extracted MAC "$canonicalMacAddress" from "$pathDeviceIdentifier" has invalid length. Skipping message.');
            return;
         }
       } else {
-        debugPrint('CDP_OPT: Could not extract MAC address from device path component: "$pathDeviceIdentifier". Skipping message.');
+        print('CDP_OPT: Could not extract MAC address from device path component: "$pathDeviceIdentifier". Skipping message.');
         return;
       }
       
@@ -450,7 +450,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
             final bool newStatus = value is bool ? value : (onlineValue == '1' || onlineValue.toLowerCase() == 'true');
             device.connected = newStatus;
             device.updateStatus(); // Assuming CameraDevice has 'updateStatus'
-            debugPrint('Direct online handling: Device ${device.macAddress} online status changed from $previousStatus to ${device.connected} (value: $onlineValue)');
+            print('Direct online handling: Device ${device.macAddress} online status changed from $previousStatus to ${device.connected} (value: $onlineValue)');
             _cachedDevicesList = null;
             _batchNotifyListeners();
             return;
@@ -479,7 +479,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
               case MessageCategory.camera: // Added case for MessageCategory.camera
                 // This case should ideally not be hit if cam[ startsWith is handled above.
                 // However, if _categorizeMessage can return it for other paths, handle appropriately.
-                debugPrint('CDP_OPT: MessageCategory.camera reached for $dataPath. This might indicate an unexpected path format.');
+                print('CDP_OPT: MessageCategory.camera reached for $dataPath. This might indicate an unexpected path format.');
                 // Potentially call _processCameraData or a similar handler if applicable.
                 break; 
               case MessageCategory.cameraReport:
@@ -497,7 +497,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
               case MessageCategory.cameraGroupAssignment: 
                 // This is now handled by cameras_mac.CAMERA_MAC.group[index]
                 // So, this case can be removed or logged as deprecated if messages still arrive.
-                debugPrint("CDP_OPT: Deprecated message type CameraGroupAssignment received for ecs_slaves: $dataPath. Group assignments are now handled by 'cameras_mac'.");
+                print("CDP_OPT: Deprecated message type CameraGroupAssignment received for ecs_slaves: $dataPath. Group assignments are now handled by 'cameras_mac'.");
                 // if (parts.length > 3 && componentAfterDevice.startsWith('cam')) {
                 //    final cameraIndex = componentAfterDevice.replaceAll('cam', '').replaceAll(RegExp(r'\\\\[|\\\\]'), '');
                 //    await _processCameraGroupAssignment(device, cameraIndex, value.toString());
@@ -518,7 +518,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         _batchNotifyListeners();
       }
     } catch (e, s) {
-      debugPrint('CDP_OPT: Error processing WebSocket message: $e\\n$s. Message: $message');
+      print('CDP_OPT: Error processing WebSocket message: $e\\n$s. Message: $message');
     }
   }
   
@@ -529,7 +529,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         pathComponent == 'connected' ||
         pathComponent == 'firsttime' || 
         pathComponent == 'current_time') {
-      debugPrint('Detected basic device property: $pathComponent');
+      print('Detected basic device property: $pathComponent');
       return MessageCategory.basicProperty;
     }
     
@@ -590,14 +590,14 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     int cameraIndex = int.tryParse(indexStr) ?? -1;
     
     if (cameraIndex < 0 || camPathProperties.isEmpty) {
-      debugPrint('CDP_OPT: Invalid camIndex or no properties for ecs_slaves camera data. Device: ${device.macAddress}, Path: $camIndexPath');
+      print('CDP_OPT: Invalid camIndex or no properties for ecs_slaves camera data. Device: ${device.macAddress}, Path: $camIndexPath');
       return;
     }
     
     String propertyName = camPathProperties[0].toLowerCase();
     // String subProperty = camPathProperties.length > 1 ? camPathProperties[1].toLowerCase() : '';
 
-    debugPrint('CDP_OPT: Processing ecs_slaves data: Device ${device.macAddress}, cam[$cameraIndex].$propertyName = $value');
+    print('CDP_OPT: Processing ecs_slaves data: Device ${device.macAddress}, cam[$cameraIndex].$propertyName = $value');
 
     Camera? cameraToUpdate;
 
@@ -607,9 +607,9 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         cameraToUpdate = _getOrCreateMacDefinedCamera(cameraMacFromMessage);
         // Link this MAC-defined camera to the parent device and its index
         _addOrUpdateCameraInDeviceList(device, cameraIndex, cameraToUpdate);
-        debugPrint('CDP_OPT: Linked camera ${cameraToUpdate.mac} to device ${device.macKey} at index $cameraIndex.');
+        print('CDP_OPT: Linked camera ${cameraToUpdate.mac} to device ${device.macKey} at index $cameraIndex.');
       } else {
-        debugPrint('CDP_OPT: Received empty MAC for cam[$cameraIndex] on device ${device.macAddress}. Cannot link or update.');
+        print('CDP_OPT: Received empty MAC for cam[$cameraIndex] on device ${device.macAddress}. Cannot link or update.');
         return; 
       }
     } else {
@@ -619,10 +619,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       if (camsInDevice.isNotEmpty) {
         cameraToUpdate = camsInDevice.first; // Should ideally be only one
         if (camsInDevice.length > 1) {
-            debugPrint("CDP_OPT: WARNING - Multiple cameras found for device ${device.macKey} at index $cameraIndex. Using first: ${cameraToUpdate.mac}. All: ${camsInDevice.map((c)=>c.mac).join(',')}");
+            print("CDP_OPT: WARNING - Multiple cameras found for device ${device.macKey} at index $cameraIndex. Using first: ${cameraToUpdate.mac}. All: ${camsInDevice.map((c)=>c.mac).join(',')}");
         }
       } else {
-        debugPrint('CDP_OPT: No camera found for device ${device.macKey} at cam[$cameraIndex] to update property $propertyName. MAC message might not have arrived yet.');
+        print('CDP_OPT: No camera found for device ${device.macKey} at cam[$cameraIndex] to update property $propertyName. MAC message might not have arrived yet.');
         return; // Cannot update if we don't know which camera it is.
       }
     }
@@ -650,7 +650,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         // This part needs to be mapped to your Camera model's fields carefully.
         // For now, we assume 'mac' is the linker, and 'name'/'ip' can be updated.
         // Other properties from ecs_slaves.cam[X] need explicit handling if they map to Camera object fields.
-        debugPrint('CDP_OPT: ecs_slaves cam[$cameraIndex] property \'$propertyName\' for ${cameraToUpdate.mac} - specific update logic may be needed.');
+        print('CDP_OPT: ecs_slaves cam[$cameraIndex] property \'$propertyName\' for ${cameraToUpdate.mac} - specific update logic may be needed.');
     }
     _cachedFlatCameraList = null; // Camera property changed
     _batchNotifyListeners();
@@ -665,19 +665,19 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   // _processCameraReport needs to find cameras in _macDefinedCameras by name.
   Future<void> _processCameraReport(CameraDevice device, List<String> properties, dynamic value) async {
     if (properties.isEmpty) {
-      debugPrint('CDP_OPT: ProcessCameraReport - No properties, skipping. Device: ${device.macAddress}');
+      print('CDP_OPT: ProcessCameraReport - No properties, skipping. Device: ${device.macAddress}');
       return;
     }
     
     final cameraName = properties[0];
     if (properties.length < 2) {
-      debugPrint('CDP_OPT: ProcessCameraReport - Not enough properties for $cameraName on device ${device.macAddress}. Skipping.');
+      print('CDP_OPT: ProcessCameraReport - Not enough properties for $cameraName on device ${device.macAddress}. Skipping.');
       return;
     }
     
     final reportProperty = properties[1].toLowerCase();
     
-    debugPrint('CDP_OPT: Processing camera report: device=${device.macAddress}, cameraNameInReport=$cameraName, property=$reportProperty, value=$value');
+    print('CDP_OPT: Processing camera report: device=${device.macAddress}, cameraNameInReport=$cameraName, property=$reportProperty, value=$value');
 
     Camera? targetCamera;
     String? deviceMacFromIndex = _cameraNameToDeviceMap[cameraName];
@@ -688,30 +688,30 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       try {
         targetCamera = device.cameras.firstWhere((cam) => cam.name == cameraName);
         // If firstWhere completes, camera is found and targetCamera is non-null.
-        debugPrint('CDP_OPT: ProcessCameraReport - Found camera "$cameraName" via _cameraNameToDeviceMap (and confirmed in device.cameras) for device ${device.macAddress}.');
+        print('CDP_OPT: ProcessCameraReport - Found camera "$cameraName" via _cameraNameToDeviceMap (and confirmed in device.cameras) for device ${device.macAddress}.');
       } catch (e) {
         // Element not found in device.cameras, even if map suggested it.
         // This could happen if the camera was removed or its name changed after the map was populated.
         targetCamera = null; 
-        debugPrint('CDP_OPT: ProcessCameraReport - Camera "$cameraName" was in _cameraNameToDeviceMap but NOT found in device.cameras list for ${device.macAddress}. Map might be stale or name changed.');
+        print('CDP_OPT: ProcessCameraReport - Camera "$cameraName" was in _cameraNameToDeviceMap but NOT found in device.cameras list for ${device.macAddress}. Map might be stale or name changed.');
       }
     }
     
     // Fallback: if not found via map (or if map was stale/incorrect), iterate all cameras for this device.
     // This also covers the case where deviceMacFromIndex was null (camera name not in map).
     if (targetCamera == null) {
-      debugPrint('CDP_OPT: ProcessCameraReport - Camera "$cameraName" not found via map or map was stale. Iterating all cameras for device ${device.macAddress}.');
+      print('CDP_OPT: ProcessCameraReport - Camera "$cameraName" not found via map or map was stale. Iterating all cameras for device ${device.macAddress}.');
       for (var camInLoop in device.cameras) {
         if (camInLoop.name == cameraName) {
           targetCamera = camInLoop;
-          debugPrint('CDP_OPT: ProcessCameraReport - Found camera "$cameraName" by iterating all cameras for device ${device.macAddress}.');
+          print('CDP_OPT: ProcessCameraReport - Found camera "$cameraName" by iterating all cameras for device ${device.macAddress}.');
           break;
         }
       }
     }
     
     if (targetCamera == null) {
-      debugPrint('CDP_OPT: ProcessCameraReport - Camera "$cameraName" not found on device ${device.macAddress} and will NOT be created from report. Report for property $reportProperty skipped.');
+      print('CDP_OPT: ProcessCameraReport - Camera "$cameraName" not found on device ${device.macAddress} and will NOT be created from report. Report for property $reportProperty skipped.');
       return;
     }
     
@@ -723,7 +723,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       case 'connected':
         final bool previousStatus = targetCamera.connected;
         targetCamera.setConnectedStatus(value);
-        debugPrint('Camera report: ${targetCamera.name} connected status changed from $previousStatus to ${targetCamera.connected}');
+        print('Camera report: ${targetCamera.name} connected status changed from $previousStatus to ${targetCamera.connected}');
         break;
       case 'last_seen_at':
         targetCamera.lastSeenAt = value.toString();
@@ -747,7 +747,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         targetCamera.reportName = value.toString();
         break;
       default:
-        debugPrint('Unhandled camera report property: $reportProperty = $value for camera $cameraName');
+        print('Unhandled camera report property: $reportProperty = $value for camera $cameraName');
         break;
     }
   }
@@ -758,13 +758,13 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     
     final property = properties[0].toLowerCase();
     
-    debugPrint('CDP_OPT: Processing sysinfo property: $property = $value for device ${device.macAddress}');
+    print('CDP_OPT: Processing sysinfo property: $property = $value for device ${device.macAddress}');
     
     switch (property) {
       case 'cputemp':
         final temp = double.tryParse(value.toString()) ?? 0.0;
         device.cpuTemp = temp;
-        debugPrint('CDP_OPT: *** UPDATED device ${device.macAddress} CPU temp to $temp°C ***');
+        print('CDP_OPT: *** UPDATED device ${device.macAddress} CPU temp to $temp°C ***');
         break;
       
       case 'uptime':
@@ -773,42 +773,42 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         
       case 'srvtime':
         // Store service time - could be added to device model if needed
-        debugPrint('CDP_OPT: Device ${device.macAddress} service time: ${value.toString()}');
+        print('CDP_OPT: Device ${device.macAddress} service time: ${value.toString()}');
         break;
         
       case 'totalram':
         final ram = int.tryParse(value.toString()) ?? 0;
         device.totalRam = ram;
-        debugPrint('CDP_OPT: Updated device ${device.macAddress} total RAM to ${(ram / (1024 * 1024)).toStringAsFixed(2)} MB');
+        print('CDP_OPT: Updated device ${device.macAddress} total RAM to ${(ram / (1024 * 1024)).toStringAsFixed(2)} MB');
         break;
         
       case 'freeram':
         final ram = int.tryParse(value.toString()) ?? 0;
         device.freeRam = ram;
-        debugPrint('CDP_OPT: Updated device ${device.macAddress} free RAM to ${(ram / (1024 * 1024)).toStringAsFixed(2)} MB');
+        print('CDP_OPT: Updated device ${device.macAddress} free RAM to ${(ram / (1024 * 1024)).toStringAsFixed(2)} MB');
         break;
         
       case 'totalconns':
         final conns = int.tryParse(value.toString()) ?? 0;
         device.totalConnections = conns;
-        debugPrint('CDP_OPT: Updated device ${device.macAddress} total connections to $conns');
+        print('CDP_OPT: Updated device ${device.macAddress} total connections to $conns');
         break;
         
       case 'sessions':
         final sessions = int.tryParse(value.toString()) ?? 0;
         device.totalSessions = sessions;
-        debugPrint('CDP_OPT: Updated device ${device.macAddress} sessions to $sessions');
+        print('CDP_OPT: Updated device ${device.macAddress} sessions to $sessions');
         break;
         
       case 'eth0':
         // Update IPv4 address from eth0
         device.ipv4 = value.toString();
-        debugPrint('CDP_OPT: Updated device ${device.macAddress} IPv4 (eth0) to ${value.toString()}');
+        print('CDP_OPT: Updated device ${device.macAddress} IPv4 (eth0) to ${value.toString()}');
         break;
         
       case 'ppp0':
         // Store PPP connection info - could be added to device model if needed
-        debugPrint('CDP_OPT: Device ${device.macAddress} PPP0 status: ${value.toString()}');
+        print('CDP_OPT: Device ${device.macAddress} PPP0 status: ${value.toString()}');
         break;
         
       case 'thermal':
@@ -816,7 +816,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         if (properties.length > 1) {
           final thermalIndex = properties[1];
           final thermalProperty = properties.length > 2 ? properties[2] : '';
-          debugPrint('CDP_OPT: Device ${device.macAddress} thermal[$thermalIndex].$thermalProperty = $value');
+          print('CDP_OPT: Device ${device.macAddress} thermal[$thermalIndex].$thermalProperty = $value');
           // Could store thermal data in device if model is extended
         }
         break;
@@ -825,7 +825,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         // Handle GPS data
         if (properties.length > 1) {
           final gpsProperty = properties[1];
-          debugPrint('CDP_OPT: Device ${device.macAddress} GPS.$gpsProperty = $value');
+          print('CDP_OPT: Device ${device.macAddress} GPS.$gpsProperty = $value');
           // Could store GPS data in device if model is extended
         }
         break;
@@ -834,14 +834,14 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         final bool previousStatus = device.connected;
         device.connected = value is bool ? value : (value.toString() == '1' || value.toString().toLowerCase() == 'true');
         device.updateStatus(); // Force status update
-        debugPrint('System info update: Device ${device.macAddress} connected status changed from $previousStatus to ${device.connected}');
+        print('System info update: Device ${device.macAddress} connected status changed from $previousStatus to ${device.connected}');
         break;
         
       case 'online':
         final bool previousStatus = device.connected;
         device.connected = value is bool ? value : (value.toString() == '1' || value.toString().toLowerCase() == 'true');
         device.updateStatus(); // Force status update
-        debugPrint('System info update: Device ${device.macAddress} online status changed from $previousStatus to ${device.connected}');
+        print('System info update: Device ${device.macAddress} online status changed from $previousStatus to ${device.connected}');
         break;
         
       case 'lastupdate':
@@ -850,7 +850,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         break;
         
       default:
-        debugPrint('CDP_OPT: Unhandled sysinfo property: $property = $value for device ${device.macAddress}');
+        print('CDP_OPT: Unhandled sysinfo property: $property = $value for device ${device.macAddress}');
         break;
     }
   }
@@ -879,13 +879,13 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         // Handle direct cpuTemp messages like "ecs_slaves.m_XX_XX_XX_XX_XX_XX.cpuTemp"
         final temp = double.tryParse(value.toString()) ?? 0.0;
         device.cpuTemp = temp;
-        debugPrint('CDP_OPT: *** BASIC PROPERTY - Updated device ${device.macAddress} CPU temp to $temp°C ***');
+        print('CDP_OPT: *** BASIC PROPERTY - Updated device ${device.macAddress} CPU temp to $temp°C ***');
         break;
       case 'connected':
         final bool previousStatus = device.connected;
         device.connected = value is bool ? value : (value.toString() == '1' || value.toString().toLowerCase() == 'true');
         device.updateStatus(); // Force status update
-        debugPrint('Device ${device.macAddress} connected status changed from $previousStatus to ${device.connected} (original value: ${value.toString()})');
+        print('Device ${device.macAddress} connected status changed from $previousStatus to ${device.connected} (original value: ${value.toString()})');
         break;
       case 'online':
         // Parse 'online' property from numeric value (1 for online, 0 for offline)
@@ -893,17 +893,17 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         final bool previousStatus = device.connected;
         device.connected = value is bool ? value : (onlineValue == '1' || onlineValue.toLowerCase() == 'true');
         device.updateStatus(); // Force status update
-        debugPrint('Device ${device.macAddress} online status changed from $previousStatus to ${device.connected} (original value: $onlineValue)');
+        print('Device ${device.macAddress} online status changed from $previousStatus to ${device.connected} (original value: $onlineValue)');
         break;
       case 'firsttime':
         // Store first time property in device uptime field
         device.uptime = value.toString();
-        debugPrint('Device ${device.macAddress} firsttime set to: ${value.toString()}');
+        print('Device ${device.macAddress} firsttime set to: ${value.toString()}');
         break;
       case 'current_time':
         // Store current time in device lastSeenAt field
         device.lastSeenAt = value.toString();
-        debugPrint('Device ${device.macAddress} current_time set to: ${value.toString()}');
+        print('Device ${device.macAddress} current_time set to: ${value.toString()}');
         break;
     }
   }
@@ -912,7 +912,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   // This method is likely deprecated as group assignments are now handled by 
   // cameras_mac.CAMERA_MAC.group[index] via _updateMacDefinedCameraProperty
   Future<void> _processCameraGroupAssignment(CameraDevice device, String cameraIndex, String groupName) async {
-    debugPrint("CDP_OPT: _processCameraGroupAssignment called for device ${device.macKey}, camIndex $cameraIndex, group $groupName. This path is likely deprecated.");
+    print("CDP_OPT: _processCameraGroupAssignment called for device ${device.macKey}, camIndex $cameraIndex, group $groupName. This path is likely deprecated.");
     // Original logic (if any was here) might involve finding the camera by index in device.cameras
     // and updating its 'groups' list. However, 'cameras_mac' is now the authority for groups.
     // Consider removing this method if no ecs_slaves messages are expected for this.
@@ -947,13 +947,13 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     try {
       // Daha sıkı filtreleme: boş, null, sadece whitespace olanları reddet
       if (groupName.isEmpty || groupName.trim().isEmpty) {
-        debugPrint("CDP_OPT: Ignoring empty or whitespace-only group name from WebSocket.");
+        print("CDP_OPT: Ignoring empty or whitespace-only group name from WebSocket.");
         return;
       }
       
       // Çok kısa grup isimlerini de reddet
       if (groupName.trim().length < 2) {
-        debugPrint("CDP_OPT: Ignoring too short group name from WebSocket: '$groupName'");
+        print("CDP_OPT: Ignoring too short group name from WebSocket: '$groupName'");
         return;
       }
       
@@ -961,13 +961,13 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       
       // Grup zaten varsa, uyarı ver ama hata verme
       if (_cameraGroups.containsKey(cleanGroupName)) {
-        debugPrint("CDP_OPT: Group '$cleanGroupName' already exists, skipping creation.");
+        print("CDP_OPT: Group '$cleanGroupName' already exists, skipping creation.");
         return;
       }
       
       // Yeni grup oluştur
       _cameraGroups[cleanGroupName] = CameraGroup(name: cleanGroupName);
-      debugPrint("CDP_OPT: Created new group from WebSocket CAM_GROUP_ADD: '$cleanGroupName'");
+      print("CDP_OPT: Created new group from WebSocket CAM_GROUP_ADD: '$cleanGroupName'");
       
       // Cache'i temizle
       _cachedGroupsList = null;
@@ -976,7 +976,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       _batchNotifyListeners();
       
     } catch (e) {
-      debugPrint("CDP_OPT: Error in addGroupFromWebSocket: $e");
+      print("CDP_OPT: Error in addGroupFromWebSocket: $e");
     }
   }
 

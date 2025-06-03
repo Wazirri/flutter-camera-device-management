@@ -334,7 +334,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
               final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
               await webSocketProvider.logout();
             } catch (e) {
-              debugPrint('Error during logout: $e');
+              print('Error during logout: $e');
             }
           }
           

@@ -44,7 +44,7 @@ class MobileBottomNavigationBar extends StatelessWidget {
               onDestinationSelected(mobileMenuItems[index].route);
             }
           } catch (e) {
-            debugPrint('Error in bottom navigation tap: $e');
+            print('Error in bottom navigation tap: $e');
           }
         },
         items: mobileMenuItems.map((item) => BottomNavigationBarItem(
@@ -54,7 +54,7 @@ class MobileBottomNavigationBar extends StatelessWidget {
       );
     } catch (e) {
       // Fallback in case of error
-      debugPrint('Error building mobile menu: $e');
+      print('Error building mobile menu: $e');
       return const SizedBox.shrink(); // Return empty widget instead of crashing
     }
   }

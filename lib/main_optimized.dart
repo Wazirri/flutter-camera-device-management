@@ -57,10 +57,10 @@ Future<void> main() async {
         // Set specific platform settings
         if (Platform.isIOS || Platform.isMacOS) {
           // iOS/macOS specific settings if needed
-          debugPrint('Configuring iOS/macOS specific settings');
+          print('Configuring iOS/macOS specific settings');
         }
       } catch (e) {
-        debugPrint('Error setting orientations: $e');
+        print('Error setting orientations: $e');
       }
     }
     
@@ -85,15 +85,15 @@ Future<void> main() async {
     );
   }, (error, stackTrace) {
     // Log any errors that occur during initialization
-    debugPrint('Caught error: $error');
-    debugPrint('Stack trace: $stackTrace');
+    print('Caught error: $error');
+    print('Stack trace: $stackTrace');
     
     // Check for file system errors
     final errorString = error.toString().toLowerCase();
     if (errorString.contains('too many open files') || 
         errorString.contains('errno = 24')) {
       FileLoggerOptimized.disableLogging();
-      debugPrint('Logları dosyaya yazma işini iptal edildi. (File logging has been disabled)');
+      print('Logları dosyaya yazma işini iptal edildi. (File logging has been disabled)');
     }
   });
 }
@@ -148,7 +148,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Handle app lifecycle changes
-    debugPrint('App lifecycle state changed to: $state');
+    print('App lifecycle state changed to: $state');
     
     // Handle specific state changes if needed
     switch (state) {
@@ -300,7 +300,7 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Handle app lifecycle state changes
-    debugPrint('AppShell lifecycle state: $state');
+    print('AppShell lifecycle state: $state');
     
     if (state == AppLifecycleState.resumed) {
       // When app is resumed from background, rebuild UI if needed
