@@ -767,13 +767,13 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
             }).toList(),
           ),
           
-          // Toplu İzle sekmesi ve kayıt grupları
+          // Toplu İzle sekmesi ve kayıt grupları - Yarı yükseklik
           if (_cameraRecordings.isNotEmpty && 
               _cameraRecordings.values.any((recordings) => recordings.isNotEmpty))
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              child: Container(
-                height: 300,
+            Expanded(
+              flex: 1, // Yarı yükseklik
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -832,8 +832,9 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
               ),
             ),
           
-          // Kayıt listeleri
+          // Kayıt listeleri - Yarı yükseklik
           Expanded(
+            flex: 1, // Yarı yükseklik
             child: TabBarView(
               children: _cameraRecordings.entries.map((entry) {
                 final camera = entry.key;
