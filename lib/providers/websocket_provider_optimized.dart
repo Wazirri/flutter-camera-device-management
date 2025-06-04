@@ -143,7 +143,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
 
       // Check if we are using a secure connection
       final wsScheme = _isSecureConnection() ? 'wss' : 'ws';
-      final url = '$wsScheme://$_serverIp:$_serverPort/ws';
+      final url = '$wsScheme://$_serverIp:$_serverPort';
       print('Connecting to WebSocket: $url');
       print('[${DateTime.now().toString().split('.').first}] Connecting to $url');
 
@@ -171,10 +171,9 @@ class WebSocketProviderOptimized with ChangeNotifier {
       // Start heartbeat
       _startHeartbeat();
 
-      // Attempt login if credentials are provided
-      if (username != null && password != null) {
-        return login(username, password, rememberMe);
-      }
+      // New login flow: Just connect, don't automatically attempt login
+      // Wait for "Oturum açılmamış!" message and then send credentials
+      print('[${DateTime.now().toString().split('.').first}] Connected, waiting for login prompt');
 
       return true;
     } catch (e) {
@@ -206,38 +205,30 @@ class WebSocketProviderOptimized with ChangeNotifier {
     _batchNotifyListeners();
   }
 
-  // Login to server
-  Future<bool> login(String username, String password, [bool rememberMe = false]) async {
-    if (!_isConnected || _socket == null) {
-      _errorMessage = 'Not connected to server';
-      print('[${DateTime.now().toString().split('.').first}] Login failed: Not connected to server');
-      _batchNotifyListeners();
-      return false;
+  // Login to server - now just connects and waits for login prompt
+  Future<bool> login(String username, String password, [bool rememberMe = false, String? serverIp, int? serverPort]) async {
+    // Store credentials for when we receive the login prompt
+    _lastUsername = username;
+    _lastPassword = password;
+    _rememberMe = rememberMe;
+    
+    // Update server settings if provided
+    if (serverIp != null) _serverIp = serverIp;
+    if (serverPort != null) _serverPort = serverPort;
+
+    // Save settings if Remember Me is checked
+    if (_rememberMe) {
+      await _saveSettings();
     }
 
-    try {
-      _lastUsername = username;
-      _lastPassword = password;
-      _rememberMe = rememberMe;
-
-      // Save settings if Remember Me is checked
-      if (_rememberMe) {
-        await _saveSettings();
-      }
-
-      // Send login command
-      final loginCommand = 'LOGIN "$username" "$password"';
-      _socket!.add(loginCommand);
-      print('[${DateTime.now().toString().split('.').first}] Sending login request');
-
-      // Wait for login response (handled in _handleMessage)
-      // We'll return true for now and let the message handler update the state
+    // Connect to server if not already connected
+    if (!_isConnected) {
+      print('[${DateTime.now().toString().split('.').first}] Not connected, initiating connection');
+      return await connect(_serverIp, _serverPort, 
+          username: username, password: password, rememberMe: rememberMe);
+    } else {
+      print('[${DateTime.now().toString().split('.').first}] Already connected, waiting for login prompt');
       return true;
-    } catch (e) {
-      _errorMessage = 'Login error: $e';
-      print('[${DateTime.now().toString().split('.').first}] Login error: $e');
-      _batchNotifyListeners();
-      return false;
     }
   }
 
@@ -255,11 +246,9 @@ class WebSocketProviderOptimized with ChangeNotifier {
   // Start monitoring ECS system after login
   void startEcsMonitoring() {
     if (_isConnected && _isLoggedIn && _socket != null) {
-
-      // Use new format: ecs_slaves.m_X
-      _socket!.add('Monitor ecs_slaves');
-      print('[${DateTime.now().toString().split('.').first}] Started monitoring ecs_slaves');
-      
+      // Monitor ecs_slaves is now automatically sent after loginok
+      // This method is kept for backward compatibility and manual monitoring start
+      print('[${DateTime.now().toString().split('.').first}] Monitoring already started automatically after login');
     } else {
       print('[${DateTime.now().toString().split('.').first}] Cannot start monitoring: Not connected or not logged in');
       print('Cannot start monitoring: connected=$_isConnected, logged in=$_isLoggedIn');
@@ -347,40 +336,61 @@ class WebSocketProviderOptimized with ChangeNotifier {
       _lastMessage = jsonData;
       final now = DateTime.now().toIso8601String();
       print('[$now] processJsonMessage: keys=${jsonData.keys.toList()}, full=$jsonData');
+      
       final command = jsonData['c'];
-      print('processJsonMessage: command=$command');
+      final message = jsonData['msg'] ?? '';
+      
+      print('processJsonMessage: command=$command, msg=$message');
+      
+      // Handle "Oturum açılmamış!" message - send login credentials (trim to handle spaces)
+      if (message.trim() == "Oturum açılmamış!" && _lastUsername != null && _lastPassword != null) {
+        print('[${DateTime.now().toString().split('.').first}] Received login prompt, sending credentials');
+        final loginCommand = 'LOGIN "$_lastUsername" "$_lastPassword"';
+        _socket!.add(loginCommand);
+        print('[${DateTime.now().toString().split('.').first}] Sent login command');
+        return;
+      }
+      
+      // Handle "Şifre veya kullanıcı adı yanlış!" message - show error and disconnect
+      if (message.trim() == "Şifre veya kullanıcı adı yanlış!") {
+        print('[${DateTime.now().toString().split('.').first}] Login failed: wrong credentials');
+        _errorMessage = message;
+        _isLoggedIn = false;
+        _isWaitingForChangedone = false;
+        // Disconnect on login failure
+        disconnect().then((_) {
+          _batchNotifyListeners();
+        });
+        _batchNotifyListeners();
+        return;
+      }
       
       switch (command) {
         case 'login':
-          // Login required or failed
+          // Login required or failed - this is the old logic, kept for compatibility
           _isLoggedIn = false;
-          _isWaitingForChangedone = false; // Reset waiting state
+          _isWaitingForChangedone = false;
           
-          // Check if this is a login failure response with error code
           final int? code = jsonData['code'];
-          final String message = jsonData['msg'] ?? 'Login required';
           
           if (code == 100) {
-            final now = DateTime.now().toIso8601String();
-            print('[$now] processJsonMessage: login failure block entered, code=100, message=$message');
             // Login failed - wrong password/username
             _errorMessage = message;
             print('[${DateTime.now().toString().split('.').first}] Login failed: $_errorMessage');
-            // Close WebSocket connection on login failure (await to ensure closure)
             disconnect().then((_) {
               _batchNotifyListeners();
             });
-            _batchNotifyListeners(); // Notify immediately as well
-            return; // Don't auto-login on failure
+            _batchNotifyListeners();
+            return;
           } else {
-            // Regular login required message
-            _errorMessage = message;
-            print('[${DateTime.now().toString().split('.').first}] Login status: $_errorMessage');
-            
-            // Auto-login when we receive a login message if we have credentials
-            if (_lastUsername != null && _lastPassword != null) {
-              print('[${DateTime.now().toString().split('.').first}] Auto-login triggered by login message');
-              login(_lastUsername!, _lastPassword!, _rememberMe);
+            // Regular login required message - don't treat as error if it's "Oturum açılmamış!"
+            if (message.trim() != "Oturum açılmamış!") {
+              _errorMessage = message;
+              print('[${DateTime.now().toString().split('.').first}] Login status: $_errorMessage');
+            } else {
+              // Clear any previous error for login prompt
+              _errorMessage = '';
+              print('[${DateTime.now().toString().split('.').first}] Login prompt received, waiting for credentials to be sent');
             }
           }
           
@@ -388,15 +398,19 @@ class WebSocketProviderOptimized with ChangeNotifier {
           break;
 
         case 'loginok':
-          // Login successful
+          // Login successful - send Monitor ecs_slaves message
           _isLoggedIn = true;
-          _isWaitingForChangedone = true; // Start waiting for changedone
+          _isWaitingForChangedone = true;
           _errorMessage = '';
-          print('[${DateTime.now().toString().split('.').first}] Login successful, waiting for changedone message');
+          print('[${DateTime.now().toString().split('.').first}] Login successful, sending Monitor ecs_slaves');
+          
+          // Send Monitor ecs_slaves message immediately after loginok
+          if (_socket != null) {
+            _socket!.add('Monitor ecs_slaves');
+            print('[${DateTime.now().toString().split('.').first}] Sent Monitor ecs_slaves command');
+          }
+          
           _batchNotifyListeners();
-
-          // Start monitoring after successful login
-          startEcsMonitoring();
           break;
 
         case 'changedone':

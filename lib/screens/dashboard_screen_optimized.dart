@@ -39,14 +39,10 @@ class _DashboardScreenOptimizedState extends State<DashboardScreenOptimized> {
     
     try {
       // Preload critical data
-      final websocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
       final cameraProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
       
-      // If we're already logged in but data hasn't loaded yet
-      if (websocketProvider.isLoggedIn && websocketProvider.systemInfo == null) {
-        // Send a request for system info
-        websocketProvider.startEcsMonitoring();
-      }
+      // Monitoring is now started automatically after login
+      print('[${DateTime.now().toString().split('.').first}] Dashboard: monitoring already active after login');
       
       // Preload camera device data with a small timeout to prevent blocking
       if (cameraProvider.devicesList.isEmpty) {

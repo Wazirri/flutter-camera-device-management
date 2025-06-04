@@ -126,16 +126,17 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
       await _saveCredentials();
       // Show connecting overlay
       _showConnectionProgress(context);
-      // Connect to WebSocket server
-      final connected = await webSocketProvider.connect(
+      
+      // Use login method which will connect and handle the entire login flow
+      final loginSuccess = await webSocketProvider.login(
+        _emailController.text,
+        _passwordController.text,
+        _rememberMe,
         _serverAddressController.text,
         int.parse(_serverPortController.text),
-        username: _emailController.text,
-        password: _passwordController.text,
-        rememberMe: _rememberMe,
       );
 
-      if (!connected) {
+      if (!loginSuccess) {
         // Close the connecting overlay
         if (mounted && Navigator.canPop(context)) {
           Navigator.pop(context);
@@ -292,12 +293,8 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
   // Preload essential dashboard data
   void _preloadDashboardData() {
     try {
-      final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
-      
-      // Start monitoring after login has completed
-      if (webSocketProvider.isLoggedIn) {
-        webSocketProvider.startEcsMonitoring();
-      }
+      // Monitoring is now started automatically after successful login
+      print('[${DateTime.now().toString().split('.').first}] Dashboard data preload completed - monitoring already active');
     } catch (e) {
       print('Error preloading dashboard data: $e');
     }
