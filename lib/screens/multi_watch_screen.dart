@@ -101,7 +101,7 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
       final player = _players[camera];
       if (player != null) {
         try {
-          player.open(Media(recordingUrl), play: false); // Otomatik başlatma
+          player.open(Media(recordingUrl), play: true); // Otomatik başlatma
         } catch (e) {
           setState(() {
             _hasError[camera] = true;
