@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../providers/camera_devices_provider_optimized.dart';
 import '../models/camera_device.dart';
+import '../models/camera_group.dart';
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
 import 'multi_watch_screen.dart';
@@ -58,7 +59,6 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   
   // Animasyon controller ve animasyonlar
   late AnimationController _animationController;
-  late Animation<Offset> _calendarSlideAnimation;
   late Animation<Offset> _playerSlideAnimation;
   late Animation<double> _fadeInAnimation;
   
@@ -83,14 +83,6 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       vsync: this,
       duration: const Duration(milliseconds: 800),
     );
-    
-    _calendarSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, -1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
     
     _playerSlideAnimation = Tween<Offset>(
       begin: const Offset(0, 1),
@@ -595,82 +587,44 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           ),
         ],
       ),
-      body: Column(
+      body: Row(
         children: [
-          // Kamera seçim bölümü
-          _buildCameraSelectionSection(),
-          
-          // Video oynatıcı
-          if (_activeCamera != null && _activeRecording != null)
-            Expanded(
-              flex: 2,
-              child: SlideTransition(
-                position: _playerSlideAnimation,
-                child: FadeTransition(
-                  opacity: _fadeInAnimation,
-                  child: _buildVideoPlayer(),
-                ),
-              ),
-            ),
-          
-          // Takvim ve Kayıt listesi yan yana
-          Expanded(
-            flex: 3,
-            child: Row(
+          // Sol panel - Takvim ve Kamera Seçimi
+          SizedBox(
+            width: 350,
+            child: Column(
               children: [
-                // Takvim bölümü (sol taraf)
+                // Kompakt Takvim
+                _buildCompactCalendar(),
+                
+                // Kamera Seçimi (Gruplu)
                 Expanded(
-                  flex: 1,
-                  child: SlideTransition(
-                    position: _calendarSlideAnimation,
-                    child: FadeTransition(
-                      opacity: _fadeInAnimation,
-                      child: Card(
-                        margin: const EdgeInsets.all(8.0),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TableCalendar(
-                            firstDay: kFirstDay,
-                            lastDay: kLastDay,
-                            focusedDay: _focusedDay,
-                            calendarFormat: CalendarFormat.month,
-                            selectedDayPredicate: (day) {
-                              return isSameDay(_selectedDay, day);
-                            },
-                            onDaySelected: (selectedDay, focusedDay) {
-                              setState(() {
-                                _selectedDay = selectedDay;
-                                _focusedDay = focusedDay;
-                              });
-                              _updateRecordingsForSelectedDay();
-                            },
-                            onPageChanged: (focusedDay) {
-                              _focusedDay = focusedDay;
-                            },
-                            calendarStyle: CalendarStyle(
-                              todayDecoration: BoxDecoration(
-                                color: AppTheme.primaryBlue.withOpacity(0.5),
-                                shape: BoxShape.circle,
-                              ),
-                              selectedDecoration: const BoxDecoration(
-                                color: AppTheme.primaryBlue,
-                                shape: BoxShape.circle,
-                              ),
-                              markerDecoration: const BoxDecoration(
-                                color: AppTheme.primaryOrange,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ),
-                        ),
+                  child: _buildGroupedCameraSelection(),
+                ),
+              ],
+            ),
+          ),
+          
+          // Sağ panel - Video Player ve Kayıt Listesi
+          Expanded(
+            child: Column(
+              children: [
+                // Video oynatıcı
+                if (_activeCamera != null && _activeRecording != null)
+                  Expanded(
+                    flex: 3,
+                    child: SlideTransition(
+                      position: _playerSlideAnimation,
+                      child: FadeTransition(
+                        opacity: _fadeInAnimation,
+                        child: _buildVideoPlayer(),
                       ),
                     ),
                   ),
-                ),
                 
-                // Kayıt listesi (sağ taraf)
+                // Kayıt listesi
                 Expanded(
-                  flex: 1,
+                  flex: 2,
                   child: SlideTransition(
                     position: _playerSlideAnimation,
                     child: FadeTransition(
@@ -1093,91 +1047,323 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     );
   }
   
-  Widget _buildCameraSelectionSection() {
-    if (_availableCameras.isEmpty) {
-      return const SizedBox.shrink();
+  Widget _buildCompactCalendar() {
+    return Card(
+      margin: const EdgeInsets.all(8.0),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Select Date',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              height: 280,
+              child: TableCalendar(
+                firstDay: kFirstDay,
+                lastDay: kLastDay,
+                focusedDay: _focusedDay,
+                calendarFormat: CalendarFormat.month,
+                headerStyle: const HeaderStyle(
+                  formatButtonVisible: false,
+                  titleCentered: true,
+                ),
+                calendarStyle: CalendarStyle(
+                  outsideDaysVisible: false,
+                  todayDecoration: BoxDecoration(
+                    color: AppTheme.primaryBlue.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  selectedDecoration: const BoxDecoration(
+                    color: AppTheme.primaryBlue,
+                    shape: BoxShape.circle,
+                  ),
+                  markerDecoration: const BoxDecoration(
+                    color: AppTheme.primaryOrange,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                selectedDayPredicate: (day) {
+                  return isSameDay(_selectedDay, day);
+                },
+                onDaySelected: (selectedDay, focusedDay) {
+                  setState(() {
+                    _selectedDay = selectedDay;
+                    _focusedDay = focusedDay;
+                  });
+                  _updateRecordingsForSelectedDay();
+                },
+                onPageChanged: (focusedDay) {
+                  _focusedDay = focusedDay;
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGroupedCameraSelection() {
+    final provider = Provider.of<CameraDevicesProviderOptimized>(context);
+    final cameraGroups = provider.cameraGroupsList;
+    
+    if (cameraGroups.isEmpty) {
+      // Fallback to ungrouped cameras
+      return _buildUngroupedCameraSelection();
     }
     
     return Card(
       margin: const EdgeInsets.all(8.0),
-      child: ExpansionTile(
-        title: Text(
-          'Select Cameras (${_selectedCameras.length}/${_availableCameras.length} selected)',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        leading: const Icon(Icons.videocam),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            constraints: const BoxConstraints(
-              maxHeight: 400, // Maksimum yükseklik sınırı
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Camera Groups',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '${_selectedCameras.length} selected',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Select All / Deselect All buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.select_all),
-                        label: const Text('Select All'),
-                        onPressed: () {
+          ),
+          // Select All / Clear All buttons
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.select_all, size: 16),
+                    label: const Text('Select All'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _selectedCameras.clear();
+                        for (final group in cameraGroups) {
+                          final camerasInGroup = provider.getCamerasInGroup(group.name);
+                          _selectedCameras.addAll(camerasInGroup);
+                        }
+                      });
+                      _updateRecordingsForSelectedDay();
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.clear, size: 16),
+                    label: const Text('Clear All'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _selectedCameras.clear();
+                        _cameraRecordings.clear();
+                        _cameraErrors.clear();
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // Camera groups list
+          Expanded(
+            child: ListView.builder(
+              itemCount: cameraGroups.length,
+              itemBuilder: (context, index) {
+                final group = cameraGroups[index];
+                final camerasInGroup = provider.getCamerasInGroup(group.name);
+                final selectedInGroup = camerasInGroup.where((c) => _selectedCameras.contains(c)).length;
+                
+                return ExpansionTile(
+                  leading: Icon(
+                    Icons.videocam_outlined,
+                    color: selectedInGroup > 0 ? AppTheme.primaryBlue : null,
+                  ),
+                  title: Text(
+                    group.name,
+                    style: TextStyle(
+                      fontWeight: selectedInGroup > 0 ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  subtitle: Text('$selectedInGroup/${camerasInGroup.length} cameras selected'),
+                  children: [
+                    ...camerasInGroup.map((camera) {
+                      final isSelected = _selectedCameras.contains(camera);
+                      return CheckboxListTile(
+                        dense: true,
+                        contentPadding: const EdgeInsets.only(left: 50, right: 16),
+                        title: Text(
+                          camera.name,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                        subtitle: Text(
+                          'IP: ${camera.ip}',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        value: isSelected,
+                        onChanged: (bool? value) {
                           setState(() {
-                            _selectedCameras = List.from(_availableCameras);
+                            if (value == true) {
+                              if (!_selectedCameras.contains(camera)) {
+                                _selectedCameras.add(camera);
+                              }
+                            } else {
+                              _selectedCameras.remove(camera);
+                              _cameraRecordings.remove(camera);
+                              _cameraErrors.remove(camera);
+                            }
                           });
                           _updateRecordingsForSelectedDay();
                         },
-                      ),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.deselect),
-                        label: const Text('Deselect All'),
-                        onPressed: () {
-                          setState(() {
-                            _selectedCameras.clear();
-                            _cameraRecordings.clear();
-                            _cameraErrors.clear();
-                          });
-                        },
-                      ),
-                    ],
+                      );
+                    }).toList(),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildUngroupedCameraSelection() {
+    if (_availableCameras.isEmpty) {
+      return Card(
+        margin: const EdgeInsets.all(8.0),
+        child: const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Center(
+            child: Text('No cameras available'),
+          ),
+        ),
+      );
+    }
+    
+    return Card(
+      margin: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Available Cameras',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
-                  
-                  const SizedBox(height: 8),
-                  
-                  // Camera checkboxes - Scrollable list
-                  Flexible(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: _availableCameras.length,
-                      itemBuilder: (context, index) {
-                        final camera = _availableCameras[index];
-                        final isSelected = _selectedCameras.contains(camera);
-                        return CheckboxListTile(
-                          title: Text(camera.name),
-                          subtitle: Text('IP: ${camera.ip}'),
-                          value: isSelected,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              if (value == true) {
-                                if (!_selectedCameras.contains(camera)) {
-                                  _selectedCameras.add(camera);
-                                }
-                              } else {
-                                _selectedCameras.remove(camera);
-                                _cameraRecordings.remove(camera);
-                                _cameraErrors.remove(camera);
-                              }
-                            });
-                            _updateRecordingsForSelectedDay();
-                          },
-                        );
-                      },
+                ),
+                Text(
+                  '${_selectedCameras.length}/${_availableCameras.length} selected',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          
+          // Select All / Clear All buttons  
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.select_all, size: 16),
+                    label: const Text('Select All'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                     ),
+                    onPressed: () {
+                      setState(() {
+                        _selectedCameras = List.from(_availableCameras);
+                      });
+                      _updateRecordingsForSelectedDay();
+                    },
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.clear, size: 16),
+                    label: const Text('Clear All'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _selectedCameras.clear();
+                        _cameraRecordings.clear();
+                        _cameraErrors.clear();
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 8),
+          
+          // Camera list
+          Expanded(
+            child: ListView.builder(
+              itemCount: _availableCameras.length,
+              itemBuilder: (context, index) {
+                final camera = _availableCameras[index];
+                final isSelected = _selectedCameras.contains(camera);
+                return CheckboxListTile(
+                  dense: true,
+                  title: Text(
+                    camera.name,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  subtitle: Text(
+                    'IP: ${camera.ip}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  value: isSelected,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      if (value == true) {
+                        if (!_selectedCameras.contains(camera)) {
+                          _selectedCameras.add(camera);
+                        }
+                      } else {
+                        _selectedCameras.remove(camera);
+                        _cameraRecordings.remove(camera);
+                        _cameraErrors.remove(camera);
+                      }
+                    });
+                    _updateRecordingsForSelectedDay();
+                  },
+                );
+              },
             ),
           ),
         ],
