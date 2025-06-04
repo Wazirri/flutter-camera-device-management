@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
 import '../models/camera_device.dart';
 import '../models/camera_layout_config.dart';
 
@@ -41,6 +43,9 @@ class MultiCameraViewProvider with ChangeNotifier {
     
     // Load saved presets from shared preferences
     _loadSavedPresets();
+    
+    // Auto-load configuration if available
+    _autoLoadConfigurationOnStart();
   }
   
   // Load saved presets from shared preferences
@@ -81,6 +86,16 @@ class MultiCameraViewProvider with ChangeNotifier {
       }
     } catch (e) {
       print('Error loading presets from shared preferences: $e');
+    }
+  }
+  
+  // Private method for auto-loading configuration on app start
+  Future<void> _autoLoadConfigurationOnStart() async {
+    try {
+      await Future.delayed(const Duration(milliseconds: 500)); // Small delay to ensure initialization
+      await autoLoadConfiguration();
+    } catch (e) {
+      print('Error auto-loading configuration on start: $e');
     }
   }
   
@@ -472,4 +487,281 @@ class MultiCameraViewProvider with ChangeNotifier {
       return false;
     }
   }
+
+  // JSON Configuration Management
+  static const String _configFileName = 'multi_camera_layout_config.json';
+  String? _currentConfigPath;
+
+  // Get the default config directory path
+  Future<String> _getConfigDirectory() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final configDir = Directory('${directory.path}/MultiCameraConfigs');
+      if (!await configDir.exists()) {
+        await configDir.create(recursive: true);
+      }
+      return configDir.path;
+    } catch (e) {
+      print('Error getting config directory: $e');
+      // Fallback to application documents directory
+      final directory = await getApplicationDocumentsDirectory();
+      return directory.path;
+    }
+  }
+
+  // Save current configuration to JSON file
+  Future<bool> saveConfigurationToFile({String? customPath, String? fileName}) async {
+    try {
+      final configData = {
+        'version': '1.0',
+        'timestamp': DateTime.now().toIso8601String(),
+        'pageLayouts': _pageLayouts,
+        'activePageIndex': _activePageIndex,
+        'cameraAssignments': _cameraAssignments.map((key, value) => 
+          MapEntry(key.toString(), value.map((k, v) => MapEntry(k.toString(), v)))),
+        'isAutoAssignmentMode': _isAutoAssignmentMode,
+        'savedPresets': _savedPresets.map((presetName, presetData) => 
+          MapEntry(presetName, presetData.map((pageIndex, assignments) => 
+            MapEntry(pageIndex.toString(), assignments.map((pos, cam) => 
+              MapEntry(pos.toString(), cam)))))),
+      };
+
+      String filePath;
+      if (customPath != null) {
+        filePath = customPath;
+      } else {
+        final configDir = await _getConfigDirectory();
+        final fileNameToUse = fileName ?? _configFileName;
+        filePath = '$configDir/$fileNameToUse';
+      }
+
+      final file = File(filePath);
+      await file.writeAsString(jsonEncode(configData));
+      
+      _currentConfigPath = filePath;
+      
+      // Save the config path in shared preferences for auto-loading
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('last_config_path', filePath);
+      
+      print('Configuration saved to: $filePath');
+      notifyListeners();
+      return true;
+    } catch (e) {
+      print('Error saving configuration: $e');
+      return false;
+    }
+  }
+
+  // Load configuration from JSON file
+  Future<bool> loadConfigurationFromFile(String filePath) async {
+    try {
+      final file = File(filePath);
+      if (!await file.exists()) {
+        print('Configuration file does not exist: $filePath');
+        return false;
+      }
+
+      final jsonString = await file.readAsString();
+      final configData = jsonDecode(jsonString) as Map<String, dynamic>;
+
+      // Validate version (optional)
+      final version = configData['version'] as String?;
+      print('Loading configuration version: $version');
+
+      // Load page layouts
+      if (configData['pageLayouts'] != null) {
+        _pageLayouts = List<int>.from(configData['pageLayouts']);
+      }
+
+      // Load active page index
+      if (configData['activePageIndex'] != null) {
+        _activePageIndex = configData['activePageIndex'] as int;
+        // Ensure active page index is within bounds
+        if (_activePageIndex >= _pageLayouts.length) {
+          _activePageIndex = 0;
+        }
+      }
+
+      // Load camera assignments
+      if (configData['cameraAssignments'] != null) {
+        _cameraAssignments.clear();
+        final assignments = configData['cameraAssignments'] as Map<String, dynamic>;
+        assignments.forEach((pageKey, pageAssignments) {
+          final pageIndex = int.parse(pageKey);
+          final cameraMap = <int, int>{};
+          (pageAssignments as Map<String, dynamic>).forEach((posKey, cameraIndex) {
+            cameraMap[int.parse(posKey)] = cameraIndex as int;
+          });
+          _cameraAssignments[pageIndex] = cameraMap;
+        });
+      }
+
+      // Load auto assignment mode
+      if (configData['isAutoAssignmentMode'] != null) {
+        _isAutoAssignmentMode = configData['isAutoAssignmentMode'] as bool;
+      }
+
+      // Load saved presets
+      if (configData['savedPresets'] != null) {
+        _savedPresets.clear();
+        final presets = configData['savedPresets'] as Map<String, dynamic>;
+        presets.forEach((presetName, presetData) {
+          final pageAssignments = <int, Map<int, int>>{};
+          (presetData as Map<String, dynamic>).forEach((pageKey, assignments) {
+            final pageIndex = int.parse(pageKey);
+            final cameraMap = <int, int>{};
+            (assignments as Map<String, dynamic>).forEach((posKey, cameraIndex) {
+              cameraMap[int.parse(posKey)] = cameraIndex as int;
+            });
+            pageAssignments[pageIndex] = cameraMap;
+          });
+          _savedPresets[presetName] = pageAssignments;
+        });
+      }
+
+      _currentConfigPath = filePath;
+      
+      // Save the config path in shared preferences for auto-loading
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('last_config_path', filePath);
+
+      print('Configuration loaded from: $filePath');
+      notifyListeners();
+      return true;
+    } catch (e) {
+      print('Error loading configuration: $e');
+      return false;
+    }
+  }
+
+  // Auto-load configuration on app start
+  Future<bool> autoLoadConfiguration() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final lastConfigPath = prefs.getString('last_config_path');
+      
+      if (lastConfigPath != null) {
+        final file = File(lastConfigPath);
+        if (await file.exists()) {
+          return await loadConfigurationFromFile(lastConfigPath);
+        }
+      }
+      return false;
+    } catch (e) {
+      print('Error auto-loading configuration: $e');
+      return false;
+    }
+  }
+
+  // Get available configuration files
+  Future<List<FileSystemEntity>> getAvailableConfigFiles() async {
+    try {
+      final configDir = await _getConfigDirectory();
+      final directory = Directory(configDir);
+      
+      if (await directory.exists()) {
+        final files = await directory.list().toList();
+        return files.where((file) => 
+          file is File && file.path.endsWith('.json')).toList();
+      }
+      return [];
+    } catch (e) {
+      print('Error getting available config files: $e');
+      return [];
+    }
+  }
+
+  // Delete configuration file
+  Future<bool> deleteConfigurationFile(String filePath) async {
+    try {
+      final file = File(filePath);
+      if (await file.exists()) {
+        await file.delete();
+        
+        // If this was the current config, clear the preference
+        if (_currentConfigPath == filePath) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.remove('last_config_path');
+          _currentConfigPath = null;
+        }
+        
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('Error deleting configuration file: $e');
+      return false;
+    }
+  }
+
+  // Convenience wrapper methods for UI
+  
+  // Save configuration with a custom name
+  Future<void> saveConfiguration(String name) async {
+    final success = await saveConfigurationToFile(fileName: '$name.json');
+    if (!success) {
+      throw Exception('Failed to save configuration');
+    }
+  }
+  
+  // Load configuration by name
+  Future<void> loadConfiguration(String name) async {
+    final configDir = await _getConfigDirectory();
+    final filePath = '$configDir/$name.json';
+    final success = await loadConfigurationFromFile(filePath);
+    if (!success) {
+      throw Exception('Failed to load configuration');
+    }
+  }
+  
+  // List all available configurations
+  Future<List<Map<String, String>>> listConfigurations() async {
+    try {
+      final files = await getAvailableConfigFiles();
+      final configurations = <Map<String, String>>[];
+      
+      for (final file in files) {
+        if (file is File) {
+          // Extract name from file path (remove .json extension)
+          final fileName = file.path.split('/').last;
+          final name = fileName.replaceAll('.json', '');
+          
+          // Get file modification time as timestamp
+          final stat = await file.stat();
+          final timestamp = stat.modified.toString().split('.')[0]; // Remove microseconds
+          
+          configurations.add({
+            'name': name,
+            'timestamp': timestamp,
+            'path': file.path,
+          });
+        }
+      }
+      
+      // Sort by modification time (newest first)
+      configurations.sort((a, b) => b['timestamp']!.compareTo(a['timestamp']!));
+      
+      return configurations;
+    } catch (e) {
+      print('Error listing configurations: $e');
+      return [];
+    }
+  }
+  
+  // Delete configuration by name
+  Future<void> deleteConfiguration(String name) async {
+    final configDir = await _getConfigDirectory();
+    final filePath = '$configDir/$name.json';
+    final success = await deleteConfigurationFile(filePath);
+    if (!success) {
+      throw Exception('Failed to delete configuration');
+    }
+  }
+
+  // Getters for configuration management
+  String? get currentConfigPath => _currentConfigPath;
+  
+  // Check if a configuration is currently loaded
+  bool get hasLoadedConfig => _currentConfigPath != null;
 }

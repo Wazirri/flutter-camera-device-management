@@ -49,6 +49,57 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
         title: const Text('Multi Camera View'),
         backgroundColor: AppTheme.darkBackground,
         actions: [
+          // Configuration management menu
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.save_alt),
+            tooltip: 'Configuration',
+            onSelected: (String action) {
+              final provider = Provider.of<MultiCameraViewProvider>(context, listen: false);
+              switch (action) {
+                case 'save':
+                  _saveConfiguration(context, provider);
+                  break;
+                case 'load':
+                  _loadConfiguration(context, provider);
+                  break;
+                case 'manage':
+                  _showConfigurationManager(context, provider);
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem<String>(
+                value: 'save',
+                child: Row(
+                  children: [
+                    Icon(Icons.save, size: 18),
+                    SizedBox(width: 8),
+                    Text('Save Configuration'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'load',
+                child: Row(
+                  children: [
+                    Icon(Icons.folder_open, size: 18),
+                    SizedBox(width: 8),
+                    Text('Load Configuration'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'manage',
+                child: Row(
+                  children: [
+                    Icon(Icons.settings, size: 18),
+                    SizedBox(width: 8),
+                    Text('Manage Configurations'),
+                  ],
+                ),
+              ),
+            ],
+          ),
           // Layout seçme butonu
           IconButton(
             icon: const Icon(Icons.grid_view),
@@ -244,6 +295,333 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
         },
       ),
     );
+  }
+
+  // Configuration management methods
+  void _saveConfiguration(BuildContext context, MultiCameraViewProvider provider) {
+    final TextEditingController nameController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppTheme.darkSurface,
+          title: const Text('Save Configuration', style: TextStyle(color: Colors.white)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Enter a name for this configuration:',
+                style: TextStyle(color: Colors.white70),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: nameController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Configuration name',
+                  hintStyle: const TextStyle(color: Colors.white54),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: AppTheme.primaryColor),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white54),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: AppTheme.primaryColor),
+                  ),
+                ),
+                autofocus: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final name = nameController.text.trim();
+                if (name.isNotEmpty) {
+                  try {
+                    await provider.saveConfiguration(name);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Configuration "$name" saved successfully'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to save configuration: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+              ),
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _loadConfiguration(BuildContext context, MultiCameraViewProvider provider) async {
+    try {
+      final configurations = await provider.listConfigurations();
+      
+      if (configurations.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No saved configurations found'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+
+      showModalBottomSheet(
+        context: context,
+        backgroundColor: AppTheme.darkSurface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        builder: (context) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                child: const Text(
+                  'Load Configuration',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const Divider(height: 1, color: Colors.white24),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: configurations.length,
+                  itemBuilder: (context, index) {
+                    final config = configurations[index];
+                    return ListTile(
+                      leading: const Icon(Icons.folder, color: Colors.white70),
+                      title: Text(
+                        config['name'] ?? 'Unknown',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      subtitle: Text(
+                        'Saved: ${config['timestamp']}',
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                      onTap: () async {
+                        final configName = config['name'];
+                        if (configName == null) return;
+                        
+                        try {
+                          await provider.loadConfiguration(configName);
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Configuration "$configName" loaded successfully'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to load configuration: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to load configurations: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _showConfigurationManager(BuildContext context, MultiCameraViewProvider provider) async {
+    try {
+      final configurations = await provider.listConfigurations();
+      
+      showDialog(
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                backgroundColor: AppTheme.darkSurface,
+                title: const Text(
+                  'Manage Configurations',
+                  style: TextStyle(color: Colors.white),
+                ),
+                content: SizedBox(
+                  width: double.maxFinite,
+                  height: 400,
+                  child: configurations.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'No saved configurations found',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: configurations.length,
+                          itemBuilder: (context, index) {
+                            final config = configurations[index];
+                            return Card(
+                              color: AppTheme.darkBackground,
+                              child: ListTile(
+                                leading: const Icon(Icons.folder, color: Colors.white70),
+                                title: Text(
+                                  config['name'] ?? 'Unknown',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                subtitle: Text(
+                                  'Saved: ${config['timestamp'] ?? 'Unknown'}',
+                                  style: const TextStyle(color: Colors.white70),
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.download, color: Colors.green),
+                                      tooltip: 'Load',
+                                      onPressed: () async {
+                                        final configName = config['name'];
+                                        if (configName == null) return;
+                                        
+                                        try {
+                                          await provider.loadConfiguration(configName);
+                                          Navigator.pop(context);
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Configuration "$configName" loaded'),
+                                              backgroundColor: Colors.green,
+                                            ),
+                                          );
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text('Failed to load: $e'),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.red),
+                                      tooltip: 'Delete',
+                                      onPressed: () async {
+                                        final configName = config['name'];
+                                        if (configName == null) return;
+                                        
+                                        final confirmed = await showDialog<bool>(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            backgroundColor: AppTheme.darkSurface,
+                                            title: const Text(
+                                              'Delete Configuration',
+                                              style: TextStyle(color: Colors.white),
+                                            ),
+                                            content: Text(
+                                              'Are you sure you want to delete "$configName"?',
+                                              style: const TextStyle(color: Colors.white70),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(context, false),
+                                                child: const Text('Cancel'),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () => Navigator.pop(context, true),
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.red,
+                                                ),
+                                                child: const Text('Delete'),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                        
+                                        if (confirmed == true) {
+                                          try {
+                                            await provider.deleteConfiguration(configName);
+                                            setState(() {
+                                              configurations.removeAt(index);
+                                            });
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text('Configuration "$configName" deleted'),
+                                                backgroundColor: Colors.orange,
+                                              ),
+                                            );
+                                          } catch (e) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text('Failed to delete: $e'),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Close'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to load configurations: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   void _showLayoutSelector(BuildContext context) {

@@ -20,6 +20,8 @@ import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
 import 'screens/multi_live_view_screen.dart';  // New multi-camera view screen
 import 'screens/multi_recordings_screen.dart';  // New multi-recordings screen
+import 'screens/multi_camera_view_screen.dart';  // Multi camera view screen
+import 'screens/camera_layout_assignment_screen.dart';  // Camera layout assignment screen
 import 'screens/activities_screen.dart';  // New activities screen
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
@@ -29,6 +31,7 @@ import 'widgets/mobile_bottom_navigation_bar.dart';
 import 'providers/websocket_provider_optimized.dart'; // Using optimized websocket provider
 import 'providers/camera_devices_provider_optimized.dart'; // Using optimized camera devices provider
 import 'providers/multi_view_layout_provider.dart';
+import 'providers/multi_camera_view_provider.dart'; // Multi camera view provider
 
 Future<void> main() async {
   // This captures errors that happen during initialization
@@ -68,6 +71,7 @@ Future<void> main() async {
     final webSocketProvider = WebSocketProviderOptimized();
     final cameraDevicesProvider = CameraDevicesProviderOptimized();
     final multiViewLayoutProvider = MultiViewLayoutProvider();
+    final multiCameraViewProvider = MultiCameraViewProvider();
     
     // Connect the providers
     webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
@@ -79,6 +83,7 @@ Future<void> main() async {
           ChangeNotifierProvider<WebSocketProviderOptimized>.value(value: webSocketProvider),
           ChangeNotifierProvider<CameraDevicesProviderOptimized>.value(value: cameraDevicesProvider),
           ChangeNotifierProvider<MultiViewLayoutProvider>.value(value: multiViewLayoutProvider),
+          ChangeNotifierProvider<MultiCameraViewProvider>.value(value: multiCameraViewProvider),
         ],
         child: const MyApp(),
       ),
@@ -227,6 +232,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           '/recordings': (context) => const AppShell(
             currentRoute: '/recordings',
             child: MultiRecordingsScreen(),
+          ),
+          '/multi-camera-view': (context) => const AppShell(
+            currentRoute: '/multi-camera-view',
+            child: MultiCameraViewScreen(),
+          ),
+          '/camera-layout-assignment': (context) => const AppShell(
+            currentRoute: '/camera-layout-assignment',
+            child: CameraLayoutAssignmentScreen(),
           ),
         },
         // Custom page transitions and routes that require parameters
