@@ -236,15 +236,9 @@ class _VersionLauncherState extends State<VersionLauncher> {
     // Small delay to let the UI render first
     await Future.delayed(Duration.zero);
     
-    if (widget.isOptimized) {
-      // Run the optimized version with error handling
-      await import('main_optimized.dart') as optimized;
-      optimized.main();
-    } else {
-      // Run the original version
-      await import('main.dart') as original;
-      original.main();
-    }
+    // Both versions now use the unified main.dart
+    await import('main.dart') as main;
+    main.main();
   }
 
   @override

@@ -6,39 +6,43 @@ import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart'; // Import for MediaKit
 
 import 'utils/keyboard_fix.dart'; // Import keyboard fix utilities
+import 'utils/file_logger_optimized.dart'; // Import optimized file logger
+import 'utils/error_monitor.dart'; // Import error monitor
 import 'screens/cameras_screen.dart';
 import 'screens/camera_devices_screen.dart';
 import 'screens/camera_groups_screen.dart';  // New camera groups screen
-import 'screens/dashboard_screen.dart';
+import 'screens/dashboard_screen_optimized.dart'; // Using optimized dashboard
 import 'screens/devices_screen.dart';
 import 'screens/live_view_screen.dart';
 import 'screens/login_screen_optimized.dart';
-import 'screens/record_view_screen.dart';
+
 import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
 import 'screens/multi_live_view_screen.dart';  // New multi-camera view screen
 import 'screens/multi_recordings_screen.dart';  // New multi-recordings screen
 import 'screens/activities_screen.dart';  // New activities screen
-import 'screens/multi_camera_view_screen.dart'; // Yeni multi camera view screen
-import 'screens/camera_layout_assignment_screen.dart'; // Yeni kamera layout atama ekranı
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
 import 'utils/page_transitions.dart';
 import 'widgets/desktop_side_menu.dart';
 import 'widgets/mobile_bottom_navigation_bar.dart';
-import 'providers/websocket_provider_optimized.dart';
-import 'providers/camera_devices_provider_optimized.dart';
+import 'providers/websocket_provider_optimized.dart'; // Using optimized websocket provider
+import 'providers/camera_devices_provider_optimized.dart'; // Using optimized camera devices provider
 import 'providers/multi_view_layout_provider.dart';
-import 'providers/multi_camera_view_provider.dart'; // Yeni provider
 
 Future<void> main() async {
-  print('TEST_LOG: main() function started.'); // <-- BU SATIRI EKLEYİN
   // This captures errors that happen during initialization
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     
+    // Initialize error monitoring
+    ErrorMonitor.instance.startMonitoring();
+    
     // Initialize MediaKit
     MediaKit.ensureInitialized();
+    
+    // Initialize optimized file logger with error protection
+    await FileLoggerOptimized.init();
     
     // Set orientations (only for mobile platforms)
     if (true) {
@@ -60,11 +64,10 @@ Future<void> main() async {
       }
     }
     
-    // Create providers first
+    // Create optimized providers
     final webSocketProvider = WebSocketProviderOptimized();
     final cameraDevicesProvider = CameraDevicesProviderOptimized();
     final multiViewLayoutProvider = MultiViewLayoutProvider();
-    final multiCameraViewProvider = MultiCameraViewProvider();
     
     // Connect the providers
     webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
@@ -76,7 +79,6 @@ Future<void> main() async {
           ChangeNotifierProvider<WebSocketProviderOptimized>.value(value: webSocketProvider),
           ChangeNotifierProvider<CameraDevicesProviderOptimized>.value(value: cameraDevicesProvider),
           ChangeNotifierProvider<MultiViewLayoutProvider>.value(value: multiViewLayoutProvider),
-          ChangeNotifierProvider<MultiCameraViewProvider>.value(value: multiCameraViewProvider),
         ],
         child: const MyApp(),
       ),
@@ -85,6 +87,14 @@ Future<void> main() async {
     // Log any errors that occur during initialization
     print('Caught error: $error');
     print('Stack trace: $stackTrace');
+    
+    // Check for file system errors
+    final errorString = error.toString().toLowerCase();
+    if (errorString.contains('too many open files') || 
+        errorString.contains('errno = 24')) {
+      FileLoggerOptimized.disableLogging();
+      print('Logları dosyaya yazma işini iptal edildi. (File logging has been disabled)');
+    }
   });
 }
 
@@ -105,7 +115,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     // Register observer for app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
-    
     // Klavye olay dinleyicisini ekle
     _hardwareKeyboard.addHandler(_handleKeyEvent);
   }
@@ -173,7 +182,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           '/login': (context) => const LoginScreenOptimized(),
           '/dashboard': (context) => const AppShell(
             currentRoute: '/dashboard',
-            child: DashboardScreen(),
+            child: DashboardScreenOptimized(), // Using optimized dashboard
           ),
           '/cameras': (context) => const AppShell(
             currentRoute: '/cameras',
@@ -211,26 +220,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             currentRoute: '/activities',
             child: ActivitiesScreen(),
           ),
-          '/multi-camera-view': (context) => const AppShell(
-            currentRoute: '/multi-camera-view',
-            child: MultiCameraViewScreen(),
-          ),
-          '/camera-layout-assignment': (context) => const AppShell(
-            currentRoute: '/camera-layout-assignment',
-            child: CameraLayoutAssignmentScreen(),
-          ),
           '/live-view': (context) => const AppShell(
-              currentRoute: '/live-view',
-              child: LiveViewScreen(camera: null),
-            ),
+            currentRoute: '/live-view',
+            child: LiveViewScreen(camera: null),
+          ),
           '/recordings': (context) => const AppShell(
-              currentRoute: '/recordings',
-              child: RecordViewScreen(camera: null),
-            ),
+            currentRoute: '/recordings',
+            child: MultiRecordingsScreen(),
+          ),
         },
-        // Özel geçişler ve parametreli rotalar için onGenerateRoute
+        // Custom page transitions and routes that require parameters
         onGenerateRoute: (settings) {
-          // Define custom page transitions for certain routes
           Widget? page;
           
           switch(settings.name) {
@@ -251,17 +251,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               if (args is Map && args.containsKey('camera')) {
                 page = AppShell(
                   currentRoute: settings.name ?? '/recordings',
-                  child: RecordViewScreen(camera: args['camera']),
+                  child: MultiRecordingsScreen(),
                 );
                 return AppPageTransitions.slideUp(page);
               }
               break;
           }
           
-          // Özel bir durum yoksa routes'a düşer
+          // Default back to the routes if no custom handling was performed
           return null;
         },
-    ),
+      ),
     );
   }
 }
@@ -286,13 +286,13 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    // Add observer for app lifecycle changes
+    // Register observer for app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    // Clean up observer
+    // Remove observer when app is disposed
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -314,71 +314,52 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    // Determine device type for responsive layout
     final isDesktop = ResponsiveHelper.isDesktop(context);
     final isTablet = ResponsiveHelper.isTablet(context);
-    final isMobile = ResponsiveHelper.isMobile(context);
-    
-    return Scaffold(
-      key: _scaffoldKey,
-      // Ana menülerden otomatik geri butonunu devre dışı bırak
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false, // Ana menülerde geri butonu gösterme
-        toolbarHeight: 0, // AppBar görünmez yap ama kontrolü sağla
-      ),
-      drawer: isMobile
-          ? SizedBox(
-              width: 250,
-              child: DesktopSideMenu(
-                currentRoute: widget.currentRoute,
-                onDestinationSelected: _navigateToRoute,
-              ),
-            )
-          : null,
-      body: SafeArea(
-        child: Row(
+    final isLargeScreen = isDesktop || isTablet;
+
+    if (isLargeScreen) {
+      return Scaffold(
+        key: _scaffoldKey,
+        body: Row(
           children: [
-            // Desktop side menu
-            if (isDesktop || isTablet)
-              DesktopSideMenu(
-                currentRoute: widget.currentRoute,
-                onDestinationSelected: _navigateToRoute,
-              ),
-            
-            // Main content
+            // Side menu for desktop/tablet
+            DesktopSideMenu(
+              currentRoute: widget.currentRoute, 
+              onDestinationSelected: (route) {
+                Navigator.pushReplacementNamed(context, route);
+              },
+            ),
+            // Main content area
             Expanded(
-              child: widget.child,
+              child: ClipRRect(
+                // Use ClipRRect to avoid rendering issues with video players
+                child: Material(
+                  color: AppTheme.darkBackground,
+                  child: widget.child,
+                ),
+              ),
             ),
           ],
         ),
-      ),
-      // Mobile bottom navigation
-      bottomNavigationBar: isMobile
-          ? MobileBottomNavigationBar(
-              currentRoute: widget.currentRoute,
-              onDestinationSelected: _navigateToRoute,
-            )
-          : null,
-    );
-  }
-
-  void _navigateToRoute(String route) {
-    try {
-      if (route != widget.currentRoute) {
-        // Mevcut sayfayı tamamen kaldır ve yeni sayfayı aç
-        // böylece geri butonu olmayacak
-        Navigator.pushNamedAndRemoveUntil(context, route, (route) => false);
-      }
-      
-      // Close drawer if open
-      if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
-        Navigator.of(context).pop();
-      }
-    } catch (e) {
-      // Handle any navigation errors
-      print('Navigation error: $e');
+      );
+    } else {
+      // Mobile layout with bottom navigation
+      return Scaffold(
+        key: _scaffoldKey,
+        body: SafeArea(
+          child: Material(
+            color: AppTheme.darkBackground,
+            child: widget.child,
+          ),
+        ),
+        bottomNavigationBar: MobileBottomNavigationBar(
+          currentRoute: widget.currentRoute,
+          onDestinationSelected: (route) {
+            Navigator.pushReplacementNamed(context, route);
+          },
+        ),
+      );
     }
   }
 }

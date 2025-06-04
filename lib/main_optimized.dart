@@ -15,7 +15,7 @@ import 'screens/dashboard_screen_optimized.dart'; // Using optimized dashboard
 import 'screens/devices_screen.dart';
 import 'screens/live_view_screen.dart';
 import 'screens/login_screen_optimized.dart';
-import 'screens/record_view_screen.dart';
+
 import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
 import 'screens/multi_live_view_screen.dart';  // New multi-camera view screen
@@ -226,7 +226,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           ),
           '/recordings': (context) => const AppShell(
             currentRoute: '/recordings',
-            child: RecordViewScreen(camera: null),
+            child: MultiRecordingsScreen(),
           ),
         },
         // Custom page transitions and routes that require parameters
@@ -251,7 +251,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               if (args is Map && args.containsKey('camera')) {
                 page = AppShell(
                   currentRoute: settings.name ?? '/recordings',
-                  child: RecordViewScreen(camera: args['camera']),
+                  child: MultiRecordingsScreen(),
                 );
                 return AppPageTransitions.slideUp(page);
               }

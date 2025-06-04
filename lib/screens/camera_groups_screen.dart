@@ -6,7 +6,8 @@ import '../models/camera_group.dart';
 import '../providers/camera_devices_provider_optimized.dart';
 import '../theme/app_theme.dart';
 import 'live_view_screen.dart';
-import 'record_view_screen.dart';
+import 'multi_recordings_screen.dart';
+
 import '../widgets/camera_details_bottom_sheet.dart';
 
 class CameraGroupsScreen extends StatefulWidget {
@@ -101,7 +102,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => RecordViewScreen(camera: camera),
+        builder: (context) => MultiRecordingsScreen(),
       ),
     );
   }
