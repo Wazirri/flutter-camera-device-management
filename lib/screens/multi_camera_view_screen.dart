@@ -17,6 +17,7 @@ class MultiCameraViewScreen extends StatefulWidget {
 
 class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
   final PageController _pageController = PageController();
+  int _lastKnownPage = 0;
 
   @override
   void initState() {
@@ -34,6 +35,32 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
       
       multiCameraProvider.setAvailableCameras(allCameras);
     });
+  }
+
+  void _syncPageController(int newPageIndex) {
+    if (_lastKnownPage != newPageIndex && _pageController.hasClients) {
+      print('🎮 _syncPageController: $_lastKnownPage → $newPageIndex');
+      _lastKnownPage = newPageIndex;
+      
+      // Auto rotation sırasında daha hızlı animasyon kullan
+      final provider = Provider.of<MultiCameraViewProvider>(context, listen: false);
+      final isAutoRotating = provider.isAutoPageRotationEnabled;
+      
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _pageController.hasClients) {
+          print('🎮 PageController.animateToPage($newPageIndex) - isAutoRotating: $isAutoRotating');
+          _pageController.animateToPage(
+            newPageIndex,
+            duration: isAutoRotating 
+              ? const Duration(milliseconds: 100) // Auto rotation için daha hızlı
+              : const Duration(milliseconds: 300), // Manuel geçiş için normal hız
+            curve: isAutoRotating 
+              ? Curves.easeInOut 
+              : Curves.easeInOut,
+          );
+        }
+      });
+    }
   }
 
   @override
@@ -205,6 +232,9 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
       ),
       body: Consumer<MultiCameraViewProvider>(
         builder: (context, provider, child) {
+          // Provider'daki sayfa değişikliklerini PageController ile senkronize et
+          _syncPageController(provider.activePageIndex);
+          
           if (provider.layouts.isEmpty) {
             return const Center(
               child: CircularProgressIndicator(),
@@ -218,7 +248,13 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
                 child: PageView.builder(
                   controller: _pageController,
                   onPageChanged: (index) {
-                    provider.setActivePage(index);
+                    // Auto rotation sırasında manuel sayfa değişikliklerini engelle
+                    if (!provider.isAutoPageRotationEnabled) {
+                      print('📖 Manual page change: $index');
+                      provider.setActivePage(index);
+                    } else {
+                      print('📖 Page change ignored during auto rotation: $index');
+                    }
                   },
                   itemCount: provider.pageLayouts.length,
                   itemBuilder: (context, index) {

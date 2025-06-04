@@ -322,9 +322,17 @@ class MultiCameraViewProvider with ChangeNotifier {
   
   // Aktif sayfa değiştir
   void setActivePage(int pageIndex) {
-    print('📄 setActivePage called: $_activePageIndex → $pageIndex');
+    print('');
+    print('📄 === setActivePage CALLED ===');
+    print('📥 Requested pageIndex: $pageIndex');
+    print('📍 Current _activePageIndex: $_activePageIndex');
+    print('📊 Total _pageLayouts.length: ${_pageLayouts.length}');
+    print('📋 Current _pageLayouts: $_pageLayouts');
     
-    if (pageIndex < 0) return;
+    if (pageIndex < 0) {
+      print('❌ pageIndex < 0, returning early');
+      return;
+    }
     
     // Eğer yeni bir sayfa ise, varsayılan değerleri ayarla
     if (pageIndex >= _pageLayouts.length) {
@@ -335,6 +343,8 @@ class MultiCameraViewProvider with ChangeNotifier {
       print('🆕 Creating new page $pageIndex with layoutCode: $layoutCode');
       _pageLayouts.add(layoutCode);
       _cameraAssignments[pageIndex] = {};
+      print('📊 New _pageLayouts.length: ${_pageLayouts.length}');
+      print('📋 Updated _pageLayouts: $_pageLayouts');
     }
     
     int oldPageIndex = _activePageIndex;
@@ -346,10 +356,16 @@ class MultiCameraViewProvider with ChangeNotifier {
     
     // Eğer otomatik atama modundaysak, kameraları otomatik olarak yeniden ata
     if (_isAutoAssignmentMode) {
+      print('🔄 Auto assignment mode enabled, calling _autoAssignCameras()');
       _autoAssignCameras();
     }
     
+    print('🔔 Calling notifyListeners()');
     notifyListeners();
+    print('✅ setActivePage completed successfully');
+    print('📍 Final _activePageIndex: $_activePageIndex');
+    print('================================');
+    print('');
   }
   
   // Sayfa ekle (farklı layout seçenekleri ile)
@@ -443,14 +459,44 @@ class MultiCameraViewProvider with ChangeNotifier {
     _autoPageRotationTimer?.cancel(); // Varolan timer'ı iptal et
     
     print('⏰ Starting timer with ${_autoPageRotationInterval}s interval');
+    print('📊 Total pages: ${_pageLayouts.length}');
+    print('📋 Page layouts: $_pageLayouts');
+    print('📍 Current active page: $_activePageIndex');
+    
     _autoPageRotationTimer = Timer.periodic(
       Duration(seconds: _autoPageRotationInterval),
       (timer) {
+        // Sadece geçerli sayfa aralığında döngü yap
+        if (_pageLayouts.isEmpty) {
+          print('⚠️ No page layouts available, stopping auto rotation');
+          stopAutoPageRotation();
+          return;
+        }
+        
         // Bir sonraki sayfaya geç (döngüsel)
         int nextPageIndex = (_activePageIndex + 1) % _pageLayouts.length;
-        print('🔄 Auto rotating: $_activePageIndex → $nextPageIndex');
-        print('📄 Current layout: ${_pageLayouts[_activePageIndex]} → ${_pageLayouts[nextPageIndex]}');
+        
+        // Güvenlik kontrolü
+        if (nextPageIndex < 0 || nextPageIndex >= _pageLayouts.length) {
+          print('⚠️ Invalid page index calculated: $nextPageIndex, resetting to 0');
+          nextPageIndex = 0;
+        }
+        
+        print('');
+        print('🔄 === AUTO ROTATION STEP ===');
+        print('📄 Total pages: ${_pageLayouts.length}');
+        print('📍 Current page: $_activePageIndex (Page ${_activePageIndex + 1})');
+        print('🎯 Next page: $nextPageIndex (Page ${nextPageIndex + 1})');
+        print('📋 Current layout: ${_pageLayouts.isNotEmpty && _activePageIndex < _pageLayouts.length ? _pageLayouts[_activePageIndex] : 'Unknown'}');
+        print('📋 Next layout: ${_pageLayouts.isNotEmpty && nextPageIndex < _pageLayouts.length ? _pageLayouts[nextPageIndex] : 'Unknown'}');
+        print('🔄 Calling setActivePage($nextPageIndex)...');
+        
+        // Sayfa değişikliğini gerçekleştir
         setActivePage(nextPageIndex);
+        
+        print('✅ setActivePage completed. New active page: $_activePageIndex');
+        print('=================================');
+        print('');
       },
     );
     
