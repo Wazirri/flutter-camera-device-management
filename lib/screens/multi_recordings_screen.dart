@@ -13,6 +13,16 @@ import '../providers/camera_devices_provider_optimized.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../widgets/video_controls.dart';
+import 'multi_watch_screen.dart';
+
+// Helper class for recording time management
+class RecordingTime {
+  final Camera camera;
+  final String recording;
+  final DateTime timestamp;
+  
+  RecordingTime(this.camera, this.recording, this.timestamp);
+}
 
 class MultiRecordingsScreen extends StatefulWidget {
   const MultiRecordingsScreen({Key? key}) : super(key: key);
@@ -435,20 +445,104 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     );
   }
   
-  void _toggleCameraSelection(Camera camera, bool selected) {
-    setState(() {
-      if (selected) {
-        if (!_selectedCameras.contains(camera)) {
-          _selectedCameras.add(camera);
-        }
-      } else {
-        _selectedCameras.remove(camera);
-        _cameraRecordings.remove(camera);
-      }
-    });
+  // Kayıtları ±5dk toleransla grupla
+  List<List<RecordingTime>> _groupRecordingsByTime() {
+    if (_cameraRecordings.isEmpty) return [];
     
-    // Seçim değiştiğinde kayıtları yeniden yükle
-    _updateRecordingsForSelectedDay();
+    // Tüm kayıtlardan zaman damgalarını çıkar
+    final List<RecordingTime> allRecordings = [];
+    
+    for (final entry in _cameraRecordings.entries) {
+      final camera = entry.key;
+      final recordings = entry.value;
+      
+      for (final recording in recordings) {
+        final recordingName = recording.contains('/') ? recording.split('/').last : recording;
+        // 2025-06-04_07-06-24.mkv formatından tarih çıkar
+        final parts = recordingName.split('_');
+        if (parts.length >= 2) {
+          final datePart = parts[0]; // 2025-06-04
+          final timePart = parts[1].split('.')[0]; // 07-06-24
+          
+          try {
+            final dateComponents = datePart.split('-');
+            final timeComponents = timePart.split('-');
+            
+            if (dateComponents.length == 3 && timeComponents.length == 3) {
+              final year = int.parse(dateComponents[0]);
+              final month = int.parse(dateComponents[1]);
+              final day = int.parse(dateComponents[2]);
+              final hour = int.parse(timeComponents[0]);
+              final minute = int.parse(timeComponents[1]);
+              final second = int.parse(timeComponents[2]);
+              
+              final timestamp = DateTime(year, month, day, hour, minute, second);
+              allRecordings.add(RecordingTime(camera, recording, timestamp));
+            }
+          } catch (e) {
+            print('Error parsing timestamp from $recordingName: $e');
+          }
+        }
+      }
+    }
+    
+    if (allRecordings.isEmpty) return [];
+    
+    // Zaman damgalarına göre sırala
+    allRecordings.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    
+    // ±5dk toleransla grupla
+    final List<List<RecordingTime>> groups = [];
+    final Duration tolerance = const Duration(minutes: 5);
+    
+    for (final recording in allRecordings) {
+      bool addedToGroup = false;
+      
+      // Mevcut gruplardan birine eklenebilir mi kontrol et
+      for (final group in groups) {
+        if (group.isNotEmpty) {
+          final groupTime = group.first.timestamp;
+          final timeDiff = recording.timestamp.difference(groupTime).abs();
+          
+          if (timeDiff <= tolerance) {
+            // Bu gruba ekle, ama aynı kameradan kayıt yoksa
+            final hasThisCamera = group.any((r) => r.camera == recording.camera);
+            if (!hasThisCamera) {
+              group.add(recording);
+              addedToGroup = true;
+              break;
+            }
+          }
+        }
+      }
+      
+      // Hiçbir gruba eklenemedi, yeni grup oluştur
+      if (!addedToGroup) {
+        groups.add([recording]);
+      }
+    }
+    
+    // Sadece birden fazla kamerası olan grupları döndür
+    return groups.where((group) => group.length > 1).toList();
+  }
+
+  void _openMultiWatchScreen(List<RecordingTime> recordingGroup) {
+    final Map<Camera, String> cameraRecordings = {};
+    
+    for (final recording in recordingGroup) {
+      cameraRecordings[recording.camera] = recording.recording;
+    }
+    
+    // Multi Watch sayfasını aç
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MultiWatchScreen(
+          cameraRecordings: cameraRecordings,
+          selectedDate: _selectedDay!,
+        ),
+      ),
+    );
   }
   
   @override
@@ -503,57 +597,10 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           // Kamera seçim bölümü
           _buildCameraSelectionSection(),
           
-          // Takvim bölümü
-          SlideTransition(
-            position: _calendarSlideAnimation,
-            child: FadeTransition(
-              opacity: _fadeInAnimation,
-              child: Card(
-                margin: const EdgeInsets.all(8.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TableCalendar(
-                    firstDay: kFirstDay,
-                    lastDay: kLastDay,
-                    focusedDay: _focusedDay,
-                    calendarFormat: CalendarFormat.month,
-                    selectedDayPredicate: (day) {
-                      return isSameDay(_selectedDay, day);
-                    },
-                    onDaySelected: (selectedDay, focusedDay) {
-                      setState(() {
-                        _selectedDay = selectedDay;
-                        _focusedDay = focusedDay;
-                      });
-                      _updateRecordingsForSelectedDay();
-                    },
-                    onPageChanged: (focusedDay) {
-                      _focusedDay = focusedDay;
-                    },
-                    calendarStyle: CalendarStyle(
-                      todayDecoration: BoxDecoration(
-                        color: AppTheme.primaryBlue.withOpacity(0.5),
-                        shape: BoxShape.circle,
-                      ),
-                      selectedDecoration: const BoxDecoration(
-                        color: AppTheme.primaryBlue,
-                        shape: BoxShape.circle,
-                      ),
-                      markerDecoration: const BoxDecoration(
-                        color: AppTheme.primaryOrange,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          
           // Video oynatıcı
           if (_activeCamera != null && _activeRecording != null)
             Expanded(
-              flex: 3,
+              flex: 2,
               child: SlideTransition(
                 position: _playerSlideAnimation,
                 child: FadeTransition(
@@ -563,15 +610,73 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
               ),
             ),
           
-          // Kayıt listesi
+          // Takvim ve Kayıt listesi yan yana
           Expanded(
-            flex: 2,
-            child: SlideTransition(
-              position: _playerSlideAnimation,
-              child: FadeTransition(
-                opacity: _fadeInAnimation,
-                child: _buildRecordingsList(),
-              ),
+            flex: 3,
+            child: Row(
+              children: [
+                // Takvim bölümü (sol taraf)
+                Expanded(
+                  flex: 1,
+                  child: SlideTransition(
+                    position: _calendarSlideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeInAnimation,
+                      child: Card(
+                        margin: const EdgeInsets.all(8.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TableCalendar(
+                            firstDay: kFirstDay,
+                            lastDay: kLastDay,
+                            focusedDay: _focusedDay,
+                            calendarFormat: CalendarFormat.month,
+                            selectedDayPredicate: (day) {
+                              return isSameDay(_selectedDay, day);
+                            },
+                            onDaySelected: (selectedDay, focusedDay) {
+                              setState(() {
+                                _selectedDay = selectedDay;
+                                _focusedDay = focusedDay;
+                              });
+                              _updateRecordingsForSelectedDay();
+                            },
+                            onPageChanged: (focusedDay) {
+                              _focusedDay = focusedDay;
+                            },
+                            calendarStyle: CalendarStyle(
+                              todayDecoration: BoxDecoration(
+                                color: AppTheme.primaryBlue.withOpacity(0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              selectedDecoration: const BoxDecoration(
+                                color: AppTheme.primaryBlue,
+                                shape: BoxShape.circle,
+                              ),
+                              markerDecoration: const BoxDecoration(
+                                color: AppTheme.primaryOrange,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                
+                // Kayıt listesi (sağ taraf)
+                Expanded(
+                  flex: 1,
+                  child: SlideTransition(
+                    position: _playerSlideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeInAnimation,
+                      child: _buildRecordingsList(),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -736,6 +841,71 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
               );
             }).toList(),
           ),
+          
+          // Toplu İzle sekmesi ve kayıt grupları
+          if (_cameraRecordings.isNotEmpty && 
+              _cameraRecordings.values.any((recordings) => recordings.isNotEmpty))
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: Container(
+                height: 300,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'Toplu İzle Grupları (±5dk tolerans)',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Builder(
+                        builder: (context) {
+                          final groups = _groupRecordingsByTime();
+                          
+                          if (groups.isEmpty) {
+                            return const Center(
+                              child: Text(
+                                'Aynı zaman diliminde birden fazla kameradan kayıt bulunamadı',
+                                style: TextStyle(color: Colors.grey),
+                                textAlign: TextAlign.center,
+                              ),
+                            );
+                          }
+                          
+                          return ListView.builder(
+                            itemCount: groups.length,
+                            itemBuilder: (context, index) {
+                              final group = groups[index];
+                              final groupTime = group.isNotEmpty 
+                                ? DateFormat('HH:mm:ss').format(group.first.timestamp)
+                                : '';
+                              
+                              return Card(
+                                margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                                child: ListTile(
+                                  leading: const Icon(Icons.play_circle_fill, color: AppTheme.primaryOrange),
+                                  title: Text('Grup ${index + 1} - $groupTime'),
+                                  subtitle: Text(
+                                    '${group.length} kamera: ${group.map((r) => r.camera.name).join(', ')}',
+                                  ),
+                                  trailing: const Icon(Icons.arrow_forward_ios),
+                                  onTap: () => _openMultiWatchScreen(group),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           
           // Kayıt listeleri
           Expanded(
