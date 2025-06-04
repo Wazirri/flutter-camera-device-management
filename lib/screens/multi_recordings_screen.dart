@@ -36,6 +36,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   List<Camera> _availableCameras = [];
   List<Camera> _selectedCameras = []; // Kullanıcının seçtiği kameralar
   final Map<Camera, List<String>> _cameraRecordings = {};
+  final Map<Camera, String> _cameraErrors = {}; // Her kamera için ayrı hata mesajları
   
   // Aktif oynatılan kayıt bilgileri
   Camera? _activeCamera;
@@ -169,6 +170,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       _isLoadingRecordings = true;
       _loadingError = '';
       _cameraRecordings.clear();
+      _cameraErrors.clear(); // Kamera hatalarını temizle
     });
     
     print('[MultiRecordings] Loading recordings for ${_selectedCameras.length} selected cameras');
@@ -200,7 +202,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     }).catchError((error) {
       setState(() {
         _isLoadingRecordings = false;
-        _loadingError = 'Error loading recordings: ${error.toString()}';
+        // Genel hata sadece beklenmedik durumlar için
+        print('[MultiRecordings] Unexpected error: $error');
       });
     });
   }
@@ -266,7 +269,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       print('[MultiRecordings] Error loading recordings for ${camera.name}: $e');
       if (mounted) {
         setState(() {
-          _loadingError = 'Error loading recordings: $e';
+          _cameraErrors[camera] = 'Error loading recordings: $e';
           _cameraRecordings[camera] = [];
         });
       }
@@ -913,6 +916,49 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
               children: _cameraRecordings.entries.map((entry) {
                 final camera = entry.key;
                 final recordings = entry.value;
+                final cameraError = _cameraErrors[camera];
+                
+                // Eğer bu kamera için hata varsa, hata mesajını göster
+                if (cameraError != null && cameraError.isNotEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.red.withOpacity(0.7),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Error loading recordings for ${camera.name}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          child: Text(
+                            cameraError,
+                            style: TextStyle(
+                              color: Colors.red.withOpacity(0.8),
+                              fontSize: 14,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: () => _updateRecordingsForSelectedDay(),
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
                 
                 if (recordings.isEmpty) {
                   return Center(
@@ -1091,6 +1137,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                           setState(() {
                             _selectedCameras.clear();
                             _cameraRecordings.clear();
+                            _cameraErrors.clear();
                           });
                         },
                       ),
@@ -1120,6 +1167,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                               } else {
                                 _selectedCameras.remove(camera);
                                 _cameraRecordings.remove(camera);
+                                _cameraErrors.remove(camera);
                               }
                             });
                             _updateRecordingsForSelectedDay();
