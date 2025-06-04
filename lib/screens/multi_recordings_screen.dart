@@ -636,65 +636,80 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         ],
       ),
       body: SafeArea(
-        child: Row(
-          children: [
-            // Sol panel - Takvim ve Kamera Seçimi
-            Container(
-              width: 350,
-              decoration: BoxDecoration(
-                border: Border(right: BorderSide(color: Colors.grey.shade300)),
-              ),
-              child: Column(
-                children: [
-                  // Kompakt Takvim - Fixed height with constraints
-                  Container(
-                    constraints: const BoxConstraints(
-                      maxHeight: 200,
-                      minHeight: 150,
-                    ),
-                    child: _buildCompactCalendar(),
-                  ),
-                  
-                  // Kamera Seçimi (Gruplu) - Takes remaining space with scrolling
-                  Expanded(
-                    child: _buildGroupedCameraSelection(),
-                  ),
-                ],
-              ),
-            ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // Dynamic sidebar width based on screen size
+            final screenWidth = constraints.maxWidth;
+            final sidebarWidth = screenWidth < 800 
+                ? screenWidth * 0.35 // 35% for small screens
+                : screenWidth < 1200 
+                    ? 350.0 // Fixed width for medium screens
+                    : screenWidth * 0.25; // 25% for large screens
             
-            // Sağ panel - Video Player ve Kayıt Listesi
-            Expanded(
-              child: Column(
-                children: [
-                  // Video oynatıcı
-                  if (_activeCamera != null && _activeRecording != null)
-                    Expanded(
-                      flex: 3,
-                      child: SlideTransition(
-                        position: _playerSlideAnimation,
-                        child: FadeTransition(
-                          opacity: _fadeInAnimation,
-                          child: _buildVideoPlayer(),
+            final sidebarHeight = constraints.maxHeight;
+            
+            return Row(
+              children: [
+                // Sol panel - Takvim ve Kamera Seçimi
+                Container(
+                  width: sidebarWidth,
+                  height: sidebarHeight,
+                  decoration: BoxDecoration(
+                    border: Border(right: BorderSide(color: Colors.grey.shade300)),
+                  ),
+                  child: Column(
+                    children: [
+                      // Kompakt Takvim - Dynamic height based on available space
+                      Container(
+                        constraints: BoxConstraints(
+                          maxHeight: sidebarHeight * 0.45, // 45% of sidebar height
+                          minHeight: 250, // Minimum height to keep calendar readable
+                        ),
+                        child: _buildCompactCalendar(),
+                      ),
+                      
+                      // Kamera Seçimi (Gruplu) - Takes remaining space with scrolling
+                      Expanded(
+                        child: _buildGroupedCameraSelection(),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                // Sağ panel - Video Player ve Kayıt Listesi
+                Expanded(
+                  child: Column(
+                    children: [
+                      // Video oynatıcı
+                      if (_activeCamera != null && _activeRecording != null)
+                        Expanded(
+                          flex: 3,
+                          child: SlideTransition(
+                            position: _playerSlideAnimation,
+                            child: FadeTransition(
+                              opacity: _fadeInAnimation,
+                              child: _buildVideoPlayer(),
+                            ),
+                          ),
+                        ),
+                      
+                      // Kayıt listesi
+                      Expanded(
+                        flex: 2,
+                        child: SlideTransition(
+                          position: _playerSlideAnimation,
+                          child: FadeTransition(
+                            opacity: _fadeInAnimation,
+                            child: _buildRecordingsList(),
+                          ),
                         ),
                       ),
-                    ),
-                  
-                  // Kayıt listesi
-                  Expanded(
-                    flex: 2,
-                    child: SlideTransition(
-                      position: _playerSlideAnimation,
-                      child: FadeTransition(
-                        opacity: _fadeInAnimation,
-                        child: _buildRecordingsList(),
-                      ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -1110,7 +1125,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     return Card(
       margin: const EdgeInsets.all(8.0),
       child: Padding(
-        padding: const EdgeInsets.all(6.0), // Reduced padding
+        padding: const EdgeInsets.all(6.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -1119,66 +1134,104 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
               'Select Date',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                fontSize: 14, // Larger title
+                fontSize: 14,
               ),
             ),
-            const SizedBox(height: 4), // More spacing
-            // Use fixed height to prevent overflow
-            SizedBox(
-              height: 280, // Increased height for better visibility
-              child: TableCalendar(
-                firstDay: kFirstDay,
-                lastDay: kLastDay,
-                focusedDay: _focusedDay,
-                calendarFormat: CalendarFormat.month,
-                headerStyle: const HeaderStyle(
-                  formatButtonVisible: false,
-                  titleCentered: true,
-                  titleTextStyle: TextStyle(fontSize: 16), // Larger header
-                  leftChevronPadding: EdgeInsets.zero,
-                  rightChevronPadding: EdgeInsets.zero,
-                  headerPadding: EdgeInsets.symmetric(vertical: 8), // More padding
-                  headerMargin: EdgeInsets.only(bottom: 8), // More margin
-                ),
-                calendarStyle: CalendarStyle(
-                  outsideDaysVisible: false,
-                  cellMargin: const EdgeInsets.all(2), // More cell margins
-                  cellPadding: const EdgeInsets.all(4), // More cell padding
-                  defaultTextStyle: const TextStyle(fontSize: 12), // Larger text
-                  weekendTextStyle: const TextStyle(fontSize: 12), // Larger weekend text
-                  selectedTextStyle: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
-                  todayTextStyle: const TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
-                  todayDecoration: BoxDecoration(
-                    color: AppTheme.primaryBlue.withOpacity(0.5),
-                    shape: BoxShape.circle,
+            const SizedBox(height: 4),
+            // Dynamic calendar with responsive sizing
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // Calculate optimal sizes based on available space
+                final availableHeight = constraints.maxHeight - 30; // Reserve space for title
+                final cellSize = (constraints.maxWidth - 32) / 7; // 7 days per week, account for padding
+                final headerHeight = 40.0;
+                final daysOfWeekHeight = 20.0;
+                final calendarBodyHeight = cellSize * 6; // 6 weeks max
+                
+                // Adjust sizes if calendar would be too tall
+                final totalNeededHeight = headerHeight + daysOfWeekHeight + calendarBodyHeight;
+                final scaleFactor = totalNeededHeight > availableHeight 
+                    ? availableHeight / totalNeededHeight 
+                    : 1.0;
+                
+                final fontSize = (10 * scaleFactor).clamp(8.0, 12.0);
+                final headerFontSize = (16 * scaleFactor).clamp(12.0, 18.0);
+                final cellPadding = (2 * scaleFactor).clamp(1.0, 3.0);
+                final cellMargin = (1 * scaleFactor).clamp(0.5, 2.0);
+                
+                return Container(
+                  constraints: BoxConstraints(
+                    maxHeight: availableHeight,
                   ),
-                  selectedDecoration: const BoxDecoration(
-                    color: AppTheme.primaryBlue,
-                    shape: BoxShape.circle,
+                  child: SingleChildScrollView(
+                    child: TableCalendar(
+                      firstDay: kFirstDay,
+                      lastDay: kLastDay,
+                      focusedDay: _focusedDay,
+                      calendarFormat: CalendarFormat.month,
+                      headerStyle: HeaderStyle(
+                        formatButtonVisible: false,
+                        titleCentered: true,
+                        titleTextStyle: TextStyle(fontSize: headerFontSize),
+                        leftChevronPadding: EdgeInsets.zero,
+                        rightChevronPadding: EdgeInsets.zero,
+                        headerPadding: EdgeInsets.symmetric(vertical: 4 * scaleFactor),
+                        headerMargin: EdgeInsets.only(bottom: 4 * scaleFactor),
+                      ),
+                      calendarStyle: CalendarStyle(
+                        outsideDaysVisible: false,
+                        cellMargin: EdgeInsets.all(cellMargin),
+                        cellPadding: EdgeInsets.all(cellPadding),
+                        defaultTextStyle: TextStyle(fontSize: fontSize),
+                        weekendTextStyle: TextStyle(fontSize: fontSize),
+                        selectedTextStyle: TextStyle(
+                          fontSize: fontSize, 
+                          color: Colors.white, 
+                          fontWeight: FontWeight.bold
+                        ),
+                        todayTextStyle: TextStyle(
+                          fontSize: fontSize, 
+                          color: Colors.white, 
+                          fontWeight: FontWeight.bold
+                        ),
+                        todayDecoration: BoxDecoration(
+                          color: AppTheme.primaryBlue.withOpacity(0.5),
+                          shape: BoxShape.circle,
+                        ),
+                        selectedDecoration: const BoxDecoration(
+                          color: AppTheme.primaryBlue,
+                          shape: BoxShape.circle,
+                        ),
+                        markerDecoration: const BoxDecoration(
+                          color: AppTheme.primaryOrange,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      daysOfWeekStyle: DaysOfWeekStyle(
+                        weekdayStyle: TextStyle(fontSize: fontSize * 0.9, fontWeight: FontWeight.w500),
+                        weekendStyle: TextStyle(
+                          fontSize: fontSize * 0.9, 
+                          fontWeight: FontWeight.w500, 
+                          color: Colors.red
+                        ),
+                      ),
+                      selectedDayPredicate: (day) {
+                        return isSameDay(_selectedDay, day);
+                      },
+                      onDaySelected: (selectedDay, focusedDay) {
+                        setState(() {
+                          _selectedDay = selectedDay;
+                          _focusedDay = focusedDay;
+                        });
+                        _updateRecordingsForSelectedDay();
+                      },
+                      onPageChanged: (focusedDay) {
+                        _focusedDay = focusedDay;
+                      },
+                    ),
                   ),
-                  markerDecoration: const BoxDecoration(
-                    color: AppTheme.primaryOrange,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                daysOfWeekStyle: const DaysOfWeekStyle(
-                  weekdayStyle: TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
-                  weekendStyle: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Colors.red),
-                ),
-                selectedDayPredicate: (day) {
-                  return isSameDay(_selectedDay, day);
-                },
-                onDaySelected: (selectedDay, focusedDay) {
-                  setState(() {
-                    _selectedDay = selectedDay;
-                    _focusedDay = focusedDay;
-                  });
-                  _updateRecordingsForSelectedDay();
-                },
-                onPageChanged: (focusedDay) {
-                  _focusedDay = focusedDay;
-                },
-              ),
+                );
+              },
             ),
           ],
         ),
