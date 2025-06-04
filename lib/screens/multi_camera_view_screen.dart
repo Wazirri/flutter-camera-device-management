@@ -138,6 +138,69 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
               );
             },
           ),
+          // Otomatik sayfa döngüsü butonu
+          Consumer<MultiCameraViewProvider>(
+            builder: (context, provider, child) {
+              return PopupMenuButton<String>(
+                icon: Icon(
+                  provider.isAutoPageRotationEnabled 
+                    ? Icons.play_circle_filled 
+                    : Icons.play_circle_outline,
+                  color: provider.isAutoPageRotationEnabled 
+                    ? Colors.green 
+                    : null,
+                ),
+                tooltip: 'Auto Page Rotation',
+                onSelected: (String action) {
+                  switch (action) {
+                    case 'toggle':
+                      provider.toggleAutoPageRotation();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(provider.isAutoPageRotationEnabled 
+                            ? 'Auto page rotation started (${provider.autoPageRotationInterval}s)' 
+                            : 'Auto page rotation stopped'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                      break;
+                    case 'settings':
+                      _showAutoRotationSettings(context, provider);
+                      break;
+                  }
+                },
+                itemBuilder: (BuildContext context) => [
+                  PopupMenuItem<String>(
+                    value: 'toggle',
+                    child: Row(
+                      children: [
+                        Icon(
+                          provider.isAutoPageRotationEnabled 
+                            ? Icons.pause 
+                            : Icons.play_arrow,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(provider.isAutoPageRotationEnabled 
+                          ? 'Stop Auto Rotation' 
+                          : 'Start Auto Rotation'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'settings',
+                    child: Row(
+                      children: [
+                        Icon(Icons.timer, size: 18),
+                        SizedBox(width: 8),
+                        Text('Rotation Settings'),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ],
       ),
       body: Consumer<MultiCameraViewProvider>(
@@ -159,15 +222,15 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
                   },
                   itemCount: provider.pageLayouts.length,
                   itemBuilder: (context, index) {
-                    // Aktif sayfanın layout'unu al
+                    // Bu sayfanın layout'unu al
                     int layoutCode = provider.pageLayouts[index];
                     CameraLayoutConfig? layout = provider.layouts.firstWhere(
                       (l) => l.layoutCode == layoutCode,
                       orElse: () => provider.layouts.first,
                     );
                     
-                    // Kamera atamalarını al
-                    Map<int, int> assignments = provider.activeCameraAssignments;
+                    // Bu sayfanın kamera atamalarını al
+                    Map<int, int> assignments = provider.cameraAssignments(index);
                     
                     return CameraGridView(
                       layout: layout,
@@ -1129,6 +1192,104 @@ class CameraPreviewPlaceholder extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// Auto rotation settings dialog
+extension MultiCameraViewScreenExtensions on _MultiCameraViewScreenState {
+  void _showAutoRotationSettings(BuildContext context, MultiCameraViewProvider provider) {
+    int selectedInterval = provider.autoPageRotationInterval;
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(Icons.timer, size: 24),
+                  SizedBox(width: 8),
+                  Text('Auto Page Rotation Settings'),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Select rotation interval:',
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Süre seçici list tiles
+                  ...[3, 5, 10, 15, 30, 60].map((seconds) => 
+                    RadioListTile<int>(
+                      title: Text('${seconds} seconds'),
+                      value: seconds,
+                      groupValue: selectedInterval,
+                      onChanged: (int? value) {
+                        if (value != null) {
+                          setState(() {
+                            selectedInterval = value;
+                          });
+                        }
+                      },
+                      dense: true,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.info_outline, size: 20, color: Colors.blue),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Pages will automatically switch after the selected interval.',
+                            style: TextStyle(fontSize: 12, color: Colors.blue),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    provider.setAutoPageRotationInterval(selectedInterval);
+                    Navigator.of(context).pop();
+                    
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Rotation interval set to ${selectedInterval} seconds'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  child: const Text('Apply'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

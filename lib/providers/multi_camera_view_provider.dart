@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,6 +34,14 @@ class MultiCameraViewProvider with ChangeNotifier {
   final Map<String, Map<int, Map<int, int>>> _savedPresets = {};
   static const String _presetsKey = 'camera_layout_presets';
 
+  // Otomatik sayfa döngüsü için değişkenler
+  bool _isAutoPageRotationEnabled = false;
+  int _autoPageRotationInterval = 5; // Saniye cinsinden
+  Timer? _autoPageRotationTimer;
+  
+  // Mevcut döngü durumu
+  bool get isAutoPageRotationActive => _autoPageRotationTimer?.isActive ?? false;
+
   // Constructor
   MultiCameraViewProvider() {
     // Başlangıçta layout dosyasını yükle
@@ -41,11 +50,25 @@ class MultiCameraViewProvider with ChangeNotifier {
     // İlk sayfa için boş bir kamera atama haritası oluştur
     _cameraAssignments[0] = {};
     
+    // Test amaçlı çoklu sayfa oluştur (farklı layout'larla)
+    _initializeTestPages();
+    
     // Load saved presets from shared preferences
     _loadSavedPresets();
     
     // Auto-load configuration if available
     _autoLoadConfigurationOnStart();
+  }
+  
+  // Test amaçlı çoklu sayfa oluştur
+  void _initializeTestPages() {
+    // 5 farklı sayfa oluştur, her biri farklı layout ile
+    _pageLayouts = [5, 2, 9, 4, 8]; // 2x2, 2cam, 3x3, 4cam, 8cam layoutlar
+    
+    // Her sayfa için boş atama haritası oluştur
+    for (int i = 0; i < _pageLayouts.length; i++) {
+      _cameraAssignments[i] = {};
+    }
   }
   
   // Load saved presets from shared preferences
@@ -118,6 +141,10 @@ class MultiCameraViewProvider with ChangeNotifier {
   bool get isAutoAssignmentMode => _isAutoAssignmentMode;
   List<Camera> get availableCameras => _availableCameras;
   
+  // Otomatik sayfa döngüsü getters
+  bool get isAutoPageRotationEnabled => _isAutoPageRotationEnabled;
+  int get autoPageRotationInterval => _autoPageRotationInterval;
+  
   // Aktif layout getter'ı
   CameraLayoutConfig? get activeLayout {
     if (_layouts.isEmpty || _pageLayouts.isEmpty || _activePageIndex >= _pageLayouts.length) {
@@ -176,24 +203,44 @@ class MultiCameraViewProvider with ChangeNotifier {
     notifyListeners();
   }
   
-  // Otomatik kamera atama
+  // Otomatik kamera atama - Gelişmiş sıralı atama sistemi
   void _autoAssignCameras() {
-    if (_availableCameras.isEmpty || activeLayout == null) return;
+    if (_availableCameras.isEmpty) return;
     
-    final Map<int, int> assignments = {};
-    final locations = activeLayout!.cameraLoc;
-    
-    // Her lokasyon için, mevcut kameralardan birini ata
-    for (int i = 0; i < locations.length; i++) {
-      if (i < _availableCameras.length) {
-        int cameraPosition = locations[i].cameraCode;
-        // index+1 değerini kullan (varsayılan CameraCode değil)
-        assignments[cameraPosition] = i + 1;
-      }
-    }
-    
-    _cameraAssignments[_activePageIndex] = assignments;
+    // Tüm sayfalardaki kameraları sıralı olarak ata
+    _autoAssignCamerasSequentially();
     notifyListeners();
+  }
+  
+  // Kameraları tüm sayfalara sıralı olarak ata
+  void _autoAssignCamerasSequentially() {
+    if (_availableCameras.isEmpty) return;
+    
+    int cameraIndex = 0; // Başlangıç kamera indeksi
+    
+    // Her sayfa için kamera ataması yap
+    for (int pageIndex = 0; pageIndex < _pageLayouts.length; pageIndex++) {
+      final layoutCode = _pageLayouts[pageIndex];
+      final layout = _layouts.firstWhere(
+        (l) => l.layoutCode == layoutCode,
+        orElse: () => _layouts.first,
+      );
+      
+      final Map<int, int> assignments = {};
+      final locations = layout.cameraLoc;
+      
+      // Bu sayfadaki her lokasyon için kamera ata
+      for (final location in locations) {
+        if (_availableCameras.isNotEmpty) {
+          // Döngüsel atama: kameralar bitince başa dön
+          final actualCameraIndex = cameraIndex % _availableCameras.length;
+          assignments[location.cameraCode] = actualCameraIndex + 1; // +1 çünkü 1-based indexing
+          cameraIndex++; // Bir sonraki kameraya geç
+        }
+      }
+      
+      _cameraAssignments[pageIndex] = assignments;
+    }
   }
   
   // Automatic camera assignment with different sorting criteria
@@ -275,15 +322,27 @@ class MultiCameraViewProvider with ChangeNotifier {
   
   // Aktif sayfa değiştir
   void setActivePage(int pageIndex) {
+    print('📄 setActivePage called: $_activePageIndex → $pageIndex');
+    
     if (pageIndex < 0) return;
     
     // Eğer yeni bir sayfa ise, varsayılan değerleri ayarla
     if (pageIndex >= _pageLayouts.length) {
-      _pageLayouts.add(5); // Varsayılan 2x2 grid
+      // Farklı layout'ları döngüsel olarak kullan
+      final availableLayouts = [2, 5, 9, 4]; // 2cam, 2x2, 3x3, 4cam
+      int layoutCode = availableLayouts[pageIndex % availableLayouts.length];
+      
+      print('🆕 Creating new page $pageIndex with layoutCode: $layoutCode');
+      _pageLayouts.add(layoutCode);
       _cameraAssignments[pageIndex] = {};
     }
     
+    int oldPageIndex = _activePageIndex;
     _activePageIndex = pageIndex;
+    
+    print('🔄 Page changed: $oldPageIndex → $_activePageIndex');
+    print('📋 Current layout code: ${_pageLayouts[_activePageIndex]}');
+    print('🎯 Active layout: ${activeLayout?.layoutCode} (${activeLayout?.maxCameraNumber} cameras)');
     
     // Eğer otomatik atama modundaysak, kameraları otomatik olarak yeniden ata
     if (_isAutoAssignmentMode) {
@@ -293,14 +352,27 @@ class MultiCameraViewProvider with ChangeNotifier {
     notifyListeners();
   }
   
-  // Sayfa ekle
-  void addPage() {
+  // Sayfa ekle (farklı layout seçenekleri ile)
+  void addPage({int? layoutCode}) {
     int newPageIndex = _pageLayouts.length;
-    _pageLayouts.add(5); // Varsayılan 2x2 grid
+    
+    // Eğer layout belirtilmemişse, mevcut layout'lardan birini döngüsel olarak seç
+    if (layoutCode == null) {
+      // Farklı layout'ları döngüsel olarak kullan
+      final availableLayouts = [2, 5, 9, 4]; // 2cam, 2x2, 3x3, 4cam
+      layoutCode = availableLayouts[newPageIndex % availableLayouts.length];
+    }
+    
+    _pageLayouts.add(layoutCode);
     _cameraAssignments[newPageIndex] = {};
     
     // Yeni sayfaya geç
     _activePageIndex = newPageIndex;
+    
+    // Otomatik atama modundaysak kameraları ata
+    if (_isAutoAssignmentMode) {
+      _autoAssignCameras();
+    }
     
     notifyListeners();
   }
@@ -343,6 +415,75 @@ class MultiCameraViewProvider with ChangeNotifier {
     }
     
     notifyListeners();
+  }
+
+  // Otomatik sayfa döngüsü metodları
+  
+  // Otomatik sayfa döngüsünü başlat/durdur
+  void toggleAutoPageRotation() {
+    if (_isAutoPageRotationEnabled) {
+      stopAutoPageRotation();
+    } else {
+      startAutoPageRotation();
+    }
+  }
+  
+  // Otomatik sayfa döngüsünü başlat
+  void startAutoPageRotation() {
+    print('🔄 Starting auto page rotation...');
+    print('📄 Available pages: ${_pageLayouts.length}');
+    print('📋 Page layouts: $_pageLayouts');
+    
+    if (_pageLayouts.length <= 1) {
+      print('⚠️ Auto rotation cancelled: Only ${_pageLayouts.length} page(s) available');
+      return; // Tek sayfa varsa döngü gereksiz
+    }
+    
+    _isAutoPageRotationEnabled = true;
+    _autoPageRotationTimer?.cancel(); // Varolan timer'ı iptal et
+    
+    print('⏰ Starting timer with ${_autoPageRotationInterval}s interval');
+    _autoPageRotationTimer = Timer.periodic(
+      Duration(seconds: _autoPageRotationInterval),
+      (timer) {
+        // Bir sonraki sayfaya geç (döngüsel)
+        int nextPageIndex = (_activePageIndex + 1) % _pageLayouts.length;
+        print('🔄 Auto rotating: $_activePageIndex → $nextPageIndex');
+        print('📄 Current layout: ${_pageLayouts[_activePageIndex]} → ${_pageLayouts[nextPageIndex]}');
+        setActivePage(nextPageIndex);
+      },
+    );
+    
+    notifyListeners();
+  }
+  
+  // Otomatik sayfa döngüsünü durdur
+  void stopAutoPageRotation() {
+    _isAutoPageRotationEnabled = false;
+    _autoPageRotationTimer?.cancel();
+    _autoPageRotationTimer = null;
+    notifyListeners();
+  }
+  
+  // Otomatik sayfa döngüsü süresini ayarla (saniye cinsinden)
+  void setAutoPageRotationInterval(int seconds) {
+    if (seconds < 1) return; // En az 1 saniye
+    
+    _autoPageRotationInterval = seconds;
+    
+    // Eğer döngü aktifse, yeni süre ile yeniden başlat
+    if (_isAutoPageRotationEnabled) {
+      startAutoPageRotation();
+    }
+    
+    notifyListeners();
+  }
+  
+  // Provider dispose edildiğinde timer'ı temizle
+  @override
+  void dispose() {
+    _autoPageRotationTimer?.cancel();
+    super.dispose();
   }
 
   // Get the list of saved preset names
@@ -520,6 +661,10 @@ class MultiCameraViewProvider with ChangeNotifier {
         'cameraAssignments': _cameraAssignments.map((key, value) => 
           MapEntry(key.toString(), value.map((k, v) => MapEntry(k.toString(), v)))),
         'isAutoAssignmentMode': _isAutoAssignmentMode,
+        'autoPageRotation': {
+          'enabled': _isAutoPageRotationEnabled,
+          'interval': _autoPageRotationInterval,
+        },
         'savedPresets': _savedPresets.map((presetName, presetData) => 
           MapEntry(presetName, presetData.map((pageIndex, assignments) => 
             MapEntry(pageIndex.toString(), assignments.map((pos, cam) => 
@@ -600,6 +745,16 @@ class MultiCameraViewProvider with ChangeNotifier {
       // Load auto assignment mode
       if (configData['isAutoAssignmentMode'] != null) {
         _isAutoAssignmentMode = configData['isAutoAssignmentMode'] as bool;
+      }
+
+      // Load auto page rotation settings
+      if (configData['autoPageRotation'] != null) {
+        final autoPageRotation = configData['autoPageRotation'] as Map<String, dynamic>;
+        // Don't auto-start rotation on load, just save the preference
+        _isAutoPageRotationEnabled = false;
+        if (autoPageRotation['interval'] != null) {
+          _autoPageRotationInterval = autoPageRotation['interval'] as int;
+        }
       }
 
       // Load saved presets
