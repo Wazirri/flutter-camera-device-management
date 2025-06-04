@@ -38,17 +38,9 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   final Map<Camera, List<String>> _cameraRecordings = {};
   final Map<Camera, String> _cameraErrors = {}; // Her kamera için ayrı hata mesajları
   
-  // Aktif oynatılan kayıt bilgileri
+  // Aktif oynatılan kayıt bilgileri (sadece selection tracking için)
   Camera? _activeCamera;
   String? _activeRecording;
-  
-  // Media player
-  late final Player _player;
-  late final VideoController _controller;
-  bool _isBuffering = false;
-  bool _hasError = false;
-  String _errorMessage = '';
-  bool _isFullScreen = false;
   
   // Takvim değişkenleri
   DateTime _focusedDay = DateTime.now();
@@ -72,10 +64,6 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   @override
   void initState() {
     super.initState();
-    
-    // Player'ı başlat
-    _player = Player();
-    _controller = VideoController(_player);
     
     // Animasyon controller'ı başlat
     _animationController = AnimationController(
@@ -101,28 +89,6 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     
     // Animasyonu başlat
     _animationController.forward();
-    
-    // Player hata dinleyicisi
-    _player.stream.error.listen((error) {
-      setState(() {
-        _hasError = true;
-        _errorMessage = "Error playing video: ${error.toString()}";
-      });
-    });
-    
-    // Player buffer dinleyicisi
-    _player.stream.buffering.listen((buffering) {
-      setState(() {
-        _isBuffering = buffering;
-      });
-    });
-    
-    // Player durum dinleyicisi
-    _player.stream.playing.listen((playing) {
-      setState(() {
-        // Play/pause durumunu güncelle
-      });
-    });
     
     // Kameraları yükle
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -296,51 +262,77 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           }
         }
       } else {
-        // Normal modda
-        _activeCamera = camera;
-        _activeRecording = recording;
-        
-        // Kayıt başlat
-        _loadRecording(camera, recording);
+        // Normal modda - Popup player aç
+        _openVideoPlayerPopup(camera, recording);
       }
     });
   }
   
-  CameraDevice? _getDeviceForCamera(Camera camera) {
-    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
-    return cameraDevicesProvider.getDeviceForCamera(camera);
-  }
-  
-  void _loadRecording(Camera camera, String recording) {
+  void _openVideoPlayerPopup(Camera camera, String recording) {
     final device = _getDeviceForCamera(camera);
     
     if (device != null && _selectedDay != null) {
       final selectedDayFormatted = DateFormat('yyyy_MM_dd').format(_selectedDay!);
       final recordingUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/$selectedDayFormatted/$recording';
       
-      setState(() {
-        _hasError = false;
-        _errorMessage = '';
-      });
-      
-      // Player'ı durdur ve yeni kaydı yükle
-      _player.stop();
-      
-      try {
-        _player.open(Media(recordingUrl), play: true);
-      } catch (e) {
-        setState(() {
-          _hasError = true;
-          _errorMessage = 'Error playing recording: $e';
-        });
-      }
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.black,
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.8,
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: Column(
+                children: [
+                  // Header with camera name and close button
+                  Container(
+                    height: 50,
+                    color: AppTheme.primaryBlue,
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 16),
+                        Icon(Icons.videocam, color: Colors.white),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${camera.name} - ${recording.split('/').last}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Video player
+                  Expanded(
+                    child: _VideoPlayerPopup(
+                      recordingUrl: recordingUrl,
+                      camera: camera,
+                      recording: recording,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
     }
   }
   
-  void _toggleFullScreen() {
-    setState(() {
-      _isFullScreen = !_isFullScreen;
-    });
+  CameraDevice? _getDeviceForCamera(Camera camera) {
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    return cameraDevicesProvider.getDeviceForCamera(camera);
   }
   
   void _toggleMultiSelectionMode() {
@@ -590,24 +582,12 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
 
   @override
   void dispose() {
-    _player.dispose();
     _animationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isFullScreen) {
-      return Scaffold(
-        body: _buildVideoPlayer(),
-        floatingActionButton: FloatingActionButton(
-          mini: true,
-          onPressed: _toggleFullScreen,
-          child: const Icon(Icons.fullscreen_exit),
-        ),
-      );
-    }
-    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Multi Recordings'),
@@ -676,107 +656,21 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                   ),
                 ),
                 
-                // Sağ panel - Video Player ve Kayıt Listesi
+                // Sağ panel - Sadece Kayıt Listesi
                 Expanded(
-                  child: Column(
-                    children: [
-                      // Video oynatıcı
-                      if (_activeCamera != null && _activeRecording != null)
-                        Expanded(
-                          flex: 3,
-                          child: SlideTransition(
-                            position: _playerSlideAnimation,
-                            child: FadeTransition(
-                              opacity: _fadeInAnimation,
-                              child: _buildVideoPlayer(),
-                            ),
-                          ),
-                        ),
-                      
-                      // Kayıt listesi
-                      Expanded(
-                        flex: 2,
-                        child: SlideTransition(
-                          position: _playerSlideAnimation,
-                          child: FadeTransition(
-                            opacity: _fadeInAnimation,
-                            child: _buildRecordingsList(),
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: SlideTransition(
+                    position: _playerSlideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeInAnimation,
+                      child: _buildRecordingsList(),
+                    ),
                   ),
                 ),
               ],
             );
           },
         ),
-      ),
-    );
-  }
-  
-  Widget _buildVideoPlayer() {
-    return Stack(
-      children: [
-        // Video Player
-        Card(
-          margin: _isFullScreen ? EdgeInsets.zero : const EdgeInsets.all(8.0),
-          color: Colors.black,
-          clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
-            borderRadius: _isFullScreen ? BorderRadius.zero : BorderRadius.circular(12),
-          ),
-          child: Video(
-            controller: _controller,
-            fill: Colors.black,
-            controls: null,
-          ),
-        ),
-        
-        // Buffering indicator
-        if (_isBuffering)
-          const Center(
-            child: CircularProgressIndicator(color: Colors.white),
-          ),
-        
-        // Error message
-        if (_hasError)
-          Center(
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.white, size: 48),
-                  const SizedBox(height: 16),
-                  Text(
-                    _errorMessage,
-                    style: const TextStyle(color: Colors.white),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          
-        // Video Controls
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: VideoControls(
-            player: _player,
-            showFullScreenButton: true,
-            onFullScreenToggle: _toggleFullScreen,
-          ),
-        ),
-      ],
-    );
+      ),    );
   }
   
   Widget _buildRecordingsList() {
@@ -1620,6 +1514,162 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           ),
         ],
       ),
+    );
+  }
+}
+
+// Popup Video Player Widget
+class _VideoPlayerPopup extends StatefulWidget {
+  final String recordingUrl;
+  final Camera camera;
+  final String recording;
+
+  const _VideoPlayerPopup({
+    required this.recordingUrl,
+    required this.camera,
+    required this.recording,
+  });
+
+  @override
+  State<_VideoPlayerPopup> createState() => _VideoPlayerPopupState();
+}
+
+class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
+  late final Player _popupPlayer;
+  late final VideoController _popupController;
+  bool _isBuffering = false;
+  bool _hasError = false;
+  String _errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // Create separate player for popup
+    _popupPlayer = Player();
+    _popupController = VideoController(_popupPlayer);
+    
+    // Setup error listener
+    _popupPlayer.stream.error.listen((error) {
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = "Error playing video: ${error.toString()}";
+        });
+      }
+    });
+    
+    // Setup buffering listener
+    _popupPlayer.stream.buffering.listen((buffering) {
+      if (mounted) {
+        setState(() {
+          _isBuffering = buffering;
+        });
+      }
+    });
+    
+    // Load and play the video
+    _loadVideo();
+  }
+
+  void _loadVideo() {
+    try {
+      _popupPlayer.open(Media(widget.recordingUrl), play: true);
+    } catch (e) {
+      setState(() {
+        _hasError = true;
+        _errorMessage = 'Error loading recording: $e';
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _popupPlayer.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_hasError) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red.withOpacity(0.7),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Error Loading Video',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Text(
+                _errorMessage,
+                style: TextStyle(
+                  color: Colors.red.withOpacity(0.8),
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () {
+                setState(() {
+                  _hasError = false;
+                  _errorMessage = '';
+                });
+                _loadVideo();
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Stack(
+      children: [
+        // Video widget
+        Video(
+          controller: _popupController,
+          fit: BoxFit.contain,
+        ),
+        
+        // Loading indicator
+        if (_isBuffering)
+          const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryOrange),
+            ),
+          ),
+        
+        // Video controls overlay
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: VideoControls(
+            player: _popupPlayer,
+            showFullScreenButton: true,
+            onFullScreenToggle: () {
+              // Close popup instead of fullscreen toggle
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+      ],
     );
   }
 }
