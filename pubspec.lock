@@ -155,9 +155,10 @@ packages:
   fvp:
     dependency: "direct main"
     description:
-      path: fvp
-      relative: true
-    source: path
+      name: fvp
+      sha256: a2b6f305a5e559abc21b1be06ca0ffb5bb6b5b523d6d45eb8e78d53f3b89e9a2
+      url: "https://pub.dev"
+    source: hosted
     version: "0.32.1"
   html:
     dependency: transitive

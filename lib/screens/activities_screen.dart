@@ -432,12 +432,12 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Play ${item.name}'),
-        content: const Text('DAV files may need to be downloaded first. Choose an option:'),
+        content: const Text('Choose how to play this DAV video file:'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Try direct streaming
+              // Try direct streaming with smart URL conversion
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -445,7 +445,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                 ),
               );
             },
-            child: const Text('Try Streaming'),
+            child: const Text('Stream (Fast)'),
           ),
           TextButton(
             onPressed: () {
@@ -643,51 +643,92 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       // Support both network URLs and local files
       if (widget.videoUrl.startsWith('http://') || widget.videoUrl.startsWith('https://')) {
         print('[VideoPlayer] Using network URL (HTTP/HTTPS)');
-        _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
+        _controller = VideoPlayerController.networkUrl(
+          Uri.parse(widget.videoUrl),
+          videoPlayerOptions: VideoPlayerOptions(
+            mixWithOthers: true,
+            allowBackgroundPlayback: false,
+          ),
+        );
       } else if (widget.videoUrl.startsWith('ftp://')) {
-        print('[VideoPlayer] Using FTP URL');
-        // FTP URLs need special handling - try converting to HTTP equivalent
-        // Some IP cameras serve files via both FTP and HTTP
-        final ftpUri = Uri.parse(widget.videoUrl);
+        print('[VideoPlayer] Converting FTP URL for better compatibility');
         
-        // Extract components from FTP URL
+        // Parse FTP URL components
+        final ftpUri = Uri.parse(widget.videoUrl);
         final host = ftpUri.host;
-        final port = ftpUri.port;
         final path = ftpUri.path;
         
-        print('[VideoPlayer] FTP Host: $host, Port: $port, Path: $path');
+        print('[VideoPlayer] FTP Host: $host, Path: $path');
         
-        // Try HTTP equivalent first (many IP cameras support this)
-        final httpUrl = 'http://$host:8080$path';
-        print('[VideoPlayer] Trying HTTP equivalent: $httpUrl');
+        // Try multiple HTTP alternatives that work with Dahua cameras
+        final httpAlternatives = [
+          'http://$host:8080$path',           // Standard web server port
+          'http://$host:80$path',             // Default HTTP port
+          'http://$host$path',                // No explicit port
+          'http://$host:8000$path',           // Alternative port
+        ];
         
-        try {
-          // Use VideoPlayerOptions for better codec support
-          _controller = VideoPlayerController.networkUrl(
-            Uri.parse(httpUrl),
-            videoPlayerOptions: VideoPlayerOptions(
-              mixWithOthers: true,
-              allowBackgroundPlayback: false,
-            ),
-          );
-        } catch (e) {
-          print('[VideoPlayer] HTTP attempt failed, trying direct FTP: $e');
-          // Fallback to original FTP URL with options
-          _controller = VideoPlayerController.networkUrl(
-            Uri.parse(widget.videoUrl),
-            videoPlayerOptions: VideoPlayerOptions(
-              mixWithOthers: true,
-              allowBackgroundPlayback: false,
-            ),
-          );
+        bool initialized = false;
+        String lastError = '';
+        
+        for (final httpUrl in httpAlternatives) {
+          try {
+            print('[VideoPlayer] Trying HTTP alternative: $httpUrl');
+            _controller = VideoPlayerController.networkUrl(
+              Uri.parse(httpUrl),
+              videoPlayerOptions: VideoPlayerOptions(
+                mixWithOthers: true,
+                allowBackgroundPlayback: false,
+              ),
+            );
+            
+            // Test initialization
+            await _controller.initialize();
+            initialized = true;
+            print('[VideoPlayer] Successfully initialized with: $httpUrl');
+            break;
+            
+          } catch (e) {
+            print('[VideoPlayer] Failed with $httpUrl: $e');
+            lastError = e.toString();
+            // Dispose failed controller
+            try {
+              _controller.dispose();
+            } catch (_) {}
+          }
         }
+        
+        if (!initialized) {
+          throw Exception('All HTTP alternatives failed. Last error: $lastError');
+        }
+        
       } else {
         // For local files
         print('[VideoPlayer] Using local file');
         _controller = VideoPlayerController.file(File(widget.videoUrl));
       }
       
-      // Add listener for controller state changes
+      // Only add listener and initialize if not already done
+      if (!widget.videoUrl.startsWith('ftp://')) {
+        // Add listener for controller state changes
+        _controller.addListener(() {
+          if (mounted) {
+            setState(() {});
+            if (_controller.value.hasError) {
+              print('[VideoPlayer] Controller error: ${_controller.value.errorDescription}');
+            }
+          }
+        });
+        
+        print('[VideoPlayer] Starting controller initialization...');
+        
+        // Initialize the controller
+        await _controller.initialize();
+        
+        print('[VideoPlayer] Controller initialized successfully');
+      }
+      
+      // Add listener for FTP case too
       _controller.addListener(() {
         if (mounted) {
           setState(() {});
@@ -697,12 +738,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         }
       });
       
-      print('[VideoPlayer] Starting controller initialization...');
-      
-      // Initialize the controller
-      await _controller.initialize();
-      
-      print('[VideoPlayer] Controller initialized successfully');
       print('[VideoPlayer] Video duration: ${_controller.value.duration}');
       print('[VideoPlayer] Video size: ${_controller.value.size}');
       print('[VideoPlayer] Aspect ratio: ${_controller.value.aspectRatio}');

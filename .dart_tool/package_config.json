@@ -123,7 +123,7 @@
     },
     {
       "name": "fvp",
-      "rootUri": "../fvp",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/fvp-0.32.1",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
