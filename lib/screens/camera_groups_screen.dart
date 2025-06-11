@@ -102,7 +102,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MultiRecordingsScreen(),
+        builder: (context) => const MultiRecordingsScreen(),
       ),
     );
   }

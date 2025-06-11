@@ -423,7 +423,7 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
                   border: OutlineInputBorder(
                     borderSide: BorderSide(color: AppTheme.primaryColor),
                   ),
-                  enabledBorder: OutlineInputBorder(
+                  enabledBorder: const OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.white54),
                   ),
                   focusedBorder: OutlineInputBorder(
@@ -1263,7 +1263,7 @@ extension MultiCameraViewScreenExtensions on _MultiCameraViewScreenState {
                   // Süre seçici list tiles
                   ...[3, 5, 10, 15, 30, 60].map((seconds) => 
                     RadioListTile<int>(
-                      title: Text('${seconds} seconds'),
+                      title: Text('$seconds seconds'),
                       value: seconds,
                       groupValue: selectedInterval,
                       onChanged: (int? value) {
@@ -1314,7 +1314,7 @@ extension MultiCameraViewScreenExtensions on _MultiCameraViewScreenState {
                     
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Rotation interval set to ${selectedInterval} seconds'),
+                        content: Text('Rotation interval set to $selectedInterval seconds'),
                         duration: const Duration(seconds: 2),
                       ),
                     );

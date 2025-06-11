@@ -281,7 +281,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         builder: (BuildContext context) {
           return Dialog(
             backgroundColor: Colors.black,
-            child: Container(
+            child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.8,
               height: MediaQuery.of(context).size.height * 0.8,
               child: Column(
@@ -293,7 +293,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                     child: Row(
                       children: [
                         const SizedBox(width: 16),
-                        Icon(Icons.videocam, color: Colors.white),
+                        const Icon(Icons.videocam, color: Colors.white),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -491,7 +491,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     
     // ±5dk toleransla grupla
     final List<List<RecordingTime>> groups = [];
-    final Duration tolerance = const Duration(minutes: 5);
+    const Duration tolerance = Duration(minutes: 5);
     
     for (final recording in allRecordings) {
       bool addedToGroup = false;
@@ -1039,8 +1039,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                 // Calculate optimal sizes based on available space
                 final availableHeight = constraints.maxHeight - 30; // Reserve space for title
                 final cellSize = (constraints.maxWidth - 32) / 7; // 7 days per week, account for padding
-                final headerHeight = 40.0;
-                final daysOfWeekHeight = 20.0;
+                const headerHeight = 40.0;
+                const daysOfWeekHeight = 20.0;
                 final calendarBodyHeight = cellSize * 6; // 6 weeks max
                 
                 // Adjust sizes if calendar would be too tall
@@ -1377,9 +1377,9 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     
     if (_availableCameras.isEmpty) {
       print('[MultiRecordings] No cameras available, showing empty state');
-      return Card(
-        margin: const EdgeInsets.all(8.0),
-        child: const Padding(
+      return const Card(
+        margin: EdgeInsets.all(8.0),
+        child: Padding(
           padding: EdgeInsets.all(16.0),
           child: Center(
             child: Text('No cameras available'),
@@ -1603,9 +1603,9 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
               color: Colors.red.withOpacity(0.7),
             ),
             const SizedBox(height: 16),
-            Text(
+            const Text(
               'Error Loading Video',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,

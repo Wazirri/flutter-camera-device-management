@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart';
+import 'package:video_player/video_player.dart';
 import 'package:path_provider/path_provider.dart';
 import '../theme/app_theme.dart';
 
@@ -400,20 +399,122 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
   void _openMediaFile(FtpItem item) {
     final ftpUrl = 'ftp://$_ftpUsername:$_ftpPassword@$_ftpHost:$_ftpPort${item.path}';
     
+    print('[Activities] Opening media file: ${item.name}');
+    print('[Activities] FTP URL: $ftpUrl');
+    print('[Activities] File path: ${item.path}');
+    
     if (item.name.toLowerCase().endsWith('.mp4') || 
         item.name.toLowerCase().endsWith('.avi') || 
         item.name.toLowerCase().endsWith('.mov') || 
         item.name.toLowerCase().endsWith('.dav')) {
       // Open video player
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => VideoPlayerScreen(videoUrl: ftpUrl, title: item.name),
-        ),
-      );
+      print('[Activities] Opening video player for: ${item.name}');
+      
+      // For DAV files, offer both streaming and download options
+      if (item.name.toLowerCase().endsWith('.dav')) {
+        _showDavFileOptions(item, ftpUrl);
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VideoPlayerScreen(videoUrl: ftpUrl, title: item.name),
+          ),
+        );
+      }
     } else {
       // Download and open image viewer
       _downloadAndShowImage(item);
+    }
+  }
+  
+  void _showDavFileOptions(FtpItem item, String ftpUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Play ${item.name}'),
+        content: const Text('DAV files may need to be downloaded first. Choose an option:'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Try direct streaming
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => VideoPlayerScreen(videoUrl: ftpUrl, title: item.name),
+                ),
+              );
+            },
+            child: const Text('Try Streaming'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Download and play locally
+              _downloadAndPlayVideo(item);
+            },
+            child: const Text('Download & Play'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  void _downloadAndPlayVideo(FtpItem item) async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Dialog(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text('Downloading video...'),
+            ],
+          ),
+        ),
+      ),
+    );
+    
+    try {
+      final downloadedFile = await _downloadFtpFile(item.path);
+      
+      // Close loading dialog
+      if (mounted) Navigator.pop(context);
+      
+      if (downloadedFile != null && mounted) {
+        // Play downloaded video
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VideoPlayerScreen(
+              videoUrl: downloadedFile.path, 
+              title: item.name,
+            ),
+          ),
+        );
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to download video')),
+        );
+      }
+    } catch (e) {
+      // Close loading dialog
+      if (mounted) Navigator.pop(context);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error downloading video: $e')),
+        );
+      }
     }
   }
   
@@ -524,20 +625,113 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late final Player player;
-  late final VideoController controller;
+  late VideoPlayerController _controller;
+  bool _isInitialized = false;
+  bool _hasError = false;
+  String _errorMessage = '';
   
   @override
   void initState() {
     super.initState();
-    player = Player();
-    controller = VideoController(player);
-    player.open(Media(widget.videoUrl));
+    _initializeVideoPlayer();
+  }
+  
+  void _initializeVideoPlayer() async {
+    try {
+      print('[VideoPlayer] Initializing video player for URL: ${widget.videoUrl}');
+      
+      // Support both network URLs and local files
+      if (widget.videoUrl.startsWith('http://') || widget.videoUrl.startsWith('https://')) {
+        print('[VideoPlayer] Using network URL (HTTP/HTTPS)');
+        _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
+      } else if (widget.videoUrl.startsWith('ftp://')) {
+        print('[VideoPlayer] Using FTP URL');
+        // FTP URLs need special handling - try converting to HTTP equivalent
+        // Some IP cameras serve files via both FTP and HTTP
+        final ftpUri = Uri.parse(widget.videoUrl);
+        
+        // Extract components from FTP URL
+        final host = ftpUri.host;
+        final port = ftpUri.port;
+        final path = ftpUri.path;
+        
+        print('[VideoPlayer] FTP Host: $host, Port: $port, Path: $path');
+        
+        // Try HTTP equivalent first (many IP cameras support this)
+        final httpUrl = 'http://$host:8080$path';
+        print('[VideoPlayer] Trying HTTP equivalent: $httpUrl');
+        
+        try {
+          // Use VideoPlayerOptions for better codec support
+          _controller = VideoPlayerController.networkUrl(
+            Uri.parse(httpUrl),
+            videoPlayerOptions: VideoPlayerOptions(
+              mixWithOthers: true,
+              allowBackgroundPlayback: false,
+            ),
+          );
+        } catch (e) {
+          print('[VideoPlayer] HTTP attempt failed, trying direct FTP: $e');
+          // Fallback to original FTP URL with options
+          _controller = VideoPlayerController.networkUrl(
+            Uri.parse(widget.videoUrl),
+            videoPlayerOptions: VideoPlayerOptions(
+              mixWithOthers: true,
+              allowBackgroundPlayback: false,
+            ),
+          );
+        }
+      } else {
+        // For local files
+        print('[VideoPlayer] Using local file');
+        _controller = VideoPlayerController.file(File(widget.videoUrl));
+      }
+      
+      // Add listener for controller state changes
+      _controller.addListener(() {
+        if (mounted) {
+          setState(() {});
+          if (_controller.value.hasError) {
+            print('[VideoPlayer] Controller error: ${_controller.value.errorDescription}');
+          }
+        }
+      });
+      
+      print('[VideoPlayer] Starting controller initialization...');
+      
+      // Initialize the controller
+      await _controller.initialize();
+      
+      print('[VideoPlayer] Controller initialized successfully');
+      print('[VideoPlayer] Video duration: ${_controller.value.duration}');
+      print('[VideoPlayer] Video size: ${_controller.value.size}');
+      print('[VideoPlayer] Aspect ratio: ${_controller.value.aspectRatio}');
+      
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+        });
+        
+        // Auto play video
+        print('[VideoPlayer] Starting playback...');
+        _controller.play();
+      }
+    } catch (e) {
+      print('[VideoPlayer] Initialization error: $e');
+      print('[VideoPlayer] Error type: ${e.runtimeType}');
+      
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = 'Error loading video: $e';
+        });
+      }
+    }
   }
   
   @override
   void dispose() {
-    player.dispose();
+    _controller.dispose();
     super.dispose();
   }
   
@@ -549,14 +743,198 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         backgroundColor: AppTheme.darkSurface,
         foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          if (_isInitialized) ...[
+            // Play/Pause button
+            IconButton(
+              icon: Icon(
+                _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+              ),
+              onPressed: () {
+                setState(() {
+                  _controller.value.isPlaying ? _controller.pause() : _controller.play();
+                });
+              },
+            ),
+            // Volume button
+            IconButton(
+              icon: Icon(
+                _controller.value.volume > 0 ? Icons.volume_up : Icons.volume_off,
+              ),
+              onPressed: () {
+                setState(() {
+                  _controller.setVolume(_controller.value.volume > 0 ? 0.0 : 1.0);
+                });
+              },
+            ),
+          ],
+        ],
       ),
+      backgroundColor: Colors.black,
       body: Center(
-        child: AspectRatio(
-          aspectRatio: 16.0 / 9.0,
-          child: Video(controller: controller),
-        ),
+        child: _buildVideoPlayer(),
       ),
     );
+  }
+  
+  Widget _buildVideoPlayer() {
+    if (_hasError) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.error_outline,
+            size: 64,
+            color: Colors.red,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Error Loading Video',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              _errorMessage,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () {
+              setState(() {
+                _hasError = false;
+                _errorMessage = '';
+                _isInitialized = false;
+              });
+              _initializeVideoPlayer();
+            },
+            icon: const Icon(Icons.refresh),
+            label: const Text('Retry'),
+          ),
+        ],
+      );
+    }
+    
+    if (!_isInitialized) {
+      return const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryOrange),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Loading video...',
+            style: TextStyle(color: Colors.white),
+          ),
+        ],
+      );
+    }
+    
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Video player with aspect ratio
+        AspectRatio(
+          aspectRatio: _controller.value.aspectRatio,
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _controller.value.isPlaying ? _controller.pause() : _controller.play();
+                  });
+                },
+                child: VideoPlayer(_controller),
+              ),
+              // Controls overlay
+              _buildControlsOverlay(),
+              // Progress indicator
+              VideoProgressIndicator(
+                _controller,
+                allowScrubbing: true,
+                colors: const VideoProgressColors(
+                  playedColor: AppTheme.primaryOrange,
+                  bufferedColor: Colors.white24,
+                  backgroundColor: Colors.white12,
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        // Video information
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              if (_controller.value.duration != Duration.zero) ...[
+                Text(
+                  'Duration: ${_formatDuration(_controller.value.duration)}',
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const SizedBox(height: 8),
+              ],
+              Text(
+                'Position: ${_formatDuration(_controller.value.position)}',
+                style: const TextStyle(color: Colors.white70),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildControlsOverlay() {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _controller.value.isPlaying ? _controller.pause() : _controller.play();
+        });
+      },
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 50),
+        reverseDuration: const Duration(milliseconds: 200),
+        child: _controller.value.isPlaying
+            ? const SizedBox.shrink()
+            : Container(
+                color: Colors.black26,
+                child: const Center(
+                  child: Icon(
+                    Icons.play_arrow,
+                    color: Colors.white,
+                    size: 100.0,
+                    semanticLabel: 'Play',
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+  
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+    
+    if (hours > 0) {
+      return '$hours:${twoDigits(minutes)}:${twoDigits(seconds)}';
+    } else {
+      return '${twoDigits(minutes)}:${twoDigits(seconds)}';
+    }
   }
 }
 

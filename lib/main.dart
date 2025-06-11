@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart'; // Import for MediaKit
+import 'package:fvp/fvp.dart' as fvp; // Import FVP for video player
 
 import 'utils/keyboard_fix.dart'; // Import keyboard fix utilities
 import 'utils/file_logger_optimized.dart'; // Import optimized file logger
@@ -43,6 +44,9 @@ Future<void> main() async {
     
     // Initialize MediaKit
     MediaKit.ensureInitialized();
+    
+    // Register FVP for enhanced video player support
+    fvp.registerWith();
     
     // Initialize optimized file logger with error protection
     await FileLoggerOptimized.init();
@@ -264,7 +268,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               if (args is Map && args.containsKey('camera')) {
                 page = AppShell(
                   currentRoute: settings.name ?? '/recordings',
-                  child: MultiRecordingsScreen(),
+                  child: const MultiRecordingsScreen(),
                 );
                 return AppPageTransitions.slideUp(page);
               }
