@@ -646,18 +646,68 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
         
         if (recordingDate != null) {
           print('[Activities] Parsed recording date: $recordingDate');
+          
+          // Extract time from filename to find the recording that should be played
+          // Format: HH.MM.SS-HH.MM.SS[M][0@0][0].dav or 2025-06-12_11-01-14.mkv
+          String? targetTime;
+          try {
+            final fileName = item.name;
+            print('[Activities] Extracting time from filename: "$fileName"');
+            
+            if (fileName.toLowerCase().endsWith('.dav')) {
+              // DAV format: HH.MM.SS-HH.MM.SS[M][0@0][0].dav
+              final timePattern = RegExp(r'^(\d{2})\.(\d{2})\.(\d{2})');
+              final match = timePattern.firstMatch(fileName);
+              
+              if (match != null) {
+                final hours = match.group(1)!;
+                final minutes = match.group(2)!;
+                final seconds = match.group(3)!;
+                targetTime = '$hours:$minutes:$seconds';
+                print('[Activities] Extracted DAV target time: "$targetTime"');
+              }
+            } else if (fileName.toLowerCase().endsWith('.mkv')) {
+              // MKV format: 2025-06-12_11-01-14.mkv
+              final timePattern = RegExp(r'_(\d{2})-(\d{2})-(\d{2})\.mkv$');
+              final match = timePattern.firstMatch(fileName);
+              
+              if (match != null) {
+                final hours = match.group(1)!;
+                final minutes = match.group(2)!;
+                final seconds = match.group(3)!;
+                targetTime = '$hours:$minutes:$seconds';
+                print('[Activities] Extracted MKV target time: "$targetTime"');
+              }
+            }
+            
+            if (targetTime == null) {
+              print('[Activities] Could not extract time from filename pattern');
+            }
+          } catch (e) {
+            print('[Activities] Error extracting time: $e');
+          }
+          
           print('[Activities] Navigating to multi-recordings with:');
           print('[Activities] - selectedCamera: "$cameraName"');
           print('[Activities] - selectedDate: $recordingDate');
+          print('[Activities] - targetTime: "$targetTime"');
           
-          // Navigate to multi-recordings screen with camera and date pre-selected
+          // Navigate to multi-recordings screen with camera, date, and target time
+          final arguments = {
+            'selectedCamera': cameraName,
+            'selectedDate': recordingDate,
+          };
+          
+          if (targetTime != null) {
+            // Send the target time to find the recording that should be played
+            // Multi-recordings screen will find the recording that starts before this time
+            arguments['targetTime'] = targetTime;
+          }
+          
           Navigator.pushNamed(
             context, 
             '/multi-recordings',
-            arguments: {
-              'selectedCamera': cameraName,
-              'selectedDate': recordingDate,
-            },
+            arguments: arguments,
           );
         } else {
           // If date parsing fails, just navigate to recordings screen

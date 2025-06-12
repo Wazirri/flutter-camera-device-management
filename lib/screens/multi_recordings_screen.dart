@@ -63,6 +63,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   
   // Pending camera selection from route arguments
   String? _pendingCameraSelection;
+  String? _pendingTargetTime;
+  int? _pendingSeekTime; // Seconds to seek when video player opens
 
   @override
   void initState() {
@@ -126,6 +128,13 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           _selectedDay = selectedDate;
           _focusedDay = selectedDate;
         });
+      }
+      
+      // Handle targetTime argument - this is the time we want to find a recording for
+      final targetTime = args['targetTime'] as String?;
+      if (targetTime != null) {
+        print('[MultiRecordings] Target time to find recording: $targetTime');
+        _pendingTargetTime = targetTime;
       }
       
       // Store camera name to select after cameras are loaded
@@ -267,6 +276,12 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       setState(() {
         _isLoadingRecordings = false;
       });
+      
+      // If we have a target time, find and play the recording before that time
+      if (_pendingTargetTime != null && _activeCamera != null) {
+        _findAndPlayRecordingBeforeTime(_activeCamera!, _pendingTargetTime!);
+        _pendingTargetTime = null; // Clear after use
+      }
     }).catchError((error) {
       setState(() {
         _isLoadingRecordings = false;
@@ -340,6 +355,82 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           _cameraErrors[camera] = 'Error loading recordings: $e';
           _cameraRecordings[camera] = [];
         });
+      }
+    }
+  }
+  
+  void _findAndPlayRecordingBeforeTime(Camera camera, String targetTime) {
+    print('[MultiRecordings] Finding recording before time: $targetTime for camera: ${camera.name}');
+    
+    final recordings = _cameraRecordings[camera];
+    if (recordings == null || recordings.isEmpty) {
+      print('[MultiRecordings] No recordings found for camera: ${camera.name}');
+      return;
+    }
+    
+    // Parse target time to minutes for easier comparison
+    final targetParts = targetTime.split(':');
+    if (targetParts.length != 3) {
+      print('[MultiRecordings] Invalid target time format: $targetTime');
+      return;
+    }
+    
+    final targetHour = int.tryParse(targetParts[0]) ?? 0;
+    final targetMinute = int.tryParse(targetParts[1]) ?? 0;
+    final targetSecond = int.tryParse(targetParts[2]) ?? 0;
+    final targetTimeInSeconds = (targetHour * 3600) + (targetMinute * 60) + targetSecond;
+    
+    print('[MultiRecordings] Target time in seconds: $targetTimeInSeconds');
+    
+    // Find recordings that start before the target time
+    String? bestRecording;
+    int bestRecordingTime = -1;
+    int seekSeconds = 0; // How many seconds to seek forward in the found recording
+    
+    for (final recording in recordings) {
+      // Extract time from recording filename
+      // Format: 2025-06-12_11-01-14.mkv
+      final timePattern = RegExp(r'(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})\.mkv$');
+      final match = timePattern.firstMatch(recording);
+      
+      if (match != null) {
+        final hour = int.tryParse(match.group(4)!) ?? 0;
+        final minute = int.tryParse(match.group(5)!) ?? 0;
+        final second = int.tryParse(match.group(6)!) ?? 0;
+        final recordingTimeInSeconds = (hour * 3600) + (minute * 60) + second;
+        
+        print('[MultiRecordings] Recording: $recording, time: $hour:$minute:$second (${recordingTimeInSeconds}s)');
+        
+        // Check if this recording starts before target time
+        if (recordingTimeInSeconds < targetTimeInSeconds) {
+          // This recording could contain our target time
+          // Check if it's better than our current best match
+          if (recordingTimeInSeconds > bestRecordingTime) {
+            bestRecording = recording;
+            bestRecordingTime = recordingTimeInSeconds;
+            // Calculate how far to seek into this recording
+            seekSeconds = targetTimeInSeconds - recordingTimeInSeconds;
+          }
+        }
+      } else {
+        print('[MultiRecordings] Could not parse time from recording: $recording');
+      }
+    }
+    
+    if (bestRecording != null) {
+      print('[MultiRecordings] Found best recording: $bestRecording');
+      print('[MultiRecordings] Will seek $seekSeconds seconds into the recording');
+      
+      // Open the video player with the found recording
+      // Store seek time for later use when player opens
+      _pendingSeekTime = seekSeconds;
+      _openVideoPlayerPopup(camera, bestRecording);
+    } else {
+      print('[MultiRecordings] No suitable recording found before target time');
+      // If no recording found before target time, just play the first recording
+      if (recordings.isNotEmpty) {
+        print('[MultiRecordings] Playing first available recording: ${recordings.first}');
+        _openVideoPlayerPopup(camera, recordings.first);
       }
     }
   }
@@ -418,6 +509,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                       recordingUrl: recordingUrl,
                       camera: camera,
                       recording: recording,
+                      seekTime: _pendingSeekTime,
                     ),
                   ),
                 ],
@@ -426,6 +518,9 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           );
         },
       );
+      
+      // Clear pending seek time after use
+      _pendingSeekTime = null;
     }
   }
   
@@ -1623,11 +1718,13 @@ class _VideoPlayerPopup extends StatefulWidget {
   final String recordingUrl;
   final Camera camera;
   final String recording;
+  final int? seekTime; // Seconds to seek to when video starts
 
   const _VideoPlayerPopup({
     required this.recordingUrl,
     required this.camera,
     required this.recording,
+    this.seekTime,
   });
 
   @override
@@ -1675,6 +1772,28 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
   void _loadVideo() {
     try {
       _popupPlayer.open(Media(widget.recordingUrl), play: true);
+      
+      // If we have a seek time, wait for the video to be ready and then seek
+      if (widget.seekTime != null && widget.seekTime! > 0) {
+        print('[VideoPlayerPopup] Will seek to ${widget.seekTime} seconds');
+        
+        // Listen for when the video is ready to seek
+        _popupPlayer.stream.duration.listen((duration) {
+          if (duration != Duration.zero && mounted) {
+            // Video is ready, now we can seek
+            final seekDuration = Duration(seconds: widget.seekTime!);
+            print('[VideoPlayerPopup] Video ready, seeking to: $seekDuration');
+            
+            // Delay the seek slightly to ensure video is fully loaded
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (mounted) {
+                _popupPlayer.seek(seekDuration);
+                print('[VideoPlayerPopup] Seek completed to: $seekDuration');
+              }
+            });
+          }
+        });
+      }
     } catch (e) {
       setState(() {
         _hasError = true;
