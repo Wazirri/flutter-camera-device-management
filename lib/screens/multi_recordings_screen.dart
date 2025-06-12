@@ -60,6 +60,9 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   // Çoklu seçim modu
   bool _isMultiSelectionMode = false;
   final Set<String> _selectedForDownload = {};
+  
+  // Pending camera selection from route arguments
+  String? _pendingCameraSelection;
 
   @override
   void initState() {
@@ -92,13 +95,46 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     
     // Kameraları yükle
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('[MultiRecordings] PostFrameCallback - Loading cameras');
+      print('[MultiRecordings] PostFrameCallback - Loading cameras and handling arguments');
+      _handleRouteArguments();
       _loadAvailableCameras();
     });
     
     // Bugünü seç
     _selectedDay = DateTime.now();
     print('[MultiRecordings] Selected day initialized: $_selectedDay');
+  }
+  
+  // Handle route arguments passed from Activities screen
+  void _handleRouteArguments() {
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    
+    if (args != null) {
+      print('[MultiRecordings] Route arguments received: $args');
+      
+      // Handle selectedCamera argument
+      final selectedCameraName = args['selectedCamera'] as String?;
+      if (selectedCameraName != null) {
+        print('[MultiRecordings] Pre-selecting camera: $selectedCameraName');
+      }
+      
+      // Handle selectedDate argument
+      final selectedDate = args['selectedDate'] as DateTime?;
+      if (selectedDate != null) {
+        print('[MultiRecordings] Setting selected date: $selectedDate');
+        setState(() {
+          _selectedDay = selectedDate;
+          _focusedDay = selectedDate;
+        });
+      }
+      
+      // Store camera name to select after cameras are loaded
+      if (selectedCameraName != null) {
+        _pendingCameraSelection = selectedCameraName;
+      }
+    } else {
+      print('[MultiRecordings] No route arguments found');
+    }
   }
   
   void _loadAvailableCameras() {
@@ -118,8 +154,71 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         print('[MultiRecordings] Camera: ${camera.name}, IP: ${camera.ip}, RecordUri: ${camera.recordUri}');
       }
       
+      // Handle pending camera selection from route arguments
+      if (_pendingCameraSelection != null) {
+        print('[MultiRecordings] Looking for camera: "$_pendingCameraSelection"');
+        print('[MultiRecordings] Available cameras:');
+        for (int i = 0; i < _availableCameras.length; i++) {
+          print('[MultiRecordings]   [$i] "${_availableCameras[i].name}"');
+        }
+        
+        final targetCamera = _availableCameras.firstWhere(
+          (camera) => camera.name == _pendingCameraSelection,
+          orElse: () {
+            print('[MultiRecordings] Exact match not found, trying partial matches...');
+            
+            // Try partial matching strategies
+            Camera? partialMatch;
+            
+            // Strategy 1: Case insensitive exact match
+            partialMatch = _availableCameras.cast<Camera?>().firstWhere(
+              (camera) => camera!.name.toLowerCase() == _pendingCameraSelection!.toLowerCase(),
+              orElse: () => null,
+            );
+            if (partialMatch != null) {
+              print('[MultiRecordings] Found case-insensitive match: "${partialMatch.name}"');
+              return partialMatch;
+            }
+            
+            // Strategy 2: Check if camera name contains the selection
+            partialMatch = _availableCameras.cast<Camera?>().firstWhere(
+              (camera) => camera!.name.toLowerCase().contains(_pendingCameraSelection!.toLowerCase()),
+              orElse: () => null,
+            );
+            if (partialMatch != null) {
+              print('[MultiRecordings] Found partial match (contains): "${partialMatch.name}"');
+              return partialMatch;
+            }
+            
+            // Strategy 3: Check if selection contains the camera name
+            partialMatch = _availableCameras.cast<Camera?>().firstWhere(
+              (camera) => _pendingCameraSelection!.toLowerCase().contains(camera!.name.toLowerCase()),
+              orElse: () => null,
+            );
+            if (partialMatch != null) {
+              print('[MultiRecordings] Found reverse partial match: "${partialMatch.name}"');
+              return partialMatch;
+            }
+            
+            print('[MultiRecordings] No match found, using first camera or dummy');
+            return _availableCameras.isNotEmpty ? _availableCameras.first : Camera(
+              index: -1, name: '', ip: '', username: '', password: '', brand: '', 
+              mediaUri: '', recordUri: '', subUri: '', remoteUri: '', mainSnapShot: '', 
+              subSnapShot: '', recordWidth: 0, recordHeight: 0, subWidth: 0, 
+              subHeight: 0, connected: false, lastSeenAt: '', recording: false,
+            );
+          },
+        );
+        
+        if (targetCamera.index != -1) {
+          _selectedCameras = [targetCamera];
+          _activeCamera = targetCamera;
+          print('[MultiRecordings] Pre-selected camera from route arguments: ${targetCamera.name}');
+        }
+        _pendingCameraSelection = null; // Clear after use
+      } 
       // Eğer hiç kamera seçilmemişse, ilk kamerayı seç
-      if (_selectedCameras.isEmpty && _availableCameras.isNotEmpty) {
+      else if (_selectedCameras.isEmpty && _availableCameras.isNotEmpty) {
         _selectedCameras = [_availableCameras.first];
         _activeCamera = _availableCameras.first;
         print('[MultiRecordings] Auto-selected first camera: ${_availableCameras.first.name}');

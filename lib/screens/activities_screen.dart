@@ -407,10 +407,10 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
         item.name.toLowerCase().endsWith('.avi') || 
         item.name.toLowerCase().endsWith('.mov') || 
         item.name.toLowerCase().endsWith('.dav')) {
-      // Open video player
+      // Open video player      
       print('[Activities] Opening video player for: ${item.name}');
       
-      // For DAV files, offer both streaming and download options
+      // For DAV files, offer both recording navigation and download options
       if (item.name.toLowerCase().endsWith('.dav')) {
         _showDavFileOptions(item, ftpUrl);
       } else {
@@ -431,21 +431,16 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Play ${item.name}'),
-        content: const Text('Choose how to play this DAV video file:'),
+        title: Text('${item.name}'),
+        content: const Text('Bu kaydı nasıl görüntülemek istiyorsunuz?'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Try direct streaming with smart URL conversion
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => VideoPlayerScreen(videoUrl: ftpUrl, title: item.name),
-                ),
-              );
+              // Navigate to camera recordings for this date
+              _navigateToCameraRecordings(item);
             },
-            child: const Text('Stream (Fast)'),
+            child: const Text('Kayda Git'),
           ),
           TextButton(
             onPressed: () {
@@ -453,11 +448,11 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
               // Download and play locally
               _downloadAndPlayVideo(item);
             },
-            child: const Text('Download & Play'),
+            child: const Text('İndir & Oynat'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('İptal'),
           ),
         ],
       ),
@@ -607,6 +602,100 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
         ),
       ),
     );
+  }
+  
+  void _navigateToCameraRecordings(FtpItem item) {
+    try {
+      // Parse the file path to extract camera name and date
+      // Path format: /cam_detections/CAMERA_NAME/YYYY_MM_DD/filename.dav
+      final pathParts = item.path.split('/');
+      
+      print('[Activities] Full file path: ${item.path}');
+      print('[Activities] Path parts: $pathParts');
+      print('[Activities] Path parts length: ${pathParts.length}');
+      
+      if (pathParts.length >= 4) {
+        final cameraName = pathParts[2]; // Get camera name from path
+        final dateString = pathParts[3]; // Get date string (YYYY_MM_DD format)
+        
+        print('[Activities] Raw extracted camera name: "$cameraName"');
+        print('[Activities] Raw extracted date string: "$dateString"');
+        
+        // Parse the date string to DateTime
+        DateTime? recordingDate;
+        try {
+          // Try both dash and underscore separated formats
+          String separator = '-';
+          if (dateString.contains('_')) {
+            separator = '_';
+          }
+          
+          if (dateString.contains(separator) && dateString.length >= 10) {
+            final dateParts = dateString.split(separator);
+            if (dateParts.length >= 3) {
+              final year = int.parse(dateParts[0]);
+              final month = int.parse(dateParts[1]);
+              final day = int.parse(dateParts[2]);
+              recordingDate = DateTime(year, month, day);
+              print('[Activities] Successfully parsed date: $recordingDate');
+            }
+          }
+        } catch (e) {
+          print('[Activities] Error parsing date: $e');
+        }
+        
+        if (recordingDate != null) {
+          print('[Activities] Parsed recording date: $recordingDate');
+          print('[Activities] Navigating to multi-recordings with:');
+          print('[Activities] - selectedCamera: "$cameraName"');
+          print('[Activities] - selectedDate: $recordingDate');
+          
+          // Navigate to multi-recordings screen with camera and date pre-selected
+          Navigator.pushNamed(
+            context, 
+            '/multi-recordings',
+            arguments: {
+              'selectedCamera': cameraName,
+              'selectedDate': recordingDate,
+            },
+          );
+        } else {
+          // If date parsing fails, just navigate to recordings screen
+          Navigator.pushNamed(context, '/multi-recordings');
+          
+          // Show snackbar with camera info
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Kayıt için kamera: $cameraName'),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      } else {
+        // Fallback: just navigate to recordings screen
+        print('[Activities] Path format not recognized: ${item.path}');
+        Navigator.pushNamed(context, '/multi-recordings');
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Recordings ekranına yönlendiriliyorsunuz'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      print('[Activities] Error navigating to recordings: $e');
+      
+      // Fallback navigation
+      Navigator.pushNamed(context, '/multi-recordings');
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Recordings ekranına gidilirken hata: $e'),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 }
 
@@ -895,7 +984,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               ),
               // Controls overlay
               _buildControlsOverlay(),
-              // Progress indicator
+              // Video progress indicator
               VideoProgressIndicator(
                 _controller,
                 allowScrubbing: true,
