@@ -157,7 +157,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: const Text('Enable Notifications'),
           subtitle: const Text('Receive alerts for important events'),
           value: _notificationsEnabled,
-          activeThumbColor: AppTheme.primaryBlue,
+          thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.selected)) {
+              return AppTheme.primaryBlue;
+            }
+            return AppTheme.darkTextSecondary;
+          }),
           onChanged: (value) {
             setState(() {
               _notificationsEnabled = value;
@@ -169,7 +174,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: const Text('Email Alerts'),
           subtitle: const Text('Receive alerts via email'),
           value: _emailAlertsEnabled,
-          activeThumbColor: AppTheme.primaryBlue,
+          thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.selected)) {
+              return AppTheme.primaryBlue;
+            }
+            return AppTheme.darkTextSecondary;
+          }),
           onChanged: (value) {
             setState(() {
               _emailAlertsEnabled = value;
@@ -710,7 +720,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title: const Text('Auto-Assignment Mode'),
           subtitle: const Text('Automatically assign cameras in sequence'),
           value: multiCameraProvider.isAutoAssignmentMode,
-          activeThumbColor: AppTheme.primaryBlue,
+          thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.selected)) {
+              return AppTheme.primaryBlue;
+            }
+            return AppTheme.darkTextSecondary;
+          }),
           onChanged: (value) {
             multiCameraProvider.toggleAssignmentMode();
           },

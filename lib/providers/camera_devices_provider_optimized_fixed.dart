@@ -75,20 +75,6 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   List<Camera> get allCameras {
     return _macDefinedCameras.values.toList();
   }
-
-  // Legacy API compatibility - devicesByMacAddress
-  Map<String, CameraDevice> get devicesByMacAddress => _devices;
-
-  // Legacy API compatibility - getDeviceForCamera
-  CameraDevice? getDeviceForCamera(Camera camera) {
-    return findDeviceForCamera(camera);
-  }
-
-  // Legacy API compatibility - preloadDevicesData (no-op for WebSocket version)
-  void preloadDevicesData() {
-    // WebSocket version doesn't need preloading
-    print('CDP_OPT: preloadDevicesData called - no action needed for WebSocket version');
-  }
   
   // Get or create camera
   Camera _getOrCreateMacDefinedCamera(String cameraMac) {
@@ -111,6 +97,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     print('CDP_OPT: Looking for device for camera: ${camera.mac} (name: ${camera.name}, index: ${camera.index})');
     
     for (var entry in _devices.entries) {
+      String deviceKey = entry.key;
       CameraDevice device = entry.value;
       
       // First try to find by MAC
@@ -301,20 +288,22 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     // Handle simple properties
     switch (propertyName.toLowerCase()) {
       // Specific to cameras_mac - MAC-level metadata
-      case 'detected': camera.macFirstSeen = value.toString(); break;
+      case 'detected': camera.macFirstDetected = value.toString(); break;
       case 'firsttime': camera.macFirstSeen = value.toString(); break;
       case 'lastdetected': camera.macLastDetected = value.toString(); break;
       case 'port': camera.macPort = value is int ? value : int.tryParse(value.toString()); break;
       case 'error': camera.macReportedError = value.toString(); break;
       case 'status': camera.macStatus = value.toString(); break;
-      case 'seen': camera.lastSeenAt = value.toString(); break;
+      case 'seen': camera.seen = value.toString(); break;
       
       // General camera properties that can also be set by cameras_mac
       case 'name': 
         camera.name = value.toString(); 
+        // If cameras_mac is the authority for name, this is the place.
         break;
       case 'cameraip': // Assuming 'cameraip' from cameras_mac maps to general 'ip'
         camera.ip = value.toString();
+        camera.cameraIp = value.toString();
         break;
       case 'brand': camera.brand = value.toString(); break;
       case 'hw': camera.hw = value.toString(); break;
@@ -335,15 +324,22 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       case 'subwidth': camera.subWidth = value is int ? value : int.tryParse(value.toString()) ?? 0; break;
       case 'subheight': camera.subHeight = value is int ? value : int.tryParse(value.toString()) ?? 0; break;
       case 'camerarawip': camera.rawIp = value is int ? value : int.tryParse(value.toString()) ?? 0; break;
-      case 'soundrec': camera.soundRec = value == true || value.toString().toLowerCase() == 'true'; break;
+      case 'soundrec': camera.soundRec = value.toString(); break;
       case 'recordpath': camera.recordPath = value.toString(); break;
-      case 'xaddr': camera.xAddr = value.toString(); break;
+      case 'xaddr': camera.xaddr = value.toString(); break;
+      
+      // 'seen' from cameras_mac might map to macLastDetected or a general lastSeenAt.
+      // Add cases for these as needed.
+      // If 'seen' is a distinct property from cameras_mac, add a case for it.
       
       // 'connected' from cameras_mac might indicate the camera's own reported connection status
+      // vs. a connection status from the ecs_slaves device perspective.
+      // For now, let's assume 'status' field from cameras_mac covers this.
+      // If 'connected' is a specific boolean from cameras_mac:
       case 'connected': camera.connected = value == 1 || value == true || value.toString().toLowerCase() == 'true'; break;
       
       // 'record' from cameras_mac
-      case 'record': camera.recording = value == true || value.toString().toLowerCase() == 'true'; break;
+      case 'record': camera.record = value == true || value.toString().toLowerCase() == 'true'; break;
       
       default:
         print('CDP_OPT: Unhandled MAC-defined camera property: $propertyName for camera ${camera.mac}');
@@ -380,16 +376,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   // Process WebSocket message
   Future<void> processWebSocketMessage(Map<String, dynamic> message) async {
     try {
-      String command = message['c'] ?? '';
-      
-      // Handle sysinfo messages
-      if (command == 'sysinfo') {
-        await _processSysInfoMessage(message);
-        return;
-      }
-      
-      // Handle changed messages
-      if (command != 'changed') return;
+      if (message['c'] != 'changed') return;
       
       String dataPath = message['data'] ?? '';
       dynamic value = message['val'];
@@ -610,6 +597,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       case 'ip':
       case 'cameraip':
         cameraToUpdate.ip = value.toString();
+        cameraToUpdate.cameraIp = value.toString();
         break;
       case 'connected':
         cameraToUpdate.connected = value == 1 || value == true || value.toString().toLowerCase() == 'true';
@@ -672,13 +660,13 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         cameraToUpdate.rawIp = value is int ? value : int.tryParse(value.toString()) ?? 0;
         break;
       case 'soundrec':
-        cameraToUpdate.soundRec = value == true || value.toString().toLowerCase() == 'true';
+        cameraToUpdate.soundRec = value.toString();
         break;
       case 'recordpath':
         cameraToUpdate.recordPath = value.toString();
         break;
       case 'xaddr':
-        cameraToUpdate.xAddr = value.toString();
+        cameraToUpdate.xaddr = value.toString();
         break;
       default:
         print('CDP_OPT: Unhandled ecs_slaves camera property: $propertyName');
@@ -690,12 +678,17 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
 
   // Process basic device properties
   Future<void> _processBasicDeviceProperty(CameraDevice device, String property, dynamic value) async {
+    print('CDP_OPT: *** Updating device ${device.macAddress} property $property = $value ***');
     switch (property.toLowerCase()) {
       case 'online':
+        bool oldOnline = device.online;
         device.online = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        print('CDP_OPT: Device ${device.macAddress} online: $oldOnline -> ${device.online}');
         break;
       case 'connected':
+        bool oldConnected = device.connected;
         device.connected = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        print('CDP_OPT: Device ${device.macAddress} connected: $oldConnected -> ${device.connected}');
         break;
       case 'firsttime':
         device.firstTime = value.toString();
@@ -728,47 +721,6 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         break;
       case 'record_path':
         device.recordPath = value.toString();
-        break;
-      case 'cputemp':
-        device.cpuTemp = double.tryParse(value.toString()) ?? 0.0;
-        print('CDP_OPT: Device ${device.macAddress} cpuTemp updated: ${device.cpuTemp}');
-        break;
-      case 'totalram':
-        device.totalRam = int.tryParse(value.toString()) ?? 0;
-        print('CDP_OPT: Device ${device.macAddress} totalRam updated: ${device.totalRam}');
-        break;
-      case 'freeram':
-        device.freeRam = int.tryParse(value.toString()) ?? 0;
-        print('CDP_OPT: Device ${device.macAddress} freeRam updated: ${device.freeRam}');
-        break;
-      case 'totalconns':
-        device.totalConnections = int.tryParse(value.toString()) ?? 0;
-        print('CDP_OPT: Device ${device.macAddress} totalConnections updated: ${device.totalConnections}');
-        break;
-      case 'sessions':
-        device.totalSessions = int.tryParse(value.toString()) ?? 0;
-        print('CDP_OPT: Device ${device.macAddress} totalSessions updated: ${device.totalSessions}');
-        break;
-      case 'eth0':
-        device.networkInfo = value.toString();
-        print('CDP_OPT: Device ${device.macAddress} networkInfo updated: ${device.networkInfo}');
-        break;
-      case 'smartweb_version':
-        device.smartwebVersion = value.toString();
-        print('CDP_OPT: Device ${device.macAddress} smartwebVersion updated: ${device.smartwebVersion}');
-        break;
-      case 'cam_count':
-        device.camCount = int.tryParse(value.toString()) ?? 0;
-        print('CDP_OPT: Device ${device.macAddress} camCount updated: ${device.camCount}');
-        break;
-      case 'is_master':
-      case 'ismaster':
-        device.isMaster = value == 1 || value == true || value.toString().toLowerCase() == 'true';
-        print('CDP_OPT: Device ${device.macAddress} isMaster updated: ${device.isMaster}');
-        break;
-      case 'last_ts':
-        device.lastTs = value.toString();
-        print('CDP_OPT: Device ${device.macAddress} lastTs updated: ${device.lastTs}');
         break;
       default:
         print('CDP_OPT: Unhandled basic device property: $property for device ${device.macAddress}');
@@ -863,8 +815,9 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     print('CDP_OPT: MAC-defined cameras: ${_macDefinedCameras.length}');
     
     for (var entry in _devices.entries) {
+      String deviceKey = entry.key;
       CameraDevice device = entry.value;
-      print('CDP_OPT: Device ${device.macKey}: ${device.cameras.length} cameras');
+      print('CDP_OPT: Device $deviceKey (${device.macKey}): ${device.cameras.length} cameras');
       for (var camera in device.cameras) {
         String status = camera.mac.startsWith(device.macKey) ? 'NO_MAC' : 'HAS_MAC';
         print('CDP_OPT:   - Camera[${camera.index}]: ${camera.mac} (${camera.name}) [$status]');
@@ -890,75 +843,6 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         notifyListeners();
       }
     });
-  }
-  
-  // Process sysinfo message and assign to master device
-  Future<void> _processSysInfoMessage(Map<String, dynamic> message) async {
-    try {
-      // Find the master device (isMaster = true)
-      CameraDevice? masterDevice;
-      for (CameraDevice device in _devices.values) {
-        if (device.isMaster == true) {
-          masterDevice = device;
-          break;
-        }
-      }
-      
-      // If no master device found, try to find one by IP address matching eth0
-      if (masterDevice == null && message.containsKey('eth0')) {
-        String masterIp = message['eth0'].toString();
-        for (CameraDevice device in _devices.values) {
-          if (device.ipv4 == masterIp) {
-            device.isMaster = true; // Mark it as master
-            masterDevice = device;
-            break;
-          }
-        }
-      }
-      
-      // If still no master device, skip processing
-      if (masterDevice == null) {
-        print('CDP_OPT: No master device found for sysinfo message');
-        return;
-      }
-      
-      // Update master device system information
-      if (message.containsKey('cpuTemp')) {
-        masterDevice.cpuTemp = double.tryParse(message['cpuTemp'].toString()) ?? 0.0;
-        print('CDP_OPT: Master device ${masterDevice.macAddress} cpuTemp updated: ${masterDevice.cpuTemp}');
-      }
-      
-      if (message.containsKey('totalRam')) {
-        masterDevice.totalRam = int.tryParse(message['totalRam'].toString()) ?? 0;
-        print('CDP_OPT: Master device ${masterDevice.macAddress} totalRam updated: ${masterDevice.totalRam}');
-      }
-      
-      if (message.containsKey('freeRam')) {
-        masterDevice.freeRam = int.tryParse(message['freeRam'].toString()) ?? 0;
-        print('CDP_OPT: Master device ${masterDevice.macAddress} freeRam updated: ${masterDevice.freeRam}');
-      }
-      
-      if (message.containsKey('totalconns')) {
-        masterDevice.totalConnections = int.tryParse(message['totalconns'].toString()) ?? 0;
-        print('CDP_OPT: Master device ${masterDevice.macAddress} totalConnections updated: ${masterDevice.totalConnections}');
-      }
-      
-      if (message.containsKey('sessions')) {
-        masterDevice.totalSessions = int.tryParse(message['sessions'].toString()) ?? 0;
-        print('CDP_OPT: Master device ${masterDevice.macAddress} totalSessions updated: ${masterDevice.totalSessions}');
-      }
-      
-      if (message.containsKey('eth0')) {
-        masterDevice.networkInfo = message['eth0'].toString();
-        print('CDP_OPT: Master device ${masterDevice.macAddress} networkInfo updated: ${masterDevice.networkInfo}');
-      }
-      
-      print('CDP_OPT: Master device ${masterDevice.macAddress} system info updated from sysinfo message');
-      _batchNotifyListeners();
-      
-    } catch (e) {
-      print('CDP_OPT: Error processing sysinfo message: $e');
-    }
   }
   
   @override

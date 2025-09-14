@@ -429,6 +429,10 @@ class WebSocketProviderOptimized with ChangeNotifier {
           // System information update
           _systemInfo = SystemInfo.fromJson(jsonData);
           _systemInfoController.add(_systemInfo!);
+          // Forward sysinfo to CameraDevicesProvider as well
+          if (_cameraDevicesProvider != null) {
+            _cameraDevicesProvider!.processWebSocketMessage(jsonData);
+          }
           print('[${DateTime.now().toString().split('.').first}] Received system info update');
           _batchNotifyListeners();
           break;

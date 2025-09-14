@@ -820,7 +820,12 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
                       onChanged: (value) {
                         provider.toggleAssignmentMode();
                       },
-                      activeThumbColor: AppTheme.primaryColor,
+                      thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+                        if (states.contains(WidgetState.selected)) {
+                          return AppTheme.primaryColor;
+                        }
+                        return AppTheme.darkTextSecondary;
+                      }),
                     ),
                     const SizedBox(width: 8),
                     Expanded(

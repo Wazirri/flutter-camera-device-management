@@ -159,19 +159,19 @@
     },
     {
       "name": "leak_tracker",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/leak_tracker-11.0.1",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/leak_tracker-10.0.9",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
     {
       "name": "leak_tracker_flutter_testing",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/leak_tracker_flutter_testing-3.0.10",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/leak_tracker_flutter_testing-3.0.9",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
     {
       "name": "leak_tracker_testing",
-      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/leak_tracker_testing-3.0.2",
+      "rootUri": "file:///Users/smarteq/.pub-cache/hosted/pub.dev/leak_tracker_testing-3.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.2"
     },
@@ -663,8 +663,8 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.9.0-97.0.dev",
+  "generatorVersion": "3.8.0-265.0.dev",
   "flutterRoot": "file:///Users/smarteq/Flutter/flutter",
-  "flutterVersion": "3.32.0-1.0.pre.465",
+  "flutterVersion": "3.31.0-1.0.pre.418",
   "pubCache": "file:///Users/smarteq/.pub-cache"
 }

@@ -102,24 +102,30 @@ class DeviceCard extends StatelessWidget {
     // Access status via the getter, which now includes logging
     final currentStatus = device.status; 
     print('DeviceCard build: ${device.macAddress}, connected: ${device.connected}, online: ${device.online}, firstTime: ${device.firstTime}, status from getter: $currentStatus'); // MODIFIED
+    
+    final isMaster = device.isMaster == true;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: isSelected ? 8 : 4,
+      elevation: isSelected ? 8 : (isMaster ? 6 : 4),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: isSelected 
-              ? AppTheme.primaryColor.withOpacity(0.8)
-              : (device.connected 
-                  ? AppTheme.primaryColor
-                  : Theme.of(context).dividerColor),
-          width: isSelected ? 3 : (device.connected ? 2 : 1),
+          color: isMaster 
+              ? Colors.amber
+              : (isSelected 
+                  ? AppTheme.primaryColor.withOpacity(0.8)
+                  : (device.connected 
+                      ? AppTheme.primaryColor
+                      : Theme.of(context).dividerColor)),
+          width: isMaster ? 3 : (isSelected ? 3 : (device.connected ? 2 : 1)),
         ),
       ),
-      color: isSelected 
-          ? AppTheme.primaryColor.withOpacity(0.1)
-          : null,
+      color: isMaster 
+          ? Colors.amber.withOpacity(0.1)
+          : (isSelected 
+              ? AppTheme.primaryColor.withOpacity(0.1)
+              : null),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -142,16 +148,48 @@ class DeviceCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                         ],
+                        if (isMaster) ...[
+                          Icon(
+                            Icons.star,
+                            color: Colors.amber,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                        ],
                         Expanded(
-                          child: Text(
-                            device.deviceType.isEmpty 
-                                ? 'Device ${device.macAddress}' 
-                                : device.deviceType,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: isSelected ? AppTheme.primaryColor : null,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                device.deviceType.isEmpty 
+                                    ? 'Device ${device.macAddress}' 
+                                    : device.deviceType,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: isMaster 
+                                      ? Colors.amber 
+                                      : (isSelected ? AppTheme.primaryColor : null),
+                                ),
+                              ),
+                              if (isMaster)
+                                Container(
+                                  margin: const EdgeInsets.only(top: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    'MASTER DEVICE',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ],

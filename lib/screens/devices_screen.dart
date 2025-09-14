@@ -907,63 +907,101 @@ class _DevicesScreenState extends State<DevicesScreen> {
 
   Widget _buildDeviceListItem(BuildContext context, CameraDevice device) {
     final textTheme = Theme.of(context).textTheme;
+    final isMaster = device.isMaster == true;
     
     return Card(
-      color: AppTheme.darkSurface,
+      color: isMaster ? AppTheme.darkSurface.withOpacity(0.9) : AppTheme.darkSurface,
+      elevation: isMaster ? 8 : 4,
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: InkWell(
-        onTap: () {
-          // Device details or action
-          _showDeviceDetails(0, device);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(device.deviceName ?? 'Unknown Device', style: textTheme.titleMedium),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  StatusIndicator(
-                    status: device.connected ? DeviceStatus.online : DeviceStatus.offline,
-                    size: 12,
-                    padding: EdgeInsets.zero,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    device.connected ? 'Online' : 'Offline',
-                    style: TextStyle(
-                      color: device.connected ? Colors.green : Colors.red,
-                      fontSize: textTheme.bodySmall?.fontSize,
+      child: Container(
+        decoration: isMaster ? BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: Colors.amber, width: 2),
+        ) : null,
+        child: InkWell(
+          onTap: () {
+            _showDeviceDetails(0, device);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    if (isMaster) ...[
+                      Icon(Icons.star, color: Colors.amber, size: 20),
+                      const SizedBox(width: 8),
+                    ],
+                    Expanded(
+                      child: Text(
+                        device.deviceName ?? 'Unknown Device', 
+                        style: textTheme.titleMedium?.copyWith(
+                          color: isMaster ? Colors.amber : null,
+                          fontWeight: isMaster ? FontWeight.bold : null,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Text('Powered: ${device.online == true ? "On" : "Off"}', style: TextStyle(color: device.online == true ? Colors.green : Colors.red, fontSize: textTheme.bodySmall?.fontSize)),
-                  const SizedBox(width: 8),
-                  Text('Connection: ${device.connected == true ? "Active" : "Inactive"}', style: TextStyle(color: device.connected == true ? Colors.green : Colors.red, fontSize: textTheme.bodySmall?.fontSize)),
-                ],
-              ),
-              // Display additional fields
-              if (device.firmwareVersion.isNotEmpty) Text('Version: ${device.firmwareVersion}', style: textTheme.bodySmall),
-              if (device.smartwebVersion != null) Text('SmartWeb Version: ${device.smartwebVersion}', style: textTheme.bodySmall),
-              Text('CPU Temp: ${device.cpuTemp}°C', style: textTheme.bodySmall),
-              Text('IPv4: ${device.ipv4}', style: textTheme.bodySmall),
-              if (device.ipv6 != null) Text('IPv6: ${device.ipv6}', style: textTheme.bodySmall),
-              Text('Last Seen: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.parse(device.lastSeenAt))}', style: textTheme.bodySmall),
-              if (device.isMaster != null) Text('Master: ${device.isMaster! ? "Yes" : "No"}', style: textTheme.bodySmall),
-              Text('Cameras: ${device.camCount}', style: textTheme.bodySmall),
-              Text('Total RAM: ${device.totalRam} MB', style: textTheme.bodySmall),
-              Text('Free RAM: ${device.freeRam} MB', style: textTheme.bodySmall),
-              Text('Total Connections: ${device.totalConnections}', style: textTheme.bodySmall),
-              Text('Total Sessions: ${device.totalSessions}', style: textTheme.bodySmall),
-              if (device.networkInfo != null && device.networkInfo!.isNotEmpty) 
-                Text('Network Info: ${device.networkInfo}', style: textTheme.bodySmall),
-            ],
+                    if (isMaster) 
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.amber,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'MASTER',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    StatusIndicator(
+                      status: device.connected ? DeviceStatus.online : DeviceStatus.offline,
+                      size: 12,
+                      padding: EdgeInsets.zero,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      device.connected ? 'Online' : 'Offline',
+                      style: TextStyle(
+                        color: device.connected ? Colors.green : Colors.red,
+                        fontSize: textTheme.bodySmall?.fontSize,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text('Powered: ${device.online == true ? "On" : "Off"}', style: TextStyle(color: device.online == true ? Colors.green : Colors.red, fontSize: textTheme.bodySmall?.fontSize)),
+                    const SizedBox(width: 8),
+                    Text('Connection: ${device.connected == true ? "Active" : "Inactive"}', style: TextStyle(color: device.connected == true ? Colors.green : Colors.red, fontSize: textTheme.bodySmall?.fontSize)),
+                  ],
+                ),
+                if (device.firmwareVersion.isNotEmpty) Text('Version: ${device.firmwareVersion}', style: textTheme.bodySmall),
+                if (device.smartwebVersion != null) Text('SmartWeb Version: ${device.smartwebVersion}', style: textTheme.bodySmall),
+                Text('CPU Temp: ${device.cpuTemp}°C', style: textTheme.bodySmall),
+                Text('IPv4: ${device.ipv4}', style: textTheme.bodySmall),
+                if (device.ipv6 != null) Text('IPv6: ${device.ipv6}', style: textTheme.bodySmall),
+                Text('Last Seen: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.parse(device.lastSeenAt))}', style: textTheme.bodySmall),
+                if (device.isMaster != null) Text('Master: ${device.isMaster! ? "Yes" : "No"}', style: textTheme.bodySmall),
+                Text('Cameras: ${device.camCount}', style: textTheme.bodySmall),
+                Text('Total RAM: ${device.totalRam} MB', style: textTheme.bodySmall),
+                Text('Free RAM: ${device.freeRam} MB', style: textTheme.bodySmall),
+                Text('Total Connections: ${device.totalConnections}', style: textTheme.bodySmall),
+                Text('Total Sessions: ${device.totalSessions}', style: textTheme.bodySmall),
+                if (device.networkInfo != null && device.networkInfo!.isNotEmpty) 
+                  Text('Network Info: ${device.networkInfo}', style: textTheme.bodySmall),
+              ],
+            ),
           ),
         ),
       ),
@@ -972,55 +1010,86 @@ class _DevicesScreenState extends State<DevicesScreen> {
 
   Widget _buildDeviceGridItem(BuildContext context, CameraDevice device) {
     final textTheme = Theme.of(context).textTheme;
+    final isMaster = device.isMaster == true;
     
     return Card(
-      color: AppTheme.darkSurface,
+      color: isMaster ? AppTheme.darkSurface.withOpacity(0.9) : AppTheme.darkSurface,
+      elevation: isMaster ? 8 : 4,
       margin: const EdgeInsets.all(8.0),
-      child: InkWell(
-        onTap: () {
-          // Device details or action
-          _showDeviceDetails(0, device);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                device.deviceName ?? 'Unknown Device',
-                style: textTheme.titleSmall,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              StatusIndicator(
-                status: device.connected ? DeviceStatus.online : DeviceStatus.offline,
-                size: 24,
-                padding: EdgeInsets.zero,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                device.connected ? 'Online' : 'Offline',
-                style: TextStyle(
-                  color: device.connected ? Colors.green : Colors.red,
-                  fontSize: textTheme.bodySmall?.fontSize,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Powered: ${device.online == true ? "On" : "Off"}', style: TextStyle(color: device.online == true ? Colors.green : Colors.red, fontSize: textTheme.bodySmall?.fontSize)),
-                  const SizedBox(width: 8),
-                  Text('Connection: ${device.connected == true ? "Active" : "Inactive"}', style: TextStyle(color: device.connected == true ? Colors.green : Colors.red, fontSize: textTheme.bodySmall?.fontSize)),
+      child: Container(
+        decoration: isMaster ? BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: Colors.amber, width: 2),
+        ) : null,
+        child: InkWell(
+          onTap: () {
+            // Device details or action
+            _showDeviceDetails(0, device);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                if (isMaster) ...[
+                  Icon(Icons.star, color: Colors.amber, size: 16),
+                  const SizedBox(height: 4),
                 ],
-              ),
-              // Display additional fields
-              if (device.firmwareVersion.isNotEmpty) Text('Ver: ${device.firmwareVersion}', style: textTheme.bodySmall, textAlign: TextAlign.center),
-              if (device.smartwebVersion != null) Text('SW Ver: ${device.smartwebVersion}', style: textTheme.bodySmall, textAlign: TextAlign.center),
-              Text('CPU: ${device.cpuTemp}°C', style: textTheme.bodySmall, textAlign: TextAlign.center),
-              Text('IPv4: ${device.ipv4}', style: textTheme.bodySmall, textAlign: TextAlign.center),
-              // Add more fields as needed, keeping in mind grid item size constraints
-            ],
+                Text(
+                  device.deviceName ?? 'Unknown Device',
+                  style: textTheme.titleSmall?.copyWith(
+                    color: isMaster ? Colors.amber : null,
+                    fontWeight: isMaster ? FontWeight.bold : null,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                if (isMaster) ...[
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.amber,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'MASTER',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 8,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 8),
+                StatusIndicator(
+                  status: device.connected ? DeviceStatus.online : DeviceStatus.offline,
+                  size: 24,
+                  padding: EdgeInsets.zero,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  device.connected ? 'Online' : 'Offline',
+                  style: TextStyle(
+                    color: device.connected ? Colors.green : Colors.red,
+                    fontSize: textTheme.bodySmall?.fontSize,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Column(
+                  children: [
+                    Text('Powered: ${device.online == true ? "On" : "Off"}', style: TextStyle(color: device.online == true ? Colors.green : Colors.red, fontSize: textTheme.bodySmall?.fontSize)),
+                    Text('Connection: ${device.connected == true ? "Active" : "Inactive"}', style: TextStyle(color: device.connected == true ? Colors.green : Colors.red, fontSize: textTheme.bodySmall?.fontSize)),
+                  ],
+                ),
+                // Display additional fields
+                if (device.firmwareVersion.isNotEmpty) Text('Ver: ${device.firmwareVersion}', style: textTheme.bodySmall, textAlign: TextAlign.center),
+                if (device.smartwebVersion != null) Text('SW Ver: ${device.smartwebVersion}', style: textTheme.bodySmall, textAlign: TextAlign.center),
+                Text('CPU: ${device.cpuTemp}°C', style: textTheme.bodySmall, textAlign: TextAlign.center),
+                Text('IPv4: ${device.ipv4}', style: textTheme.bodySmall, textAlign: TextAlign.center),
+                // Add more fields as needed, keeping in mind grid item size constraints
+              ],
+            ),
           ),
         ),
       ),

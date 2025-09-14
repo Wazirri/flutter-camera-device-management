@@ -45,6 +45,15 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
     _tabController.dispose();
     super.dispose();
   }
+
+  // Helper method to check if camera has a real MAC address (not a temp placeholder ID)
+  bool _hasMacAddress(Camera camera) {
+    // MAC adresi gerçek MAC format'ında mı kontrol et (örn: me8_b7_23_0c_12_43)
+    // Geçici ID'ler genelde "deviceKey_cam_index" formatında
+    return camera.mac.isNotEmpty && 
+           !camera.mac.contains('_cam_') && 
+           !camera.mac.contains('_placeholder_');
+  }
   
   void _selectCamera(Camera camera) {
     setState(() {
@@ -239,7 +248,7 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                   icon: const Icon(Icons.refresh),
                   label: const Text('Refresh'),
                   onPressed: () {
-                    provider.refreshCameras();
+                    // provider.refreshCameras(); // Method removed, WebSocket handles updates
                   },
                 ),
               ],
@@ -247,8 +256,11 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
           );
         }
         
-        // Group cameras by MAC address
-        final groupedCamerasByMac = provider.getCamerasByMacAddress();
+        // Group cameras by device MAC address - use devicesList
+        final groupedCamerasByMac = <String, List<Camera>>{};
+        for (var device in provider.devicesList) {
+          groupedCamerasByMac[device.macKey] = device.cameras;
+        }
         
         // Build the MAC address filter chips
         final macAddressFilters = Padding(
@@ -368,7 +380,7 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                   icon: const Icon(Icons.refresh),
                   label: const Text('Refresh'),
                   onPressed: () {
-                    provider.refreshCameras();
+                    // provider.refreshCameras(); // Method removed, WebSocket handles updates
                   },
                 ),
               ],
@@ -516,24 +528,30 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                   fit: StackFit.expand,
                                   children: [
                                     Container(
-                                      color: Colors.black,
-                                      child: camera.mainSnapShot.isNotEmpty
-                                          ? Image.network(
-                                              camera.mainSnapShot,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) {
-                                                return const Icon(
-                                                  Icons.broken_image_outlined,
+                                      color: !_hasMacAddress(camera) ? Colors.grey[800] : Colors.black,
+                                      child: !_hasMacAddress(camera)
+                                          ? const Icon(
+                                              Icons.videocam_off_outlined,
+                                              size: 36.0,
+                                              color: Colors.grey,
+                                            )
+                                          : camera.mainSnapShot.isNotEmpty
+                                              ? Image.network(
+                                                  camera.mainSnapShot,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (context, error, stackTrace) {
+                                                    return const Icon(
+                                                      Icons.broken_image_outlined,
+                                                      size: 36.0,
+                                                      color: Colors.white54,
+                                                    );
+                                                  },
+                                                )
+                                              : const Icon(
+                                                  Icons.videocam_off,
                                                   size: 36.0,
                                                   color: Colors.white54,
-                                                );
-                                              },
-                                            )
-                                          : const Icon(
-                                              Icons.videocam_off,
-                                              size: 36.0,
-                                              color: Colors.white54,
-                                            ),
+                                                ),
                                     ),
                                     if (camera.connected)
                                       Positioned(
@@ -578,14 +596,38 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        camera.name,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16.0,
-                                        ),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              camera.name,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16.0,
+                                                color: !_hasMacAddress(camera) ? Colors.grey : null,
+                                              ),
+                                            ),
+                                          ),
+                                          if (!_hasMacAddress(camera))
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.orange.withOpacity(0.2),
+                                                borderRadius: BorderRadius.circular(4),
+                                                border: Border.all(color: Colors.orange, width: 1),
+                                              ),
+                                              child: const Text(
+                                                'NO MAC',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.orange,
+                                                ),
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                       const SizedBox(height: 4),
                                       Row(
@@ -621,14 +663,20 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   IconButton(
-                                    icon: const Icon(Icons.videocam),
-                                    onPressed: () => _openLiveView(camera),
-                                    tooltip: 'Live View',
+                                    icon: Icon(
+                                      Icons.videocam,
+                                      color: !_hasMacAddress(camera) ? Colors.grey : null,
+                                    ),
+                                    onPressed: !_hasMacAddress(camera) ? null : () => _openLiveView(camera),
+                                    tooltip: !_hasMacAddress(camera) ? 'No MAC Address' : 'Live View',
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.video_library),
-                                    onPressed: () => _openRecordView(camera),
-                                    tooltip: 'Recordings',
+                                    icon: Icon(
+                                      Icons.video_library,
+                                      color: !_hasMacAddress(camera) ? Colors.grey : null,
+                                    ),
+                                    onPressed: !_hasMacAddress(camera) ? null : () => _openRecordView(camera),
+                                    tooltip: !_hasMacAddress(camera) ? 'No MAC Address' : 'Recordings',
                                   ),
                                 ],
                               ),

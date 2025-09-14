@@ -21,6 +21,15 @@ class CameraGridItem extends StatelessWidget {
     required this.onPlayback,
   }) : super(key: key);
 
+  // Helper method to check if camera has a real MAC address (not a temp placeholder ID)
+  bool _hasMacAddress(Camera camera) {
+    // MAC adresi gerçek MAC format'ında mı kontrol et (örn: me8_b7_23_0c_12_43)
+    // Geçici ID'ler genelde "deviceKey_cam_index" formatında
+    return camera.mac.isNotEmpty && 
+           !camera.mac.contains('_cam_') && 
+           !camera.mac.contains('_placeholder_');
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -46,64 +55,98 @@ class CameraGridItem extends StatelessWidget {
                 children: [
                   // Camera image (placeholder or actual image)
                   Container(
-                    color: Colors.black,
-                    child: camera.mainSnapShot.isNotEmpty
-                      ? Image.network(
-                          camera.mainSnapShot,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Center(
+                    color: camera.isPlaceholder ? Colors.grey[800] : Colors.black,
+                    child: _hasMacAddress(camera)
+                      ? camera.mainSnapShot.isNotEmpty
+                          ? Image.network(
+                              camera.mainSnapShot,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Center(
+                                  child: Icon(
+                                    Icons.broken_image_outlined,
+                                    size: 48.0,
+                                    color: Colors.white54,
+                                  ),
+                                );
+                              },
+                            )
+                          : const Center(
                               child: Icon(
-                                Icons.broken_image_outlined,
+                                Icons.videocam_off,
                                 size: 48.0,
                                 color: Colors.white54,
                               ),
-                            );
-                          },
-                        )
+                            )
                       : const Center(
                           child: Icon(
-                            Icons.videocam_off,
+                            Icons.videocam_off_outlined,
                             size: 48.0,
-                            color: Colors.white54,
+                            color: Colors.grey,
                           ),
                         ),
                   ),
                   
                   // Camera status overlay (top-left corner)
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                        vertical: 4.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.fiber_manual_record,
-                            color: Colors.white,
-                            size: 12,
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            'LIVE',
-                            style: TextStyle(
+                  if (_hasMacAddress(camera))
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 4.0,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.fiber_manual_record,
                               color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                              size: 12,
                             ),
-                          ),
-                        ],
+                            SizedBox(width: 4),
+                            Text(
+                              'LIVE',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+                  
+                  // No MAC address indicator (top-right corner)
+                  if (!_hasMacAddress(camera))
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 4.0,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          'NO MAC',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -119,9 +162,10 @@ class CameraGridItem extends StatelessWidget {
                     camera.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16.0,
+                      color: camera.isPlaceholder ? Colors.grey : null,
                     ),
                   ),
                   
@@ -158,14 +202,20 @@ class CameraGridItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.videocam),
-                  tooltip: 'Live View',
-                  onPressed: onLiveView,
+                  icon: Icon(
+                    Icons.videocam,
+                    color: camera.isPlaceholder ? Colors.grey : null,
+                  ),
+                  tooltip: !_hasMacAddress(camera) ? 'No MAC Address' : 'Live View',
+                  onPressed: !_hasMacAddress(camera) ? null : onLiveView,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.video_library),
-                  tooltip: 'Recordings',
-                  onPressed: onPlayback,
+                  icon: Icon(
+                    Icons.video_library,
+                    color: camera.isPlaceholder ? Colors.grey : null,
+                  ),
+                  tooltip: !_hasMacAddress(camera) ? 'No MAC Address' : 'Recordings',
+                  onPressed: !_hasMacAddress(camera) ? null : onPlayback,
                 ),
                 IconButton(
                   icon: const Icon(Icons.more_vert),

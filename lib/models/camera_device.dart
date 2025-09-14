@@ -137,7 +137,7 @@ class CameraDevice {
       macAddress: json['macAddress'] as String,
       macKey: json['macKey'] as String,
       ipv4: json['ipv4'] as String? ?? '',
-      lastSeenAt: json['lastSeenAt'] as String? ?? '',
+      lastSeenAt: json['last_seen_at'] as String? ?? '',
       connected: json['connected'] as bool? ?? false,
       online: json['online'] as bool? ?? false,
       firstTime: json['firstTime'] as String? ?? '',
@@ -324,6 +324,9 @@ class Camera {
   // Field to store the MAC key of the parent device this camera is associated with
   String? parentDeviceMacKey;
 
+  // Flag to indicate if this is a placeholder camera (no physical device)
+  bool isPlaceholder;
+
 
   Camera({
     required this.index,
@@ -369,6 +372,7 @@ class Camera {
     this.macReportedError,
     this.macStatus,
     this.parentDeviceMacKey,
+    this.isPlaceholder = false,
   }) : groups = groups ?? [];
   
   // Added id getter to uniquely identify cameras
@@ -420,6 +424,7 @@ class Camera {
     String? macReportedError,
     String? macStatus,
     String? parentDeviceMacKey, // Added parentDeviceMacKey to copyWith
+    bool? isPlaceholder,
   }) {
     return Camera(
       index: index ?? this.index, // Updated index in copyWith
@@ -465,6 +470,7 @@ class Camera {
       macReportedError: macReportedError ?? this.macReportedError,
       macStatus: macStatus ?? this.macStatus,
       parentDeviceMacKey: parentDeviceMacKey ?? this.parentDeviceMacKey, // Updated parentDeviceMacKey
+      isPlaceholder: isPlaceholder ?? this.isPlaceholder,
     );
   }
   
