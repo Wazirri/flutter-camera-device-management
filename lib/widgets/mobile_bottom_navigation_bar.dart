@@ -96,8 +96,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                 _buildNavItem(Icons.dashboard, 'Dashboard', 0),
                 _buildNavItem(Icons.videocam, 'Live View', 1),
                 _buildNavItem(Icons.video_library, 'Recordings', 2),
-                _buildNavItem(Icons.devices, 'Devices', 3),
-                _buildNavItem(Icons.menu, 'More', 4),
+                _buildNavItem(Icons.menu, 'More', 3),
               ],
             ),
           ),
@@ -134,12 +133,8 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
         return 1;
       case '/recordings':
         return 2;
-      case '/camera-devices':
-      case '/cameras':
-      case '/devices':
-        return 3;
       default:
-        return 4; // More menu
+        return 3; // More menu
     }
   }
 
@@ -164,9 +159,6 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
           widget.onDestinationSelected('/recordings');
           break;
         case 3:
-          widget.onDestinationSelected('/camera-devices');
-          break;
-        case 4:
           // Show a More menu with additional options
           _showMoreMenu(context);
           break;
@@ -256,10 +248,18 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
 
                 _buildAnimatedMoreMenuItem(
                   context,
+                  Icon(Icons.devices, color: AppTheme.accentColor),
+                  'Camera Devices',
+                  '/camera-devices',
+                  3,
+                ),
+
+                _buildAnimatedMoreMenuItem(
+                  context,
                   Icon(Icons.settings, color: AppTheme.primaryColor),
                   'Settings',
                   '/settings',
-                  3,
+                  4,
                 ),
                 
                 _buildAnimatedMoreMenuItem(
@@ -267,7 +267,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                   Icon(Icons.feed, color: AppTheme.accentColor),
                   'WebSocket Logs',
                   '/websocket-logs',
-                  4,
+                  5,
                 ),
                 
                 const Padding(
@@ -280,7 +280,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                   const Icon(Icons.logout, color: Colors.red),
                   'Logout',
                   '/login',
-                  5,
+                  6,
                   textColor: Colors.red,
                 ),
                 

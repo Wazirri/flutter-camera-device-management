@@ -13,7 +13,6 @@ import 'screens/cameras_screen.dart';
 import 'screens/camera_devices_screen.dart';
 import 'screens/camera_groups_screen.dart';  // New camera groups screen
 import 'screens/dashboard_screen_optimized.dart'; // Using optimized dashboard
-import 'screens/devices_screen.dart';
 import 'screens/live_view_screen.dart';
 import 'screens/login_screen_optimized.dart';
 
@@ -138,6 +137,49 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.dispose();
   }
   
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Handle app lifecycle state changes at the top level
+    print('App lifecycle state changed to: $state');
+    
+    // Get providers
+    final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
+    
+    switch (state) {
+      case AppLifecycleState.resumed:
+        // App is resumed from background
+        print('App resumed - ensuring WebSocket connection');
+        if (!webSocketProvider.isConnected) {
+          print('WebSocket disconnected during background, reconnecting...');
+          webSocketProvider.reconnect();
+        }
+        break;
+        
+      case AppLifecycleState.paused:
+        // App is paused (going to background)
+        print('App paused - maintaining WebSocket connection');
+        break;
+        
+      case AppLifecycleState.inactive:
+        // App is inactive
+        print('App inactive');
+        break;
+        
+      case AppLifecycleState.detached:
+        // App is detached
+        print('App detached - closing connections');
+        webSocketProvider.disconnect();
+        break;
+        
+      case AppLifecycleState.hidden:
+        // App is hidden
+        print('App hidden - maintaining connection for background updates');
+        break;
+    }
+    
+    super.didChangeAppLifecycleState(state);
+  }
+  
   // Klavye olaylarını işleyen fonksiyon
   bool _handleKeyEvent(KeyEvent event) {
     if (event is KeyDownEvent) {
@@ -152,30 +194,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       _physicalKeysPressed.remove(event.physicalKey);
     }
     return false; // Olayı normal şekilde işle
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // Handle app lifecycle changes
-    print('App lifecycle state changed to: $state');
-    
-    // Handle specific state changes if needed
-    switch (state) {
-      case AppLifecycleState.resumed:
-        // App is visible and responding to user input
-        break;
-      case AppLifecycleState.inactive:
-        // App is inactive, happens when notifications or modal alerts appear
-        break;
-      case AppLifecycleState.paused:
-        // App is not visible
-        break;
-      case AppLifecycleState.detached:
-        // Application is in detached state (applicable for iOS and Android)
-        break;
-      default:
-        break;
-    }
   }
 
   @override
@@ -200,10 +218,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           '/camera-groups': (context) => const AppShell(
             currentRoute: '/camera-groups',
             child: CameraGroupsScreen(),
-          ),
-          '/devices': (context) => const AppShell(
-            currentRoute: '/devices',
-            child: DevicesScreen(),
           ),
           '/settings': (context) => const AppShell(
             currentRoute: '/settings',
@@ -319,13 +333,45 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
     // Handle app lifecycle state changes
     print('AppShell lifecycle state: $state');
     
-    if (state == AppLifecycleState.resumed) {
-      // When app is resumed from background, rebuild UI if needed
-      if (mounted) {
-        setState(() {
-          // Refresh the UI
-        });
-      }
+    final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
+    
+    switch (state) {
+      case AppLifecycleState.resumed:
+        // When app is resumed from background, check WebSocket connection
+        print('App resumed - checking WebSocket connection');
+        if (!webSocketProvider.isConnected) {
+          print('WebSocket disconnected, attempting to reconnect...');
+          webSocketProvider.reconnect();
+        }
+        
+        // Rebuild UI if needed
+        if (mounted) {
+          setState(() {
+            // Refresh the UI
+          });
+        }
+        break;
+        
+      case AppLifecycleState.paused:
+        // App is paused, keep connection but reduce activity
+        print('App paused - maintaining WebSocket connection');
+        break;
+        
+      case AppLifecycleState.inactive:
+        // App is inactive (e.g., during transitions)
+        print('App inactive - maintaining connection');
+        break;
+        
+      case AppLifecycleState.detached:
+        // App is detached, close connection
+        print('App detached - closing WebSocket connection');
+        webSocketProvider.disconnect();
+        break;
+        
+      case AppLifecycleState.hidden:
+        // App is hidden, maintain connection for background updates
+        print('App hidden - maintaining WebSocket connection for background updates');
+        break;
     }
   }
 

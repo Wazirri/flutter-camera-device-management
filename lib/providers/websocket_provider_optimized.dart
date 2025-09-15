@@ -205,6 +205,32 @@ class WebSocketProviderOptimized with ChangeNotifier {
     _batchNotifyListeners();
   }
 
+  // Reconnect to WebSocket server with saved credentials
+  Future<bool> reconnect() async {
+    print('[${DateTime.now().toString().split('.').first}] reconnect() called');
+    
+    // Check if we have saved credentials
+    if (_lastUsername == null || _lastPassword == null) {
+      print('No saved credentials available for reconnect');
+      return false;
+    }
+    
+    // Disconnect first if still connected
+    if (_isConnected) {
+      await disconnect();
+    }
+    
+    // Wait a bit before reconnecting
+    await Future.delayed(const Duration(milliseconds: 500));
+    
+    // Attempt to reconnect with saved credentials
+    print('[${DateTime.now().toString().split('.').first}] Attempting to reconnect with saved credentials');
+    return await connect(_serverIp, _serverPort, 
+        username: _lastUsername!, 
+        password: _lastPassword!, 
+        rememberMe: _rememberMe);
+  }
+
   // Login to server - now just connects and waits for login prompt
   Future<bool> login(String username, String password, [bool rememberMe = false, String? serverIp, int? serverPort]) async {
     // Store credentials for when we receive the login prompt
@@ -519,6 +545,10 @@ class WebSocketProviderOptimized with ChangeNotifier {
     _isConnected = false;
     _isConnecting = false;
     _isWaitingForChangedone = false;
+    
+    // Start connection error handling and auto-reconnect
+    _handleConnectionError();
+    
     _batchNotifyListeners();
 
     // Try to reconnect (login state korunur)
@@ -673,6 +703,49 @@ class WebSocketProviderOptimized with ChangeNotifier {
       if (_needsNotification) {
         _needsNotification = false;
         notifyListeners();
+      }
+    });
+  }
+  
+  // Handle connection errors and start auto-reconnect
+  void _handleConnectionError() {
+    print('[${DateTime.now().toString().split('.').first}] Connection error detected, starting auto-reconnect');
+    
+    _isConnected = false;
+    _isLoggedIn = false;
+    
+    // Start auto-reconnect if we have saved credentials
+    if (_lastUsername != null && _lastPassword != null) {
+      _startAutoReconnect();
+    }
+    
+    _batchNotifyListeners();
+  }
+  
+  // Start automatic reconnection timer
+  void _startAutoReconnect() {
+    _stopReconnectTimer(); // Stop any existing timer
+    
+    print('[${DateTime.now().toString().split('.').first}] Starting auto-reconnect timer');
+    
+    _reconnectTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      if (!_isConnected && _lastUsername != null && _lastPassword != null) {
+        print('[${DateTime.now().toString().split('.').first}] Auto-reconnect attempt');
+        
+        try {
+          final success = await reconnect();
+          if (success) {
+            print('[${DateTime.now().toString().split('.').first}] Auto-reconnect successful');
+            _stopReconnectTimer();
+          } else {
+            print('[${DateTime.now().toString().split('.').first}] Auto-reconnect failed, will retry');
+          }
+        } catch (e) {
+          print('[${DateTime.now().toString().split('.').first}] Auto-reconnect error: $e');
+        }
+      } else if (_isConnected) {
+        // Stop timer if we're connected
+        _stopReconnectTimer();
       }
     });
   }

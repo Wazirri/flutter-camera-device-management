@@ -409,33 +409,6 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
               : camerasInGroup;
             camerasGroupedByName[group.name] = filteredCameras;
           }
-          
-          // Find cameras that don't belong to any group
-          final allGroupedCameraIds = <String>{};
-          for (final group in cameraGroups) {
-            final camerasInGroup = provider.getCamerasInGroup(group.name);
-            allGroupedCameraIds.addAll(camerasInGroup.map((c) => c.id));
-          }
-          
-          final ungroupedCameras = provider.cameras.where((camera) => 
-            !allGroupedCameraIds.contains(camera.id)
-          ).toList();
-          
-          if (ungroupedCameras.isNotEmpty) {
-            List<Camera> filteredUngroupedCameras = showOnlyActive 
-              ? ungroupedCameras.where((camera) => camera.connected).toList()
-              : ungroupedCameras;
-            
-            if (filteredUngroupedCameras.isNotEmpty) {
-              camerasGroupedByName['Ungrouped Cameras'] = filteredUngroupedCameras;
-            }
-          }
-        } else {
-          // No groups exist, put all cameras in ungrouped
-          List<Camera> allCameras = showOnlyActive 
-            ? provider.cameras.where((camera) => camera.connected).toList()
-            : provider.cameras;
-          camerasGroupedByName['Ungrouped Cameras'] = allCameras;
         }
 
         // Remove empty groups
@@ -448,11 +421,7 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
 
   Widget _buildGroupedCameraContent(Map<String, List<Camera>> groupedCameras, Widget? filterChips) {
     final sortedGroupNames = groupedCameras.keys.toList()
-      ..sort((a, b) {
-        if (a == 'Ungrouped Cameras') return 1;
-        if (b == 'Ungrouped Cameras') return -1;
-        return a.compareTo(b);
-      });
+      ..sort((a, b) => a.compareTo(b));
 
     final cameraContent = Expanded(
       child: CustomScrollView(

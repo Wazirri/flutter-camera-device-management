@@ -9,6 +9,8 @@ enum MessageCategory {
   camera,
   cameraReport,
   systemInfo,
+  appConfig,
+  testData,
   configuration,
   basicProperty,
   cameraGroupAssignment,
@@ -466,6 +468,14 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
           await _processSystemInfo(device, pathComponent, remainingPath, value);
           _batchNotifyListeners();
           break;
+        case MessageCategory.appConfig:
+          await _processAppConfig(device, pathComponent, remainingPath, value);
+          _batchNotifyListeners();
+          break;
+        case MessageCategory.testData:
+          await _processTestData(device, pathComponent, remainingPath, value);
+          _batchNotifyListeners();
+          break;
         case MessageCategory.configuration:
           await _processConfiguration(device, pathComponent, remainingPath, value);
           break;
@@ -493,7 +503,36 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     if (pathComponent == 'online' || 
         pathComponent == 'connected' ||
         pathComponent == 'firsttime' || 
-        pathComponent == 'current_time') {
+        pathComponent == 'current_time' ||
+        pathComponent == 'name' ||
+        pathComponent == 'version' ||
+        pathComponent == 'smartweb_version' ||
+        pathComponent == 'cpuTemp' ||
+        pathComponent == 'ipv4' ||
+        pathComponent == 'ipv6' ||
+        pathComponent == 'last_seen_at' ||
+        pathComponent == 'isMaster' ||
+        pathComponent == 'last_ts' ||
+        pathComponent == 'cam_count' ||
+        
+        // Ready states from device_info.json
+        pathComponent == 'app_ready' ||
+        pathComponent == 'system_ready' ||
+        pathComponent == 'programs_ready' ||
+        pathComponent == 'cam_ready' ||
+        pathComponent == 'configuration_ready' ||
+        pathComponent == 'camreports_ready' ||
+        pathComponent == 'movita_ready' ||
+        
+        // Device status fields
+        pathComponent == 'registered' ||
+        pathComponent == 'app_version' ||
+        pathComponent == 'system_count' ||
+        pathComponent == 'camreports_count' ||
+        pathComponent == 'programs_count' ||
+        pathComponent == 'is_closed_by_master' ||
+        pathComponent == 'last_heartbeat_ts' ||
+        pathComponent == 'offline_since') {
       print('Detected basic device property: $pathComponent');
       return MessageCategory.basicProperty;
     }
@@ -521,6 +560,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       return MessageCategory.systemInfo;
     } else if (pathComponent == 'sysinfo') {
       return MessageCategory.systemInfo;
+    } else if (pathComponent == 'app') {
+      return MessageCategory.appConfig;
+    } else if (pathComponent == 'test') {
+      return MessageCategory.testData;
     } else {
       return MessageCategory.basicProperty; 
     }
@@ -714,7 +757,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         print('CDP_OPT: Device ${device.macAddress} last_seen_at updated: ${device.lastSeenAt}');
         break;
       case 'last_heartbeat_ts':
-        // Convert timestamp to readable format if needed
+        device.lastHeartbeatTs = int.tryParse(value.toString()) ?? 0;
         print('CDP_OPT: Device ${device.macAddress} last_heartbeat_ts updated: $value');
         break;
       case 'uptime':
@@ -724,6 +767,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         device.deviceType = value.toString();
         break;
       case 'firmware_version':
+      case 'version':
         device.firmwareVersion = value.toString();
         break;
       case 'record_path':
@@ -770,6 +814,60 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         device.lastTs = value.toString();
         print('CDP_OPT: Device ${device.macAddress} lastTs updated: ${device.lastTs}');
         break;
+      case 'name':
+        device.deviceName = value.toString();
+        print('CDP_OPT: Device ${device.macAddress} name updated: ${device.deviceName}');
+        break;
+      case 'ipv6':
+        device.ipv6 = value.toString();
+        break;
+        
+      // Ready states from device_info.json
+      case 'app_ready':
+        device.appReady = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'system_ready':
+        device.systemReady = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'programs_ready':
+        device.programsReady = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'cam_ready':
+        device.camReady = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'configuration_ready':
+        device.configurationReady = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'camreports_ready':
+        device.camreportsReady = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'movita_ready':
+        device.movitaReady = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+        
+      // Device status fields
+      case 'registered':
+        device.registered = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'app_version':
+        device.appVersion = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'system_count':
+        device.systemCount = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'camreports_count':
+        device.camreportsCount = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'programs_count':
+        device.programsCount = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'is_closed_by_master':
+        device.isClosedByMaster = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'offline_since':
+        device.offlineSince = int.tryParse(value.toString()) ?? 0;
+        break;
+        
       default:
         print('CDP_OPT: Unhandled basic device property: $property for device ${device.macAddress}');
         break;
@@ -778,8 +876,193 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
 
   // Process system info
   Future<void> _processSystemInfo(CameraDevice device, String property, List<String> subPath, dynamic value) async {
-    // Handle system information updates
-    print('CDP_OPT: System info update for ${device.macAddress}: $property = $value');
+    // Handle system information updates from device_info.json
+    if (subPath.isEmpty) {
+      print('CDP_OPT: System info update for ${device.macAddress}: $property = $value');
+      return;
+    }
+    
+    String systemProperty = subPath[0];
+    switch (systemProperty.toLowerCase()) {
+      case 'mac':
+        device.systemMac = value.toString();
+        break;
+      case 'gateway':
+        device.gateway = value.toString();
+        break;
+      case 'gpsok':
+        device.gpsOk = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'ignition':
+        device.ignition = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'internetexists':
+        device.internetExists = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'ip':
+        device.systemIp = value.toString();
+        break;
+      case 'bootcount':
+        device.bootCount = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'diskfree':
+        device.diskFree = value.toString();
+        break;
+      case 'diskrunning':
+        device.diskRunning = value.toString();
+        break;
+      case 'emptysize':
+        device.emptySize = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'recordsize':
+        device.recordSize = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'recording':
+        device.recording = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'shmc_ready':
+        device.shmcReady = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'timeset':
+        device.timeset = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'uykumodu':
+        device.uykumodu = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      default:
+        print('CDP_OPT: Unhandled system property: $systemProperty for device ${device.macAddress}');
+        break;
+    }
+    print('CDP_OPT: System info update for ${device.macAddress}: $property.$systemProperty = $value');
+  }
+
+  // Process app config
+  Future<void> _processAppConfig(CameraDevice device, String property, List<String> subPath, dynamic value) async {
+    // Handle app configuration updates from device_info.json
+    if (subPath.isEmpty) {
+      print('CDP_OPT: App config update for ${device.macAddress}: $property = $value');
+      return;
+    }
+    
+    String appProperty = subPath[0];
+    switch (appProperty.toLowerCase()) {
+      case 'ip':
+        // Could map to device IP or create a new field
+        device.ipv4 = value.toString();
+        break;
+      case 'devicetype':
+        device.appDeviceType = value.toString();
+        break;
+      case 'recordingduration':
+        device.maxRecordDuration = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'recordpath':
+        device.appRecordPath = value.toString();
+        break;
+      case 'recording':
+        device.appRecording = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'group':
+        device.group = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'firmwareversion':
+        device.appFirmwareVersion = value.toString();
+        break;
+      case 'firmwaredate':
+        device.firmwareDate = value.toString();
+        break;
+      case 'gps_data_flow_status':
+      case 'gpsdataflowstatus':
+        device.gpsDataFlowStatus = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'int_connection':
+      case 'intconnection':
+        device.intConnection = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'record_over_tcp':
+      case 'recordovertcp':
+        device.recordOverTcp = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'ppp':
+        device.ppp = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'recording_cameras':
+      case 'recordingcameras':
+        device.recordingCameras = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'min_space_in_mbytes':
+      case 'minspaceinmbytes':
+        device.minSpaceInMBytes = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'restart_player_timeout':
+      case 'restartplayertimeout':
+        device.restartPlayerTimeout = int.tryParse(value.toString()) ?? 0;
+        break;
+      default:
+        print('CDP_OPT: Unhandled app property: $appProperty for device ${device.macAddress}');
+        break;
+    }
+    print('CDP_OPT: App config update for ${device.macAddress}: $property.$appProperty = $value');
+  }
+
+  // Process test data
+  Future<void> _processTestData(CameraDevice device, String property, List<String> subPath, dynamic value) async {
+    // Handle test data updates from device_info.json
+    if (subPath.isEmpty) {
+      print('CDP_OPT: Test data update for ${device.macAddress}: $property = $value');
+      return;
+    }
+    
+    String testProperty = subPath[0];
+    switch (testProperty.toLowerCase()) {
+      case 'connection_count':
+      case 'connectioncount':
+        device.testConnectionCount = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'connection_last_update':
+      case 'connectionlastupdate':
+        device.testConnectionLastUpdate = value.toString();
+        break;
+      case 'connection_error':
+      case 'connectionerror':
+        device.testConnectionError = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'kamera_baglanti_count':
+      case 'kamerabaglanticount':
+        device.testKameraBaglantiCount = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'kamera_baglanti_last_update':
+      case 'kamerabagantilastupdate':
+        device.testKameraBaglantiLastUpdate = value.toString();
+        break;
+      case 'kamera_baglanti_error':
+      case 'kamerabaglatierror':
+        device.testKameraBaglantiError = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'program_count':
+      case 'programcount':
+        device.testProgramCount = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'program_last_update':
+      case 'programlastupdate':
+        device.testProgramLastUpdate = value.toString();
+        break;
+      case 'program_error':
+      case 'programerror':
+        device.testProgramError = int.tryParse(value.toString()) ?? 0;
+        break;
+      case 'is_error':
+      case 'iserror':
+        device.testIsError = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        break;
+      case 'uptime':
+        device.testUptime = value.toString();
+        break;
+      default:
+        print('CDP_OPT: Unhandled test property: $testProperty for device ${device.macAddress}');
+        break;
+    }
+    print('CDP_OPT: Test data update for ${device.macAddress}: $property.$testProperty = $value');
   }
 
   // Process configuration

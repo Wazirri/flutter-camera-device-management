@@ -31,6 +31,82 @@ class CameraDevice {
   String? lastTs; // WebSocket field: last_ts
   int camCount; // WebSocket field: cam_count
 
+  // Ready states
+  bool appReady;
+  bool systemReady;
+  bool programsReady;
+  bool camReady;
+  bool configurationReady;
+  bool camreportsReady;
+  bool movitaReady;
+
+  // Device status fields
+  bool registered;
+  int appVersion;
+  int systemCount;
+  int camreportsCount;
+  int programsCount;
+  bool isClosedByMaster;
+  
+  // Heartbeat and connection
+  int lastHeartbeatTs;
+  int offlineSince;
+
+  // System information
+  String? systemMac;
+  String? gateway;
+  bool gpsOk;
+  bool ignition;
+  bool internetExists;
+  String? systemIp;
+  int bootCount;
+  String? diskFree;
+  String? diskRunning;
+  int emptySize;
+  int recordSize;
+  int recording;
+  bool shmcReady;
+  bool timeset;
+  bool uykumodu; // sleep mode
+  
+  // App configuration
+  String? appDeviceType;
+  String? firmwareDate;
+  String? appFirmwareVersion;
+  bool gpsDataFlowStatus;
+  int group;
+  bool intConnection;
+  String? isai;
+  String? libPath;
+  String? logPath;
+  String? macAddressPath;
+  int maxRecordDuration;
+  int minSpaceInMBytes;
+  String? movitabinPath;
+  String? movitarecPath;
+  String? netdev;
+  String? pinCode;
+  bool ppp;
+  bool recordOverTcp;
+  String? appRecordPath;
+  bool appRecording;
+  int recordingCameras;
+  int restartPlayerTimeout;
+  String? rp2040version;
+  
+  // Test information
+  String? testUptime;
+  int testConnectionCount;
+  String? testConnectionLastUpdate;
+  int testConnectionError;
+  bool testIsError;
+  int testKameraBaglantiCount;
+  String? testKameraBaglantiLastUpdate;
+  int testKameraBaglantiError;
+  int testProgramCount;
+  String? testProgramLastUpdate;
+  int testProgramError;
+
   // Fields for system information
   int totalRam;
   int freeRam;
@@ -60,6 +136,83 @@ class CameraDevice {
     this.isMaster,
     this.lastTs,
     this.camCount = 0,
+    
+    // Ready states with defaults
+    this.appReady = false,
+    this.systemReady = false,
+    this.programsReady = false,
+    this.camReady = false,
+    this.configurationReady = false,
+    this.camreportsReady = false,
+    this.movitaReady = false,
+    
+    // Device status fields with defaults
+    this.registered = false,
+    this.appVersion = 0,
+    this.systemCount = 0,
+    this.camreportsCount = 0,
+    this.programsCount = 0,
+    this.isClosedByMaster = false,
+    
+    // Heartbeat and connection with defaults
+    this.lastHeartbeatTs = 0,
+    this.offlineSince = 0,
+    
+    // System information with defaults
+    this.systemMac,
+    this.gateway,
+    this.gpsOk = false,
+    this.ignition = false,
+    this.internetExists = false,
+    this.systemIp,
+    this.bootCount = 0,
+    this.diskFree,
+    this.diskRunning,
+    this.emptySize = 0,
+    this.recordSize = 0,
+    this.recording = 0,
+    this.shmcReady = false,
+    this.timeset = false,
+    this.uykumodu = false,
+    
+    // App configuration with defaults
+    this.appDeviceType,
+    this.firmwareDate,
+    this.appFirmwareVersion,
+    this.gpsDataFlowStatus = false,
+    this.group = 0,
+    this.intConnection = false,
+    this.isai,
+    this.libPath,
+    this.logPath,
+    this.macAddressPath,
+    this.maxRecordDuration = 0,
+    this.minSpaceInMBytes = 0,
+    this.movitabinPath,
+    this.movitarecPath,
+    this.netdev,
+    this.pinCode,
+    this.ppp = false,
+    this.recordOverTcp = false,
+    this.appRecordPath,
+    this.appRecording = false,
+    this.recordingCameras = 0,
+    this.restartPlayerTimeout = 0,
+    this.rp2040version,
+    
+    // Test information with defaults
+    this.testUptime,
+    this.testConnectionCount = 0,
+    this.testConnectionLastUpdate,
+    this.testConnectionError = 0,
+    this.testIsError = false,
+    this.testKameraBaglantiCount = 0,
+    this.testKameraBaglantiLastUpdate,
+    this.testKameraBaglantiError = 0,
+    this.testProgramCount = 0,
+    this.testProgramLastUpdate,
+    this.testProgramError = 0,
+    
     this.totalRam = 0,
     this.freeRam = 0,
     this.networkInfo,
@@ -90,6 +243,83 @@ class CameraDevice {
     bool? isMaster,
     String? lastTs,
     int? camCount,
+    
+    // Ready states
+    bool? appReady,
+    bool? systemReady,
+    bool? programsReady,
+    bool? camReady,
+    bool? configurationReady,
+    bool? camreportsReady,
+    bool? movitaReady,
+    
+    // Device status fields
+    bool? registered,
+    int? appVersion,
+    int? systemCount,
+    int? camreportsCount,
+    int? programsCount,
+    bool? isClosedByMaster,
+    
+    // Heartbeat and connection
+    int? lastHeartbeatTs,
+    int? offlineSince,
+    
+    // System information
+    String? systemMac,
+    String? gateway,
+    bool? gpsOk,
+    bool? ignition,
+    bool? internetExists,
+    String? systemIp,
+    int? bootCount,
+    String? diskFree,
+    String? diskRunning,
+    int? emptySize,
+    int? recordSize,
+    int? recording,
+    bool? shmcReady,
+    bool? timeset,
+    bool? uykumodu,
+    
+    // App configuration
+    String? appDeviceType,
+    String? firmwareDate,
+    String? appFirmwareVersion,
+    bool? gpsDataFlowStatus,
+    int? group,
+    bool? intConnection,
+    String? isai,
+    String? libPath,
+    String? logPath,
+    String? macAddressPath,
+    int? maxRecordDuration,
+    int? minSpaceInMBytes,
+    String? movitabinPath,
+    String? movitarecPath,
+    String? netdev,
+    String? pinCode,
+    bool? ppp,
+    bool? recordOverTcp,
+    String? appRecordPath,
+    bool? appRecording,
+    int? recordingCameras,
+    int? restartPlayerTimeout,
+    String? rp2040version,
+    
+    // Test information
+    String? testUptime,
+    int? testConnectionCount,
+    String? testConnectionLastUpdate,
+    int? testConnectionError,
+    bool? testIsError,
+    int? testKameraBaglantiCount,
+    String? testKameraBaglantiLastUpdate,
+    int? testKameraBaglantiError,
+    int? testProgramCount,
+    String? testProgramLastUpdate,
+    int? testProgramError,
+    
     int? totalRam,
     int? freeRam,
     String? networkInfo,
@@ -117,6 +347,83 @@ class CameraDevice {
       isMaster: isMaster ?? this.isMaster,
       lastTs: lastTs ?? this.lastTs,
       camCount: camCount ?? this.camCount,
+      
+      // Ready states
+      appReady: appReady ?? this.appReady,
+      systemReady: systemReady ?? this.systemReady,
+      programsReady: programsReady ?? this.programsReady,
+      camReady: camReady ?? this.camReady,
+      configurationReady: configurationReady ?? this.configurationReady,
+      camreportsReady: camreportsReady ?? this.camreportsReady,
+      movitaReady: movitaReady ?? this.movitaReady,
+      
+      // Device status fields
+      registered: registered ?? this.registered,
+      appVersion: appVersion ?? this.appVersion,
+      systemCount: systemCount ?? this.systemCount,
+      camreportsCount: camreportsCount ?? this.camreportsCount,
+      programsCount: programsCount ?? this.programsCount,
+      isClosedByMaster: isClosedByMaster ?? this.isClosedByMaster,
+      
+      // Heartbeat and connection
+      lastHeartbeatTs: lastHeartbeatTs ?? this.lastHeartbeatTs,
+      offlineSince: offlineSince ?? this.offlineSince,
+      
+      // System information
+      systemMac: systemMac ?? this.systemMac,
+      gateway: gateway ?? this.gateway,
+      gpsOk: gpsOk ?? this.gpsOk,
+      ignition: ignition ?? this.ignition,
+      internetExists: internetExists ?? this.internetExists,
+      systemIp: systemIp ?? this.systemIp,
+      bootCount: bootCount ?? this.bootCount,
+      diskFree: diskFree ?? this.diskFree,
+      diskRunning: diskRunning ?? this.diskRunning,
+      emptySize: emptySize ?? this.emptySize,
+      recordSize: recordSize ?? this.recordSize,
+      recording: recording ?? this.recording,
+      shmcReady: shmcReady ?? this.shmcReady,
+      timeset: timeset ?? this.timeset,
+      uykumodu: uykumodu ?? this.uykumodu,
+      
+      // App configuration
+      appDeviceType: appDeviceType ?? this.appDeviceType,
+      firmwareDate: firmwareDate ?? this.firmwareDate,
+      appFirmwareVersion: appFirmwareVersion ?? this.appFirmwareVersion,
+      gpsDataFlowStatus: gpsDataFlowStatus ?? this.gpsDataFlowStatus,
+      group: group ?? this.group,
+      intConnection: intConnection ?? this.intConnection,
+      isai: isai ?? this.isai,
+      libPath: libPath ?? this.libPath,
+      logPath: logPath ?? this.logPath,
+      macAddressPath: macAddressPath ?? this.macAddressPath,
+      maxRecordDuration: maxRecordDuration ?? this.maxRecordDuration,
+      minSpaceInMBytes: minSpaceInMBytes ?? this.minSpaceInMBytes,
+      movitabinPath: movitabinPath ?? this.movitabinPath,
+      movitarecPath: movitarecPath ?? this.movitarecPath,
+      netdev: netdev ?? this.netdev,
+      pinCode: pinCode ?? this.pinCode,
+      ppp: ppp ?? this.ppp,
+      recordOverTcp: recordOverTcp ?? this.recordOverTcp,
+      appRecordPath: appRecordPath ?? this.appRecordPath,
+      appRecording: appRecording ?? this.appRecording,
+      recordingCameras: recordingCameras ?? this.recordingCameras,
+      restartPlayerTimeout: restartPlayerTimeout ?? this.restartPlayerTimeout,
+      rp2040version: rp2040version ?? this.rp2040version,
+      
+      // Test information
+      testUptime: testUptime ?? this.testUptime,
+      testConnectionCount: testConnectionCount ?? this.testConnectionCount,
+      testConnectionLastUpdate: testConnectionLastUpdate ?? this.testConnectionLastUpdate,
+      testConnectionError: testConnectionError ?? this.testConnectionError,
+      testIsError: testIsError ?? this.testIsError,
+      testKameraBaglantiCount: testKameraBaglantiCount ?? this.testKameraBaglantiCount,
+      testKameraBaglantiLastUpdate: testKameraBaglantiLastUpdate ?? this.testKameraBaglantiLastUpdate,
+      testKameraBaglantiError: testKameraBaglantiError ?? this.testKameraBaglantiError,
+      testProgramCount: testProgramCount ?? this.testProgramCount,
+      testProgramLastUpdate: testProgramLastUpdate ?? this.testProgramLastUpdate,
+      testProgramError: testProgramError ?? this.testProgramError,
+      
       totalRam: totalRam ?? this.totalRam,
       freeRam: freeRam ?? this.freeRam,
       networkInfo: networkInfo ?? this.networkInfo,
@@ -140,20 +447,100 @@ class CameraDevice {
       lastSeenAt: json['last_seen_at'] as String? ?? '',
       connected: json['connected'] as bool? ?? false,
       online: json['online'] as bool? ?? false,
-      firstTime: json['firstTime'] as String? ?? '',
+      firstTime: json['firstTime'] as String? ?? json['firsttime'] as String? ?? '',
       uptime: json['uptime'] as String? ?? '',
       deviceType: json['deviceType'] as String? ?? '',
-      firmwareVersion: json['firmwareVersion'] as String? ?? '', // Corresponds to 'version' in WS
+      firmwareVersion: json['firmwareVersion'] as String? ?? json['version']?.toString() ?? '',
       recordPath: json['recordPath'] as String? ?? '',
       
-      deviceName: json['name'] as String?, // WebSocket 'name'
+      // Basic device info from WebSocket
+      deviceName: json['name'] as String?,
       currentTime: json['current_time'] as String?,
       smartwebVersion: json['smartweb_version'] as String?,
-      cpuTemp: (json['cpuTemp'] as num?)?.toDouble() ?? 0.0,
+      cpuTemp: (json['cpuTemp'] is String) 
+          ? double.tryParse(json['cpuTemp'] as String) ?? 0.0
+          : (json['cpuTemp'] as num?)?.toDouble() ?? 0.0,
       ipv6: json['ipv6'] as String?,
       isMaster: json['isMaster'] as bool?,
-      lastTs: json['last_ts'] as String?,
+      lastTs: json['last_ts']?.toString(),
       camCount: json['cam_count'] as int? ?? 0,
+      
+      // Ready states from WebSocket
+      appReady: json['app_ready'] as bool? ?? false,
+      systemReady: json['system_ready'] as bool? ?? false,
+      programsReady: json['programs_ready'] as bool? ?? false,
+      camReady: json['cam_ready'] as bool? ?? false,
+      configurationReady: json['configuration_ready'] as bool? ?? false,
+      camreportsReady: json['camreports_ready'] as bool? ?? false,
+      movitaReady: json['movita_ready'] as bool? ?? false,
+      
+      // Device status fields from WebSocket
+      registered: json['registered'] as bool? ?? false,
+      appVersion: json['app_version'] as int? ?? json['version'] as int? ?? 0,
+      systemCount: json['system_count'] as int? ?? 0,
+      camreportsCount: json['camreports_count'] as int? ?? 0,
+      programsCount: json['programs_count'] as int? ?? 0,
+      isClosedByMaster: json['is_closed_by_master'] as bool? ?? false,
+      
+      // Heartbeat and connection from WebSocket
+      lastHeartbeatTs: json['last_heartbeat_ts'] as int? ?? 0,
+      offlineSince: json['offline_since'] as int? ?? 0,
+      
+      // System information from WebSocket system.* fields
+      systemMac: json['system']?['mac'] as String?,
+      gateway: json['system']?['gateway'] as String?,
+      gpsOk: json['system']?['gpsOk'] as bool? ?? false,
+      ignition: json['system']?['ignition'] as bool? ?? false,
+      internetExists: json['system']?['internetExists'] as bool? ?? false,
+      systemIp: json['system']?['ip'] as String?,
+      bootCount: json['system']?['bootcount'] as int? ?? 0,
+      diskFree: json['system']?['diskfree'] as String?,
+      diskRunning: json['system']?['diskrunning'] as String?,
+      emptySize: json['system']?['emptySize'] as int? ?? 0,
+      recordSize: json['system']?['recordSize'] as int? ?? 0,
+      recording: json['system']?['recording'] as int? ?? 0,
+      shmcReady: json['system']?['shmc_ready'] as bool? ?? false,
+      timeset: json['system']?['timeset'] as bool? ?? false,
+      uykumodu: json['system']?['uykumodu'] as bool? ?? false,
+      
+      // App configuration from WebSocket app.* fields
+      appDeviceType: json['app']?['deviceType'] as String?,
+      firmwareDate: json['app']?['firmwareDate'] as String?,
+      appFirmwareVersion: json['app']?['firmwareVersion'] as String?,
+      gpsDataFlowStatus: json['app']?['gpsDataFlowStatus'] as bool? ?? false,
+      group: json['app']?['group'] as int? ?? 0,
+      intConnection: json['app']?['intConnection'] as bool? ?? false,
+      isai: json['app']?['isai'] as String? ?? json['app']?['useai'] as String?,
+      libPath: json['app']?['libPath'] as String?,
+      logPath: json['app']?['logPath'] as String?,
+      macAddressPath: json['app']?['macAddressPath'] as String?,
+      maxRecordDuration: json['app']?['maxRecordDuration'] as int? ?? 0,
+      minSpaceInMBytes: json['app']?['minSpaceInMBytes'] as int? ?? 0,
+      movitabinPath: json['app']?['movitabinPath'] as String?,
+      movitarecPath: json['app']?['movitarecPath'] as String?,
+      netdev: json['app']?['netdev'] as String?,
+      pinCode: json['app']?['pinCode'] as String?,
+      ppp: json['app']?['ppp'] as bool? ?? false,
+      recordOverTcp: json['app']?['recordOverTcp'] as bool? ?? false,
+      appRecordPath: json['app']?['recordPath'] as String?,
+      appRecording: json['app']?['recording'] as bool? ?? false,
+      recordingCameras: json['app']?['recordingCameras'] as int? ?? 0,
+      restartPlayerTimeout: json['app']?['restartPlayerTimeout'] as int? ?? 0,
+      rp2040version: json['app']?['rp2040version'] as String?,
+      
+      // Test information from WebSocket test.* fields
+      testUptime: json['test']?['uptime'] as String?,
+      testConnectionCount: json['test']?['connection']?['count'] as int? ?? 0,
+      testConnectionLastUpdate: json['test']?['connection']?['last_update'] as String?,
+      testConnectionError: json['test']?['connection']?['error'] as int? ?? 0,
+      testIsError: json['test']?['is_error'] as bool? ?? false,
+      testKameraBaglantiCount: json['test']?['kamera_baglanti']?['count'] as int? ?? 0,
+      testKameraBaglantiLastUpdate: json['test']?['kamera_baglanti']?['last_update'] as String?,
+      testKameraBaglantiError: json['test']?['kamera_baglanti']?['error'] as int? ?? 0,
+      testProgramCount: json['test']?['program']?['count'] as int? ?? 0,
+      testProgramLastUpdate: json['test']?['program']?['last_update'] as String?,
+      testProgramError: json['test']?['program']?['error'] as int? ?? 0,
+      
       cameras: camerasList,
       totalRam: json['totalRam'] as int? ?? 0,
       freeRam: json['freeRam'] as int? ?? 0,
@@ -174,10 +561,11 @@ class CameraDevice {
         'firstTime': firstTime,
         'uptime': uptime,
         'deviceType': deviceType,
-        'firmwareVersion': firmwareVersion, // Corresponds to 'version' in WS
+        'firmwareVersion': firmwareVersion,
         'recordPath': recordPath,
         
-        'name': deviceName, // WebSocket 'name'
+        // Basic device info
+        'name': deviceName,
         'current_time': currentTime,
         'smartweb_version': smartwebVersion,
         'cpuTemp': cpuTemp,
@@ -185,6 +573,95 @@ class CameraDevice {
         'isMaster': isMaster,
         'last_ts': lastTs,
         'cam_count': camCount,
+        
+        // Ready states
+        'app_ready': appReady,
+        'system_ready': systemReady,
+        'programs_ready': programsReady,
+        'cam_ready': camReady,
+        'configuration_ready': configurationReady,
+        'camreports_ready': camreportsReady,
+        'movita_ready': movitaReady,
+        
+        // Device status fields
+        'registered': registered,
+        'app_version': appVersion,
+        'system_count': systemCount,
+        'camreports_count': camreportsCount,
+        'programs_count': programsCount,
+        'is_closed_by_master': isClosedByMaster,
+        
+        // Heartbeat and connection
+        'last_heartbeat_ts': lastHeartbeatTs,
+        'offline_since': offlineSince,
+        
+        // System information
+        'system': {
+          'mac': systemMac,
+          'gateway': gateway,
+          'gpsOk': gpsOk,
+          'ignition': ignition,
+          'internetExists': internetExists,
+          'ip': systemIp,
+          'bootcount': bootCount,
+          'diskfree': diskFree,
+          'diskrunning': diskRunning,
+          'emptySize': emptySize,
+          'recordSize': recordSize,
+          'recording': recording,
+          'shmc_ready': shmcReady,
+          'timeset': timeset,
+          'uykumodu': uykumodu,
+        },
+        
+        // App configuration
+        'app': {
+          'deviceType': appDeviceType,
+          'firmwareDate': firmwareDate,
+          'firmwareVersion': appFirmwareVersion,
+          'gpsDataFlowStatus': gpsDataFlowStatus,
+          'group': group,
+          'intConnection': intConnection,
+          'isai': isai,
+          'libPath': libPath,
+          'logPath': logPath,
+          'macAddressPath': macAddressPath,
+          'maxRecordDuration': maxRecordDuration,
+          'minSpaceInMBytes': minSpaceInMBytes,
+          'movitabinPath': movitabinPath,
+          'movitarecPath': movitarecPath,
+          'netdev': netdev,
+          'pinCode': pinCode,
+          'ppp': ppp,
+          'recordOverTcp': recordOverTcp,
+          'recordPath': appRecordPath,
+          'recording': appRecording,
+          'recordingCameras': recordingCameras,
+          'restartPlayerTimeout': restartPlayerTimeout,
+          'rp2040version': rp2040version,
+        },
+        
+        // Test information
+        'test': {
+          'uptime': testUptime,
+          'connection': {
+            'count': testConnectionCount,
+            'last_update': testConnectionLastUpdate,
+            'error': testConnectionError,
+          },
+          'is_error': testIsError,
+          'kamera_baglanti': {
+            'count': testKameraBaglantiCount,
+            'last_update': testKameraBaglantiLastUpdate,
+            'error': testKameraBaglantiError,
+          },
+          'program': {
+            'count': testProgramCount,
+            'last_update': testProgramLastUpdate,
+            'error': testProgramError,
+          },
+        },
+        
         'cameras': cameras.map((camera) => camera.toJson()).toList(),
         'totalRam': totalRam,
         'freeRam': freeRam,

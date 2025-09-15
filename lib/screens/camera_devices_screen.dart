@@ -320,7 +320,7 @@ class DeviceDetailsSheet extends StatelessWidget {
     print('DeviceDetailsSheet build: ${device.macAddress}, connected: ${device.connected}, online: ${device.online}, firstTime: ${device.firstTime}, status from getter: $currentStatus'); // MODIFIED
 
     return DefaultTabController(
-      length: 2, // İki tab için: Cihaz Bilgileri ve Kameralar
+      length: 5, // Beş tab için: ECS Slaves, Sistem, App, Test, Kameralar
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -380,14 +380,27 @@ class DeviceDetailsSheet extends StatelessWidget {
           
           // Tab Bar
           TabBar(
+            isScrollable: true,
             tabs: const [
               Tab(
-                icon: Icon(Icons.info_outline),
-                text: 'Device Info',
+                icon: Icon(Icons.devices),
+                text: 'ECS Slaves',
+              ),
+              Tab(
+                icon: Icon(Icons.computer),
+                text: 'Sistem',
+              ),
+              Tab(
+                icon: Icon(Icons.settings),
+                text: 'App',
+              ),
+              Tab(
+                icon: Icon(Icons.bug_report),
+                text: 'Test',
               ),
               Tab(
                 icon: Icon(Icons.videocam_outlined),
-                text: 'Cameras',
+                text: 'Kameralar',
               ),
             ],
             labelColor: AppTheme.primaryColor,
@@ -399,185 +412,395 @@ class DeviceDetailsSheet extends StatelessWidget {
           Expanded(
             child: TabBarView(
               children: [
-                // İlk Tab: Cihaz Bilgileri
-                SingleChildScrollView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Device Information',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      // Temel Bilgiler
-                      InfoRow(label: 'Device Name', value: device.deviceName ?? 'Unknown'),
-                      InfoRow(label: 'IP Address (IPv4)', value: device.ipv4),
-                      if (device.ipv6 != null && device.ipv6!.isNotEmpty)
-                        InfoRow(label: 'IP Address (IPv6)', value: device.ipv6!),
-                      InfoRow(label: 'MAC Address', value: device.macAddress),
-                      InfoRow(label: 'First Seen', value: device.firstTime),
-                      InfoRow(label: 'Last Seen', value: device.lastSeenAt),
-                      InfoRow(label: 'Current Time', value: device.currentTime ?? 'Unknown'),
-                      InfoRow(label: 'Uptime', value: device.formattedUptime),
-                      InfoRow(label: 'Firmware Version', value: device.firmwareVersion),
-                      if (device.smartwebVersion != null && device.smartwebVersion!.isNotEmpty)
-                        InfoRow(label: 'SmartWeb Version', value: device.smartwebVersion!),
-                      InfoRow(
-                        label: 'CPU Temperature', 
-                        value: device.cpuTemp > 0 ? '${device.cpuTemp.toStringAsFixed(1)}°C' : 'Not available'
-                      ),
-                      InfoRow(label: 'Master Status', value: device.isMaster == true ? 'Master' : 'Slave'),
-                      InfoRow(label: 'Last Timestamp', value: device.lastTs ?? 'Unknown'),
-                      InfoRow(label: 'Record Path', value: device.recordPath),
-                      InfoRow(label: 'Camera Count', value: '${device.camCount}'),
-                      InfoRow(
-                        label: 'Total RAM', 
-                        value: device.totalRam > 0 ? '${(device.totalRam / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB' : 'Not available'
-                      ),
-                      InfoRow(
-                        label: 'Free RAM', 
-                        value: device.freeRam > 0 ? '${(device.freeRam / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB' : 'Not available'
-                      ),
-                      InfoRow(label: 'Network Info', value: device.networkInfo ?? 'Unknown'),
-                      InfoRow(label: 'Total Connections', value: '${device.totalConnections}'),
-                      InfoRow(label: 'Total Sessions', value: '${device.totalSessions}'),
-                      
-                      // Powered ve Connection status
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Status Information',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            const SizedBox(
-                              width: 100,
-                              child: Text(
-                                'Powered',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                            Icon(
-                              device.online ? Icons.power_settings_new : Icons.power_off,
-                              color: device.online ? AppTheme.online : AppTheme.offline,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                device.online ? "On" : "Off",
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            const SizedBox(
-                              width: 100,
-                              child: Text(
-                                'Connection',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                            Icon(
-                              device.connected ? Icons.link : Icons.link_off,
-                              color: device.connected ? AppTheme.online : AppTheme.offline,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                device.connected ? "Active" : "Inactive",
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                // İkinci Tab: Kameralar
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Cameras (${device.cameras.length})',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (device.cameras.isNotEmpty && device.connected)
-                            TextButton.icon(
-                              icon: const Icon(Icons.visibility),
-                              label: const Text('View All'),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                Navigator.pushNamed(context, '/live-view');
-                              },
-                            ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: device.cameras.isEmpty
-                          ? const Center(
-                              child: Text('No cameras found for this device'),
-                            )
-                          : ListView.builder(
-                              controller: scrollController,
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              itemCount: device.cameras.length,
-                              itemBuilder: (context, index) {
-                                final camera = device.cameras[index];
-                                return CameraCard(
-                                  camera: camera,
-                                  onTap: () {
-                                    // Set the selected camera
-                                    Provider.of<CameraDevicesProviderOptimized>(context, listen: false)
-                                        .setSelectedCameraIndex(index);
-                                        
-                                    // Navigate to live view screen
-                                    Navigator.pop(context);
-                                    Navigator.pushNamed(context, '/live-view');
-                                  },
-                                );
-                              },
-                            ),
-                    ),
-                  ],
-                ),
+                // ECS Slaves Tab
+                _buildEcsSlavesTab(context),
+                // Sistem Tab
+                _buildSystemTab(context),
+                // App Tab
+                _buildAppTab(context),
+                // Test Tab
+                _buildTestTab(context),
+                // Kameralar Tab
+                _buildCamerasTab(context),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ECS Slaves Tab - Temel cihaz bilgileri
+  Widget _buildEcsSlavesTab(BuildContext context) {
+    return SingleChildScrollView(
+      controller: scrollController,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'ECS Slaves Bilgileri',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          // Temel cihaz bilgileri
+          InfoRow(label: 'Cihaz Adı', value: device.deviceName ?? 'Bilinmiyor'),
+          InfoRow(label: 'IPv4 Adresi', value: device.ipv4),
+          if (device.ipv6 != null && device.ipv6!.isNotEmpty)
+            InfoRow(label: 'IPv6 Adresi', value: device.ipv6!),
+          InfoRow(label: 'MAC Adresi', value: device.macAddress),
+          InfoRow(label: 'İlk Görülme', value: device.firstTime),
+          InfoRow(label: 'Son Görülme', value: device.lastSeenAt),
+          InfoRow(label: 'Şu Anki Zaman', value: device.currentTime ?? 'Bilinmiyor'),
+          InfoRow(label: 'Firmware Versiyonu', value: device.firmwareVersion),
+          if (device.smartwebVersion != null && device.smartwebVersion!.isNotEmpty)
+            InfoRow(label: 'SmartWeb Versiyonu', value: device.smartwebVersion!),
+          InfoRow(
+            label: 'CPU Sıcaklığı', 
+            value: device.cpuTemp > 0 ? '${device.cpuTemp.toStringAsFixed(1)}°C' : 'Mevcut değil'
+          ),
+          InfoRow(label: 'Master Durumu', value: device.isMaster == true ? 'Master' : 'Slave'),
+          InfoRow(label: 'Son Timestamp', value: device.lastTs ?? 'Bilinmiyor'),
+          InfoRow(label: 'Kayıt Yolu', value: device.recordPath),
+          InfoRow(label: 'Kamera Sayısı', value: '${device.camCount}'),
+          
+          // Ready States
+          const SizedBox(height: 16),
+          const Text(
+            'Hazırlık Durumları',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _buildStatusRow('App Hazır', device.appReady),
+          _buildStatusRow('Sistem Hazır', device.systemReady),
+          _buildStatusRow('Programlar Hazır', device.programsReady),
+          _buildStatusRow('Kamera Hazır', device.camReady),
+          _buildStatusRow('Konfigürasyon Hazır', device.configurationReady),
+          _buildStatusRow('Kamera Raporları Hazır', device.camreportsReady),
+          _buildStatusRow('Movita Hazır', device.movitaReady),
+          
+          // Cihaz durum bilgileri
+          const SizedBox(height: 16),
+          const Text(
+            'Cihaz Durum Bilgileri',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _buildStatusRow('Kayıtlı', device.registered),
+          InfoRow(label: 'App Versiyonu', value: '${device.appVersion}'),
+          InfoRow(label: 'Sistem Sayısı', value: '${device.systemCount}'),
+          InfoRow(label: 'Kamera Raporları Sayısı', value: '${device.camreportsCount}'),
+          InfoRow(label: 'Program Sayısı', value: '${device.programsCount}'),
+          _buildStatusRow('Master Tarafından Kapatıldı', device.isClosedByMaster),
+          InfoRow(label: 'Son Heartbeat', value: device.lastHeartbeatTs > 0 ? DateTime.fromMillisecondsSinceEpoch(device.lastHeartbeatTs * 1000).toString() : 'Bilinmiyor'),
+          InfoRow(label: 'Offline Başlangıcı', value: device.offlineSince > 0 ? DateTime.fromMillisecondsSinceEpoch(device.offlineSince * 1000).toString() : 'Hiçbir zaman'),
+        ],
+      ),
+    );
+  }
+
+  // Sistem Bilgileri Tab
+  Widget _buildSystemTab(BuildContext context) {
+    return SingleChildScrollView(
+      controller: scrollController,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Sistem Bilgileri',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          // System bilgileri
+          if (device.systemMac != null)
+            InfoRow(label: 'Sistem MAC', value: device.systemMac!),
+          if (device.gateway != null)
+            InfoRow(label: 'Gateway', value: device.gateway!),
+          if (device.systemIp != null)
+            InfoRow(label: 'Sistem IP', value: device.systemIp!),
+          _buildStatusRow('GPS Durumu', device.gpsOk),
+          _buildStatusRow('Kontak Durumu', device.ignition),
+          _buildStatusRow('İnternet Bağlantısı', device.internetExists),
+          InfoRow(label: 'Boot Sayısı', value: '${device.bootCount}'),
+          if (device.diskFree != null)
+            InfoRow(label: 'Disk Boş Alan', value: device.diskFree!),
+          if (device.diskRunning != null)
+            InfoRow(label: 'Disk Durumu', value: device.diskRunning!),
+          InfoRow(label: 'Boş Alan (GB)', value: '${device.emptySize}'),
+          InfoRow(label: 'Kayıt Boyutu (GB)', value: '${device.recordSize}'),
+          InfoRow(label: 'Kayıt Durumu', value: '${device.recording}'),
+          _buildStatusRow('SHMC Hazır', device.shmcReady),
+          _buildStatusRow('Zaman Ayarlandı', device.timeset),
+          _buildStatusRow('Uyku Modu', device.uykumodu),
+          
+          // RAM Bilgileri
+          const SizedBox(height: 16),
+          const Text(
+            'RAM Bilgileri',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          InfoRow(
+            label: 'Toplam RAM', 
+            value: device.totalRam > 0 ? '${(device.totalRam / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB' : 'Mevcut değil'
+          ),
+          InfoRow(
+            label: 'Boş RAM', 
+            value: device.freeRam > 0 ? '${(device.freeRam / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB' : 'Mevcut değil'
+          ),
+          
+          // Ağ Bilgileri
+          const SizedBox(height: 16),
+          const Text(
+            'Ağ Bilgileri',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          InfoRow(label: 'Ağ Bilgileri', value: device.networkInfo ?? 'Bilinmiyor'),
+          InfoRow(label: 'Toplam Bağlantı', value: '${device.totalConnections}'),
+          InfoRow(label: 'Toplam Oturum', value: '${device.totalSessions}'),
+        ],
+      ),
+    );
+  }
+
+  // App Bilgileri Tab
+  Widget _buildAppTab(BuildContext context) {
+    return SingleChildScrollView(
+      controller: scrollController,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Uygulama Bilgileri',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          // App konfigürasyonu
+          if (device.appDeviceType != null)
+            InfoRow(label: 'Cihaz Tipi', value: device.appDeviceType!),
+          if (device.firmwareDate != null)
+            InfoRow(label: 'Firmware Tarihi', value: device.firmwareDate!),
+          if (device.appFirmwareVersion != null)
+            InfoRow(label: 'App Firmware Versiyonu', value: device.appFirmwareVersion!),
+          _buildStatusRow('GPS Veri Akışı', device.gpsDataFlowStatus),
+          InfoRow(label: 'Grup', value: '${device.group}'),
+          _buildStatusRow('İç Bağlantı', device.intConnection),
+          if (device.isai != null)
+            InfoRow(label: 'ISAI', value: device.isai!),
+          if (device.libPath != null)
+            InfoRow(label: 'Lib Yolu', value: device.libPath!),
+          if (device.logPath != null)
+            InfoRow(label: 'Log Yolu', value: device.logPath!),
+          if (device.macAddressPath != null)
+            InfoRow(label: 'MAC Adres Yolu', value: device.macAddressPath!),
+          InfoRow(label: 'Maksimum Kayıt Süresi', value: '${device.maxRecordDuration} dk'),
+          InfoRow(label: 'Minimum Alan (MB)', value: '${device.minSpaceInMBytes}'),
+          if (device.movitabinPath != null)
+            InfoRow(label: 'Movita Bin Yolu', value: device.movitabinPath!),
+          if (device.movitarecPath != null)
+            InfoRow(label: 'Movita Rec Yolu', value: device.movitarecPath!),
+          if (device.netdev != null)
+            InfoRow(label: 'Ağ Cihazı', value: device.netdev!),
+          if (device.pinCode != null)
+            InfoRow(label: 'PIN Kodu', value: device.pinCode!),
+          _buildStatusRow('PPP', device.ppp),
+          _buildStatusRow('TCP Üzerinden Kayıt', device.recordOverTcp),
+          if (device.appRecordPath != null)
+            InfoRow(label: 'App Kayıt Yolu', value: device.appRecordPath!),
+          _buildStatusRow('App Kayıt Yapıyor', device.appRecording),
+          InfoRow(label: 'Kayıt Yapan Kameralar', value: '${device.recordingCameras}'),
+          InfoRow(label: 'Player Restart Timeout', value: '${device.restartPlayerTimeout}'),
+          if (device.rp2040version != null)
+            InfoRow(label: 'RP2040 Versiyonu', value: device.rp2040version!),
+        ],
+      ),
+    );
+  }
+
+  // Test Bilgileri Tab
+  Widget _buildTestTab(BuildContext context) {
+    return SingleChildScrollView(
+      controller: scrollController,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Test Bilgileri',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          // Test uptime
+          if (device.testUptime != null)
+            InfoRow(label: 'Test Uptime', value: device.testUptime!),
+          _buildStatusRow('Test Hatası Var', device.testIsError),
+          
+          // Bağlantı testleri
+          const SizedBox(height: 16),
+          const Text(
+            'Bağlantı Testleri',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          InfoRow(label: 'Bağlantı Test Sayısı', value: '${device.testConnectionCount}'),
+          if (device.testConnectionLastUpdate != null)
+            InfoRow(label: 'Son Bağlantı Test Güncellemesi', value: device.testConnectionLastUpdate!),
+          InfoRow(label: 'Bağlantı Test Hataları', value: '${device.testConnectionError}'),
+          
+          // Kamera bağlantı testleri
+          const SizedBox(height: 16),
+          const Text(
+            'Kamera Bağlantı Testleri',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          InfoRow(label: 'Kamera Bağlantı Test Sayısı', value: '${device.testKameraBaglantiCount}'),
+          if (device.testKameraBaglantiLastUpdate != null)
+            InfoRow(label: 'Son Kamera Test Güncellemesi', value: device.testKameraBaglantiLastUpdate!),
+          InfoRow(label: 'Kamera Bağlantı Test Hataları', value: '${device.testKameraBaglantiError}'),
+          
+          // Program testleri
+          const SizedBox(height: 16),
+          const Text(
+            'Program Testleri',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          InfoRow(label: 'Program Test Sayısı', value: '${device.testProgramCount}'),
+          if (device.testProgramLastUpdate != null)
+            InfoRow(label: 'Son Program Test Güncellemesi', value: device.testProgramLastUpdate!),
+          InfoRow(label: 'Program Test Hataları', value: '${device.testProgramError}'),
+        ],
+      ),
+    );
+  }
+
+  // Kameralar Tab
+  Widget _buildCamerasTab(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Kameralar (${device.cameras.length})',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (device.cameras.isNotEmpty && device.connected)
+                TextButton.icon(
+                  icon: const Icon(Icons.visibility),
+                  label: const Text('Tümünü Görüntüle'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/live-view');
+                  },
+                ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: device.cameras.isEmpty
+              ? const Center(
+                  child: Text('Bu cihaz için kamera bulunamadı'),
+                )
+              : ListView.builder(
+                  controller: scrollController,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: device.cameras.length,
+                  itemBuilder: (context, index) {
+                    final camera = device.cameras[index];
+                    return CameraCard(
+                      camera: camera,
+                      onTap: () {
+                        // Set the selected camera
+                        Provider.of<CameraDevicesProviderOptimized>(context, listen: false)
+                            .setSelectedCameraIndex(index);
+                            
+                        // Navigate to live view screen
+                        Navigator.pop(context);
+                        Navigator.pushNamed(context, '/live-view');
+                      },
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
+  // Durum göstergesi satırı
+  Widget _buildStatusRow(String label, bool status) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              label,
+              style: TextStyle(
+                color: Colors.grey.shade400,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          Icon(
+            status ? Icons.check_circle : Icons.cancel,
+            color: status ? Colors.green : Colors.red,
+            size: 16,
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              status ? "Evet" : "Hayır",
+              style: const TextStyle(fontSize: 14),
             ),
           ),
         ],
