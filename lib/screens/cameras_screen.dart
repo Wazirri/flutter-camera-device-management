@@ -284,10 +284,11 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                 // MAC address filter chips
                 ...groupedCamerasByMac.keys.map((macAddress) {
                   final deviceCount = groupedCamerasByMac[macAddress]?.length ?? 0;
+                  final deviceName = _getDeviceName(context, macAddress);
                   return Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: FilterChip(
-                      label: Text('Device ${macAddress.substring(0, 8)}... ($deviceCount)'),
+                      label: Text('$deviceName ($deviceCount)'),
                       selected: selectedMacAddress == macAddress,
                       onSelected: (_) => _selectMacAddress(macAddress),
                       backgroundColor: Theme.of(context).cardColor,
@@ -329,7 +330,7 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
           }
           
           final groupName = deviceMac != null 
-            ? 'Device ${deviceMac.substring(0, 8)}...' 
+            ? _getDeviceName(context, deviceMac)
             : 'Ungrouped Cameras';
           camerasGroupedByDevice.putIfAbsent(groupName, () => []).add(camera);
         }
@@ -617,12 +618,105 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                         ],
                                       ),
                                       const SizedBox(height: 4),
-                                      Text(
-                                        camera.ip,
-                                        style: TextStyle(
-                                          fontSize: 12.0,
-                                          color: Colors.grey[600],
+                                      // IP Address
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.language,
+                                            size: 12.0,
+                                            color: Colors.grey[600],
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            camera.ip,
+                                            style: TextStyle(
+                                              fontSize: 12.0,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      // Current device assignment
+                                      if (camera.currentDevice != null)
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.device_hub,
+                                              size: 12.0,
+                                              color: Colors.blue,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                _getDeviceName(context, camera.currentDevice!.deviceMac),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 12.0,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
+                                      if (camera.currentDevice != null) const SizedBox(height: 4),
+                                      // Resolution and additional info row
+                                      Row(
+                                        children: [
+                                          // Resolution
+                                          if (camera.recordWidth > 0 && camera.recordHeight > 0) ...[
+                                            Icon(
+                                              Icons.high_quality,
+                                              size: 12.0,
+                                              color: Colors.orange,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              '${camera.recordWidth}x${camera.recordHeight}',
+                                              style: const TextStyle(
+                                                fontSize: 11.0,
+                                                color: Colors.orange,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                          ],
+                                          // History count
+                                          if (camera.deviceHistory.isNotEmpty) ...[
+                                            Icon(
+                                              Icons.history,
+                                              size: 12.0,
+                                              color: Colors.purple,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              '${camera.deviceHistory.length}',
+                                              style: const TextStyle(
+                                                fontSize: 11.0,
+                                                color: Colors.purple,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                          ],
+                                          // Recording status
+                                          if (camera.recording) ...[
+                                            Icon(
+                                              Icons.fiber_manual_record,
+                                              size: 12.0,
+                                              color: Colors.red,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              'REC',
+                                              style: const TextStyle(
+                                                fontSize: 11.0,
+                                                color: Colors.red,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                          ],
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -678,6 +772,52 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         cameraContent,
       ],
     );
+  }
+
+  // Get device name from MAC address
+  String _getDeviceName(BuildContext context, String deviceMac) {
+    try {
+      final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+      
+      // Convert device MAC to the format used in devices map (from m_XX_XX_XX_XX_XX_XX to XX:XX:XX:XX:XX:XX)
+      String normalizedMac = deviceMac;
+      if (deviceMac.startsWith('m_')) {
+        normalizedMac = deviceMac.substring(2).replaceAll('_', ':');
+      }
+      
+      // Find device by MAC address
+      for (var device in provider.devices.values) {
+        if (device.macAddress == normalizedMac || device.macKey == deviceMac) {
+          if (device.deviceName?.isNotEmpty == true) {
+            // If device name is too long, shorten it smartly
+            final name = device.deviceName!;
+            if (name.length > 15) {
+              // Try to find meaningful abbreviation
+              if (name.contains(' ')) {
+                final parts = name.split(' ');
+                if (parts.length >= 2) {
+                  return '${parts[0]} ${parts.last}';
+                }
+              }
+              return '${name.substring(0, 12)}...';
+            }
+            return name;
+          } else if (device.deviceType.isNotEmpty) {
+            return device.deviceType.length > 15 
+                ? '${device.deviceType.substring(0, 12)}...'
+                : device.deviceType;
+          } else {
+            // Use shortened MAC as fallback
+            return '${device.macAddress.substring(0, 8)}...';
+          }
+        }
+      }
+      
+      // If not found, return shortened MAC
+      return deviceMac.length > 10 ? '${deviceMac.substring(0, 10)}...' : deviceMac;
+    } catch (e) {
+      return deviceMac.length > 10 ? '${deviceMac.substring(0, 10)}...' : deviceMac;
+    }
   }
 }
 

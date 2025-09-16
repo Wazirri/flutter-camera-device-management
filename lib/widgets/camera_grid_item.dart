@@ -157,14 +157,14 @@ class CameraGridItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Camera name
+                  // Camera name (shortened for better display)
                   Text(
-                    camera.name.isNotEmpty ? camera.name : 'Camera ${camera.index + 1}',
+                    _getCameraDisplayName(camera),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16.0,
+                      fontSize: 14.0,
                       color: camera.isPlaceholder ? Colors.grey : null,
                     ),
                   ),
@@ -456,6 +456,26 @@ class CameraGridItem extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Get shortened camera display name
+  String _getCameraDisplayName(Camera camera) {
+    if (camera.name.isNotEmpty) {
+      // If camera name is too long, create a smart shortened version
+      if (camera.name.length > 20) {
+        // Try to find meaningful parts to keep
+        final parts = camera.name.split('_');
+        if (parts.length > 1) {
+          // Take first and last part if multiple parts
+          return '${parts.first}_${parts.last}';
+        } else {
+          // Just truncate
+          return '${camera.name.substring(0, 17)}...';
+        }
+      }
+      return camera.name;
+    }
+    return 'Camera ${camera.index + 1}';
   }
 
   // Get device name from MAC address
