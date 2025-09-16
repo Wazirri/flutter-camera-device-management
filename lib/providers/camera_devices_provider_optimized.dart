@@ -352,7 +352,128 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         break;
     }
     
+    // Handle current and history device assignments
+    if (parts.length >= 4) {
+      await _handleDeviceAssignment(camera, parts, value);
+    }
+    
+    // Merge updated MAC-defined camera data with device cameras
+    _mergeMacDefinedCameraData();
+    
     _batchNotifyListeners();
+  }
+
+  // Handle current and history device assignment data
+  Future<void> _handleDeviceAssignment(Camera camera, List<String> parts, dynamic value) async {
+    String assignmentType = parts[2]; // 'current' or 'history'
+    String property = parts.length > 4 ? parts[4] : parts[3]; // property name
+    
+    if (assignmentType == 'current') {
+      // Handle current device assignment: cameras_mac.MAC.current.property
+      await _updateCurrentDeviceAssignment(camera, property, value);
+    } else if (assignmentType == 'history') {
+      // Handle history device assignment: cameras_mac.MAC.history.TIMESTAMP.property
+      if (parts.length >= 5) {
+        String timestamp = parts[3];
+        String historyProperty = parts[4];
+        await _updateHistoryDeviceAssignment(camera, timestamp, historyProperty, value);
+      }
+    }
+  }
+
+  // Update current device assignment for camera
+  Future<void> _updateCurrentDeviceAssignment(Camera camera, String property, dynamic value) async {
+    if (camera.currentDevice == null) {
+      camera.currentDevice = CameraCurrentDevice(
+        deviceMac: '',
+        deviceIp: '',
+        cameraIp: '',
+        name: '',
+        startDate: 0,
+      );
+    }
+    
+    switch (property.toLowerCase()) {
+      case 'device_mac':
+        camera.currentDevice = camera.currentDevice!.copyWith(deviceMac: value.toString());
+        break;
+      case 'device_ip':
+        camera.currentDevice = camera.currentDevice!.copyWith(deviceIp: value.toString());
+        break;
+      case 'cameraip':
+        camera.currentDevice = camera.currentDevice!.copyWith(cameraIp: value.toString());
+        break;
+      case 'name':
+        camera.currentDevice = camera.currentDevice!.copyWith(name: value.toString());
+        break;
+      case 'start_date':
+        int startDate = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        camera.currentDevice = camera.currentDevice!.copyWith(startDate: startDate);
+        break;
+      default:
+        print('CDP_OPT: Unhandled current device property: $property for camera ${camera.mac}');
+    }
+    
+    print('CDP_OPT: Updated current device for camera ${camera.mac}: ${camera.currentDevice}');
+  }
+
+  // Update history device assignment for camera
+  Future<void> _updateHistoryDeviceAssignment(Camera camera, String timestamp, String property, dynamic value) async {
+    int timestampInt = int.tryParse(timestamp) ?? 0;
+    
+    // Find existing history entry or create new one
+    CameraHistoryDevice? historyEntry = camera.deviceHistory
+        .where((h) => h.startDate == timestampInt)
+        .firstOrNull;
+    
+    if (historyEntry == null) {
+      historyEntry = CameraHistoryDevice(
+        deviceMac: '',
+        deviceIp: '',
+        cameraIp: '',
+        name: '',
+        startDate: timestampInt,
+        endDate: 0,
+      );
+      camera.deviceHistory.add(historyEntry);
+    }
+    
+    // Update the history entry based on property
+    switch (property.toLowerCase()) {
+      case 'device_mac':
+        int index = camera.deviceHistory.indexOf(historyEntry);
+        camera.deviceHistory[index] = historyEntry.copyWith(deviceMac: value.toString());
+        break;
+      case 'device_ip':
+        int index = camera.deviceHistory.indexOf(historyEntry);
+        camera.deviceHistory[index] = historyEntry.copyWith(deviceIp: value.toString());
+        break;
+      case 'cameraip':
+        int index = camera.deviceHistory.indexOf(historyEntry);
+        camera.deviceHistory[index] = historyEntry.copyWith(cameraIp: value.toString());
+        break;
+      case 'name':
+        int index = camera.deviceHistory.indexOf(historyEntry);
+        camera.deviceHistory[index] = historyEntry.copyWith(name: value.toString());
+        break;
+      case 'start_date':
+        int startDate = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        int index = camera.deviceHistory.indexOf(historyEntry);
+        camera.deviceHistory[index] = historyEntry.copyWith(startDate: startDate);
+        break;
+      case 'end_date':
+        int endDate = value is int ? value : int.tryParse(value.toString()) ?? 0;
+        int index = camera.deviceHistory.indexOf(historyEntry);
+        camera.deviceHistory[index] = historyEntry.copyWith(endDate: endDate);
+        break;
+      default:
+        print('CDP_OPT: Unhandled history device property: $property for camera ${camera.mac}');
+    }
+    
+    // Sort history by start date for consistent ordering
+    camera.deviceHistory.sort((a, b) => b.startDate.compareTo(a.startDate));
+    
+    print('CDP_OPT: Updated history for camera ${camera.mac}, entry count: ${camera.deviceHistory.length}');
   }
 
   // Add or update camera in device list
@@ -375,8 +496,95 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     // Sort cameras by index for consistent ordering
     device.cameras.sort((a, b) => a.index.compareTo(b.index));
     
+    // Merge MAC-defined camera data with device camera data
+    _mergeMacDefinedCameraData();
+    
     // Invalidate caches
     _cachedDevicesList = null;
+  }
+
+  // Merge MAC-defined camera data with device cameras based on MAC address
+  void _mergeMacDefinedCameraData() {
+    for (var device in devices.values) {
+      for (var deviceCamera in device.cameras) {
+        // Find corresponding MAC-defined camera with same MAC address
+        var macDefinedCamera = _macDefinedCameras[deviceCamera.mac];
+        if (macDefinedCamera != null) {
+          print('CDP_OPT: Merging MAC-defined data for camera ${deviceCamera.mac}');
+          
+          // Merge current device assignment
+          if (macDefinedCamera.currentDevice != null) {
+            deviceCamera.currentDevice = macDefinedCamera.currentDevice;
+          }
+          
+          // Merge history device assignments
+          deviceCamera.deviceHistory = List<CameraHistoryDevice>.from(macDefinedCamera.deviceHistory);
+          
+          // Merge other MAC-specific properties
+          if (macDefinedCamera.macFirstSeen != null) {
+            deviceCamera.macFirstSeen = macDefinedCamera.macFirstSeen;
+          }
+          if (macDefinedCamera.macLastDetected != null) {
+            deviceCamera.macLastDetected = macDefinedCamera.macLastDetected;
+          }
+          if (macDefinedCamera.macPort != null) {
+            deviceCamera.macPort = macDefinedCamera.macPort;
+          }
+          if (macDefinedCamera.macReportedError != null) {
+            deviceCamera.macReportedError = macDefinedCamera.macReportedError;
+          }
+          if (macDefinedCamera.macStatus != null) {
+            deviceCamera.macStatus = macDefinedCamera.macStatus;
+          }
+          
+          // Merge other enhanced properties from MAC-defined camera
+          if (macDefinedCamera.username.isNotEmpty) {
+            deviceCamera.username = macDefinedCamera.username;
+          }
+          if (macDefinedCamera.password.isNotEmpty) {
+            deviceCamera.password = macDefinedCamera.password;
+          }
+          if (macDefinedCamera.brand.isNotEmpty) {
+            deviceCamera.brand = macDefinedCamera.brand;
+          }
+          if (macDefinedCamera.manufacturer.isNotEmpty) {
+            deviceCamera.manufacturer = macDefinedCamera.manufacturer;
+          }
+          if (macDefinedCamera.recordCodec.isNotEmpty) {
+            deviceCamera.recordCodec = macDefinedCamera.recordCodec;
+          }
+          if (macDefinedCamera.recordWidth > 0) {
+            deviceCamera.recordWidth = macDefinedCamera.recordWidth;
+          }
+          if (macDefinedCamera.recordHeight > 0) {
+            deviceCamera.recordHeight = macDefinedCamera.recordHeight;
+          }
+          if (macDefinedCamera.subCodec.isNotEmpty) {
+            deviceCamera.subCodec = macDefinedCamera.subCodec;
+          }
+          if (macDefinedCamera.subWidth > 0) {
+            deviceCamera.subWidth = macDefinedCamera.subWidth;
+          }
+          if (macDefinedCamera.subHeight > 0) {
+            deviceCamera.subHeight = macDefinedCamera.subHeight;
+          }
+          if (macDefinedCamera.recordUri.isNotEmpty) {
+            deviceCamera.recordUri = macDefinedCamera.recordUri;
+          }
+          if (macDefinedCamera.subUri.isNotEmpty) {
+            deviceCamera.subUri = macDefinedCamera.subUri;
+          }
+          if (macDefinedCamera.mainSnapShot.isNotEmpty) {
+            deviceCamera.mainSnapShot = macDefinedCamera.mainSnapShot;
+          }
+          if (macDefinedCamera.subSnapShot.isNotEmpty) {
+            deviceCamera.subSnapShot = macDefinedCamera.subSnapShot;
+          }
+          
+          print('CDP_OPT: Merged camera ${deviceCamera.mac}: Current device: ${deviceCamera.currentDevice?.deviceMac}, History entries: ${deviceCamera.deviceHistory.length}');
+        }
+      }
+    }
   }
 
   // Process WebSocket message

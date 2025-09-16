@@ -8,6 +8,130 @@ enum DeviceStatus {
   unknown,
 }
 
+// Current device assignment for camera from cameras_mac.json
+class CameraCurrentDevice {
+  final String deviceMac;      // Device MAC address camera is currently assigned to
+  final String deviceIp;      // Device IP address
+  final String cameraIp;      // Camera IP address
+  final String name;          // Camera name in current assignment
+  final int startDate;        // Timestamp when assigned to this device
+
+  CameraCurrentDevice({
+    required this.deviceMac,
+    required this.deviceIp,
+    required this.cameraIp,
+    required this.name,
+    required this.startDate,
+  });
+
+  // Copy with method for immutable updates
+  CameraCurrentDevice copyWith({
+    String? deviceMac,
+    String? deviceIp,
+    String? cameraIp,
+    String? name,
+    int? startDate,
+  }) {
+    return CameraCurrentDevice(
+      deviceMac: deviceMac ?? this.deviceMac,
+      deviceIp: deviceIp ?? this.deviceIp,
+      cameraIp: cameraIp ?? this.cameraIp,
+      name: name ?? this.name,
+      startDate: startDate ?? this.startDate,
+    );
+  }
+
+  factory CameraCurrentDevice.fromJson(Map<String, dynamic> json) {
+    return CameraCurrentDevice(
+      deviceMac: json['device_mac'] ?? '',
+      deviceIp: json['device_ip'] ?? '',
+      cameraIp: json['cameraIp'] ?? '',
+      name: json['name'] ?? '',
+      startDate: json['start_date'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'device_mac': deviceMac,
+      'device_ip': deviceIp,
+      'cameraIp': cameraIp,
+      'name': name,
+      'start_date': startDate,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'CameraCurrentDevice(deviceMac: $deviceMac, deviceIp: $deviceIp, cameraIp: $cameraIp, name: $name, startDate: $startDate)';
+  }
+}
+
+// Historical device assignment for camera from cameras_mac.json
+class CameraHistoryDevice {
+  final String deviceMac;      // Device MAC address camera was previously assigned to
+  final String deviceIp;      // Device IP address
+  final String cameraIp;      // Camera IP address  
+  final String name;          // Camera name in this historical assignment
+  final int startDate;        // Timestamp when assigned to this device
+  final int endDate;          // Timestamp when assignment ended
+
+  CameraHistoryDevice({
+    required this.deviceMac,
+    required this.deviceIp,
+    required this.cameraIp,
+    required this.name,
+    required this.startDate,
+    required this.endDate,
+  });
+
+  // Copy with method for immutable updates
+  CameraHistoryDevice copyWith({
+    String? deviceMac,
+    String? deviceIp,
+    String? cameraIp,
+    String? name,
+    int? startDate,
+    int? endDate,
+  }) {
+    return CameraHistoryDevice(
+      deviceMac: deviceMac ?? this.deviceMac,
+      deviceIp: deviceIp ?? this.deviceIp,
+      cameraIp: cameraIp ?? this.cameraIp,
+      name: name ?? this.name,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+    );
+  }
+
+  factory CameraHistoryDevice.fromJson(Map<String, dynamic> json) {
+    return CameraHistoryDevice(
+      deviceMac: json['device_mac'] ?? '',
+      deviceIp: json['device_ip'] ?? '',
+      cameraIp: json['cameraIp'] ?? '',
+      name: json['name'] ?? '',
+      startDate: json['start_date'] ?? 0,
+      endDate: json['end_date'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'device_mac': deviceMac,
+      'device_ip': deviceIp,
+      'cameraIp': cameraIp,
+      'name': name,
+      'start_date': startDate,
+      'end_date': endDate,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'CameraHistoryDevice(deviceMac: $deviceMac, deviceIp: $deviceIp, cameraIp: $cameraIp, name: $name, startDate: $startDate, endDate: $endDate)';
+  }
+}
+
 class CameraDevice {
   final String macAddress; // Original field
   final String macKey; // Original field, used as a unique key
@@ -804,6 +928,12 @@ class Camera {
   // Flag to indicate if this is a placeholder camera (no physical device)
   bool isPlaceholder;
 
+  // Current device assignment from cameras_mac.json
+  CameraCurrentDevice? currentDevice;
+
+  // History of device assignments from cameras_mac.json  
+  List<CameraHistoryDevice> deviceHistory;
+
 
   Camera({
     required this.index,
@@ -850,7 +980,10 @@ class Camera {
     this.macStatus,
     this.parentDeviceMacKey,
     this.isPlaceholder = false,
-  }) : groups = groups ?? [];
+    this.currentDevice,
+    List<CameraHistoryDevice>? deviceHistory,
+  }) : groups = groups ?? [], 
+       deviceHistory = deviceHistory ?? [];
   
   // Added id getter to uniquely identify cameras
   // Using a combination of name and index as id
@@ -902,6 +1035,8 @@ class Camera {
     String? macStatus,
     String? parentDeviceMacKey, // Added parentDeviceMacKey to copyWith
     bool? isPlaceholder,
+    CameraCurrentDevice? currentDevice,
+    List<CameraHistoryDevice>? deviceHistory,
   }) {
     return Camera(
       index: index ?? this.index, // Updated index in copyWith
@@ -948,6 +1083,8 @@ class Camera {
       macStatus: macStatus ?? this.macStatus,
       parentDeviceMacKey: parentDeviceMacKey ?? this.parentDeviceMacKey, // Updated parentDeviceMacKey
       isPlaceholder: isPlaceholder ?? this.isPlaceholder,
+      currentDevice: currentDevice ?? this.currentDevice,
+      deviceHistory: deviceHistory ?? List<CameraHistoryDevice>.from(this.deviceHistory),
     );
   }
   
@@ -994,6 +1131,12 @@ class Camera {
       macReportedError: json['macReportedError'] as String?,
       macStatus: json['macStatus'] as String?,
       parentDeviceMacKey: json['parentDeviceMacKey'] as String?,
+      currentDevice: json['currentDevice'] != null 
+          ? CameraCurrentDevice.fromJson(json['currentDevice'] as Map<String, dynamic>)
+          : null,
+      deviceHistory: (json['deviceHistory'] as List<dynamic>?)
+          ?.map((e) => CameraHistoryDevice.fromJson(e as Map<String, dynamic>))
+          .toList() ?? [],
     );
   }
   
@@ -1040,6 +1183,8 @@ class Camera {
       'macReportedError': macReportedError,
       'macStatus': macStatus,
       'parentDeviceMacKey': parentDeviceMacKey,
+      'currentDevice': currentDevice?.toJson(),
+      'deviceHistory': deviceHistory.map((e) => e.toJson()).toList(),
     };
   }
   

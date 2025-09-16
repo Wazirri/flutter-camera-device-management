@@ -159,7 +159,7 @@ class CameraGridItem extends StatelessWidget {
                 children: [
                   // Camera name
                   Text(
-                    camera.name,
+                    camera.name.isNotEmpty ? camera.name : 'Camera ${camera.index + 1}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -169,6 +169,33 @@ class CameraGridItem extends StatelessWidget {
                     ),
                   ),
                   
+                  const SizedBox(height: 8),
+                  
+                  // Current device assignment
+                  if (camera.currentDevice != null)
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.device_hub,
+                          size: 14.0,
+                          color: Colors.blue,
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            _getDeviceName(context, camera.currentDevice!.deviceMac),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 11.0,
+                              color: Colors.blue,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  
                   const SizedBox(height: 4),
                   
                   // Camera status
@@ -176,21 +203,138 @@ class CameraGridItem extends StatelessWidget {
                     children: [
                       Icon(
                         camera.connected ? Icons.link : Icons.link_off,
-                        size: 16.0,
+                        size: 14.0,
                         color: camera.connected
                           ? Colors.green
                           : Colors.red,
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        camera.connected ? 'Connected' : 'Disconnected',
-                        style: TextStyle(
-                          fontSize: 12.0,
-                          color: camera.connected
-                            ? Colors.green
-                            : Colors.red,
+                      Expanded(
+                        child: Text(
+                          camera.connected ? 'Connected' : 'Disconnected',
+                          style: TextStyle(
+                            fontSize: 11.0,
+                            color: camera.connected
+                              ? Colors.green
+                              : Colors.red,
+                          ),
                         ),
                       ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 4),
+                  
+                  // Resolution info
+                  if (camera.recordWidth > 0 && camera.recordHeight > 0)
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.high_quality,
+                          size: 14.0,
+                          color: Colors.orange,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${camera.recordWidth}x${camera.recordHeight}',
+                          style: const TextStyle(
+                            fontSize: 11.0,
+                            color: Colors.orange,
+                          ),
+                        ),
+                      ],
+                    ),
+                  
+                  const SizedBox(height: 4),
+                  
+                  // History count and last seen
+                  Row(
+                    children: [
+                      // History count
+                      if (camera.deviceHistory.isNotEmpty) ...[
+                        Icon(
+                          Icons.history,
+                          size: 14.0,
+                          color: Colors.purple,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${camera.deviceHistory.length} history',
+                          style: const TextStyle(
+                            fontSize: 11.0,
+                            color: Colors.purple,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      
+                      // Last seen
+                      if (camera.lastSeenAt.isNotEmpty) ...[
+                        Icon(
+                          Icons.access_time,
+                          size: 14.0,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            _formatLastSeen(camera.lastSeenAt),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 11.0,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 4),
+                  
+                  // Additional info row
+                  Row(
+                    children: [
+                      // Recording status
+                      if (camera.recording) ...[
+                        Icon(
+                          Icons.fiber_manual_record,
+                          size: 14.0,
+                          color: Colors.red,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Recording',
+                          style: const TextStyle(
+                            fontSize: 11.0,
+                            color: Colors.red,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      
+                      // Brand info
+                      if (camera.brand.isNotEmpty) ...[
+                        Icon(
+                          Icons.business,
+                          size: 14.0,
+                          color: Colors.teal,
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            camera.brand,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 11.0,
+                              color: Colors.teal,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ],
@@ -312,5 +456,78 @@ class CameraGridItem extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Get device name from MAC address
+  String _getDeviceName(BuildContext context, String deviceMac) {
+    try {
+      final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+      
+      // Convert device MAC to the format used in devices map (from m_XX_XX_XX_XX_XX_XX to XX:XX:XX:XX:XX:XX)
+      String normalizedMac = deviceMac;
+      if (deviceMac.startsWith('m_')) {
+        normalizedMac = deviceMac.substring(2).replaceAll('_', ':');
+      }
+      
+      // Find device by MAC address
+      for (var device in provider.devices.values) {
+        if (device.macAddress == normalizedMac || device.macKey == deviceMac) {
+          return device.deviceName?.isNotEmpty == true 
+              ? device.deviceName! 
+              : device.deviceType.isNotEmpty 
+                  ? device.deviceType 
+                  : device.macAddress.substring(0, 8) + '...';
+        }
+      }
+      
+      // If not found, return shortened MAC
+      return deviceMac.length > 10 ? '${deviceMac.substring(0, 10)}...' : deviceMac;
+    } catch (e) {
+      return deviceMac.length > 10 ? '${deviceMac.substring(0, 10)}...' : deviceMac;
+    }
+  }
+
+  // Format last seen time
+  String _formatLastSeen(String lastSeen) {
+    if (lastSeen.isEmpty) return 'Never';
+    
+    try {
+      // Try to parse various date formats
+      DateTime? dateTime;
+      
+      // Format: "2025-09-16 - 13:54:26"
+      if (lastSeen.contains(' - ')) {
+        final parts = lastSeen.split(' - ');
+        if (parts.length == 2) {
+          final dateStr = '${parts[0]} ${parts[1]}';
+          dateTime = DateTime.tryParse(dateStr.replaceAll(' - ', ' '));
+        }
+      } else {
+        // Try standard ISO format
+        dateTime = DateTime.tryParse(lastSeen);
+      }
+      
+      if (dateTime != null) {
+        final now = DateTime.now();
+        final difference = now.difference(dateTime);
+        
+        if (difference.inMinutes < 1) {
+          return 'Just now';
+        } else if (difference.inMinutes < 60) {
+          return '${difference.inMinutes}m ago';
+        } else if (difference.inHours < 24) {
+          return '${difference.inHours}h ago';
+        } else if (difference.inDays < 7) {
+          return '${difference.inDays}d ago';
+        } else {
+          return '${dateTime.day}/${dateTime.month}';
+        }
+      }
+      
+      // If parsing fails, return truncated string
+      return lastSeen.length > 12 ? '${lastSeen.substring(0, 12)}...' : lastSeen;
+    } catch (e) {
+      return lastSeen.length > 12 ? '${lastSeen.substring(0, 12)}...' : lastSeen;
+    }
   }
 }

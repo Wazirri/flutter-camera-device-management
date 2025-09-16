@@ -169,6 +169,39 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                     DetailItem(name: 'Sub Resolution', value: '${camera.subWidth}x${camera.subHeight}'),
                   ],
                 ),
+                // Current Device Assignment
+                if (camera.currentDevice != null)
+                  _buildDetailGroup(
+                    context: context,
+                    title: 'Current Device Assignment',
+                    details: [
+                      DetailItem(name: 'Device MAC', value: camera.currentDevice!.deviceMac),
+                      DetailItem(name: 'Device IP', value: camera.currentDevice!.deviceIp),
+                      DetailItem(name: 'Camera IP', value: camera.currentDevice!.cameraIp),
+                      DetailItem(name: 'Name in Device', value: camera.currentDevice!.name),
+                      DetailItem(name: 'Assignment Date', value: _formatTimestamp(camera.currentDevice!.startDate)),
+                    ],
+                  ),
+                // Device History
+                if (camera.deviceHistory.isNotEmpty)
+                  _buildDeviceHistorySection(context),
+                // MAC Address Information
+                _buildDetailGroup(
+                  context: context,
+                  title: 'MAC Address Information',
+                  details: [
+                    if (camera.macFirstSeen != null)
+                      DetailItem(name: 'First Seen', value: camera.macFirstSeen!),
+                    if (camera.macLastDetected != null)
+                      DetailItem(name: 'Last Detected', value: camera.macLastDetected!),
+                    if (camera.macPort != null)
+                      DetailItem(name: 'Port', value: camera.macPort.toString()),
+                    if (camera.macReportedError != null)
+                      DetailItem(name: 'Reported Error', value: camera.macReportedError!),
+                    if (camera.macStatus != null)
+                      DetailItem(name: 'Status', value: camera.macStatus!),
+                  ],
+                ),
                 // SizedBox to provide some spacing before the non-scrolling buttons if needed,
                 // but generally, the buttons will be outside this Expanded ListView.
                 // const SizedBox(height: 16), 
@@ -329,6 +362,228 @@ class CameraDetailsBottomSheet extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  // Build device history section with proper formatting
+  Widget _buildDeviceHistorySection(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.darkBorder, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryBlue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(
+                  Icons.history,
+                  color: AppTheme.primaryBlue,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Device Assignment History (${camera.deviceHistory.length} entries)',
+                style: const TextStyle(
+                  color: AppTheme.darkTextPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // History entries
+          ...camera.deviceHistory.asMap().entries.map((entry) {
+            int index = entry.key;
+            var history = entry.value;
+            bool isLast = index == camera.deviceHistory.length - 1;
+            
+            return Container(
+              margin: EdgeInsets.only(bottom: isLast ? 0 : 12),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.darkBackground,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppTheme.darkBorder.withOpacity(0.5), width: 1),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header with entry number
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryBlue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'Entry ${index + 1}',
+                          style: const TextStyle(
+                            color: AppTheme.primaryBlue,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      if (history.endDate > 0)
+                        Icon(
+                          Icons.check_circle,
+                          color: Colors.green,
+                          size: 16,
+                        )
+                      else
+                        Icon(
+                          Icons.access_time,
+                          color: Colors.orange,
+                          size: 16,
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // Device information
+                  _buildHistoryDetailRow('Device MAC', history.deviceMac),
+                  _buildHistoryDetailRow('Device IP', history.deviceIp),
+                  _buildHistoryDetailRow('Camera IP', history.cameraIp),
+                  _buildHistoryDetailRow('Camera Name', history.name),
+                  
+                  const SizedBox(height: 8),
+                  Divider(height: 1, color: AppTheme.darkBorder),
+                  const SizedBox(height: 8),
+                  
+                  // Time information
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Start Date',
+                              style: TextStyle(
+                                color: AppTheme.darkTextSecondary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _formatTimestamp(history.startDate),
+                              style: const TextStyle(
+                                color: AppTheme.darkTextPrimary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'End Date',
+                              style: TextStyle(
+                                color: AppTheme.darkTextSecondary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              history.endDate > 0 ? _formatTimestamp(history.endDate) : 'Active',
+                              style: TextStyle(
+                                color: history.endDate > 0 ? AppTheme.darkTextPrimary : Colors.green,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  // Duration calculation
+                  if (history.endDate > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppTheme.darkSurface,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'Duration: ${_formatDuration(history.endDate - history.startDate)}',
+                          style: const TextStyle(
+                            color: AppTheme.darkTextSecondary,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  // Build history detail row
+  Widget _buildHistoryDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: AppTheme.darkTextSecondary,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          const Text(
+            ': ',
+            style: TextStyle(
+              color: AppTheme.darkTextSecondary,
+              fontSize: 12,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value.isEmpty ? 'N/A' : value,
+              style: const TextStyle(
+                color: AppTheme.darkTextPrimary,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -546,4 +801,32 @@ class DetailItem {
   final String value;
 
   DetailItem({required this.name, required this.value});
+}
+
+// Helper method to format timestamp
+String _formatTimestamp(int timestamp) {
+  if (timestamp == 0) return 'N/A';
+  
+  try {
+    final date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
+    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+  } catch (e) {
+    return timestamp.toString();
+  }
+}
+
+// Helper method to format duration in seconds
+String _formatDuration(int durationSeconds) {
+  if (durationSeconds <= 0) return 'N/A';
+  
+  final days = durationSeconds ~/ 86400;
+  final hours = (durationSeconds % 86400) ~/ 3600;
+  final minutes = (durationSeconds % 3600) ~/ 60;
+  
+  List<String> parts = [];
+  if (days > 0) parts.add('${days}d');
+  if (hours > 0) parts.add('${hours}h');
+  if (minutes > 0) parts.add('${minutes}m');
+  
+  return parts.isEmpty ? '< 1m' : parts.join(' ');
 }
