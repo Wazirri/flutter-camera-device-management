@@ -789,34 +789,68 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
       for (var device in provider.devices.values) {
         if (device.macAddress == normalizedMac || device.macKey == deviceMac) {
           if (device.deviceName?.isNotEmpty == true) {
-            // If device name is too long, shorten it smartly
-            final name = device.deviceName!;
-            if (name.length > 15) {
-              // Try to find meaningful abbreviation
-              if (name.contains(' ')) {
-                final parts = name.split(' ');
-                if (parts.length >= 2) {
-                  return '${parts[0]} ${parts.last}';
-                }
-              }
-              return '${name.substring(0, 12)}...';
-            }
-            return name;
+            // Return full device name without truncation
+            print('DEBUG: Device $deviceMac using full name "${device.deviceName}"');
+            return device.deviceName!;
           } else if (device.deviceType.isNotEmpty) {
-            return device.deviceType.length > 15 
-                ? '${device.deviceType.substring(0, 12)}...'
-                : device.deviceType;
+            print('DEBUG: Device $deviceMac using device type "${device.deviceType}"');
+            return device.deviceType;
           } else {
-            // Use shortened MAC as fallback
-            return '${device.macAddress.substring(0, 8)}...';
+            // Use shortened MAC as fallback for readability
+            String shortMac;
+            if (deviceMac.startsWith('m_')) {
+              // For MAC format like mf8_ce_07_f2_8c_b6, extract meaningful part
+              final macPart = deviceMac.substring(1); // remove 'm'
+              final parts = macPart.split('_');
+              if (parts.length >= 3) {
+                // Take first 3 parts: f8_ce_07
+                shortMac = '${parts[0]}_${parts[1]}_${parts[2]}';
+              } else {
+                shortMac = macPart;
+              }
+            } else {
+              shortMac = deviceMac;
+            }
+            print('DEBUG: Device $deviceMac using MAC fallback "$shortMac"');
+            return shortMac;
           }
         }
       }
       
-      // If not found, return shortened MAC
-      return deviceMac.length > 10 ? '${deviceMac.substring(0, 10)}...' : deviceMac;
+      // If not found, return shortened MAC with better formatting
+      String shortMac;
+      if (deviceMac.startsWith('m_')) {
+        // For MAC format like mf8_ce_07_f2_8c_b6, extract meaningful part
+        final macPart = deviceMac.substring(1); // remove 'm'
+        final parts = macPart.split('_');
+        if (parts.length >= 3) {
+          // Take first 3 parts: f8_ce_07
+          shortMac = '${parts[0]}_${parts[1]}_${parts[2]}';
+        } else {
+          shortMac = macPart;
+        }
+      } else {
+        shortMac = deviceMac;
+      }
+      print('DEBUG: Device $deviceMac not found, using MAC "$shortMac"');
+      return shortMac;
     } catch (e) {
-      return deviceMac.length > 10 ? '${deviceMac.substring(0, 10)}...' : deviceMac;
+      String shortMac;
+      if (deviceMac.startsWith('m_')) {
+        // For MAC format like mf8_ce_07_f2_8c_b6, extract meaningful part
+        final macPart = deviceMac.substring(1); // remove 'm'
+        final parts = macPart.split('_');
+        if (parts.length >= 3) {
+          // Take first 3 parts: f8_ce_07
+          shortMac = '${parts[0]}_${parts[1]}_${parts[2]}';
+        } else {
+          shortMac = macPart;
+        }
+      } else {
+        shortMac = deviceMac;
+      }
+      print('DEBUG: Error for device $deviceMac, using fallback "$shortMac"');
+      return shortMac;
     }
   }
 }
