@@ -277,10 +277,15 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         _isLoadingRecordings = false;
       });
       
+      print('[MultiRecordings] All recordings loaded. Checking for target time: $_pendingTargetTime');
+      
       // If we have a target time, find and play the recording before that time
       if (_pendingTargetTime != null && _activeCamera != null) {
+        print('[MultiRecordings] Calling _findAndPlayRecordingBeforeTime with camera: ${_activeCamera!.name}, targetTime: $_pendingTargetTime');
         _findAndPlayRecordingBeforeTime(_activeCamera!, _pendingTargetTime!);
         _pendingTargetTime = null; // Clear after use
+      } else {
+        print('[MultiRecordings] No target time or active camera. TargetTime: $_pendingTargetTime, ActiveCamera: ${_activeCamera?.name}');
       }
     }).catchError((error) {
       setState(() {
@@ -424,7 +429,10 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       // Open the video player with the found recording
       // Store seek time for later use when player opens
       _pendingSeekTime = seekSeconds;
+      print('[MultiRecordings] Set _pendingSeekTime to: $_pendingSeekTime');
+      print('[MultiRecordings] About to call _openVideoPlayerPopup...');
       _openVideoPlayerPopup(camera, bestRecording);
+      print('[MultiRecordings] Called _openVideoPlayerPopup');
     } else {
       print('[MultiRecordings] No suitable recording found before target time');
       // If no recording found before target time, just play the first recording
@@ -459,11 +467,16 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   }
   
   void _openVideoPlayerPopup(Camera camera, String recording) {
+    print('[MultiRecordings] _openVideoPlayerPopup called with seekTime: $_pendingSeekTime');
     final device = _getDeviceForCamera(camera);
     
     if (device != null && _selectedDay != null) {
       final selectedDayFormatted = DateFormat('yyyy_MM_dd').format(_selectedDay!);
       final recordingUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/$selectedDayFormatted/$recording';
+      
+      // Store seek time locally before clearing the pending value
+      final seekTimeToPass = _pendingSeekTime;
+      print('[MultiRecordings] Passing seekTime to popup: $seekTimeToPass');
       
       showDialog(
         context: context,
@@ -509,7 +522,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                       recordingUrl: recordingUrl,
                       camera: camera,
                       recording: recording,
-                      seekTime: _pendingSeekTime,
+                      seekTime: seekTimeToPass,
                     ),
                   ),
                 ],
@@ -519,7 +532,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         },
       );
       
-      // Clear pending seek time after use
+      // Clear pending seek time after dialog is shown
       _pendingSeekTime = null;
     }
   }
@@ -1742,6 +1755,8 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
   void initState() {
     super.initState();
     
+    print('[VideoPlayerPopup] initState called with seekTime: ${widget.seekTime}');
+    
     // Create separate player for popup
     _popupPlayer = Player();
     _popupController = VideoController(_popupPlayer);
@@ -1860,10 +1875,11 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
 
     return Stack(
       children: [
-        // Video widget
+        // Video widget without built-in controls
         Video(
           controller: _popupController,
           fit: BoxFit.contain,
+          controls: null, // Disable built-in controls
         ),
         
         // Loading indicator

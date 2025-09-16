@@ -384,6 +384,16 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     try {
       String command = message['c'] ?? '';
       
+      // Check if message contains array data
+      if (message.containsKey('val') && message['val'] is List) {
+        print('CDP_OPT: *** ARRAY DATA DETECTED ***');
+        print('CDP_OPT: Array path: ${message['data']}');
+        print('CDP_OPT: Array length: ${(message['val'] as List).length}');
+        print('CDP_OPT: Array content: ${message['val']}');
+        await _processArrayMessage(message);
+        return;
+      }
+      
       // Handle sysinfo messages
       if (command == 'sysinfo') {
         await _processSysInfoMessage(message);
@@ -495,6 +505,211 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     } catch (e, s) {
       print('CDP_OPT: Error processing WebSocket message: $e\\n$s. Message: $message');
     }
+  }
+  
+  // Process array-based camera updates
+  Future<void> _processArrayMessage(Map<String, dynamic> message) async {
+    try {
+      String dataPath = message['data'] ?? '';
+      
+      // Check if this is a camera array message (cam[index].property)
+      if (dataPath.contains('.cam[') && dataPath.contains('].')) {
+        print('CDP_OPT: *** CAMERA ARRAY MESSAGE DETECTED ***');
+        await _processCameraArrayMessage(message);
+        return;
+      }
+      
+      print('CDP_OPT: Non-camera array message: $dataPath');
+    } catch (e, s) {
+      print('CDP_OPT: Error processing array message: $e\\n$s. Message: $message');
+    }
+  }
+  
+  // Process camera array messages and handle array reset
+  Future<void> _processCameraArrayMessage(Map<String, dynamic> message) async {
+    try {
+      String dataPath = message['data'] ?? '';
+      dynamic value = message['val'];
+      
+      // Parse the path: ecs_slaves.DEVICE_MAC.cam[INDEX].PROPERTY
+      final pathParts = dataPath.split('.');
+      if (pathParts.length < 4) {
+        print('CDP_OPT: Invalid camera array path: $dataPath');
+        return;
+      }
+      
+      // Extract device MAC and camera index
+      final deviceMacPart = pathParts[1]; // m_XX_XX_XX_XX_XX_XX format
+      final canonicalDeviceMac = deviceMacPart.replaceAll('_', ':').substring(2);
+      
+      // Parse cam[index].property
+      final camPart = pathParts[2]; // cam[index]
+      final property = pathParts[3]; // property name
+      
+      final camIndexMatch = RegExp(r'cam\[(\d+)\]').firstMatch(camPart);
+      if (camIndexMatch == null) {
+        print('CDP_OPT: Could not parse camera index from: $camPart');
+        return;
+      }
+      
+      final cameraIndex = int.parse(camIndexMatch.group(1)!);
+      
+      print('CDP_OPT: Camera array update - Device: $canonicalDeviceMac, Index: $cameraIndex, Property: $property, Value: $value');
+      
+      // Get or create the device
+      final device = _getOrCreateDevice(canonicalDeviceMac, deviceMacPart);
+      
+      // Check if this is the start of a new camera array (index 0 with a key property)
+      if (cameraIndex == 0 && (property == 'name' || property == 'mac' || property == 'brand')) {
+        print('CDP_OPT: *** RESETTING CAMERA ARRAY for device $canonicalDeviceMac ***');
+        // Clear existing cameras for this device
+        device.cameras.clear();
+        
+        // Also remove these cameras from global MAC-defined cameras
+        final camerasToRemove = <String>[];
+        for (final entry in _macDefinedCameras.entries) {
+          if (entry.value.parentDeviceMacKey == canonicalDeviceMac) {
+            camerasToRemove.add(entry.key);
+          }
+        }
+        
+        for (final cameraKey in camerasToRemove) {
+          _macDefinedCameras.remove(cameraKey);
+          print('CDP_OPT: Removed camera $cameraKey from global list');
+        }
+        
+        // Clear caches
+        _cachedDevicesList = null;
+        _cachedFlatCameraList = null;
+        _cachedGroupsList = null;
+      }
+      
+      // Ensure device has enough camera slots
+      while (device.cameras.length <= cameraIndex) {
+        final newCamera = Camera(
+          mac: '',
+          name: '',
+          ip: '',
+          username: '',
+          password: '',
+          macPort: 80,
+          mediaUri: '',
+          recordUri: '',
+          mainSnapShot: '',
+          subUri: '',
+          subSnapShot: '',
+          recording: false,
+          parentDeviceMacKey: canonicalDeviceMac,
+          index: device.cameras.length,
+        );
+        device.cameras.add(newCamera);
+        print('CDP_OPT: Added camera slot ${device.cameras.length - 1} for device $canonicalDeviceMac');
+      }
+      
+      // Update the camera property
+      final camera = device.cameras[cameraIndex];
+      await _updateCameraProperty(camera, property, value);
+      
+      // If camera has MAC, add/update it in global list
+      if (camera.mac.isNotEmpty) {
+        _macDefinedCameras[camera.mac] = camera;
+        print('CDP_OPT: Added/updated camera ${camera.mac} in global list');
+      }
+      
+      _batchNotifyListeners();
+      
+    } catch (e, s) {
+      print('CDP_OPT: Error processing camera array message: $e\\n$s. Message: $message');
+    }
+  }
+  
+  // Update individual camera property
+  Future<void> _updateCameraProperty(Camera camera, String property, dynamic value) async {
+    switch (property) {
+      case 'mac':
+        // Remove old MAC from global list if it exists
+        if (camera.mac.isNotEmpty && _macDefinedCameras.containsKey(camera.mac)) {
+          _macDefinedCameras.remove(camera.mac);
+        }
+        camera.mac = value?.toString() ?? '';
+        break;
+      case 'name':
+        camera.name = value?.toString() ?? '';
+        break;
+      case 'cameraIp':
+        camera.ip = value?.toString() ?? '';
+        break;
+      case 'username':
+        camera.username = value?.toString() ?? '';
+        break;
+      case 'password':
+        camera.password = value?.toString() ?? '';
+        break;
+      case 'port':
+        camera.macPort = value is int ? value : (int.tryParse(value?.toString() ?? '') ?? 80);
+        break;
+      case 'mediaUri':
+        camera.mediaUri = value?.toString() ?? '';
+        break;
+      case 'recordUri':
+        camera.recordUri = value?.toString() ?? '';
+        break;
+      case 'remoteUri':
+        camera.remoteUri = value?.toString() ?? '';
+        break;
+      case 'mainSnapShot':
+        camera.mainSnapShot = value?.toString() ?? '';
+        break;
+      case 'subUri':
+        camera.subUri = value?.toString() ?? '';
+        break;
+      case 'subSnapShot':
+        camera.subSnapShot = value?.toString() ?? '';
+        break;
+      case 'brand':
+        camera.brand = value?.toString() ?? '';
+        break;
+      case 'manufacturer':
+        camera.manufacturer = value?.toString() ?? '';
+        break;
+      case 'hw':
+        camera.hw = value?.toString() ?? '';
+        break;
+      case 'country':
+        camera.country = value?.toString() ?? '';
+        break;
+      case 'record':
+        camera.recording = (value == 1 || value == true || value?.toString().toLowerCase() == 'true');
+        break;
+      case 'soundRec':
+        camera.soundRec = (value == true || value?.toString().toLowerCase() == 'true');
+        break;
+      case 'recordcodec':
+        camera.recordCodec = value?.toString() ?? '';
+        break;
+      case 'subcodec':
+        camera.subCodec = value?.toString() ?? '';
+        break;
+      case 'recordwidth':
+        camera.recordWidth = value is int ? value : (int.tryParse(value?.toString() ?? '') ?? 0);
+        break;
+      case 'recordheight':
+        camera.recordHeight = value is int ? value : (int.tryParse(value?.toString() ?? '') ?? 0);
+        break;
+      case 'subwidth':
+        camera.subWidth = value is int ? value : (int.tryParse(value?.toString() ?? '') ?? 0);
+        break;
+      case 'subheight':
+        camera.subHeight = value is int ? value : (int.tryParse(value?.toString() ?? '') ?? 0);
+        break;
+      case 'xAddrs':
+        camera.xAddrs = value?.toString() ?? '';
+        break;
+      default:
+        print('CDP_OPT: Unhandled camera property: $property = $value');
+    }
+    
+    print('CDP_OPT: Updated camera ${camera.name} (${camera.mac}) property $property = $value');
   }
   
   // Categorize messages

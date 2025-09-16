@@ -13,8 +13,8 @@ class ActivitiesScreen extends StatefulWidget {
 
 class _ActivitiesScreenState extends State<ActivitiesScreen> {
   // FTP configuration
-  final String _ftpHost = '212.253.90.143';
-  final int _ftpPort = 20521;
+  final String _ftpHost = '192.168.1.205';
+  final int _ftpPort = 21;
   final String _ftpUsername = 'dahuaftp';
   final String _ftpPassword = 'dahuaftp';
   final String _ftpBasePath = '/cam_detections';
