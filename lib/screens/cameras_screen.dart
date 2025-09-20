@@ -308,8 +308,11 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
           // Filter by selected MAC address
           baseFilteredCameras = groupedCamerasByMac[selectedMacAddress] ?? [];
         } else {
-          // Show all cameras
-          baseFilteredCameras = provider.cameras;
+          // Show all cameras from all devices
+          baseFilteredCameras = [];
+          for (var device in provider.devicesList) {
+            baseFilteredCameras.addAll(device.cameras);
+          }
         }
         
         // Apply active filter if needed
@@ -317,21 +320,34 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
           baseFilteredCameras = baseFilteredCameras.where((camera) => camera.connected).toList();
         }
 
-        // Group the filtered cameras by MAC address (treating each MAC as a device group)
+        // Group the filtered cameras by their actual device assignment
         final Map<String, List<Camera>> camerasGroupedByDevice = {};
         for (var camera in baseFilteredCameras) {
-          // Find which MAC address this camera belongs to
+          // Find which device this camera belongs to by checking devicesList
           String? deviceMac;
-          for (var macAddress in groupedCamerasByMac.keys) {
-            if (groupedCamerasByMac[macAddress]?.any((c) => c.id == camera.id) == true) {
-              deviceMac = macAddress;
+          String? deviceName;
+          
+          for (var device in provider.devicesList) {
+            if (device.cameras.any((c) => c.id == camera.id)) {
+              deviceMac = device.macKey;
+              deviceName = _getDeviceName(context, deviceMac);
+              print('DEBUG: Camera ${camera.name} (${camera.id}) found in device $deviceName ($deviceMac)');
               break;
             }
           }
           
-          final groupName = deviceMac != null 
-            ? _getDeviceName(context, deviceMac)
-            : 'Ungrouped Cameras';
+          // Use device name if found, otherwise try to get from camera's currentDevice
+          if (deviceName == null && camera.currentDevice != null) {
+            deviceMac = camera.currentDevice!.deviceMac;
+            deviceName = _getDeviceName(context, deviceMac);
+            print('DEBUG: Camera ${camera.name} (${camera.id}) using currentDevice $deviceName ($deviceMac)');
+          }
+          
+          if (deviceName == null) {
+            print('DEBUG: Camera ${camera.name} (${camera.id}) has no device assignment - adding to Ungrouped');
+          }
+          
+          final groupName = deviceName ?? 'Ungrouped Cameras';
           camerasGroupedByDevice.putIfAbsent(groupName, () => []).add(camera);
         }
 
