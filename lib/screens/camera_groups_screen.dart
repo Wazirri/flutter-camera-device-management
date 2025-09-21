@@ -18,8 +18,8 @@ class CameraGroupsScreen extends StatefulWidget {
 }
 
 class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
-  // Currently selected group name
-  String? _expandedGroupName;
+  // Currently expanded group names (multiple groups can be expanded)
+  final Set<String> _expandedGroupNames = <String>{};
   bool _isLoading = false;
   String _searchQuery = '';
   bool _showOnlyActive = false;
@@ -47,10 +47,10 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
   // Select a group to expand and show its cameras
   void _toggleGroup(String groupName) {
     setState(() {
-      if (_expandedGroupName == groupName) {
-        _expandedGroupName = null; // Collapse if already expanded
+      if (_expandedGroupNames.contains(groupName)) {
+        _expandedGroupNames.remove(groupName); // Collapse if already expanded
       } else {
-        _expandedGroupName = groupName; // Expand this group
+        _expandedGroupNames.add(groupName); // Expand this group
       }
     });
   }
@@ -108,15 +108,13 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
   }
 
   // Remove camera from group
-  Future<void> _removeCameraFromGroup(Camera camera) async {
-    if (_expandedGroupName == null) return;
-    
+  Future<void> _removeCameraFromGroup(Camera camera, String groupName) async {    
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Remove Camera from Group'),
         content: Text(
-          'Are you sure you want to remove "${camera.name}" from group "$_expandedGroupName"?',
+          'Are you sure you want to remove "${camera.name}" from group "$groupName"?',
         ),
         actions: [
           TextButton(
@@ -138,7 +136,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
       });
       
       final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
-      bool success = await provider.removeCameraFromGroupViaWebSocket(camera.mac, _expandedGroupName!);
+      bool success = await provider.removeCameraFromGroupViaWebSocket(camera.mac, groupName);
       
       setState(() {
         _isLoading = false;
@@ -285,7 +283,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
 
   // Build a camera group expansion panel
   Widget _buildCameraGroup(BuildContext context, CameraGroup group, List<Camera> camerasInGroup) {
-    final bool isExpanded = _expandedGroupName == group.name;
+    final bool isExpanded = _expandedGroupNames.contains(group.name);
     final String subtitle = '${camerasInGroup.length} camera${camerasInGroup.length != 1 ? 's' : ''}';
     
     // Filter cameras by search query and active status if necessary
@@ -564,7 +562,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
                                     Icons.remove_circle_outline,
                                     color: camera.mac.isEmpty ? Colors.grey : Colors.red,
                                   ),
-                                  onPressed: camera.mac.isEmpty ? null : () => _removeCameraFromGroup(camera),
+                                  onPressed: camera.mac.isEmpty ? null : () => _removeCameraFromGroup(camera, group.name),
                                   tooltip: camera.mac.isEmpty ? 'No MAC Address' : 'Remove from Group',
                                 ),
                               ],
