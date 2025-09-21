@@ -45,10 +45,10 @@ class MenuItems {
         isSelected: currentRoute == '/live-view',
       ),
       CustomMenuItem(
-        title: 'Recordings',
-        icon: Icons.video_library_rounded,
-        route: '/recordings',
-        isSelected: currentRoute == '/recordings',
+        title: 'Recording Download',
+        icon: Icons.download_rounded,
+        route: '/recording-download',
+        isSelected: currentRoute == '/recording-download',
       ),
       CustomMenuItem(
         title: 'Cameras',

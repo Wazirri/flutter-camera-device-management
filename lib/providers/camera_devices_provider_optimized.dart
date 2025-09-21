@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/camera_device.dart'; // Corrected import path
 import '../models/camera_group.dart';
+import 'websocket_provider_optimized.dart';
 
 enum MessageCategory {
   camera,
@@ -27,6 +28,9 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   int _selectedCameraIndex = 0;
   bool _isLoading = false;
   String? _selectedGroupName;
+
+  // WebSocket provider reference
+  WebSocketProviderOptimized? _webSocketProvider;
 
   // Camera name to device mapping for faster lookups
   final Map<String, String> _cameraNameToDeviceMap = {};
@@ -91,9 +95,27 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     // WebSocket version doesn't need preloading
     print('CDP_OPT: preloadDevicesData called - no action needed for WebSocket version');
   }
+
+  // Set WebSocket provider reference
+  void setWebSocketProvider(WebSocketProviderOptimized webSocketProvider) {
+    _webSocketProvider = webSocketProvider;
+  }
   
   // Get or create camera
   Camera _getOrCreateMacDefinedCamera(String cameraMac) {
+    // Skip device MAC addresses (those starting with 'm_') - they are not actual cameras
+    if (cameraMac.startsWith('m_')) {
+      // Return a temporary camera object for device MACs, but don't store it
+      return Camera(
+        mac: cameraMac,
+        name: '',
+        ip: '',
+        index: -1,
+        connected: false,
+        isPlaceholder: true, // Mark as placeholder since it's not a real camera
+      );
+    }
+    
     if (!_macDefinedCameras.containsKey(cameraMac)) {
       _macDefinedCameras[cameraMac] = Camera(
         mac: cameraMac,
@@ -101,7 +123,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         ip: '',
         index: -1, // Will be set when device assigns it
         connected: false,
-        isPlaceholder: false, // DÜZELTME: Artık placeholder mantığı kullanmıyoruz
+        isPlaceholder: false,
       );
       _cachedFlatCameraList = null; // Invalidate cache
     }
@@ -222,11 +244,30 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     }
   }
 
-  void createGroup(String groupName) {
+  void createGroup(String groupName, {bool fromWebSocket = false}) async {
     if (!_cameraGroups.containsKey(groupName) && groupName.isNotEmpty) {
+      // If not from WebSocket, send WebSocket command first
+      if (!fromWebSocket && _webSocketProvider != null) {
+        print('CDP_OPT: Sending create group command via WebSocket: $groupName');
+        bool success = await _webSocketProvider!.sendCreateCameraGroup(groupName);
+        if (!success) {
+          print('CDP_OPT: Failed to send create group command via WebSocket');
+          return; // Don't create locally if WebSocket command failed
+        }
+      } else if (!fromWebSocket) {
+        print('CDP_OPT: WebSocket provider not available, creating group locally only');
+      }
+      
+      // Create locally (this will also be called when WebSocket confirms the creation)
       _cameraGroups[groupName] = CameraGroup(name: groupName, cameraMacs: []);
       _cachedGroupsList = null;
       _batchNotifyListeners();
+      
+      if (fromWebSocket) {
+        print('CDP_OPT: Created camera group from WebSocket/Master device: $groupName');
+      } else {
+        print('CDP_OPT: Created camera group locally: $groupName');
+      }
     }
   }
 
@@ -274,27 +315,35 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     String propertyName = parts[2];
     print('CDP_OPT: *** CAMERAS_MAC: Processing ${parts[2]} for camera ${camera.mac} = $value ***');
     
-    // Handle group assignment
-    if (parts.length >= 4 && parts[2] == 'group') {
+    // Handle group assignment - check if property name contains group[index]
+    if (propertyName.startsWith('group[') && propertyName.endsWith(']')) {
+      print('CDP_OPT: 🎯 REAL GROUP MESSAGE: $propertyName = $value for camera ${camera.mac}');
       try {
-        String groupIndexPart = parts[3]; // group[0], group[1], etc.
-        if (groupIndexPart.startsWith('group[') && groupIndexPart.endsWith(']')) {
-          int groupIndex = int.parse(groupIndexPart.substring(6, groupIndexPart.length - 1));
-          String groupValue = value.toString();
+        int groupIndex = int.parse(propertyName.substring(6, propertyName.length - 1));
+        String groupValue = value.toString();
+        
+        // Ensure the camera has enough group slots
+        while (camera.groups.length <= groupIndex) {
+          camera.groups.add('');
+        }
+        
+        camera.groups[groupIndex] = groupValue;
+        print('CDP_OPT: ✅ Camera ${camera.mac} group at index $groupIndex updated to "$groupValue". Groups: ${camera.groups}');
+        
+        // Update the global group structure if this group name is new
+        if (groupValue.isNotEmpty) {
+          _ensureGroupExists(groupValue);
           
-          // Ensure the camera has enough group slots
-          while (camera.groups.length <= groupIndex) {
-            camera.groups.add('');
+          // ÖNEMLİ: Kamerayı gruba ekle!
+          if (!_cameraGroups[groupValue]!.cameraMacs.contains(camera.mac)) {
+            _cameraGroups[groupValue]!.cameraMacs.add(camera.mac);
+            print('CDP_OPT: ✅ Camera ${camera.mac} added to group "$groupValue". Group now has ${_cameraGroups[groupValue]!.cameraMacs.length} cameras');
           }
           
-          camera.groups[groupIndex] = groupValue;
-          print('CDP_OPT: Camera ${camera.mac} group at index $groupIndex updated to "$groupValue". Groups: ${camera.groups}');
-          
-          // Update the global group structure if this group name is new
-          _ensureGroupExists(groupValue);
+          print('CDP_OPT: ✅ Group "$groupValue" ensured in global groups. Total groups: ${_cameraGroups.length}');
         }
       } catch (e) {
-        print('CDP_OPT: Error parsing group index from ${parts[3]}: $e');
+        print('CDP_OPT: ❌ Error parsing group index from $propertyName: $e');
       }
       _batchNotifyListeners();
       return;
@@ -614,6 +663,15 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       String dataPath = message['data'] ?? '';
       dynamic value = message['val'];
       
+      // Check for cameraGroups configuration messages
+      if (dataPath.contains('configuration.cameraGroups[')) {
+        print('CDP_OPT: *** DETECTED CAMERA GROUPS MESSAGE ***');
+        print('CDP_OPT: DataPath: $dataPath');
+        print('CDP_OPT: Value: $value');
+        await _processCameraGroupMessage(dataPath, value);
+        return;
+      }
+      
       // Skip duplicate messages
       String messageKey = '${dataPath}_${value.toString()}';
       if (_processedMessages.containsKey(messageKey)) {
@@ -628,10 +686,14 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
 
       if (dataPath.startsWith('cameras_mac.')) {
         final parts = dataPath.split('.'); // cameras_mac.CAMERA_MAC.property or cameras_mac.CAMERA_MAC.group[0]
+        print('CDP_OPT: DATAPATH SPLIT: $dataPath -> Parts: $parts (length: ${parts.length})');
         if (parts.length >= 3) {
           final cameraMac = parts[1]; // This is the camera's own MAC address
           if (cameraMac.isNotEmpty) {
             print('CDP_OPT: *** CAMERAS_MAC: Processing ${parts[2]} for camera $cameraMac = $value ***');
+            if (parts[2].startsWith('group[')) {
+              print('CDP_OPT: 🎯 GROUP MESSAGE DETECTED: ${parts[2]} = $value');
+            }
             final camera = _getOrCreateMacDefinedCamera(cameraMac);
             await _updateMacDefinedCameraProperty(camera, parts, value);
             print('CDP_OPT: *** MAC-defined camera count: ${_macDefinedCameras.length} ***');
@@ -818,10 +880,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       final camera = device.cameras[cameraIndex];
       await _updateCameraProperty(camera, property, value);
       
-      // If camera has MAC, add/update it in global list
+      // Always update camera in global list if it has MAC (even if name/other props changed)
       if (camera.mac.isNotEmpty) {
         _macDefinedCameras[camera.mac] = camera;
-        print('CDP_OPT: Added/updated camera ${camera.mac} in global list');
+        print('CDP_OPT: Updated camera ${camera.mac} (${camera.name}) in global list');
       }
       
       _batchNotifyListeners();
@@ -840,6 +902,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
           _macDefinedCameras.remove(camera.mac);
         }
         camera.mac = value?.toString() ?? '';
+        // Add camera with new MAC to global list
+        if (camera.mac.isNotEmpty) {
+          _macDefinedCameras[camera.mac] = camera;
+        }
         break;
       case 'name':
         camera.name = value?.toString() ?? '';
@@ -1664,6 +1730,53 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       
     } catch (e) {
       print('CDP_OPT: Error processing sysinfo message: $e');
+    }
+  }
+
+  // Process camera group configuration messages from master device
+  Future<void> _processCameraGroupMessage(String dataPath, dynamic value) async {
+    try {
+      print('CDP_OPT: *** CAMERA GROUP MESSAGE RECEIVED ***');
+      print('CDP_OPT: Data path: $dataPath');
+      print('CDP_OPT: Value: $value');
+      
+      // Parse the dataPath to extract group index and device MAC
+      // Example: "ecs_slaves.m_CA_1A_E6_81_C9_F4.configuration.cameraGroups[0]"
+      final RegExp regExp = RegExp(r'ecs_slaves\.m_([A-F0-9_]+)\.configuration\.cameraGroups\[(\d+)\]');
+      final match = regExp.firstMatch(dataPath);
+      
+      if (match == null) {
+        print('CDP_OPT: Invalid cameraGroups path format: $dataPath');
+        return;
+      }
+      
+      final deviceMac = match.group(1)?.replaceAll('_', ':') ?? '';
+      final groupIndex = int.tryParse(match.group(2) ?? '') ?? -1;
+      final groupName = value?.toString() ?? '';
+      
+      print('CDP_OPT: Parsed - Device MAC: $deviceMac, Group Index: $groupIndex, Group Name: $groupName');
+      
+      if (deviceMac.isEmpty || groupIndex < 0 || groupName.isEmpty) {
+        print('CDP_OPT: Invalid cameraGroup data - MAC: $deviceMac, Index: $groupIndex, Name: $groupName');
+        return;
+      }
+      
+      print('CDP_OPT: Processing cameraGroup from device $deviceMac (master check skipped)');
+      
+      // Create or update the camera group (without checking if device is master)
+      if (!_cameraGroups.containsKey(groupName)) {
+        // Use createGroup with fromWebSocket=true to avoid sending WebSocket command back
+        createGroup(groupName, fromWebSocket: true);
+        print('CDP_OPT: Created new camera group from device $deviceMac: $groupName');
+      } else {
+        print('CDP_OPT: Camera group already exists: $groupName');
+      }
+      
+      print('CDP_OPT: Successfully processed cameraGroup message for $groupName');
+      
+    } catch (e, s) {
+      print('CDP_OPT: Error processing camera group message: $e');
+      print('CDP_OPT: Stack trace: $s');
     }
   }
   

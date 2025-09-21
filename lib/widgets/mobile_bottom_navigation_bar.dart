@@ -95,8 +95,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
               items: [
                 _buildNavItem(Icons.dashboard, 'Dashboard', 0),
                 _buildNavItem(Icons.videocam, 'Live View', 1),
-                _buildNavItem(Icons.video_library, 'Recordings', 2),
-                _buildNavItem(Icons.menu, 'More', 3),
+                _buildNavItem(Icons.menu, 'More', 2),
               ],
             ),
           ),
@@ -131,10 +130,8 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
         return 0;
       case '/live-view':
         return 1;
-      case '/recordings':
-        return 2;
       default:
-        return 3; // More menu
+        return 2; // More menu
     }
   }
 
@@ -156,9 +153,6 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
           widget.onDestinationSelected('/live-view');
           break;
         case 2:
-          widget.onDestinationSelected('/recordings');
-          break;
-        case 3:
           // Show a More menu with additional options
           _showMoreMenu(context);
           break;
@@ -248,10 +242,18 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
 
                 _buildAnimatedMoreMenuItem(
                   context,
+                  Icon(Icons.download, color: AppTheme.accentColor),
+                  'Recording Download',
+                  '/recording-download',
+                  3,
+                ),
+
+                _buildAnimatedMoreMenuItem(
+                  context,
                   Icon(Icons.devices, color: AppTheme.accentColor),
                   'Camera Devices',
                   '/camera-devices',
-                  3,
+                  4,
                 ),
 
                 _buildAnimatedMoreMenuItem(
@@ -259,7 +261,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                   Icon(Icons.settings, color: AppTheme.primaryColor),
                   'Settings',
                   '/settings',
-                  4,
+                  5,
                 ),
                 
                 _buildAnimatedMoreMenuItem(
@@ -267,7 +269,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                   Icon(Icons.feed, color: AppTheme.accentColor),
                   'WebSocket Logs',
                   '/websocket-logs',
-                  5,
+                  6,
                 ),
                 
                 const Padding(
@@ -280,7 +282,7 @@ class _MobileBottomNavigationBarState extends State<MobileBottomNavigationBar> w
                   const Icon(Icons.logout, color: Colors.red),
                   'Logout',
                   '/login',
-                  6,
+                  7,
                   textColor: Colors.red,
                 ),
                 

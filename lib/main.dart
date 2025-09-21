@@ -12,6 +12,7 @@ import 'utils/error_monitor.dart'; // Import error monitor
 import 'screens/cameras_screen.dart';
 import 'screens/camera_devices_screen.dart';
 import 'screens/camera_groups_screen.dart';  // New camera groups screen
+import 'screens/recording_download_screen.dart';  // Recording download screen
 import 'screens/dashboard_screen_optimized.dart'; // Using optimized dashboard
 import 'screens/live_view_screen.dart';
 import 'screens/login_screen_optimized.dart';
@@ -78,6 +79,7 @@ Future<void> main() async {
     
     // Connect the providers
     webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
+    cameraDevicesProvider.setWebSocketProvider(webSocketProvider);
     
     // Run the app with providers
     runApp(
@@ -218,6 +220,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           '/camera-groups': (context) => const AppShell(
             currentRoute: '/camera-groups',
             child: CameraGroupsScreen(),
+          ),
+          '/recording-download': (context) => const AppShell(
+            currentRoute: '/recording-download',
+            child: RecordingDownloadScreen(),
           ),
           '/settings': (context) => const AppShell(
             currentRoute: '/settings',

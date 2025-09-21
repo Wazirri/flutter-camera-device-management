@@ -23,10 +23,10 @@ class MobileBottomNavigationBar extends StatelessWidget {
         allMenuItems.firstWhere((item) => item.route == '/dashboard'),
         // Live View
         allMenuItems.firstWhere((item) => item.route == '/live-view'),
+        // Recording Download
+        allMenuItems.firstWhere((item) => item.route == '/recording-download'),
         // Camera Devices (our new feature)
         allMenuItems.firstWhere((item) => item.route == '/camera-devices'),
-        // Recordings
-        allMenuItems.firstWhere((item) => item.route == '/recordings'),
         // Settings
         allMenuItems.firstWhere((item) => item.route == '/settings'),
       ];

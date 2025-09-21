@@ -106,6 +106,104 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     _selectedDay = DateTime.now();
     print('[MultiRecordings] Selected day initialized: $_selectedDay');
   }
+
+  // Parse timestamp from various filename formats
+  DateTime? _parseTimestampFromFilename(String filename) {
+    // Remove file extension
+    final nameWithoutExt = filename.contains('.') 
+        ? filename.substring(0, filename.lastIndexOf('.'))
+        : filename;
+    
+    try {
+      // Format 1: 2025-06-04_07-06-24 (most common)
+      if (nameWithoutExt.contains('_')) {
+        final parts = nameWithoutExt.split('_');
+        if (parts.length >= 2) {
+          final datePart = parts[0];
+          final timePart = parts[1];
+          
+          // Parse date part (YYYY-MM-DD or YYYY_MM_DD)
+          List<String> dateComponents;
+          if (datePart.contains('-')) {
+            dateComponents = datePart.split('-');
+          } else {
+            // Handle compact format like 20250604
+            if (datePart.length == 8) {
+              dateComponents = [
+                datePart.substring(0, 4),  // year
+                datePart.substring(4, 6),  // month  
+                datePart.substring(6, 8),  // day
+              ];
+            } else {
+              return null;
+            }
+          }
+          
+          // Parse time part (HH-MM-SS or HH_MM_SS)
+          List<String> timeComponents;
+          if (timePart.contains('-')) {
+            timeComponents = timePart.split('-');
+          } else if (timePart.contains('_')) {
+            timeComponents = timePart.split('_');
+          } else {
+            // Handle compact format like 070624
+            if (timePart.length == 6) {
+              timeComponents = [
+                timePart.substring(0, 2),  // hour
+                timePart.substring(2, 4),  // minute
+                timePart.substring(4, 6),  // second
+              ];
+            } else {
+              return null;
+            }
+          }
+          
+          if (dateComponents.length == 3 && timeComponents.length == 3) {
+            final year = int.parse(dateComponents[0]);
+            final month = int.parse(dateComponents[1]);
+            final day = int.parse(dateComponents[2]);
+            final hour = int.parse(timeComponents[0]);
+            final minute = int.parse(timeComponents[1]);
+            final second = int.parse(timeComponents[2]);
+            
+            return DateTime(year, month, day, hour, minute, second);
+          }
+        }
+      }
+      
+      // Format 2: 2025-06-04-07-06-24 (all dashes)
+      if (nameWithoutExt.contains('-')) {
+        final parts = nameWithoutExt.split('-');
+        if (parts.length == 6) {
+          final year = int.parse(parts[0]);
+          final month = int.parse(parts[1]);
+          final day = int.parse(parts[2]);
+          final hour = int.parse(parts[3]);
+          final minute = int.parse(parts[4]);
+          final second = int.parse(parts[5]);
+          
+          return DateTime(year, month, day, hour, minute, second);
+        }
+      }
+      
+      // Format 3: 20250604070624 (compact format)
+      if (nameWithoutExt.length >= 14 && RegExp(r'^\d+$').hasMatch(nameWithoutExt)) {
+        final year = int.parse(nameWithoutExt.substring(0, 4));
+        final month = int.parse(nameWithoutExt.substring(4, 6));
+        final day = int.parse(nameWithoutExt.substring(6, 8));
+        final hour = int.parse(nameWithoutExt.substring(8, 10));
+        final minute = int.parse(nameWithoutExt.substring(10, 12));
+        final second = int.parse(nameWithoutExt.substring(12, 14));
+        
+        return DateTime(year, month, day, hour, minute, second);
+      }
+      
+    } catch (e) {
+      print('Error parsing timestamp from $filename: $e');
+    }
+    
+    return null;
+  }
   
   // Handle route arguments passed from Activities screen
   void _handleRouteArguments() {
@@ -324,17 +422,28 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           final dateResponse = await http.get(Uri.parse(dateUrl));
           
           if (dateResponse.statusCode == 200) {
-            // MKV dosyalarını bul (single recordings screen ile aynı format)
+            // MKV ve M3U8 dosyalarını bul
             final html = utf8.decode(dateResponse.bodyBytes);
-            final fileRegExp = RegExp(r'<a href="([^"]+\.mkv)"');
-            final fileMatches = fileRegExp.allMatches(html);
-            final recordings = fileMatches.map((m) => m.group(1)!).toList();
             
-            print('[MultiRecordings] Found ${recordings.length} recordings for ${camera.name}: $recordings');
+            // MKV dosyalarını bul
+            final mkvRegExp = RegExp(r'<a href="([^"]+\.mkv)"');
+            final mkvMatches = mkvRegExp.allMatches(html);
+            final mkvRecordings = mkvMatches.map((m) => m.group(1)!).toList();
+            
+            // M3U8 dosyalarını bul
+            final m3u8RegExp = RegExp(r'<a href="([^"]+\.m3u8)"');
+            final m3u8Matches = m3u8RegExp.allMatches(html);
+            final m3u8Recordings = m3u8Matches.map((m) => m.group(1)!).toList();
+            
+            // Tüm kayıtları birleştir
+            final allRecordings = [...mkvRecordings, ...m3u8Recordings];
+            
+            print('[MultiRecordings] Found ${mkvRecordings.length} MKV and ${m3u8Recordings.length} M3U8 recordings for ${camera.name}');
+            print('[MultiRecordings] Total recordings: $allRecordings');
             
             if (mounted) {
               setState(() {
-                _cameraRecordings[camera] = recordings;
+                _cameraRecordings[camera] = allRecordings;
               });
             }
           } else {
@@ -393,15 +502,14 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     int seekSeconds = 0; // How many seconds to seek forward in the found recording
     
     for (final recording in recordings) {
-      // Extract time from recording filename
-      // Format: 2025-06-12_11-01-14.mkv
-      final timePattern = RegExp(r'(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})\.mkv$');
-      final match = timePattern.firstMatch(recording);
+      // Extract time from recording filename using our parsing function
+      final recordingName = recording.contains('/') ? recording.split('/').last : recording;
+      final timestamp = _parseTimestampFromFilename(recordingName);
       
-      if (match != null) {
-        final hour = int.tryParse(match.group(4)!) ?? 0;
-        final minute = int.tryParse(match.group(5)!) ?? 0;
-        final second = int.tryParse(match.group(6)!) ?? 0;
+      if (timestamp != null) {
+        final hour = timestamp.hour;
+        final minute = timestamp.minute;
+        final second = timestamp.second;
         final recordingTimeInSeconds = (hour * 3600) + (minute * 60) + second;
         
         print('[MultiRecordings] Recording: $recording, time: $hour:$minute:$second (${recordingTimeInSeconds}s)');
@@ -414,7 +522,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
             bestRecording = recording;
             bestRecordingTime = recordingTimeInSeconds;
             // Calculate how far to seek into this recording
-            seekSeconds = targetTimeInSeconds - recordingTimeInSeconds;
+            seekSeconds = (targetTimeInSeconds - recordingTimeInSeconds).round();
           }
         }
       } else {
@@ -663,30 +771,12 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       
       for (final recording in recordings) {
         final recordingName = recording.contains('/') ? recording.split('/').last : recording;
-        // 2025-06-04_07-06-24.mkv formatından tarih çıkar
-        final parts = recordingName.split('_');
-        if (parts.length >= 2) {
-          final datePart = parts[0]; // 2025-06-04
-          final timePart = parts[1].split('.')[0]; // 07-06-24
-          
-          try {
-            final dateComponents = datePart.split('-');
-            final timeComponents = timePart.split('-');
-            
-            if (dateComponents.length == 3 && timeComponents.length == 3) {
-              final year = int.parse(dateComponents[0]);
-              final month = int.parse(dateComponents[1]);
-              final day = int.parse(dateComponents[2]);
-              final hour = int.parse(timeComponents[0]);
-              final minute = int.parse(timeComponents[1]);
-              final second = int.parse(timeComponents[2]);
-              
-              final timestamp = DateTime(year, month, day, hour, minute, second);
-              allRecordings.add(RecordingTime(camera, recording, timestamp));
-            }
-          } catch (e) {
-            print('Error parsing timestamp from $recordingName: $e');
-          }
+        final timestamp = _parseTimestampFromFilename(recordingName);
+        
+        if (timestamp != null) {
+          allRecordings.add(RecordingTime(camera, recording, timestamp));
+        } else {
+          print('Error parsing timestamp from $recordingName');
         }
       }
     }
@@ -1104,24 +1194,9 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                   itemBuilder: (context, index) {
                     final recording = recordings[index];
                     final recordingName = recording.split('/').last;
-                    final timestampStr = recordingName.split('_').first;
                     
-                    // Zaman damgası formatını ayıkla
-                    DateTime? timestamp;
-                    try {
-                      if (timestampStr.length >= 14) {
-                        final year = int.parse(timestampStr.substring(0, 4));
-                        final month = int.parse(timestampStr.substring(4, 6));
-                        final day = int.parse(timestampStr.substring(6, 8));
-                        final hour = int.parse(timestampStr.substring(8, 10));
-                        final minute = int.parse(timestampStr.substring(10, 12));
-                        final second = int.parse(timestampStr.substring(12, 14));
-                        
-                        timestamp = DateTime(year, month, day, hour, minute, second);
-                      }
-                    } catch (e) {
-                      print('Error parsing timestamp: $e');
-                    }
+                    // Use our new timestamp parsing function
+                    final timestamp = _parseTimestampFromFilename(recordingName);
                     
                     final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
                     final device = cameraDevicesProvider.getDeviceForCamera(camera);
@@ -1137,10 +1212,34 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                       color: isSelected ? AppTheme.primaryBlue.withOpacity(0.2) : null,
                       child: ListTile(
                         leading: Icon(
-                          isSelected && _isMultiSelectionMode ? Icons.check_circle : Icons.videocam,
+                          isSelected && _isMultiSelectionMode ? Icons.check_circle : 
+                          recordingName.toLowerCase().endsWith('.m3u8') ? Icons.playlist_play : Icons.videocam,
                           color: isSelected ? AppTheme.primaryBlue : null,
                         ),
-                        title: Text(recordingName),
+                        title: Row(
+                          children: [
+                            Expanded(child: Text(recordingName)),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: recordingName.toLowerCase().endsWith('.m3u8') 
+                                    ? Colors.orange.withOpacity(0.2)
+                                    : Colors.blue.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                recordingName.toLowerCase().endsWith('.m3u8') ? 'M3U8' : 'MKV',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: recordingName.toLowerCase().endsWith('.m3u8') 
+                                      ? Colors.orange
+                                      : Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                         subtitle: timestamp != null
                           ? Text(DateFormat('HH:mm:ss').format(timestamp))
                           : null,

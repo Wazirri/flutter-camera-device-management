@@ -228,21 +228,6 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   },
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.history),
-                  label: const Text('Recordings'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.primaryOrange,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // Recordings sayfasına git (mevcut implemenatasyonunuza göre düzenleyin)
-                  },
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 12), // Spacing between button rows
@@ -765,9 +750,33 @@ void _showMoveCameraDialog(BuildContext context, Camera camera, WebSocketProvide
                 onPressed: selectedDeviceMac == null
                   ? null // Cihaz seçilmediyse butonu devre dışı bırak
                   : () async {
+                      // Find camera's current device (source device)
+                      String? sourceMac;
+                      if (camera.currentDevice != null) {
+                        sourceMac = camera.currentDevice!.deviceMac;
+                      } else {
+                        // Fallback: try to find from parent device
+                        sourceMac = camera.parentDeviceMacKey;
+                      }
+                      
+                      if (sourceMac == null || sourceMac.isEmpty) {
+                        // Show error if we can't determine source device
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Cannot determine camera\'s current device'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+                      
+                      // Use camera's MAC address (with proper formatting)
+                      String cameraMac = camera.mac.isNotEmpty ? camera.mac : camera.ip.replaceAll('.', '_');
+                      
                       final success = await provider.moveCamera(
-                        selectedDeviceMac!, 
-                        'me${camera.ip.replaceAll('.', '_')}' // Bu format örnek - gerçek format değişebilir
+                        cameraMac,      // Camera MAC address
+                        sourceMac,      // Source device MAC
+                        selectedDeviceMac!, // Target device MAC
                       );
                       
                       if (!context.mounted) return;

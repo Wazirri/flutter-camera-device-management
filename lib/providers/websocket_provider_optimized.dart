@@ -309,10 +309,30 @@ class WebSocketProviderOptimized with ChangeNotifier {
     print('WebSocketProvider: Sending group assignment command: $command');
     return await sendCommand(command);
   }
+
+  /// Create a new camera group via WebSocket command
+  Future<bool> sendCreateCameraGroup(String groupName) async {
+    final command = "CAM_GROUP_ADD $groupName";
+    print('WebSocketProvider: Sending create group command: $command');
+    return await sendCommand(command);
+  }
+
+  /// Convert recording via WebSocket command
+  Future<bool> sendConvertRecording({
+    required String cameraName, // The camera name (e.g., KAMERA131)
+    required String startTime,
+    required String endTime,
+    required String format,
+    required String targetSlaveMac,
+  }) async {
+    final command = "CONVERT_REC $cameraName $startTime $endTime $format $targetSlaveMac";
+    print('WebSocketProvider: Sending convert recording command: $command');
+    return await sendCommand(command);
+  }
   
   // Move camera to device
-  Future<bool> moveCamera(String deviceMac, String cameraMac) {
-    final command = 'MOVECAM $deviceMac $cameraMac';
+  Future<bool> moveCamera(String cameraMac, String sourceMac, String targetMac) {
+    final command = 'MOVECAM $cameraMac $sourceMac $targetMac';
     return sendCommand(command);
   }
   
