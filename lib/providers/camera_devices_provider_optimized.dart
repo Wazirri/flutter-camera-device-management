@@ -244,6 +244,25 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     }
   }
 
+  Future<bool> removeCameraFromGroupViaWebSocket(String cameraMac, String groupName) async {
+    if (_webSocketProvider != null) {
+      print('CDP_OPT: Sending remove camera from group command via WebSocket: $cameraMac from $groupName');
+      bool success = await _webSocketProvider!.sendRemoveGroupFromCamera(cameraMac, groupName);
+      if (success) {
+        print('CDP_OPT: Successfully sent remove camera from group command via WebSocket');
+        // The actual removal will be handled when we receive confirmation from WebSocket
+        return true;
+      } else {
+        print('CDP_OPT: Failed to send remove camera from group command via WebSocket');
+        return false;
+      }
+    } else {
+      print('CDP_OPT: WebSocket provider not available, removing camera from group locally only');
+      removeCameraFromGroup(cameraMac, groupName);
+      return false;
+    }
+  }
+
   void createGroup(String groupName, {bool fromWebSocket = false}) async {
     if (!_cameraGroups.containsKey(groupName) && groupName.isNotEmpty) {
       // If not from WebSocket, send WebSocket command first

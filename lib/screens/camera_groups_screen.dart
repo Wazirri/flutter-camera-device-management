@@ -107,6 +107,61 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
     );
   }
 
+  // Remove camera from group
+  Future<void> _removeCameraFromGroup(Camera camera) async {
+    if (_expandedGroupName == null) return;
+    
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Camera from Group'),
+        content: Text(
+          'Are you sure you want to remove "${camera.name}" from group "$_expandedGroupName"?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirmed == true) {
+      setState(() {
+        _isLoading = true;
+      });
+      
+      final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+      bool success = await provider.removeCameraFromGroupViaWebSocket(camera.mac, _expandedGroupName!);
+      
+      setState(() {
+        _isLoading = false;
+      });
+      
+      if (!success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to remove camera from group'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Camera removed from group successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    }
+  }
+
   // Show add group dialog
   void _showAddGroupDialog() {
     String groupName = '';
@@ -288,35 +343,234 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
                     return Card(
                       elevation: 2,
                       margin: const EdgeInsets.only(bottom: 8.0),
-                      child: ListTile(
-                        leading: Icon(
-                          camera.connected ? Icons.videocam : Icons.videocam_off,
-                          color: camera.connected ? Colors.green : Colors.red,
-                          size: 28,
-                        ),
-                        title: Text(
-                          camera.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text('${camera.ip} • ${camera.brand}'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
+                      clipBehavior: Clip.antiAlias,
+                      child: InkWell(
+                        onTap: () => _selectCamera(camera),
+                        child: Row(
                           children: [
-                            // Live View button
-                            IconButton(
-                              icon: const Icon(Icons.play_arrow, color: AppTheme.primaryBlue),
-                              onPressed: () => _openLiveView(camera),
-                              tooltip: 'Live View',
+                            // Camera thumbnail/preview
+                            SizedBox(
+                              width: 120,
+                              height: 80,
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  Container(
+                                    color: camera.mac.isEmpty ? Colors.grey[800] : Colors.black,
+                                    child: camera.mac.isEmpty
+                                        ? const Icon(
+                                            Icons.videocam_off_outlined,
+                                            size: 36.0,
+                                            color: Colors.grey,
+                                          )
+                                        : camera.mainSnapShot.isNotEmpty
+                                            ? Image.network(
+                                                camera.mainSnapShot,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error, stackTrace) {
+                                                  return const Icon(
+                                                    Icons.broken_image_outlined,
+                                                    size: 36.0,
+                                                    color: Colors.white54,
+                                                  );
+                                                },
+                                              )
+                                            : const Icon(
+                                                Icons.videocam_off,
+                                                size: 36.0,
+                                                color: Colors.white54,
+                                              ),
+                                  ),
+                                  if (camera.connected)
+                                    Positioned(
+                                      top: 4,
+                                      left: 4,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6.0,
+                                          vertical: 2.0,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.6),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.fiber_manual_record,
+                                              color: Colors.red,
+                                              size: 10,
+                                            ),
+                                            SizedBox(width: 2),
+                                            Text(
+                                              'LIVE',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
-                            // Playback button
-                            IconButton(
-                              icon: const Icon(Icons.history, color: AppTheme.primaryOrange),
-                              onPressed: () => _openRecordView(camera),
-                              tooltip: 'Recordings',
+                            // Camera details
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Camera name and MAC status
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            camera.name,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16.0,
+                                              color: camera.mac.isEmpty ? Colors.grey : null,
+                                            ),
+                                          ),
+                                        ),
+                                        if (camera.mac.isEmpty)
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.orange.withOpacity(0.2),
+                                              borderRadius: BorderRadius.circular(4),
+                                              border: Border.all(color: Colors.orange, width: 1),
+                                            ),
+                                            child: const Text(
+                                              'NO MAC',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.orange,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    // Connection status
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          camera.connected ? Icons.link : Icons.link_off,
+                                          size: 14.0,
+                                          color: camera.connected ? Colors.green : Colors.red,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          camera.connected ? 'Connected' : 'Disconnected',
+                                          style: TextStyle(
+                                            fontSize: 12.0,
+                                            color: camera.connected ? Colors.green : Colors.red,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    // IP Address
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.language,
+                                          size: 12.0,
+                                          color: Colors.grey[600],
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          camera.ip.isNotEmpty ? camera.ip : 'No IP',
+                                          style: TextStyle(
+                                            fontSize: 12.0,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    // Brand and device info
+                                    Row(
+                                      children: [
+                                        if (camera.brand.isNotEmpty) ...[
+                                          Icon(
+                                            Icons.business,
+                                            size: 12.0,
+                                            color: Colors.blue,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            camera.brand,
+                                            style: const TextStyle(
+                                              fontSize: 12.0,
+                                              color: Colors.blue,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                        ],
+                                        // Resolution
+                                        if (camera.recordWidth > 0 && camera.recordHeight > 0) ...[
+                                          Icon(
+                                            Icons.high_quality,
+                                            size: 12.0,
+                                            color: Colors.orange,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '${camera.recordWidth}x${camera.recordHeight}',
+                                            style: const TextStyle(
+                                              fontSize: 11.0,
+                                              color: Colors.orange,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            // Action buttons
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.videocam,
+                                    color: camera.mac.isEmpty ? Colors.grey : AppTheme.primaryBlue,
+                                  ),
+                                  onPressed: camera.mac.isEmpty ? null : () => _openLiveView(camera),
+                                  tooltip: camera.mac.isEmpty ? 'No MAC Address' : 'Live View',
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.video_library,
+                                    color: camera.mac.isEmpty ? Colors.grey : AppTheme.primaryOrange,
+                                  ),
+                                  onPressed: camera.mac.isEmpty ? null : () => _openRecordView(camera),
+                                  tooltip: camera.mac.isEmpty ? 'No MAC Address' : 'Recordings',
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.remove_circle_outline,
+                                    color: camera.mac.isEmpty ? Colors.grey : Colors.red,
+                                  ),
+                                  onPressed: camera.mac.isEmpty ? null : () => _removeCameraFromGroup(camera),
+                                  tooltip: camera.mac.isEmpty ? 'No MAC Address' : 'Remove from Group',
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        onTap: () => _selectCamera(camera),
                       ),
                     );
                   },

@@ -317,6 +317,13 @@ class WebSocketProviderOptimized with ChangeNotifier {
     return await sendCommand(command);
   }
 
+  /// Remove a camera from a group via WebSocket command
+  Future<bool> sendRemoveGroupFromCamera(String cameraMac, String groupName) async {
+    final command = "REMOVE_GROUP_FROM_CAM $cameraMac $groupName";
+    print('WebSocketProvider: Sending remove group from camera command: $command');
+    return await sendCommand(command);
+  }
+
   /// Convert recording via WebSocket command
   Future<bool> sendConvertRecording({
     required String cameraName, // The camera name (e.g., KAMERA131)
