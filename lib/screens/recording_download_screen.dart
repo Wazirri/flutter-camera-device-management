@@ -36,7 +36,7 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Recording Download'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        automaticallyImplyLeading: false, // Geri tuşunu kaldır
       ),
       body: Consumer2<CameraDevicesProviderOptimized, WebSocketProviderOptimized>(
         builder: (context, cameraProvider, webSocketProvider, child) {
