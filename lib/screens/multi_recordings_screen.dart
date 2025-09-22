@@ -110,10 +110,14 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
 
   // Parse timestamp from various filename formats
   DateTime? _parseTimestampFromFilename(String filename) {
+    print('[MultiRecordings] Parsing timestamp from: $filename');
+    
     // Remove file extension
     final nameWithoutExt = filename.contains('.') 
         ? filename.substring(0, filename.lastIndexOf('.'))
         : filename;
+    
+    print('[MultiRecordings] Filename without extension: $nameWithoutExt');
     
     try {
       // Format 1: 2025-06-04_07-06-24 (most common)
@@ -172,6 +176,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         }
       }
       
+      print('[MultiRecordings] Format 1 (underscore) failed for: $nameWithoutExt');
+      
       // Format 2: 2025-06-04-07-06-24 (all dashes)
       if (nameWithoutExt.contains('-')) {
         final parts = nameWithoutExt.split('-');
@@ -187,6 +193,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         }
       }
       
+      print('[MultiRecordings] Format 2 (all dashes) failed for: $nameWithoutExt');
+      
       // Format 3: 20250604070624 (compact format)
       if (nameWithoutExt.length >= 14 && RegExp(r'^\d+$').hasMatch(nameWithoutExt)) {
         final year = int.parse(nameWithoutExt.substring(0, 4));
@@ -199,10 +207,35 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         return DateTime(year, month, day, hour, minute, second);
       }
       
+      print('[MultiRecordings] Format 3 (compact) failed for: $nameWithoutExt');
+      
+      // Format 4: HH-MM-SS (for m3u8 files that only contain time)
+      if (nameWithoutExt.contains('-') && nameWithoutExt.split('-').length == 3) {
+        final parts = nameWithoutExt.split('-');
+        try {
+          final hour = int.parse(parts[0]);
+          final minute = int.parse(parts[1]);
+          final second = int.parse(parts[2]);
+          
+          // Use the selected day from the calendar as the date
+          if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 && second >= 0 && second <= 59) {
+            final selectedDate = _selectedDay ?? DateTime.now();
+            final timestamp = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, hour, minute, second);
+            print('[MultiRecordings] Successfully parsed time-only format: $nameWithoutExt -> $timestamp');
+            return timestamp;
+          }
+        } catch (e) {
+          print('[MultiRecordings] Error parsing time-only format for $nameWithoutExt: $e');
+        }
+      }
+      
+      print('[MultiRecordings] Format 4 (time-only) failed for: $nameWithoutExt');
+
     } catch (e) {
-      print('Error parsing timestamp from $filename: $e');
+      print('[MultiRecordings] Error parsing timestamp from $filename: $e');
     }
     
+    print('[MultiRecordings] All parsing attempts failed for: $filename');
     return null;
   }
   
@@ -788,6 +821,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   List<List<RecordingTime>> _groupRecordingsByTime() {
     if (_cameraRecordings.isEmpty) return [];
     
+    print('[MultiRecordings] Grouping recordings by time...');
+    
     // Tüm kayıtlardan zaman damgalarını çıkar
     final List<RecordingTime> allRecordings = [];
     
@@ -795,32 +830,56 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       final camera = entry.key;
       final recordings = entry.value;
       
+      print('[MultiRecordings] Camera ${camera.name} has ${recordings.length} recordings: $recordings');
+      
       for (final recording in recordings) {
         final recordingName = recording.contains('/') ? recording.split('/').last : recording;
         final timestamp = _parseTimestampFromFilename(recordingName);
         
+        // Enhanced debugging for file type tracking
+        final fileExtension = recordingName.toLowerCase().contains('.mkv') ? 'MKV' : 
+                            recordingName.toLowerCase().contains('.m3u8') ? 'M3U8' : 'UNKNOWN';
+        
         if (timestamp != null) {
+          print('[MultiRecordings] Parsed $recordingName ($fileExtension) -> $timestamp');
           allRecordings.add(RecordingTime(camera, recording, timestamp));
         } else {
-          print('Error parsing timestamp from $recordingName');
+          print('[MultiRecordings] ERROR: Could not parse timestamp from $recordingName ($fileExtension)');
         }
       }
     }
+    
+    print('[MultiRecordings] Total recordings with valid timestamps: ${allRecordings.length}');
+    
+    // Debug: Count file types in valid recordings
+    final mkvCount = allRecordings.where((r) => r.recording.toLowerCase().contains('.mkv')).length;
+    final m3u8Count = allRecordings.where((r) => r.recording.toLowerCase().contains('.m3u8')).length;
+    print('[MultiRecordings] Valid recordings breakdown: $mkvCount MKV, $m3u8Count M3U8');
     
     if (allRecordings.isEmpty) return [];
     
     // Zaman damgalarına göre sırala
     allRecordings.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     
+    print('[MultiRecordings] Sorted recordings:');
+    for (final rec in allRecordings) {
+      final fileType = rec.recording.toLowerCase().contains('.mkv') ? 'MKV' : 
+                      rec.recording.toLowerCase().contains('.m3u8') ? 'M3U8' : 'UNKNOWN';
+      print('[MultiRecordings]   ${rec.camera.name}: ${rec.recording} ($fileType) -> ${rec.timestamp}');
+    }
+    
     // ±5dk toleransla grupla
     final List<List<RecordingTime>> groups = [];
     const Duration tolerance = Duration(minutes: 5);
+    
+    print('[MultiRecordings] Starting grouping with ${tolerance.inMinutes}min tolerance...');
     
     for (final recording in allRecordings) {
       bool addedToGroup = false;
       
       // Mevcut gruplardan birine eklenebilir mi kontrol et
-      for (final group in groups) {
+      for (int i = 0; i < groups.length; i++) {
+        final group = groups[i];
         if (group.isNotEmpty) {
           final groupTime = group.first.timestamp;
           final timeDiff = recording.timestamp.difference(groupTime).abs();
@@ -829,22 +888,41 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
             // Bu gruba ekle, ama aynı kameradan kayıt yoksa
             final hasThisCamera = group.any((r) => r.camera == recording.camera);
             if (!hasThisCamera) {
+              print('[MultiRecordings] Adding ${recording.camera.name}:${recording.recording} to group $i (time diff: ${timeDiff.inMinutes}min)');
               group.add(recording);
               addedToGroup = true;
               break;
+            } else {
+              print('[MultiRecordings] Skipping ${recording.camera.name}:${recording.recording} - camera already in group $i');
             }
+          } else {
+            print('[MultiRecordings] Time diff too large for ${recording.camera.name}:${recording.recording} vs group $i: ${timeDiff.inMinutes}min > ${tolerance.inMinutes}min');
           }
         }
       }
       
       // Hiçbir gruba eklenemedi, yeni grup oluştur
       if (!addedToGroup) {
+        print('[MultiRecordings] Creating new group for ${recording.camera.name}:${recording.recording}');
         groups.add([recording]);
       }
     }
     
+    print('[MultiRecordings] Created ${groups.length} groups:');
+    for (int i = 0; i < groups.length; i++) {
+      final group = groups[i];
+      print('[MultiRecordings] Group $i (${group.length} cameras):');
+      for (final rec in group) {
+        final fileType = rec.recording.toLowerCase().contains('.mkv') ? 'MKV' : 
+                        rec.recording.toLowerCase().contains('.m3u8') ? 'M3U8' : 'UNKNOWN';
+        print('[MultiRecordings]   ${rec.camera.name}: ${rec.recording} ($fileType)');
+      }
+    }
+    
     // Sadece birden fazla kamerası olan grupları döndür
-    return groups.where((group) => group.length > 1).toList();
+    final result = groups.where((group) => group.length > 1).toList();
+    print('[MultiRecordings] Returning ${result.length} multi-camera groups');
+    return result;
   }
 
   void _openMultiWatchScreen(List<RecordingTime> recordingGroup) {
