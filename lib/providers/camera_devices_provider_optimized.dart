@@ -133,22 +133,54 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   // Find the device that contains a specific camera
   CameraDevice? findDeviceForCamera(Camera camera) {
     print('CDP_OPT: Looking for device for camera: ${camera.mac} (name: ${camera.name}, index: ${camera.index})');
+    print('CDP_OPT: Camera currentDevice: ${camera.currentDevice?.deviceMac ?? "NULL"}');
     
+    // First check if camera has currentDevice assignment
+    if (camera.currentDevice != null) {
+      final deviceMac = camera.currentDevice!.deviceMac;
+      print('CDP_OPT: Camera has currentDevice assignment: $deviceMac');
+      
+      // Convert m_XX_XX_XX format to XX:XX:XX:XX:XX:XX format
+      String normalizedMac = deviceMac;
+      if (deviceMac.startsWith('m_')) {
+        normalizedMac = deviceMac.substring(2).replaceAll('_', ':');
+      }
+      print('CDP_OPT: Normalized MAC: $normalizedMac');
+      
+      // Find device by normalized MAC
+      for (var entry in _devices.entries) {
+        CameraDevice device = entry.value;
+        print('CDP_OPT: Checking device: ${device.macAddress} vs $normalizedMac (key: ${device.macKey} vs $deviceMac)');
+        if (device.macAddress == normalizedMac || device.macKey == deviceMac) {
+          print('CDP_OPT: Found device for camera ${camera.mac} via currentDevice: ${device.macAddress} (${device.ipv4})');
+          return device;
+        }
+      }
+      
+      print('CDP_OPT: currentDevice not found in devices list: $deviceMac -> $normalizedMac');
+    }
+    
+    // Fallback: try to find by MAC address in device cameras
+    print('CDP_OPT: Fallback: Searching by MAC address in device cameras');
     for (var entry in _devices.entries) {
       CameraDevice device = entry.value;
       
       // First try to find by MAC
       for (var deviceCamera in device.cameras) {
         if (deviceCamera.mac == camera.mac && deviceCamera.mac.isNotEmpty) {
-          print('CDP_OPT: Found device for camera ${camera.mac}: ${device.macAddress} (${device.ipv4})');
+          print('CDP_OPT: Found device for camera ${camera.mac} by MAC search: ${device.macAddress} (${device.ipv4})');
           return device;
         }
       }
-      
-      // If MAC is empty or not found, try to find by index
+    }
+    
+    // Last resort: try to find by index (this is often wrong!)
+    print('CDP_OPT: Last resort: Searching by index (often wrong!)');
+    for (var entry in _devices.entries) {
+      CameraDevice device = entry.value;
       for (var deviceCamera in device.cameras) {
         if (deviceCamera.index == camera.index && camera.index >= 0) {
-          print('CDP_OPT: Found device for camera by index ${camera.index}: ${device.macAddress} (${device.ipv4})');
+          print('CDP_OPT: WARNING: Found device for camera by index ${camera.index} (may be incorrect): ${device.macAddress} (${device.ipv4})');
           return device;
         }
       }

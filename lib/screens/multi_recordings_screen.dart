@@ -37,6 +37,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   List<Camera> _selectedCameras = []; // Kullanıcının seçtiği kameralar
   final Map<Camera, List<String>> _cameraRecordings = {};
   final Map<Camera, String> _cameraErrors = {}; // Her kamera için ayrı hata mesajları
+  final Map<Camera, String> _cameraDateFormats = {}; // Her kamera için hangi tarih formatının çalıştığını sakla
   
   // Aktif oynatılan kayıt bilgileri (sadece selection tracking için)
   Camera? _activeCamera;
@@ -346,26 +347,37 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       _loadingError = '';
       _cameraRecordings.clear();
       _cameraErrors.clear(); // Kamera hatalarını temizle
+      _cameraDateFormats.clear(); // Tarih formatlarını temizle
     });
     
     print('[MultiRecordings] Loading recordings for ${_selectedCameras.length} selected cameras');
     
     // Seçili gün için seçili kameraların kayıtlarını yükle
     final selectedDayFormatted = DateFormat('yyyy_MM_dd').format(_selectedDay!);
+    final selectedDayFormattedAlt = DateFormat('yyyy-MM-dd').format(_selectedDay!);
     final futures = <Future>[];
     
     for (var camera in _selectedCameras) {
       // Kamera device'ını bul
       final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+      
+      print('[MultiRecordings] Camera: ${camera.name} (MAC: ${camera.mac}, Index: ${camera.index})');
+      print('[MultiRecordings] Camera currentDevice: ${camera.currentDevice?.deviceMac ?? 'NULL'}');
+      
       final device = cameraDevicesProvider.getDeviceForCamera(camera);
       
       if (device != null) {
+        print('[MultiRecordings] Found device for ${camera.name}: ${device.macAddress} (IP: ${device.ipv4})');
+        
         // Kayıt URL'i oluştur
         final recordingsUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/';
+        print('[MultiRecordings] Generated URL: $recordingsUrl');
         
         // Kamera için kayıtları yükle
-        final future = _loadRecordingsForCamera(camera, recordingsUrl, selectedDayFormatted);
+        final future = _loadRecordingsForCamera(camera, recordingsUrl, selectedDayFormatted, selectedDayFormattedAlt);
         futures.add(future);
+      } else {
+        print('[MultiRecordings] ERROR: No device found for camera ${camera.name}');
       }
     }
     
@@ -394,7 +406,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     });
   }
   
-  Future<void> _loadRecordingsForCamera(Camera camera, String recordingsUrl, String formattedDate) async {
+  Future<void> _loadRecordingsForCamera(Camera camera, String recordingsUrl, String formattedDate, String formattedDateAlt) async {
     try {
       print('[MultiRecordings] Loading recordings for camera: ${camera.name}');
       print('[MultiRecordings] Recordings URL: $recordingsUrl');
@@ -413,11 +425,20 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         final dates = dateMatches.map((m) => m.group(1)!).toList();
         
         print('[MultiRecordings] Found dates: $dates');
-        print('[MultiRecordings] Looking for date: $formattedDate');
+        print('[MultiRecordings] Looking for date: $formattedDate or $formattedDateAlt');
         
+        String? foundDate;
         if (dates.contains(formattedDate)) {
+          foundDate = formattedDate;
+          _cameraDateFormats[camera] = formattedDate; // Çalışan formatı kaydet
+        } else if (dates.contains(formattedDateAlt)) {
+          foundDate = formattedDateAlt;
+          _cameraDateFormats[camera] = formattedDateAlt; // Çalışan formatı kaydet
+        }
+        
+        if (foundDate != null) {
           // Seçili tarih klasörünün içeriğini al
-          final dateUrl = '$recordingsUrl$formattedDate/';
+          final dateUrl = '$recordingsUrl$foundDate/';
           print('[MultiRecordings] Loading date folder: $dateUrl');
           final dateResponse = await http.get(Uri.parse(dateUrl));
           
@@ -451,7 +472,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           }
         } else {
           // Bu tarih için kayıt yok
-          print('[MultiRecordings] No recordings found for date $formattedDate for camera ${camera.name}');
+          print('[MultiRecordings] No recordings found for date $formattedDate or $formattedDateAlt for camera ${camera.name}');
           if (mounted) {
             setState(() {
               _cameraRecordings[camera] = [];
@@ -579,8 +600,13 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     final device = _getDeviceForCamera(camera);
     
     if (device != null && _selectedDay != null) {
-      final selectedDayFormatted = DateFormat('yyyy_MM_dd').format(_selectedDay!);
-      final recordingUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/$selectedDayFormatted/$recording';
+      // Kamera için hangi tarih formatının çalıştığını kontrol et
+      final dateFormat = _cameraDateFormats[camera];
+      final recordingUrl = dateFormat != null 
+          ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$dateFormat/$recording'
+          : 'http://${device.ipv4}:8080/Rec/${camera.name}/${DateFormat('yyyy_MM_dd').format(_selectedDay!)}/$recording';
+      
+      print('[MultiRecordings] Using recording URL: $recordingUrl');
       
       // Store seek time locally before clearing the pending value
       final seekTimeToPass = _pendingSeekTime;
