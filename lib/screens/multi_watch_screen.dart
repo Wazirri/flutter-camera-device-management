@@ -11,11 +11,13 @@ import '../widgets/video_controls.dart';
 class MultiWatchScreen extends StatefulWidget {
   final Map<Camera, String> cameraRecordings;
   final DateTime selectedDate;
+  final Map<Camera, String>? cameraDateFormats; // Date format per camera
 
   const MultiWatchScreen({
     Key? key,
     required this.cameraRecordings,
     required this.selectedDate,
+    this.cameraDateFormats,
   }) : super(key: key);
 
   @override
@@ -88,10 +90,13 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
     final device = cameraDevicesProvider.getDeviceForCamera(camera);
     
     if (device != null) {
-      final selectedDayFormatted = DateFormat('yyyy_MM_dd').format(widget.selectedDate);
+      // Use the stored date format for this camera, or default to yyyy_MM_dd
+      final cameraDateFormat = widget.cameraDateFormats?[camera];
+      final selectedDayFormatted = cameraDateFormat ?? DateFormat('yyyy_MM_dd').format(widget.selectedDate);
+      
       final recordingUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/$selectedDayFormatted/$recording';
       
-      print('[MultiWatch] Loading recording for ${camera.name}: $recordingUrl');
+      print('[MultiWatch] Loading recording for ${camera.name}: $recordingUrl (format: ${cameraDateFormat ?? 'default'})');
       
       setState(() {
         _hasError[camera] = false;
@@ -103,12 +108,19 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
         try {
           player.open(Media(recordingUrl), play: true); // Otomatik başlatma
         } catch (e) {
+          print('[MultiWatch] Error loading recording for ${camera.name}: $e');
           setState(() {
             _hasError[camera] = true;
             _errorMessages[camera] = 'Error loading recording: $e';
           });
         }
       }
+    } else {
+      print('[MultiWatch] No device found for camera: ${camera.name}');
+      setState(() {
+        _hasError[camera] = true;
+        _errorMessages[camera] = 'Device not found for camera';
+      });
     }
   }
   

@@ -110,14 +110,10 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
 
   // Parse timestamp from various filename formats
   DateTime? _parseTimestampFromFilename(String filename) {
-    print('[MultiRecordings] Parsing timestamp from: $filename');
-    
     // Remove file extension
     final nameWithoutExt = filename.contains('.') 
         ? filename.substring(0, filename.lastIndexOf('.'))
         : filename;
-    
-    print('[MultiRecordings] Filename without extension: $nameWithoutExt');
     
     try {
       // Format 1: 2025-06-04_07-06-24 (most common)
@@ -176,8 +172,6 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         }
       }
       
-      print('[MultiRecordings] Format 1 (underscore) failed for: $nameWithoutExt');
-      
       // Format 2: 2025-06-04-07-06-24 (all dashes)
       if (nameWithoutExt.contains('-')) {
         final parts = nameWithoutExt.split('-');
@@ -193,8 +187,6 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         }
       }
       
-      print('[MultiRecordings] Format 2 (all dashes) failed for: $nameWithoutExt');
-      
       // Format 3: 20250604070624 (compact format)
       if (nameWithoutExt.length >= 14 && RegExp(r'^\d+$').hasMatch(nameWithoutExt)) {
         final year = int.parse(nameWithoutExt.substring(0, 4));
@@ -206,8 +198,6 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         
         return DateTime(year, month, day, hour, minute, second);
       }
-      
-      print('[MultiRecordings] Format 3 (compact) failed for: $nameWithoutExt');
       
       // Format 4: HH-MM-SS (for m3u8 files that only contain time)
       if (nameWithoutExt.contains('-') && nameWithoutExt.split('-').length == 3) {
@@ -221,21 +211,17 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 && second >= 0 && second <= 59) {
             final selectedDate = _selectedDay ?? DateTime.now();
             final timestamp = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, hour, minute, second);
-            print('[MultiRecordings] Successfully parsed time-only format: $nameWithoutExt -> $timestamp');
             return timestamp;
           }
         } catch (e) {
           print('[MultiRecordings] Error parsing time-only format for $nameWithoutExt: $e');
         }
       }
-      
-      print('[MultiRecordings] Format 4 (time-only) failed for: $nameWithoutExt');
 
     } catch (e) {
       print('[MultiRecordings] Error parsing timestamp from $filename: $e');
     }
     
-    print('[MultiRecordings] All parsing attempts failed for: $filename');
     return null;
   }
   
@@ -939,6 +925,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         builder: (context) => MultiWatchScreen(
           cameraRecordings: cameraRecordings,
           selectedDate: _selectedDay!,
+          cameraDateFormats: _cameraDateFormats, // Pass the date formats
         ),
       ),
     );
@@ -968,6 +955,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           builder: (context) => MultiWatchScreen(
             cameraRecordings: closestRecordings,
             selectedDate: _selectedDay!,
+            cameraDateFormats: _cameraDateFormats, // Pass the date formats
           ),
         ),
       );
