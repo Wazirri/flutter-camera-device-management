@@ -242,6 +242,30 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         }
       }
 
+      // Format 5: Special MP4 format like 000500__001000 (time range format)
+      if (nameWithoutExt.contains('__')) {
+        final parts = nameWithoutExt.split('__');
+        if (parts.length == 2 && parts[0].length == 6 && parts[1].length == 6) {
+          try {
+            // Parse start time (HHMMSS format)
+            final startTimeStr = parts[0];
+            final startHour = int.parse(startTimeStr.substring(0, 2));
+            final startMinute = int.parse(startTimeStr.substring(2, 4));
+            final startSecond = int.parse(startTimeStr.substring(4, 6));
+            
+            // Use the selected day from the calendar as the date
+            final selectedDate = _selectedDay ?? DateTime.now();
+            final timestamp = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, 
+                                     startHour, startMinute, startSecond);
+            
+            print('[MultiRecordings] Parsed MP4 time range format: $nameWithoutExt -> $timestamp');
+            return timestamp;
+          } catch (e) {
+            print('[MultiRecordings] Error parsing MP4 time range format for $nameWithoutExt: $e');
+          }
+        }
+      }
+
     } catch (e) {
       print('[MultiRecordings] Error parsing timestamp from $filename: $e');
     }
@@ -621,8 +645,12 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   }
   
   void _selectRecording(Camera camera, String recording) {
+    print('[Select] Recording selected: ${camera.name} - $recording');
+    print('[Select] Multi-selection mode: $_isMultiSelectionMode');
+    
     setState(() {
       if (_isMultiSelectionMode) {
+        print('[Select] In multi-selection mode');
         // Çoklu seçim modunda
         final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
         final device = cameraDevicesProvider.getDeviceForCamera(camera);
@@ -631,14 +659,21 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           // Include date folder in the download URL
           final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDay ?? DateTime.now());
           final completeUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/$dateStr/$recording';
+          print('[Select] Generated URL: $completeUrl');
           
           if (_selectedForDownload.contains(completeUrl)) {
+            print('[Select] Removing from selection');
             _selectedForDownload.remove(completeUrl);
           } else {
+            print('[Select] Adding to selection');
             _selectedForDownload.add(completeUrl);
           }
+          print('[Select] Total selected: ${_selectedForDownload.length}');
+        } else {
+          print('[Select] ERROR: No device found for camera ${camera.name}');
         }
       } else {
+        print('[Select] In normal mode, opening video player');
         // Normal modda - Popup player aç
         _openVideoPlayerPopup(camera, recording);
       }
@@ -727,47 +762,75 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   }
   
   void _toggleMultiSelectionMode() {
+    print('[Toggle] Toggling multi-selection mode. Before: $_isMultiSelectionMode');
     setState(() {
       _isMultiSelectionMode = !_isMultiSelectionMode;
       if (!_isMultiSelectionMode) {
+        print('[Toggle] Clearing selected downloads. Count was: ${_selectedForDownload.length}');
         _selectedForDownload.clear();
       }
     });
+    print('[Toggle] Multi-selection mode after toggle: $_isMultiSelectionMode');
   }
   
   void _downloadSelectedRecordings() async {
-    if (_selectedForDownload.isEmpty) return;
+    print('[Download] Starting download process...');
+    print('[Download] Selected recordings count: ${_selectedForDownload.length}');
+    print('[Download] Selected recordings URLs: $_selectedForDownload');
     
+    if (_selectedForDownload.isEmpty) {
+      print('[Download] No recordings selected, returning...');
+      return;
+    }
+    
+    print('[Download] Checking permissions...');
     // İzinleri kontrol et
     final permissionStatus = await _checkAndRequestPermissions();
     if (!permissionStatus) {
+      print('[Download] Permission denied!');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Storage permission required to download recordings'))
       );
       return;
     }
+    print('[Download] Permission granted!');
     
+    print('[Download] Getting download directory...');
     // İndirme klasörünü al
     final downloadDir = await _getDownloadDirectory();
     if (downloadDir == null) {
+      print('[Download] Failed to get download directory!');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to get download directory'))
       );
       return;
     }
+    print('[Download] Download directory: ${downloadDir.path}');
     
+    print('[Download] Starting individual downloads...');
     // İndirme işlemlerini başlat
     for (final recordingUrl in _selectedForDownload) {
       final fileName = recordingUrl.split('/').last;
       final filePath = '${downloadDir.path}/$fileName';
       
+      print('[Download] Processing: $recordingUrl');
+      print('[Download] File name: $fileName');
+      print('[Download] File path: $filePath');
+      
       try {
+        print('[Download] Making HTTP request to: $recordingUrl');
         // İlerleme göstergesi ile indirme işlemini başlat
         final response = await http.get(Uri.parse(recordingUrl));
         
+        print('[Download] HTTP Response status: ${response.statusCode}');
+        print('[Download] HTTP Response headers: ${response.headers}');
+        print('[Download] HTTP Response body length: ${response.bodyBytes.length}');
+        
         if (response.statusCode == 200) {
+          print('[Download] Creating file at: $filePath');
           final file = File(filePath);
           await file.writeAsBytes(response.bodyBytes);
+          print('[Download] File written successfully!');
           
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -779,15 +842,20 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
             )
           );
         } else {
+          print('[Download] HTTP Error: ${response.statusCode}');
+          print('[Download] HTTP Error body: ${response.body}');
           throw Exception('Failed to download: ${response.statusCode}');
         }
       } catch (e) {
+        print('[Download] Exception occurred: $e');
+        print('[Download] Exception type: ${e.runtimeType}');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error downloading $fileName: $e'))
         );
       }
     }
     
+    print('[Download] All downloads completed!');
     // İndirme tamamlandıktan sonra çoklu seçim modunu kapat
     setState(() {
       _isMultiSelectionMode = false;
@@ -811,52 +879,81 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   }
   
   Future<Directory?> _getDownloadDirectory() async {
+    print('[GetDir] Starting _getDownloadDirectory...');
+    
     try {
       if (Platform.isAndroid) {
+        print('[GetDir] Platform is Android');
         return await getExternalStorageDirectory();
       } else if (Platform.isIOS) {
+        print('[GetDir] Platform is iOS');
         return await getApplicationDocumentsDirectory();
       } else {
+        print('[GetDir] Platform is desktop (macOS/Windows/Linux)');
         // macOS, Windows, Linux için - desktop
         if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+          print('[GetDir] Showing download location dialog...');
           // Desktop için kullanıcıya yer seçtirme seçeneği sun
           final shouldShowPicker = await _showDownloadLocationDialog();
-          if (!shouldShowPicker) {
-            return await getDownloadsDirectory();
-          }
+          print('[GetDir] Dialog result: $shouldShowPicker');
           
-          // Kullanıcı kendi yer seçmek istiyorsa Downloads klasörünü kullan
-          // TODO: File picker paketi eklendikten sonra kullanıcı seçimi yapılabilir
-          return await getDownloadsDirectory();
+          if (!shouldShowPicker) {
+            print('[GetDir] User chose Downloads folder');
+            final dir = await getDownloadsDirectory();
+            print('[GetDir] Downloads directory: ${dir?.path}');
+            return dir;
+          } else {
+            print('[GetDir] User chose custom location (not implemented yet)');
+            // Şimdilik Downloads klasörünü kullan (file picker sonra eklenecek)
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('File picker will be implemented soon. Using Downloads folder.'))
+            );
+            final dir = await getDownloadsDirectory();
+            print('[GetDir] Fallback to Downloads directory: ${dir?.path}');
+            return dir;
+          }
         }
+        print('[GetDir] Unknown desktop platform, using Downloads');
         return await getDownloadsDirectory();
       }
     } catch (e) {
-      print('Error getting download directory: $e');
+      print('[GetDir] Exception occurred: $e');
+      print('[GetDir] Exception type: ${e.runtimeType}');
       return null;
     }
   }
   
   Future<bool> _showDownloadLocationDialog() async {
+    print('[Dialog] Showing download location dialog...');
+    
     final result = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
+        print('[Dialog] Building dialog widget...');
         return AlertDialog(
           title: const Text('Download Location'),
           content: const Text('Choose download location:'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
+              onPressed: () {
+                print('[Dialog] Downloads Folder button pressed');
+                Navigator.of(context).pop(false);
+              },
               child: const Text('Downloads Folder'),
             ),
             TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
+              onPressed: () {
+                print('[Dialog] Choose Location button pressed');
+                Navigator.of(context).pop(true);
+              },
               child: const Text('Choose Location'),
             ),
           ],
         );
       },
     );
+    
+    print('[Dialog] Dialog result: $result');
     return result ?? false;
   }
   
@@ -1073,7 +1170,10 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           IconButton(
             icon: Icon(_isMultiSelectionMode ? Icons.cancel : Icons.select_all),
             tooltip: _isMultiSelectionMode ? 'Cancel Selection' : 'Multi Select',
-            onPressed: _toggleMultiSelectionMode,
+            onPressed: () {
+              print('[Button] Multi-select toggle pressed! Current mode: $_isMultiSelectionMode');
+              _toggleMultiSelectionMode();
+            },
           ),
           
           // İndirme butonu (sadece çoklu seçim modunda)
@@ -1081,7 +1181,10 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
             IconButton(
               icon: const Icon(Icons.download),
               tooltip: 'Download Selected',
-              onPressed: _selectedForDownload.isNotEmpty ? _downloadSelectedRecordings : null,
+              onPressed: _selectedForDownload.isNotEmpty ? () {
+                print('[Button] Download button pressed! Selected count: ${_selectedForDownload.length}');
+                _downloadSelectedRecordings();
+              } : null,
             ),
           
           // Yenileme butonu
@@ -1359,7 +1462,15 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         
         final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
         final device = cameraDevicesProvider.getDeviceForCamera(camera);
-        final recordingUrl = device != null ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$recording' : '';
+        
+        // Use the same URL format as video player (with date format)
+        String recordingUrl = '';
+        if (device != null && _selectedDay != null) {
+          final dateFormat = _cameraDateFormats[camera];
+          recordingUrl = dateFormat != null 
+              ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$dateFormat/$recording'
+              : 'http://${device.ipv4}:8080/Rec/${camera.name}/${DateFormat('yyyy_MM_dd').format(_selectedDay!)}/$recording';
+        }
         
         final isSelected = _isMultiSelectionMode ? 
           _selectedForDownload.contains(recordingUrl) :
@@ -1447,39 +1558,57 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   }
 
   void _downloadSingleRecording(Camera camera, String recording, String recordingUrl) async {
+    print('[SingleDownload] Starting single download for: ${camera.name} - $recording');
+    print('[SingleDownload] URL: $recordingUrl');
+    print('[SingleDownload] Multi-selection mode: $_isMultiSelectionMode');
+    
     if (_isMultiSelectionMode) {
+      print('[SingleDownload] In multi-selection mode, calling _selectRecording');
       _selectRecording(camera, recording);
       return;
     }
     
+    print('[SingleDownload] Checking permissions...');
     // Tekli indirme işlemi
     final permissionStatus = await _checkAndRequestPermissions();
     if (!permissionStatus) {
+      print('[SingleDownload] Permission denied!');
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Storage permission required to download recordings'))
       );
       return;
     }
+    print('[SingleDownload] Permission granted!');
     
+    print('[SingleDownload] Getting download directory...');
     final downloadDir = await _getDownloadDirectory();
     if (downloadDir == null) {
+      print('[SingleDownload] Failed to get download directory!');
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to get download directory'))
       );
       return;
     }
+    print('[SingleDownload] Download directory: ${downloadDir.path}');
     
     final fileName = recording.split('/').last;
     final filePath = '${downloadDir.path}/$fileName';
+    print('[SingleDownload] File name: $fileName');
+    print('[SingleDownload] File path: $filePath');
     
     try {
+      print('[SingleDownload] Making HTTP request...');
       final response = await http.get(Uri.parse(recordingUrl));
+      print('[SingleDownload] HTTP Response status: ${response.statusCode}');
+      print('[SingleDownload] HTTP Response body length: ${response.bodyBytes.length}');
       
       if (response.statusCode == 200) {
+        print('[SingleDownload] Creating file...');
         final file = File(filePath);
         await file.writeAsBytes(response.bodyBytes);
+        print('[SingleDownload] File written successfully!');
         
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1492,9 +1621,13 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           )
         );
       } else {
+        print('[SingleDownload] HTTP Error: ${response.statusCode}');
+        print('[SingleDownload] HTTP Error body: ${response.body}');
         throw Exception('Failed to download: ${response.statusCode}');
       }
     } catch (e) {
+      print('[SingleDownload] Exception occurred: $e');
+      print('[SingleDownload] Exception type: ${e.runtimeType}');
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error downloading $fileName: $e'))
