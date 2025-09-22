@@ -158,6 +158,11 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Toplu İzleme - ${DateFormat('dd/MM/yyyy').format(widget.selectedDate)}'),
+        automaticallyImplyLeading: true, // Sadece geri butonu göster
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.play_arrow),
@@ -184,16 +189,41 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   }
   
   Widget _buildPlayersGrid(int cameraCount) {
-    // Grid düzenini belirle
+    // Ekran boyutuna göre optimal grid düzenini belirle
+    final screenSize = MediaQuery.of(context).size;
+    final isLandscape = screenSize.width > screenSize.height;
+    
     int crossAxisCount;
+    double childAspectRatio;
+    
     if (cameraCount == 1) {
+      // Tek kamera - tam ekran
       crossAxisCount = 1;
+      childAspectRatio = isLandscape ? 16 / 9 : 9 / 16;
+    } else if (cameraCount == 2) {
+      // İki kamera - yan yana veya alt alta
+      crossAxisCount = isLandscape ? 2 : 1;
+      childAspectRatio = 16 / 9;
     } else if (cameraCount <= 4) {
+      // 3-4 kamera - 2x2 grid
       crossAxisCount = 2;
+      childAspectRatio = 16 / 9;
+    } else if (cameraCount <= 6) {
+      // 5-6 kamera - 3x2 veya 2x3
+      crossAxisCount = isLandscape ? 3 : 2;
+      childAspectRatio = 16 / 9;
     } else if (cameraCount <= 9) {
+      // 7-9 kamera - 3x3
       crossAxisCount = 3;
-    } else {
+      childAspectRatio = 16 / 9;
+    } else if (cameraCount <= 12) {
+      // 10-12 kamera - 4x3
       crossAxisCount = 4;
+      childAspectRatio = 16 / 9;
+    } else {
+      // 12+ kamera - dense grid
+      crossAxisCount = isLandscape ? 5 : 4;
+      childAspectRatio = 16 / 9;
     }
     
     return GridView.builder(
@@ -201,7 +231,7 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
         crossAxisCount: crossAxisCount,
         crossAxisSpacing: 8.0,
         mainAxisSpacing: 8.0,
-        childAspectRatio: 16 / 9, // Video aspect ratio
+        childAspectRatio: childAspectRatio,
       ),
       itemCount: cameraCount,
       itemBuilder: (context, index) {
@@ -219,6 +249,11 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
     final isBuffering = _isBuffering[camera] ?? false;
     final hasError = _hasError[camera] ?? false;
     final errorMessage = _errorMessages[camera] ?? '';
+    final cameraCount = widget.cameraRecordings.length;
+    
+    // Kamera sayısına göre font boyutu ayarla
+    double titleFontSize = cameraCount <= 4 ? 14 : (cameraCount <= 9 ? 12 : 10);
+    double iconSize = cameraCount <= 4 ? 20 : (cameraCount <= 9 ? 16 : 14);
     
     if (controller == null || player == null) {
       return _buildErrorCard(camera, 'Player not initialized');
@@ -226,26 +261,43 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
     
     return Card(
       clipBehavior: Clip.antiAlias,
+      elevation: cameraCount <= 4 ? 4 : 2, // Daha az kamera = daha yüksek elevation
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Kamera başlığı
           Container(
-            padding: const EdgeInsets.all(8.0),
+            padding: EdgeInsets.all(cameraCount <= 4 ? 8.0 : 6.0),
             color: AppTheme.primaryBlue,
             child: Row(
               children: [
-                const Icon(Icons.videocam, color: Colors.white, size: 16),
+                Icon(Icons.videocam, color: Colors.white, size: iconSize),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
                     camera.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 12,
+                      fontSize: titleFontSize,
                       fontWeight: FontWeight.bold,
                     ),
                     overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                // Recording format indicator
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    recording.toLowerCase().endsWith('.m3u8') ? 'M3U8' : 'MKV',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: titleFontSize - 2,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],

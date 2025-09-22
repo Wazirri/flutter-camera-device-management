@@ -980,6 +980,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     return Scaffold(
       appBar: AppBar(
         title: const Text('Multi Recordings'),
+        automaticallyImplyLeading: false, // Geri butonunu devre dışı bırak
         actions: [
           // Çoklu seçim modu butonu
           IconButton(
@@ -1119,299 +1120,299 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         ),
       );
     }
+
+    // Toplu kayıt gruplarını hesapla
+    final groups = _groupRecordingsByTime();
+    final totalTabs = _cameraRecordings.length + (groups.isNotEmpty ? 1 : 0);
     
-    // Tüm kameraları ve kayıtlarını sekmeli bir şekilde göster
     return DefaultTabController(
-      length: _cameraRecordings.length,
+      length: totalTabs,
       child: Column(
         children: [
-          // Kamera sekmeleri
+          // Tab Bar
           TabBar(
             isScrollable: true,
-            tabs: _cameraRecordings.keys.map((camera) {
-              final recordings = _cameraRecordings[camera] ?? [];
-              return Tab(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(camera.name),
-                    const SizedBox(width: 4),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: AppTheme.primaryBlue,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        recordings.length.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
+            tabs: [
+              // Toplu İzle tab - EN BAŞTA
+              if (groups.isNotEmpty)
+                Tab(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.group_work, size: 16),
+                      const SizedBox(width: 4),
+                      const Text('Toplu İzle'),
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: AppTheme.primaryOrange,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          groups.length.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              );
-            }).toList(),
+              // Her kamera için tab
+              ..._cameraRecordings.keys.map((camera) {
+                final recordings = _cameraRecordings[camera] ?? [];
+                return Tab(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(camera.name),
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: AppTheme.primaryBlue,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          recordings.length.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
           ),
           
-          // Toplu İzle sekmesi ve kayıt grupları - Yarı yükseklik
-          if (_cameraRecordings.isNotEmpty && 
-              _cameraRecordings.values.any((recordings) => recordings.isNotEmpty))
-            Expanded(
-              flex: 1, // Yarı yükseklik
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'Toplu İzle Grupları (±5dk tolerans)',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Builder(
-                        builder: (context) {
-                          final groups = _groupRecordingsByTime();
-                          
-                          if (groups.isEmpty) {
-                            return const Center(
-                              child: Text(
-                                'Aynı zaman diliminde birden fazla kameradan kayıt bulunamadı',
-                                style: TextStyle(color: Colors.grey),
-                                textAlign: TextAlign.center,
-                              ),
-                            );
-                          }
-                          
-                          return ListView.builder(
-                            itemCount: groups.length,
-                            itemBuilder: (context, index) {
-                              final group = groups[index];
-                              final groupTime = group.isNotEmpty 
-                                ? DateFormat('HH:mm:ss').format(group.first.timestamp)
-                                : '';
-                              
-                              return Card(
-                                margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                                child: ListTile(
-                                  leading: const Icon(Icons.play_circle_fill, color: AppTheme.primaryOrange),
-                                  title: Text('Grup ${index + 1} - $groupTime'),
-                                  subtitle: Text(
-                                    '${group.length} kamera: ${group.map((r) => r.camera.name).join(', ')}',
-                                  ),
-                                  trailing: const Icon(Icons.arrow_forward_ios),
-                                  onTap: () => _openMultiWatchScreen(group),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          
-          // Kayıt listeleri - Yarı yükseklik
+          // Tab içerikleri
           Expanded(
-            flex: 1, // Yarı yükseklik
             child: TabBarView(
-              children: _cameraRecordings.entries.map((entry) {
-                final camera = entry.key;
-                final recordings = entry.value;
-                final cameraError = _cameraErrors[camera];
-                
-                // Eğer bu kamera için hata varsa, hata mesajını göster
-                if (cameraError != null && cameraError.isNotEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 64,
-                          color: Colors.red.withOpacity(0.7),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Error loading recordings for ${camera.name}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 32),
-                          child: Text(
-                            cameraError,
-                            style: TextStyle(
-                              color: Colors.red.withOpacity(0.8),
-                              fontSize: 14,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: () => _updateRecordingsForSelectedDay(),
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                
-                if (recordings.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'No recordings available for ${camera.name}',
-                      style: const TextStyle(color: Colors.grey),
-                    ),
-                  );
-                }
-                
-                return ListView.builder(
-                  itemCount: recordings.length,
-                  itemBuilder: (context, index) {
-                    final recording = recordings[index];
-                    final recordingName = recording.split('/').last;
-                    
-                    // Use our new timestamp parsing function
-                    final timestamp = _parseTimestampFromFilename(recordingName);
-                    
-                    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
-                    final device = cameraDevicesProvider.getDeviceForCamera(camera);
-                    
-                    final recordingUrl = device != null ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$recording' : '';
-                    
-                    final isSelected = _isMultiSelectionMode ? 
-                      _selectedForDownload.contains(recordingUrl) :
-                      _activeCamera == camera && _activeRecording == recording;
-                    
-                    return Card(
-                      margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                      color: isSelected ? AppTheme.primaryBlue.withOpacity(0.2) : null,
-                      child: ListTile(
-                        leading: Icon(
-                          isSelected && _isMultiSelectionMode ? Icons.check_circle : 
-                          recordingName.toLowerCase().endsWith('.m3u8') ? Icons.playlist_play : Icons.videocam,
-                          color: isSelected ? AppTheme.primaryBlue : null,
-                        ),
-                        title: Row(
-                          children: [
-                            Expanded(child: Text(recordingName)),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: recordingName.toLowerCase().endsWith('.m3u8') 
-                                    ? Colors.orange.withOpacity(0.2)
-                                    : Colors.blue.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                recordingName.toLowerCase().endsWith('.m3u8') ? 'M3U8' : 'MKV',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: recordingName.toLowerCase().endsWith('.m3u8') 
-                                      ? Colors.orange
-                                      : Colors.blue,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        subtitle: timestamp != null
-                          ? Text(DateFormat('HH:mm:ss').format(timestamp))
-                          : null,
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.play_arrow),
-                              onPressed: _isMultiSelectionMode ? null : () => _selectRecording(camera, recording),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.download),
-                              onPressed: () async {
-                                if (_isMultiSelectionMode) {
-                                  _selectRecording(camera, recording);
-                                } else {
-                                  // Tekli indirme işlemi
-                                  final permissionStatus = await _checkAndRequestPermissions();
-                                  if (!permissionStatus) {
-                                    if (!context.mounted) return;
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Storage permission required to download recordings'))
-                                    );
-                                    return;
-                                  }
-                                  
-                                  final downloadDir = await _getDownloadDirectory();
-                                  if (downloadDir == null) {
-                                    if (!context.mounted) return;
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Failed to get download directory'))
-                                    );
-                                    return;
-                                  }
-                                  
-                                  final fileName = recording.split('/').last;
-                                  final filePath = '${downloadDir.path}/$fileName';
-                                  
-                                  try {
-                                    final response = await http.get(Uri.parse(recordingUrl));
-                                    
-                                    if (response.statusCode == 200) {
-                                      final file = File(filePath);
-                                      await file.writeAsBytes(response.bodyBytes);
-                                      
-                                      if (!context.mounted) return;
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text('Downloaded: $fileName'),
-                                          action: SnackBarAction(
-                                            label: 'Open',
-                                            onPressed: () => _openDownloadedFile(filePath),
-                                          ),
-                                        )
-                                      );
-                                    } else {
-                                      throw Exception('Failed to download: ${response.statusCode}');
-                                    }
-                                  } catch (e) {
-                                    if (!context.mounted) return;
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Error downloading $fileName: $e'))
-                                    );
-                                  }
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                        onTap: () => _selectRecording(camera, recording),
-                      ),
-                    );
-                  },
-                );
-              }).toList(),
+              children: [
+                // Toplu İzle içeriği - EN BAŞTA
+                if (groups.isNotEmpty)
+                  _buildGroupRecordingsList(groups),
+                // Her kamera için içerik
+                ..._cameraRecordings.entries.map((entry) {
+                  return _buildCameraRecordingsList(entry.key, entry.value);
+                }),
+              ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildCameraRecordingsList(Camera camera, List<String> recordings) {
+    final cameraError = _cameraErrors[camera];
+    
+    // Hata varsa göster
+    if (cameraError != null && cameraError.isNotEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 64,
+              color: Colors.red.withOpacity(0.7),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Error loading recordings for ${camera.name}',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Text(
+                cameraError,
+                style: TextStyle(
+                  color: Colors.red.withOpacity(0.8),
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () => _updateRecordingsForSelectedDay(),
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    if (recordings.isEmpty) {
+      return Center(
+        child: Text(
+          'No recordings available for ${camera.name}',
+          style: const TextStyle(color: Colors.grey),
+        ),
+      );
+    }
+    
+    return ListView.builder(
+      itemCount: recordings.length,
+      itemBuilder: (context, index) {
+        final recording = recordings[index];
+        final recordingName = recording.split('/').last;
+        final timestamp = _parseTimestampFromFilename(recordingName);
+        
+        final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+        final device = cameraDevicesProvider.getDeviceForCamera(camera);
+        final recordingUrl = device != null ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$recording' : '';
+        
+        final isSelected = _isMultiSelectionMode ? 
+          _selectedForDownload.contains(recordingUrl) :
+          _activeCamera == camera && _activeRecording == recording;
+        
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          color: isSelected ? AppTheme.primaryBlue.withOpacity(0.2) : null,
+          child: ListTile(
+            leading: Icon(
+              isSelected && _isMultiSelectionMode ? Icons.check_circle : 
+              recordingName.toLowerCase().endsWith('.m3u8') ? Icons.playlist_play : Icons.videocam,
+              color: isSelected ? AppTheme.primaryBlue : null,
+            ),
+            title: Row(
+              children: [
+                Expanded(child: Text(recordingName)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: recordingName.toLowerCase().endsWith('.m3u8') 
+                        ? Colors.orange.withOpacity(0.2)
+                        : Colors.blue.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    recordingName.toLowerCase().endsWith('.m3u8') ? 'M3U8' : 'MKV',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: recordingName.toLowerCase().endsWith('.m3u8') 
+                          ? Colors.orange
+                          : Colors.blue,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            subtitle: timestamp != null
+              ? Text(DateFormat('HH:mm:ss').format(timestamp))
+              : null,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.play_arrow),
+                  onPressed: _isMultiSelectionMode ? null : () => _selectRecording(camera, recording),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.download),
+                  onPressed: () => _downloadSingleRecording(camera, recording, recordingUrl),
+                ),
+              ],
+            ),
+            onTap: () => _selectRecording(camera, recording),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildGroupRecordingsList(List<List<RecordingTime>> groups) {
+    return ListView.builder(
+      itemCount: groups.length,
+      itemBuilder: (context, index) {
+        final group = groups[index];
+        final groupTime = group.isNotEmpty 
+          ? DateFormat('HH:mm:ss').format(group.first.timestamp)
+          : '';
+        
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          child: ListTile(
+            leading: const Icon(Icons.play_circle_fill, color: AppTheme.primaryOrange),
+            title: Text('Grup ${index + 1} - $groupTime'),
+            subtitle: Text(
+              '${group.length} kamera: ${group.map((r) => r.camera.name).join(', ')}',
+            ),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () => _openMultiWatchScreen(group),
+          ),
+        );
+      },
+    );
+  }
+
+  void _downloadSingleRecording(Camera camera, String recording, String recordingUrl) async {
+    if (_isMultiSelectionMode) {
+      _selectRecording(camera, recording);
+      return;
+    }
+    
+    // Tekli indirme işlemi
+    final permissionStatus = await _checkAndRequestPermissions();
+    if (!permissionStatus) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Storage permission required to download recordings'))
+      );
+      return;
+    }
+    
+    final downloadDir = await _getDownloadDirectory();
+    if (downloadDir == null) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to get download directory'))
+      );
+      return;
+    }
+    
+    final fileName = recording.split('/').last;
+    final filePath = '${downloadDir.path}/$fileName';
+    
+    try {
+      final response = await http.get(Uri.parse(recordingUrl));
+      
+      if (response.statusCode == 200) {
+        final file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+        
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Downloaded: $fileName'),
+            action: SnackBarAction(
+              label: 'Open',
+              onPressed: () => _openDownloadedFile(filePath),
+            ),
+          )
+        );
+      } else {
+        throw Exception('Failed to download: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error downloading $fileName: $e'))
+      );
+    }
   }
   
   Widget _buildCompactCalendar() {
