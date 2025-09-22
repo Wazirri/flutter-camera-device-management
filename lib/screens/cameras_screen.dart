@@ -411,6 +411,14 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         // Group cameras by their camera groups
         final Map<String, List<Camera>> camerasGroupedByName = {};
         
+        // Get all cameras
+        List<Camera> allCameras = showOnlyActive 
+          ? provider.cameras.where((camera) => camera.connected).toList()
+          : provider.cameras;
+        
+        // Track which cameras are assigned to groups
+        Set<String> assignedCameraIds = {};
+        
         if (cameraGroups.isNotEmpty) {
           // Initialize groups
           for (final group in cameraGroups) {
@@ -425,7 +433,20 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
               ? camerasInGroup.where((camera) => camera.connected).toList()
               : camerasInGroup;
             camerasGroupedByName[group.name] = filteredCameras;
+            
+            // Track assigned cameras
+            for (final camera in filteredCameras) {
+              assignedCameraIds.add(camera.id);
+            }
           }
+        }
+        
+        // Find ungrouped cameras (not assigned to any group)
+        final ungroupedCameras = allCameras.where((camera) => !assignedCameraIds.contains(camera.id)).toList();
+        
+        // Add ungrouped cameras to a separate group if any exist
+        if (ungroupedCameras.isNotEmpty) {
+          camerasGroupedByName['Ungrouped Cameras'] = ungroupedCameras;
         }
 
         // Remove empty groups
@@ -790,7 +811,7 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
     );
   }
 
-  // Get device name from MAC address
+  // Get device name and IP from MAC address
   String _getDeviceName(BuildContext context, String deviceMac) {
     try {
       final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
@@ -804,13 +825,11 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
       // Find device by MAC address
       for (var device in provider.devices.values) {
         if (device.macAddress == normalizedMac || device.macKey == deviceMac) {
+          String deviceName = '';
           if (device.deviceName?.isNotEmpty == true) {
-            // Return full device name without truncation
-            print('DEBUG: Device $deviceMac using full name "${device.deviceName}"');
-            return device.deviceName!;
+            deviceName = device.deviceName!;
           } else if (device.deviceType.isNotEmpty) {
-            print('DEBUG: Device $deviceMac using device type "${device.deviceType}"');
-            return device.deviceType;
+            deviceName = device.deviceType;
           } else {
             // Use shortened MAC as fallback for readability
             String shortMac;
@@ -827,9 +846,16 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
             } else {
               shortMac = deviceMac;
             }
-            print('DEBUG: Device $deviceMac using MAC fallback "$shortMac"');
-            return shortMac;
+            deviceName = shortMac;
           }
+          
+          // Add IP address if available
+          if (device.ipv4.isNotEmpty) {
+            deviceName += ' (${device.ipv4})';
+          }
+          
+          print('DEBUG: Device $deviceMac using full name "$deviceName"');
+          return deviceName;
         }
       }
       

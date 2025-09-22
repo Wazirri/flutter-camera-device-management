@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../providers/websocket_provider_optimized.dart';
 import '../providers/camera_devices_provider_optimized.dart';
 import '../utils/responsive_helper.dart';
+import '../models/camera_device.dart';
 
 class RecordingDownloadScreen extends StatefulWidget {
   const RecordingDownloadScreen({Key? key}) : super(key: key);
@@ -86,50 +87,7 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: 16),
-                          DropdownButtonFormField<String>(
-                            value: _selectedCameraName,
-                            decoration: const InputDecoration(
-                              labelText: 'Select Camera',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.videocam),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please select a camera';
-                              }
-                              return null;
-                            },
-                            items: cameras.map((camera) {
-                              return DropdownMenuItem<String>(
-                                value: camera.name.isNotEmpty ? camera.name : camera.mac,
-                                child: Text(
-                                  camera.name.isNotEmpty 
-                                    ? '${camera.name} (${camera.mac})'
-                                    : camera.mac,
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedCameraName = value;
-                                
-                                // Auto-select the target device for the selected camera
-                                if (value != null) {
-                                  // Find the camera by name or MAC
-                                  final selectedCamera = cameras.firstWhere(
-                                    (camera) => (camera.name.isNotEmpty ? camera.name : camera.mac) == value,
-                                    orElse: () => cameras.first,
-                                  );
-                                  
-                                  // Find the device that contains this camera
-                                  final deviceForCamera = cameraProvider.findDeviceForCamera(selectedCamera);
-                                  if (deviceForCamera != null) {
-                                    _selectedTargetSlaveMac = deviceForCamera.macAddress;
-                                  }
-                                }
-                              });
-                            },
-                          ),
+                          _buildGroupedCameraDropdown(cameras, cameraProvider),
                         ],
                       ),
                     ),
@@ -269,7 +227,7 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
                                   },
                                   items: devices.map((device) {
                                     return DropdownMenuItem<String>(
-                                      value: device.macAddress,
+                                      value: device.macKey,
                                       child: Text(
                                         device.deviceName?.isNotEmpty == true 
                                           ? '${device.deviceName} (${device.macAddress})'
@@ -463,10 +421,24 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
       final cameras = cameraProvider.allCameras;
       
       // Find the selected camera to get its MAC address
-      final selectedCamera = cameras.firstWhere(
-        (camera) => (camera.name.isNotEmpty ? camera.name : camera.mac) == _selectedCameraName!,
-        orElse: () => cameras.first,
-      );
+      Camera? selectedCamera;
+      try {
+        selectedCamera = cameras.firstWhere(
+          (camera) => (camera.name.isNotEmpty ? camera.name : camera.mac) == _selectedCameraName!,
+        );
+      } catch (e) {
+        selectedCamera = cameras.isNotEmpty ? cameras.first : null;
+      }
+      
+      if (selectedCamera == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Selected camera not found'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
       
       // Send conversion request with camera name
       final success = await webSocketProvider.sendConvertRecording(
@@ -504,5 +476,158 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  // Build grouped camera dropdown with camera groups only
+  Widget _buildGroupedCameraDropdown(List<Camera> cameras, CameraDevicesProviderOptimized cameraProvider) {
+    // Group cameras by camera groups only
+    final Map<String, List<Camera>> camerasByGroup = {};
+    
+    // Get camera groups
+    final cameraGroups = cameraProvider.cameraGroupsList;
+    
+    // Group cameras by camera groups first
+    Set<String> groupedCameraIds = {};
+    if (cameraGroups.isNotEmpty) {
+      for (final group in cameraGroups) {
+        final camerasInGroup = cameraProvider.getCamerasInGroup(group.name);
+        if (camerasInGroup.isNotEmpty) {
+          camerasByGroup[group.name] = camerasInGroup;
+          for (final camera in camerasInGroup) {
+            groupedCameraIds.add(camera.id);
+          }
+        }
+      }
+    }
+    
+    // Find ungrouped cameras (not assigned to any group)
+    final ungroupedCameras = cameras.where((camera) => !groupedCameraIds.contains(camera.id)).toList();
+    
+    // Build dropdown items
+    List<DropdownMenuItem<String>> items = [];
+    
+    // Add camera groups
+    camerasByGroup.forEach((groupName, camerasInGroup) {
+      // Add group header
+      items.add(DropdownMenuItem<String>(
+        value: null,
+        enabled: false,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Row(
+            children: [
+              const Icon(Icons.group_work, size: 16, color: Colors.blue),
+              const SizedBox(width: 8),
+              Text(
+                groupName,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ));
+      
+      // Add cameras in this group
+      for (var camera in camerasInGroup) {
+        items.add(DropdownMenuItem<String>(
+          value: camera.name.isNotEmpty ? camera.name : camera.mac,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24),
+            child: Text(
+              camera.name.isNotEmpty 
+                ? '${camera.name} (${camera.mac})'
+                : camera.mac,
+            ),
+          ),
+        ));
+      }
+    });
+    
+    // Add ungrouped cameras if any exist
+    if (ungroupedCameras.isNotEmpty) {
+      // Add ungrouped cameras header
+      items.add(DropdownMenuItem<String>(
+        value: null,
+        enabled: false,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: const Row(
+            children: [
+              Icon(Icons.videocam_off_outlined, size: 16, color: Colors.grey),
+              SizedBox(width: 8),
+              Text(
+                'Ungrouped Cameras',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ));
+      
+      // Add ungrouped cameras
+      for (var camera in ungroupedCameras) {
+        items.add(DropdownMenuItem<String>(
+          value: camera.name.isNotEmpty ? camera.name : camera.mac,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24),
+            child: Text(
+              camera.name.isNotEmpty 
+                ? '${camera.name} (${camera.mac})'
+                : camera.mac,
+            ),
+          ),
+        ));
+      }
+    }
+    
+    return DropdownButtonFormField<String>(
+      value: _selectedCameraName,
+      decoration: const InputDecoration(
+        labelText: 'Select Camera',
+        border: OutlineInputBorder(),
+        prefixIcon: Icon(Icons.videocam),
+        helperText: 'Cameras grouped by Groups and Devices',
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please select a camera';
+        }
+        return null;
+      },
+      items: items,
+      onChanged: (value) {
+        if (value != null) {
+          setState(() {
+            _selectedCameraName = value;
+            
+            // Auto-select the target device for the selected camera
+            // Find the camera by name or MAC
+            Camera? selectedCamera;
+            try {
+              selectedCamera = cameras.firstWhere(
+                (camera) => (camera.name.isNotEmpty ? camera.name : camera.mac) == value,
+              );
+            } catch (e) {
+              // Camera not found
+              selectedCamera = null;
+            }
+            
+            // Find the device that contains this camera
+            if (selectedCamera != null) {
+              final deviceForCamera = cameraProvider.findDeviceForCamera(selectedCamera);
+              if (deviceForCamera != null) {
+                _selectedTargetSlaveMac = deviceForCamera.macKey;
+              }
+            }
+          });
+        }
+      },
+    );
   }
 }

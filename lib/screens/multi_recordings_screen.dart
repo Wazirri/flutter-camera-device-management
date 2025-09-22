@@ -218,6 +218,30 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         }
       }
 
+      // Format 5: Special MP4 format like 000500__001000 (time range format)
+      if (nameWithoutExt.contains('__')) {
+        final parts = nameWithoutExt.split('__');
+        if (parts.length == 2 && parts[0].length == 6 && parts[1].length == 6) {
+          try {
+            // Parse start time (HHMMSS format)
+            final startTimeStr = parts[0];
+            final startHour = int.parse(startTimeStr.substring(0, 2));
+            final startMinute = int.parse(startTimeStr.substring(2, 4));
+            final startSecond = int.parse(startTimeStr.substring(4, 6));
+            
+            // Use the selected day from the calendar as the date
+            final selectedDate = _selectedDay ?? DateTime.now();
+            final timestamp = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, 
+                                     startHour, startMinute, startSecond);
+            
+            print('[MultiRecordings] Parsed MP4 time range format: $nameWithoutExt -> $timestamp');
+            return timestamp;
+          } catch (e) {
+            print('[MultiRecordings] Error parsing MP4 time range format for $nameWithoutExt: $e');
+          }
+        }
+      }
+
     } catch (e) {
       print('[MultiRecordings] Error parsing timestamp from $filename: $e');
     }
@@ -475,10 +499,15 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
             final m3u8Matches = m3u8RegExp.allMatches(html);
             final m3u8Recordings = m3u8Matches.map((m) => m.group(1)!).toList();
             
-            // Tüm kayıtları birleştir
-            final allRecordings = [...mkvRecordings, ...m3u8Recordings];
+            // MP4 dosyalarını bul (özel format dahil: 000500__001000.mp4)
+            final mp4RegExp = RegExp(r'<a href="([^"]+\.mp4)"');
+            final mp4Matches = mp4RegExp.allMatches(html);
+            final mp4Recordings = mp4Matches.map((m) => m.group(1)!).toList();
             
-            print('[MultiRecordings] Found ${mkvRecordings.length} MKV and ${m3u8Recordings.length} M3U8 recordings for ${camera.name}');
+            // Tüm kayıtları birleştir
+            final allRecordings = [...mkvRecordings, ...m3u8Recordings, ...mp4Recordings];
+            
+            print('[MultiRecordings] Found ${mkvRecordings.length} MKV, ${m3u8Recordings.length} M3U8, and ${mp4Recordings.length} MP4 recordings for ${camera.name}');
             print('[MultiRecordings] Total recordings: $allRecordings');
             
             if (mounted) {
@@ -599,7 +628,9 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         final device = cameraDevicesProvider.getDeviceForCamera(camera);
         
         if (device != null) {
-          final completeUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/$recording';
+          // Include date folder in the download URL
+          final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDay ?? DateTime.now());
+          final completeUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/$dateStr/$recording';
           
           if (_selectedForDownload.contains(completeUrl)) {
             _selectedForDownload.remove(completeUrl);
@@ -786,7 +817,18 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       } else if (Platform.isIOS) {
         return await getApplicationDocumentsDirectory();
       } else {
-        // macOS, Windows, Linux için
+        // macOS, Windows, Linux için - desktop
+        if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+          // Desktop için kullanıcıya yer seçtirme seçeneği sun
+          final shouldShowPicker = await _showDownloadLocationDialog();
+          if (!shouldShowPicker) {
+            return await getDownloadsDirectory();
+          }
+          
+          // Kullanıcı kendi yer seçmek istiyorsa Downloads klasörünü kullan
+          // TODO: File picker paketi eklendikten sonra kullanıcı seçimi yapılabilir
+          return await getDownloadsDirectory();
+        }
         return await getDownloadsDirectory();
       }
     } catch (e) {
@@ -795,12 +837,57 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     }
   }
   
-  void _openDownloadedFile(String filePath) {
-    // Platform-specific file açma işlemleri burada yapılabilir
-    // Şu an için sadece bilgi veriyoruz
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('File saved at: $filePath'))
+  Future<bool> _showDownloadLocationDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Download Location'),
+          content: const Text('Choose download location:'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Downloads Folder'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Choose Location'),
+            ),
+          ],
+        );
+      },
     );
+    return result ?? false;
+  }
+  
+  void _openDownloadedFile(String filePath) {
+    if (Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+      // Desktop platformlarda dosyayı explorer/finder'da göster
+      _showInExplorer(filePath);
+    } else {
+      // Mobil platformlarda sadece bilgi ver
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('File saved at: $filePath'))
+      );
+    }
+  }
+  
+  void _showInExplorer(String filePath) {
+    // Dosyayı explorer/finder'da göstermek için platform-specific komutlar
+    try {
+      if (Platform.isMacOS) {
+        Process.run('open', ['-R', filePath]);
+      } else if (Platform.isWindows) {
+        Process.run('explorer', ['/select,', filePath]);
+      } else if (Platform.isLinux) {
+        Process.run('xdg-open', [File(filePath).parent.path]);
+      }
+    } catch (e) {
+      print('Error opening file in explorer: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('File saved at: $filePath'))
+      );
+    }
   }
   
   // Kayıtları ±5dk toleransla grupla
