@@ -383,6 +383,15 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton.icon(
+                  onPressed: () => _navigateToCameraAssignment(group),
+                  icon: const Icon(Icons.videocam, size: 16),
+                  label: const Text('Kamera Eşleştir'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.green,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                TextButton.icon(
                   onPressed: () => _showModifyGroupDialog(group),
                   icon: const Icon(Icons.edit, size: 16),
                   label: const Text('Düzenle'),
@@ -1026,6 +1035,16 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
           ),
         ],
       ),
+    );
+  }
+
+  // ============= NAVIGATION =============
+
+  void _navigateToCameraAssignment(CameraGroup group) {
+    Navigator.pushNamed(
+      context,
+      '/camera-groups',
+      arguments: group.name, // Grup adını argüman olarak gönder
     );
   }
 }

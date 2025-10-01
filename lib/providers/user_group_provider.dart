@@ -37,6 +37,8 @@ class UserGroupProvider with ChangeNotifier {
         final name = message['name'] as String?;
         if (name == 'users') {
           print('UGP: Users data update completed');
+          // Update group memberships based on user types
+          updateUserGroupMembership();
           _batchNotifyListeners();
         } else if (name == 'groups') {
           print('UGP: Groups data update completed');
@@ -92,6 +94,8 @@ class UserGroupProvider with ChangeNotifier {
               break;
             case 'usertype':
               _users[username] = currentUser.copyWith(usertype: value?.toString() ?? '');
+              // Update group membership when usertype changes
+              updateUserGroupMembership();
               break;
             case 'active':
               final isActive = (value == 1 || value == '1' || value == true);
@@ -218,6 +222,99 @@ class UserGroupProvider with ChangeNotifier {
   // Get active users
   List<User> getActiveUsers() {
     return _users.values.where((user) => user.active).toList();
+  }
+
+  // Process camera-to-group assignment from cameras_mac WebSocket messages
+  void processCameraGroupAssignment(String cameraMac, List<String> groupNames) {
+    try {
+      // Remove this camera from all groups first
+      for (var group in _groups.values) {
+        group.removeCamera(cameraMac);
+      }
+
+      // Add camera to specified groups
+      for (var groupName in groupNames) {
+        if (!_groups.containsKey(groupName)) {
+          // Create group if doesn't exist
+          _groups[groupName] = CameraGroup(
+            name: groupName,
+            cameraMacs: [],
+            users: [],
+            permissions: {},
+          );
+        }
+        _groups[groupName]!.addCamera(cameraMac);
+        print('UGP: Added camera $cameraMac to group $groupName');
+      }
+
+      _batchNotifyListeners();
+    } catch (e) {
+      print('UGP: Error processing camera group assignment: $e');
+    }
+  }
+
+  // Update user's group membership
+  void updateUserGroupMembership() {
+    try {
+      // Clear all users from all groups first
+      for (var group in _groups.values) {
+        group.users.clear();
+      }
+
+      // Add users to their groups based on usertype
+      for (var user in _users.values) {
+        if (user.usertype.isNotEmpty) {
+          if (!_groups.containsKey(user.usertype)) {
+            // Create group if doesn't exist
+            _groups[user.usertype] = CameraGroup(
+              name: user.usertype,
+              cameraMacs: [],
+              users: [],
+              permissions: {},
+            );
+          }
+          _groups[user.usertype]!.addUser(user.username);
+          print('UGP: Added user ${user.username} to group ${user.usertype}');
+        }
+      }
+
+      _batchNotifyListeners();
+    } catch (e) {
+      print('UGP: Error updating user group membership: $e');
+    }
+  }
+
+  // Sync camera assignments from camera groups (called from CameraDevicesProvider)
+  void syncCameraGroupsFromProvider(Map<String, CameraGroup> cameraGroupsMap) {
+    try {
+      for (var entry in cameraGroupsMap.entries) {
+        final groupName = entry.key;
+        final cameraGroup = entry.value;
+
+        // Get or create group in UserGroupProvider
+        if (!_groups.containsKey(groupName)) {
+          _groups[groupName] = CameraGroup(
+            name: groupName,
+            cameraMacs: [],
+            users: [],
+            permissions: {},
+          );
+        }
+
+        // Update camera assignments
+        _groups[groupName] = CameraGroup(
+          name: groupName,
+          cameraMacs: List<String>.from(cameraGroup.cameraMacs),
+          users: _groups[groupName]!.users, // Keep existing users
+          permissions: _groups[groupName]!.permissions, // Keep existing permissions
+        );
+      }
+
+      print('UGP: Synced camera assignments from CameraDevicesProvider. Total groups: ${_groups.length}');
+      _batchNotifyListeners();
+    } catch (e) {
+      print('UGP: Error syncing camera groups: $e');
+    }
   }
 
   // Clear all data

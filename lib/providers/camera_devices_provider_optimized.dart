@@ -31,6 +31,9 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
 
   // WebSocket provider reference
   WebSocketProviderOptimized? _webSocketProvider;
+  
+  // UserGroupProvider reference for syncing camera-group assignments
+  dynamic _userGroupProvider;
 
   // Camera name to device mapping for faster lookups
   final Map<String, String> _cameraNameToDeviceMap = {};
@@ -99,6 +102,15 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   // Set WebSocket provider reference
   void setWebSocketProvider(WebSocketProviderOptimized webSocketProvider) {
     _webSocketProvider = webSocketProvider;
+  }
+  
+  // Set UserGroupProvider reference for syncing camera-group assignments
+  void setUserGroupProvider(dynamic userGroupProvider) {
+    _userGroupProvider = userGroupProvider;
+    // Initial sync of existing groups
+    if (_userGroupProvider != null) {
+      _userGroupProvider.syncCameraGroupsFromProvider(_cameraGroups);
+    }
   }
   
   // Get or create camera
@@ -383,6 +395,11 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
           if (!_cameraGroups[groupValue]!.cameraMacs.contains(camera.mac)) {
             _cameraGroups[groupValue]!.cameraMacs.add(camera.mac);
             print('CDP_OPT: ✅ Camera ${camera.mac} added to group "$groupValue". Group now has ${_cameraGroups[groupValue]!.cameraMacs.length} cameras');
+          }
+          
+          // Sync to UserGroupProvider
+          if (_userGroupProvider != null) {
+            _userGroupProvider.syncCameraGroupsFromProvider(_cameraGroups);
           }
           
           print('CDP_OPT: ✅ Group "$groupValue" ensured in global groups. Total groups: ${_cameraGroups.length}');

@@ -84,6 +84,7 @@ Future<void> main() async {
     webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
     webSocketProvider.setUserGroupProvider(userGroupProvider);
     cameraDevicesProvider.setWebSocketProvider(webSocketProvider);
+    cameraDevicesProvider.setUserGroupProvider(userGroupProvider);
     
     // Run the app with providers
     runApp(
