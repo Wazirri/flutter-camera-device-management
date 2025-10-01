@@ -297,19 +297,13 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
 
   void createGroup(String groupName, {bool fromWebSocket = false}) async {
     if (!_cameraGroups.containsKey(groupName) && groupName.isNotEmpty) {
-      // If not from WebSocket, send WebSocket command first
-      if (!fromWebSocket && _webSocketProvider != null) {
-        print('CDP_OPT: Sending create group command via WebSocket: $groupName');
-        bool success = await _webSocketProvider!.sendCreateCameraGroup(groupName);
-        if (!success) {
-          print('CDP_OPT: Failed to send create group command via WebSocket');
-          return; // Don't create locally if WebSocket command failed
-        }
-      } else if (!fromWebSocket) {
-        print('CDP_OPT: WebSocket provider not available, creating group locally only');
+      // Note: Camera groups are created locally for camera-to-group assignments.
+      // This is separate from user permission groups managed via CREATEGROUP command.
+      if (!fromWebSocket) {
+        print('CDP_OPT: Creating camera group locally for assignments: $groupName');
       }
       
-      // Create locally (this will also be called when WebSocket confirms the creation)
+      // Create locally
       _cameraGroups[groupName] = CameraGroup(name: groupName, cameraMacs: []);
       _cachedGroupsList = null;
       _batchNotifyListeners();
@@ -713,15 +707,6 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       
       String dataPath = message['data'] ?? '';
       dynamic value = message['val'];
-      
-      // Check for cameraGroups configuration messages
-      if (dataPath.contains('configuration.cameraGroups[')) {
-        print('CDP_OPT: *** DETECTED CAMERA GROUPS MESSAGE ***');
-        print('CDP_OPT: DataPath: $dataPath');
-        print('CDP_OPT: Value: $value');
-        await _processCameraGroupMessage(dataPath, value);
-        return;
-      }
       
       // Skip duplicate messages
       String messageKey = '${dataPath}_${value.toString()}';
@@ -1640,44 +1625,6 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       _cachedGroupsList = null;
     }
   }
-  
-  // WebSocket'ten gelen CAM_GROUP_ADD komutunu işle
-  void addGroupFromWebSocket(String groupName) {
-    try {
-      // Daha sıkı filtreleme: boş, null, sadece whitespace olanları reddet
-      if (groupName.isEmpty || groupName.trim().isEmpty) {
-        print("CDP_OPT: Ignoring empty or whitespace-only group name from WebSocket.");
-        return;
-      }
-      
-      // Çok kısa grup isimlerini de reddet
-      if (groupName.trim().length < 2) {
-        print("CDP_OPT: Ignoring too short group name from WebSocket: '$groupName'");
-        return;
-      }
-      
-      final String cleanGroupName = groupName.trim();
-      
-      // Grup zaten varsa, uyarı ver ama hata verme
-      if (_cameraGroups.containsKey(cleanGroupName)) {
-        print("CDP_OPT: Group '$cleanGroupName' already exists, skipping creation.");
-        return;
-      }
-      
-      // Yeni grup oluştur
-      _cameraGroups[cleanGroupName] = CameraGroup(
-        name: cleanGroupName,
-        cameraMacs: [],
-      );
-      
-      _cachedGroupsList = null; // Cache'i invalidate et
-      _batchNotifyListeners();
-      print("CDP_OPT: Successfully created new group from WebSocket: '$cleanGroupName'");
-      
-    } catch (e) {
-      print("CDP_OPT: Error creating group from WebSocket: $e. Group name: '$groupName'");
-    }
-  }
 
   // Print device summary for debugging
   void _printDeviceSummary() {
@@ -1781,53 +1728,6 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       
     } catch (e) {
       print('CDP_OPT: Error processing sysinfo message: $e');
-    }
-  }
-
-  // Process camera group configuration messages from master device
-  Future<void> _processCameraGroupMessage(String dataPath, dynamic value) async {
-    try {
-      print('CDP_OPT: *** CAMERA GROUP MESSAGE RECEIVED ***');
-      print('CDP_OPT: Data path: $dataPath');
-      print('CDP_OPT: Value: $value');
-      
-      // Parse the dataPath to extract group index and device MAC
-      // Example: "ecs_slaves.m_CA_1A_E6_81_C9_F4.configuration.cameraGroups[0]"
-      final RegExp regExp = RegExp(r'ecs_slaves\.m_([A-F0-9_]+)\.configuration\.cameraGroups\[(\d+)\]');
-      final match = regExp.firstMatch(dataPath);
-      
-      if (match == null) {
-        print('CDP_OPT: Invalid cameraGroups path format: $dataPath');
-        return;
-      }
-      
-      final deviceMac = match.group(1)?.replaceAll('_', ':') ?? '';
-      final groupIndex = int.tryParse(match.group(2) ?? '') ?? -1;
-      final groupName = value?.toString() ?? '';
-      
-      print('CDP_OPT: Parsed - Device MAC: $deviceMac, Group Index: $groupIndex, Group Name: $groupName');
-      
-      if (deviceMac.isEmpty || groupIndex < 0 || groupName.isEmpty) {
-        print('CDP_OPT: Invalid cameraGroup data - MAC: $deviceMac, Index: $groupIndex, Name: $groupName');
-        return;
-      }
-      
-      print('CDP_OPT: Processing cameraGroup from device $deviceMac (master check skipped)');
-      
-      // Create or update the camera group (without checking if device is master)
-      if (!_cameraGroups.containsKey(groupName)) {
-        // Use createGroup with fromWebSocket=true to avoid sending WebSocket command back
-        createGroup(groupName, fromWebSocket: true);
-        print('CDP_OPT: Created new camera group from device $deviceMac: $groupName');
-      } else {
-        print('CDP_OPT: Camera group already exists: $groupName');
-      }
-      
-      print('CDP_OPT: Successfully processed cameraGroup message for $groupName');
-      
-    } catch (e, s) {
-      print('CDP_OPT: Error processing camera group message: $e');
-      print('CDP_OPT: Stack trace: $s');
     }
   }
   

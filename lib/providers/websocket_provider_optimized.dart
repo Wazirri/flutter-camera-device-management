@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:movita_ecs/models/system_info.dart';
 import 'camera_devices_provider_optimized.dart';
+import 'user_group_provider.dart';
 
 class WebSocketProviderOptimized with ChangeNotifier {
   WebSocket? _socket;
@@ -24,6 +25,9 @@ class WebSocketProviderOptimized with ChangeNotifier {
   
   // Reference to CameraDevicesProvider
   CameraDevicesProviderOptimized? _cameraDevicesProvider;
+  
+  // Reference to UserGroupProvider
+  UserGroupProvider? _userGroupProvider;
 
   // System info stream controller
   final _systemInfoController = StreamController<SystemInfo>.broadcast();
@@ -61,6 +65,11 @@ class WebSocketProviderOptimized with ChangeNotifier {
   // Set the camera devices provider
   void setCameraDevicesProvider(CameraDevicesProviderOptimized provider) {
     _cameraDevicesProvider = provider;
+  }
+
+  // Set the user group provider
+  void setUserGroupProvider(UserGroupProvider provider) {
+    _userGroupProvider = provider;
   }
 
   // Detect platform and use local server if desktop
@@ -310,17 +319,63 @@ class WebSocketProviderOptimized with ChangeNotifier {
     return await sendCommand(command);
   }
 
-  /// Create a new camera group via WebSocket command
-  Future<bool> sendCreateCameraGroup(String groupName) async {
-    final command = "CAM_GROUP_ADD $groupName";
-    print('WebSocketProvider: Sending create group command: $command');
-    return await sendCommand(command);
-  }
-
   /// Remove a camera from a group via WebSocket command
   Future<bool> sendRemoveGroupFromCamera(String cameraMac, String groupName) async {
     final command = "REMOVE_GROUP_FROM_CAM $cameraMac $groupName";
     print('WebSocketProvider: Sending remove group from camera command: $command');
+    return await sendCommand(command);
+  }
+
+  // ============= USER MANAGEMENT COMMANDS =============
+  
+  /// Create a new user
+  /// Format: CREATEUSER username password name group_name
+  Future<bool> sendCreateUser(String username, String password, String name, String groupName) async {
+    final command = 'CREATEUSER "$username" "$password" "$name" "$groupName"';
+    print('WebSocketProvider: Sending create user command: $command');
+    return await sendCommand(command);
+  }
+
+  /// Delete a user
+  /// Format: DELETEUSER username
+  Future<bool> sendDeleteUser(String username) async {
+    final command = 'DELETEUSER "$username"';
+    print('WebSocketProvider: Sending delete user command: $command');
+    return await sendCommand(command);
+  }
+
+  /// Change user password
+  /// Format: CHANGEPASS username new_pass
+  Future<bool> sendChangePassword(String username, String newPassword) async {
+    final command = 'CHANGEPASS "$username" "$newPassword"';
+    print('WebSocketProvider: Sending change password command: $command');
+    return await sendCommand(command);
+  }
+
+  // ============= GROUP MANAGEMENT COMMANDS =============
+  
+  /// Create a new group
+  /// Format: CREATEGROUP groupname description permissions
+  /// Permissions: view,record,user_management
+  Future<bool> sendCreateGroup(String groupName, String description, String permissions) async {
+    final command = 'CREATEGROUP "$groupName" "$description" "$permissions"';
+    print('WebSocketProvider: Sending create group command: $command');
+    return await sendCommand(command);
+  }
+
+  /// Modify a group
+  /// Format: MODIFYGROUP groupname description permissions
+  Future<bool> sendModifyGroup(String groupName, String description, String permissions) async {
+    final command = 'MODIFYGROUP "$groupName" "$description" "$permissions"';
+    print('WebSocketProvider: Sending modify group command: $command');
+    return await sendCommand(command);
+  }
+
+  /// Delete a group
+  /// Format: DELETEGROUP groupname
+  Future<bool> sendDeleteGroup(String groupName) async {
+    final command = 'DELETEGROUP "$groupName"';
+    print('WebSocketProvider: Sending delete group command: $command');
     return await sendCommand(command);
   }
 
@@ -460,6 +515,8 @@ class WebSocketProviderOptimized with ChangeNotifier {
           // Send Monitor ecs_slaves message immediately after loginok
           if (_socket != null) {
             _socket!.add('Monitor ecs_slaves');
+            _socket!.add('Monitor users');
+            _socket!.add('Monitor groups');
             print('[${DateTime.now().toString().split('.').first}] Sent Monitor ecs_slaves command');
           }
           
@@ -475,6 +532,11 @@ class WebSocketProviderOptimized with ChangeNotifier {
           print('[${DateTime.now().toString().split('.').first}] changedone received for ecs_slaves - login complete');
             print('changedone: isWaitingForChangedone now $_isWaitingForChangedone, isLoggedIn=$_isLoggedIn');
             _batchNotifyListeners();
+          }
+          
+          // Forward to UserGroupProvider for users and groups completion
+          if (_userGroupProvider != null) {
+            _userGroupProvider!.processWebSocketMessage(jsonData);
           }
           break;
 
@@ -496,6 +558,11 @@ class WebSocketProviderOptimized with ChangeNotifier {
             _cameraDevicesProvider!.processWebSocketMessage(jsonData);
             print('[${DateTime.now().toString().split('.').first}] Received camera device update');
           }
+          
+          // Forward user and group updates to UserGroupProvider
+          if (_userGroupProvider != null) {
+            _userGroupProvider!.processWebSocketMessage(jsonData);
+          }
           break;
 
         default:
@@ -516,39 +583,10 @@ class WebSocketProviderOptimized with ChangeNotifier {
       
       final command = parts[0];
       
-      switch (command) {
-        case 'CAM_GROUP_ADD':
-          if (parts.length >= 2) {
-            final groupName = parts.sublist(1).join(' '); // Join all parts after command as group name
-            _handleCamGroupAdd(groupName);
-          }
-          break;
-        default:
-          print('[${DateTime.now().toString().split('.').first}] Received unknown string command: $command');
-          break;
-      }
+      // No string commands currently handled
+      print('[${DateTime.now().toString().split('.').first}] Received string command: $command');
     } catch (e) {
       print('[${DateTime.now().toString().split('.').first}] Error processing string message: $e');
-    }
-  }
-  
-  // CAM_GROUP_ADD komutunu işle
-  void _handleCamGroupAdd(String groupName) {
-    try {
-      if (groupName.isEmpty) {
-        print('CAM_GROUP_ADD: Empty group name received');
-        return;
-      }
-      
-      // CameraDevicesProvider'a grup ekleme mesajı gönder
-      if (_cameraDevicesProvider != null) {
-        _cameraDevicesProvider!.addGroupFromWebSocket(groupName);
-        print('[${DateTime.now().toString().split('.').first}] CAM_GROUP_ADD: Added group "$groupName"');
-      }
-      
-      _batchNotifyListeners();
-    } catch (e) {
-      print('[${DateTime.now().toString().split('.').first}] Error handling CAM_GROUP_ADD: $e');
     }
   }
 

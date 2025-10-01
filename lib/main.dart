@@ -13,6 +13,7 @@ import 'screens/cameras_screen.dart';
 import 'screens/camera_devices_screen.dart';
 import 'screens/camera_groups_screen.dart';  // New camera groups screen
 import 'screens/recording_download_screen.dart';  // Recording download screen
+import 'screens/user_group_management_screen.dart';  // User and group management screen
 import 'screens/dashboard_screen_optimized.dart'; // Using optimized dashboard
 import 'screens/live_view_screen.dart';
 import 'screens/login_screen_optimized.dart';
@@ -33,6 +34,7 @@ import 'providers/websocket_provider_optimized.dart'; // Using optimized websock
 import 'providers/camera_devices_provider_optimized.dart'; // Using optimized camera devices provider
 import 'providers/multi_view_layout_provider.dart';
 import 'providers/multi_camera_view_provider.dart'; // Multi camera view provider
+import 'providers/user_group_provider.dart'; // User group provider
 
 Future<void> main() async {
   // This captures errors that happen during initialization
@@ -76,9 +78,11 @@ Future<void> main() async {
     final cameraDevicesProvider = CameraDevicesProviderOptimized();
     final multiViewLayoutProvider = MultiViewLayoutProvider();
     final multiCameraViewProvider = MultiCameraViewProvider();
+    final userGroupProvider = UserGroupProvider();
     
     // Connect the providers
     webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
+    webSocketProvider.setUserGroupProvider(userGroupProvider);
     cameraDevicesProvider.setWebSocketProvider(webSocketProvider);
     
     // Run the app with providers
@@ -89,6 +93,7 @@ Future<void> main() async {
           ChangeNotifierProvider<CameraDevicesProviderOptimized>.value(value: cameraDevicesProvider),
           ChangeNotifierProvider<MultiViewLayoutProvider>.value(value: multiViewLayoutProvider),
           ChangeNotifierProvider<MultiCameraViewProvider>.value(value: multiCameraViewProvider),
+          ChangeNotifierProvider<UserGroupProvider>.value(value: userGroupProvider),
         ],
         child: const MyApp(),
       ),
@@ -220,6 +225,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           '/camera-groups': (context) => const AppShell(
             currentRoute: '/camera-groups',
             child: CameraGroupsScreen(),
+          ),
+          '/user-group-management': (context) => const AppShell(
+            currentRoute: '/user-group-management',
+            child: UserGroupManagementScreen(),
           ),
           '/recording-download': (context) => const AppShell(
             currentRoute: '/recording-download',
