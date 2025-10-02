@@ -705,39 +705,20 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
     final Map<String, List<Camera>> groupedCameras = {};
     for (final group in cameraGroups) {
       // Get cameras by MACs listed in the group
-      print("CameraGroupsScreen: Looking for cameras in group '${group.name}' with MACs: ${group.cameraMacs}");
-      
       final camerasInGroup = group.cameraMacs
-          .map((mac) {
-            final foundCamera = cameraProvider.cameras.firstWhere(
-              (camera) {
-                final matches = camera.mac == mac;
-                if (!matches && camera.mac.isNotEmpty) {
-                  // Debug: Show MAC comparison for first few cameras
-                  print("CameraGroupsScreen: MAC mismatch - Looking for '$mac', found '${camera.mac}' (${camera.name})");
-                }
-                return matches;
-              },
-              orElse: () {
-                print("CameraGroupsScreen: ❌ Camera with MAC '$mac' not found in cameras list");
-                return Camera(
+          .map((mac) => cameraProvider.cameras.firstWhere(
+                (camera) => camera.mac == mac,
+                orElse: () => Camera(
                   mac: mac,
                   name: 'Unknown',
                   ip: '',
                   index: -1,
                   connected: false,
-                );
-              },
-            );
-            if (foundCamera.name != 'Unknown') {
-              print("CameraGroupsScreen: ✅ Found camera '${foundCamera.name}' (MAC: ${foundCamera.mac})");
-            }
-            return foundCamera;
-          })
+                ),
+              ))
           .where((camera) => camera.name != 'Unknown') // Filter out not found cameras
           .toList();
       groupedCameras[group.name] = camerasInGroup;
-      print("CameraGroupsScreen: Group '${group.name}' has ${camerasInGroup.length} cameras from ${group.cameraMacs.length} MACs");
     }
     
     // Filter groups based on search query
