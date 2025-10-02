@@ -287,11 +287,12 @@ class UserGroupProvider with ChangeNotifier {
   // Sync camera assignments from camera groups (called from CameraDevicesProvider)
   void syncCameraGroupsFromProvider(Map<String, CameraGroup> cameraGroupsMap) {
     try {
+      // Update camera assignments for groups that exist in CameraDevicesProvider
       for (var entry in cameraGroupsMap.entries) {
         final groupName = entry.key;
         final cameraGroup = entry.value;
 
-        // Get or create group in UserGroupProvider
+        // Get or create group in UserGroupProvider if it doesn't exist
         if (!_groups.containsKey(groupName)) {
           _groups[groupName] = CameraGroup(
             name: groupName,
@@ -299,18 +300,35 @@ class UserGroupProvider with ChangeNotifier {
             users: [],
             permissions: {},
           );
+          print('UGP: Created new group from camera assignments: $groupName');
         }
 
-        // Update camera assignments
+        // Update ONLY camera assignments, keep users and permissions from WebSocket
         _groups[groupName] = CameraGroup(
           name: groupName,
           cameraMacs: List<String>.from(cameraGroup.cameraMacs),
-          users: _groups[groupName]!.users, // Keep existing users
-          permissions: _groups[groupName]!.permissions, // Keep existing permissions
+          users: _groups[groupName]!.users, // Keep existing users from WebSocket
+          permissions: _groups[groupName]!.permissions, // Keep existing permissions from WebSocket
         );
+        print('UGP: Updated camera assignments for group "$groupName": ${cameraGroup.cameraMacs.length} cameras');
       }
 
-      print('UGP: Synced camera assignments from CameraDevicesProvider. Total groups: ${_groups.length}');
+      // Also clear camera assignments for groups that don't have any cameras in CameraDevicesProvider
+      // but still exist in UserGroupProvider (permission groups without camera assignments)
+      for (var groupName in _groups.keys) {
+        if (!cameraGroupsMap.containsKey(groupName)) {
+          // This group has no camera assignments, clear its cameraMacs list
+          _groups[groupName] = CameraGroup(
+            name: groupName,
+            cameraMacs: [], // Clear camera assignments
+            users: _groups[groupName]!.users,
+            permissions: _groups[groupName]!.permissions,
+          );
+          print('UGP: Cleared camera assignments for group "$groupName" (no cameras assigned)');
+        }
+      }
+
+      print('UGP: Synced camera assignments from CameraDevicesProvider. Total groups: ${_groups.length}, Groups with cameras: ${cameraGroupsMap.length}');
       _batchNotifyListeners();
     } catch (e) {
       print('UGP: Error syncing camera groups: $e');

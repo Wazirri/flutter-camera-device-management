@@ -636,12 +636,10 @@ void _showAddGroupDialog(BuildContext context, Camera camera, WebSocketProviderO
                 onPressed: selectedGroupName == null || existingGroups.isEmpty
                   ? null 
                   : () async {
-                      // Kamera MAC'i burada camera.mac'ten alınmalı.
-                      // WebSocket komutunun beklediği format "ADD_GROUP_TO_CAM <camera_mac> <group_name>"
-                      // camera.mac zaten doğru formatta olmalı (örn: "00:11:22:33:44:55_cam0")
-                      // Eğer değilse, burada wsProvider.sendAddGroupToCamera göndermeden önce formatlamanız gerekir.
-                      // Şimdilik camera.mac'in doğru olduğunu varsayıyoruz.
-                      final String cameraIdentifier = camera.mac; // Doğrudan camera.mac kullanılıyor
+                      // WebSocket command format: ADD_GROUP_TO_CAM <camera_mac> <group_name>
+                      // Example: ADD_GROUP_TO_CAM e8:b7:23:0c:11:b2 timko1
+                      // Use camera.mac directly without any conversion
+                      final String cameraIdentifier = camera.mac;
                       
                       if (cameraIdentifier.isEmpty) {
                         if (!context.mounted) return;

@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
 import '../models/camera_group.dart';
 import '../providers/camera_devices_provider_optimized.dart';
+import '../providers/user_group_provider.dart';
+import '../providers/websocket_provider_optimized.dart';
 import '../theme/app_theme.dart';
 import 'live_view_screen.dart';
 import 'multi_recordings_screen.dart';
@@ -281,13 +283,109 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
     });
   }
 
+  // Show dialog to assign cameras to a group
+  Future<void> _showAssignCamerasDialog(CameraGroup group) async {
+    final cameraProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    
+    // Get all available cameras
+    final allCameras = cameraProvider.cameras.where((c) => c.mac.isNotEmpty && !c.mac.startsWith('m_')).toList();
+    
+    // Track selected cameras (initially select cameras already in the group)
+    final selectedCameraMacs = Set<String>.from(group.cameraMacs);
+    
+    final result = await showDialog<Set<String>>(
+      context: context,
+      builder: (context) => _CameraSelectionDialog(
+        groupName: group.name,
+        allCameras: allCameras,
+        initialSelectedMacs: selectedCameraMacs,
+      ),
+    );
+    
+    if (result != null) {
+      // Send camera assignments to server via WebSocket
+      await _assignCamerasToGroup(group.name, result);
+    }
+  }
+
+  // Assign cameras to group by sending WebSocket messages
+  Future<void> _assignCamerasToGroup(String groupName, Set<String> selectedCameraMacs) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final wsProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
+      
+      print('CDP: Assigning ${selectedCameraMacs.length} cameras to group $groupName');
+      
+      // Send individual WebSocket messages for each camera
+      int successCount = 0;
+      int failCount = 0;
+      
+      for (final cameraMac in selectedCameraMacs) {
+        try {
+          // Send ADD_GROUP_TO_CAM command for each camera
+          // Format: ADD_GROUP_TO_CAM <camera_mac> <group_name>
+          // Example: ADD_GROUP_TO_CAM e8:b7:23:0c:11:b2 timko1
+          final success = await wsProvider.sendAddGroupToCamera(cameraMac, groupName);
+          
+          if (success) {
+            successCount++;
+            print('CDP: ✅ Successfully assigned camera $cameraMac to group $groupName');
+          } else {
+            failCount++;
+            print('CDP: ❌ Failed to assign camera $cameraMac to group $groupName');
+          }
+          
+          // Small delay between messages to avoid overwhelming the server
+          await Future.delayed(const Duration(milliseconds: 50));
+        } catch (e) {
+          failCount++;
+          print('CDP: ❌ Error assigning camera $cameraMac: $e');
+        }
+      }
+      
+      // Show result
+      if (failCount == 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('$successCount kamera başarıyla $groupName grubuna atandı'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('$successCount başarılı, $failCount başarısız'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      
+      await _loadCameraGroups();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Hata: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   // Build a camera group expansion panel
   Widget _buildCameraGroup(BuildContext context, CameraGroup group, List<Camera> camerasInGroup) {
     final bool isExpanded = _expandedGroupNames.contains(group.name);
-    final String subtitle = '${camerasInGroup.length} camera${camerasInGroup.length != 1 ? 's' : ''}';
     
     // Filter cameras by search query and active status if necessary
     List<Camera> filteredCameras = camerasInGroup;
+    print("CameraGroupsScreen: _buildCameraGroup for '${group.name}': Initial cameras: ${camerasInGroup.length}");
+    
     if (_searchQuery.isNotEmpty) {
       final String lowercaseQuery = _searchQuery.toLowerCase();
       filteredCameras = filteredCameras.where((camera) => 
@@ -295,11 +393,20 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
         camera.ip.toLowerCase().contains(lowercaseQuery) ||
         camera.brand.toLowerCase().contains(lowercaseQuery)
       ).toList();
+      print("CameraGroupsScreen: After search filter for '${group.name}': ${filteredCameras.length} cameras");
     }
     
     if (_showOnlyActive) {
+      final beforeActiveFilter = filteredCameras.length;
       filteredCameras = filteredCameras.where((camera) => camera.connected).toList();
+      print("CameraGroupsScreen: After active filter for '${group.name}': ${filteredCameras.length} cameras (was $beforeActiveFilter, showOnlyActive=$_showOnlyActive)");
+      for (final camera in camerasInGroup) {
+        print("CameraGroupsScreen:   - ${camera.name}: connected=${camera.connected}");
+      }
     }
+    
+    final String subtitle = '${filteredCameras.length} camera${filteredCameras.length != 1 ? 's' : ''}';
+    print("CameraGroupsScreen: Final subtitle for '${group.name}': $subtitle");
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8.0),
@@ -314,8 +421,20 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
               ),
             ),
             subtitle: Text(subtitle),
-            trailing: Icon(
-              isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Assign cameras button
+                IconButton(
+                  icon: const Icon(Icons.video_library),
+                  tooltip: 'Kamera Eşleştir',
+                  onPressed: () => _showAssignCamerasDialog(group),
+                ),
+                // Expand/collapse icon
+                Icon(
+                  isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                ),
+              ],
             ),
             onTap: () => _toggleGroup(group.name),
           ),
@@ -580,17 +699,51 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<CameraDevicesProviderOptimized>(context);
-    final cameraGroups = provider.cameraGroupsList;
+    final cameraProvider = Provider.of<CameraDevicesProviderOptimized>(context);
+    final userGroupProvider = Provider.of<UserGroupProvider>(context);
     
-    print("CameraGroupsScreen: Rendering ${cameraGroups.length} groups: ${cameraGroups.map((g) => g.name).toList()}");
+    // Get groups from UserGroupProvider (permission/user groups)
+    final cameraGroups = userGroupProvider.groupsList;
+    
+    print("CameraGroupsScreen: Rendering ${cameraGroups.length} groups from UserGroupProvider: ${cameraGroups.map((g) => g.name).toList()}");
     
     // For each group, get the cameras in that group
     final Map<CameraGroup, List<Camera>> groupedCameras = {};
     for (final group in cameraGroups) {
-      final camerasInGroup = provider.getCamerasInGroup(group.name);
+      // Get cameras by MACs listed in the group
+      print("CameraGroupsScreen: Looking for cameras in group '${group.name}' with MACs: ${group.cameraMacs}");
+      
+      final camerasInGroup = group.cameraMacs
+          .map((mac) {
+            final foundCamera = cameraProvider.cameras.firstWhere(
+              (camera) {
+                final matches = camera.mac == mac;
+                if (!matches && camera.mac.isNotEmpty) {
+                  // Debug: Show MAC comparison for first few cameras
+                  print("CameraGroupsScreen: MAC mismatch - Looking for '$mac', found '${camera.mac}' (${camera.name})");
+                }
+                return matches;
+              },
+              orElse: () {
+                print("CameraGroupsScreen: ❌ Camera with MAC '$mac' not found in cameras list");
+                return Camera(
+                  mac: mac,
+                  name: 'Unknown',
+                  ip: '',
+                  index: -1,
+                  connected: false,
+                );
+              },
+            );
+            if (foundCamera.name != 'Unknown') {
+              print("CameraGroupsScreen: ✅ Found camera '${foundCamera.name}' (MAC: ${foundCamera.mac})");
+            }
+            return foundCamera;
+          })
+          .where((camera) => camera.name != 'Unknown') // Filter out not found cameras
+          .toList();
       groupedCameras[group] = camerasInGroup;
-      print("CameraGroupsScreen: Group '${group.name}' has ${camerasInGroup.length} cameras");
+      print("CameraGroupsScreen: Group '${group.name}' has ${camerasInGroup.length} cameras from ${group.cameraMacs.length} MACs");
     }
     
     // Filter groups based on search query
@@ -739,6 +892,224 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
                         },
                       ),
                     ),
+    );
+  }
+}
+
+// Dialog for selecting cameras to assign to a group
+class _CameraSelectionDialog extends StatefulWidget {
+  final String groupName;
+  final List<Camera> allCameras;
+  final Set<String> initialSelectedMacs;
+
+  const _CameraSelectionDialog({
+    required this.groupName,
+    required this.allCameras,
+    required this.initialSelectedMacs,
+  });
+
+  @override
+  _CameraSelectionDialogState createState() => _CameraSelectionDialogState();
+}
+
+class _CameraSelectionDialogState extends State<_CameraSelectionDialog> {
+  late Set<String> _selectedMacs;
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedMacs = Set<String>.from(widget.initialSelectedMacs);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Filter cameras by search query
+    final filteredCameras = widget.allCameras.where((camera) {
+      if (_searchQuery.isEmpty) return true;
+      final query = _searchQuery.toLowerCase();
+      return camera.name.toLowerCase().contains(query) ||
+          camera.ip.toLowerCase().contains(query) ||
+          camera.mac.toLowerCase().contains(query);
+    }).toList();
+
+    return Dialog(
+      backgroundColor: AppTheme.darkBackground,
+      child: Container(
+        width: 600,
+        height: 700,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              children: [
+                const Icon(Icons.video_library, color: AppTheme.primaryOrange),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Kamera Eşleştir',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Grup: ${widget.groupName}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+            const Divider(),
+            const SizedBox(height: 8),
+
+            // Search bar
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Kamera ara...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+                fillColor: Colors.grey[900],
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+            ),
+            const SizedBox(height: 12),
+
+            // Selection info
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryOrange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppTheme.primaryOrange.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, size: 16, color: AppTheme.primaryOrange),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${_selectedMacs.length} kamera seçildi',
+                    style: TextStyle(color: AppTheme.primaryOrange),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedMacs.clear();
+                      });
+                    },
+                    child: const Text('Tümünü Temizle'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedMacs.addAll(filteredCameras.map((c) => c.mac));
+                      });
+                    },
+                    child: const Text('Tümünü Seç'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Camera list
+            Expanded(
+              child: filteredCameras.isEmpty
+                  ? const Center(
+                      child: Text('Kamera bulunamadı'),
+                    )
+                  : ListView.builder(
+                      itemCount: filteredCameras.length,
+                      itemBuilder: (context, index) {
+                        final camera = filteredCameras[index];
+                        final isSelected = _selectedMacs.contains(camera.mac);
+
+                        return Card(
+                          color: isSelected
+                              ? AppTheme.primaryOrange.withOpacity(0.1)
+                              : Colors.grey[850],
+                          child: CheckboxListTile(
+                            value: isSelected,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  _selectedMacs.add(camera.mac);
+                                } else {
+                                  _selectedMacs.remove(camera.mac);
+                                }
+                              });
+                            },
+                            title: Text(
+                              camera.name.isEmpty ? 'Unknown Camera' : camera.name,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('MAC: ${camera.mac}'),
+                                if (camera.ip.isNotEmpty) Text('IP: ${camera.ip}'),
+                                if (camera.brand.isNotEmpty) Text('Brand: ${camera.brand}'),
+                              ],
+                            ),
+                            secondary: Icon(
+                              camera.connected ? Icons.videocam : Icons.videocam_off,
+                              color: camera.connected ? Colors.green : Colors.grey,
+                            ),
+                            activeColor: AppTheme.primaryOrange,
+                          ),
+                        );
+                      },
+                    ),
+            ),
+
+            const Divider(),
+
+            // Action buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('İptal'),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(_selectedMacs);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryOrange,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Kaydet'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

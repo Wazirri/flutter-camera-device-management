@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/user_group_provider.dart';
 import '../providers/websocket_provider_optimized.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 import '../models/user.dart';
 import '../models/camera_group.dart';
+import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 
 class UserGroupManagementScreen extends StatefulWidget {
@@ -1040,11 +1042,314 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
 
   // ============= NAVIGATION =============
 
-  void _navigateToCameraAssignment(CameraGroup group) {
-    Navigator.pushNamed(
-      context,
-      '/camera-groups',
-      arguments: group.name, // Grup adını argüman olarak gönder
+  // Show dialog to assign cameras to a group
+  Future<void> _navigateToCameraAssignment(CameraGroup group) async {
+    final cameraProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    
+    // Get all available cameras
+    final allCameras = cameraProvider.cameras.where((c) => c.mac.isNotEmpty && !c.mac.startsWith('m_')).toList();
+    
+    // Track selected cameras (initially select cameras already in the group)
+    final selectedCameraMacs = Set<String>.from(group.cameraMacs);
+    
+    final result = await showDialog<Set<String>>(
+      context: context,
+      builder: (context) => _CameraSelectionDialog(
+        groupName: group.name,
+        allCameras: allCameras,
+        initialSelectedMacs: selectedCameraMacs,
+      ),
+    );
+    
+    if (result != null) {
+      // Send camera assignments to server via WebSocket
+      await _assignCamerasToGroup(group.name, result);
+    }
+  }
+
+  // Assign cameras to group by sending WebSocket messages
+  Future<void> _assignCamerasToGroup(String groupName, Set<String> selectedCameraMacs) async {
+    try {
+      final wsProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
+      
+      print('UGM: Assigning ${selectedCameraMacs.length} cameras to group $groupName');
+      
+      // Send individual WebSocket messages for each camera
+      int successCount = 0;
+      int failCount = 0;
+      
+      for (final cameraMac in selectedCameraMacs) {
+        try {
+          // Send ADD_GROUP_TO_CAM command for each camera
+          // Format: ADD_GROUP_TO_CAM <camera_mac> <group_name>
+          // Example: ADD_GROUP_TO_CAM e8:b7:23:0c:11:b2 timko1
+          final success = await wsProvider.sendAddGroupToCamera(cameraMac, groupName);
+          
+          if (success) {
+            successCount++;
+            print('UGM: ✅ Successfully assigned camera $cameraMac to group $groupName');
+          } else {
+            failCount++;
+            print('UGM: ❌ Failed to assign camera $cameraMac to group $groupName');
+          }
+          
+          // Small delay between messages to avoid overwhelming the server
+          await Future.delayed(const Duration(milliseconds: 50));
+        } catch (e) {
+          failCount++;
+          print('UGM: ❌ Error assigning camera $cameraMac: $e');
+        }
+      }
+      
+      // Show result
+      if (failCount == 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('$successCount kamera başarıyla $groupName grubuna atandı'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('$successCount başarılı, $failCount başarısız'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      
+      setState(() {
+        // Trigger refresh
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Hata: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        // Refresh UI
+      });
+    }
+  }
+}
+
+// Dialog for selecting cameras to assign to a group
+class _CameraSelectionDialog extends StatefulWidget {
+  final String groupName;
+  final List<Camera> allCameras;
+  final Set<String> initialSelectedMacs;
+
+  const _CameraSelectionDialog({
+    required this.groupName,
+    required this.allCameras,
+    required this.initialSelectedMacs,
+  });
+
+  @override
+  _CameraSelectionDialogState createState() => _CameraSelectionDialogState();
+}
+
+class _CameraSelectionDialogState extends State<_CameraSelectionDialog> {
+  late Set<String> _selectedMacs;
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedMacs = Set<String>.from(widget.initialSelectedMacs);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Filter cameras by search query
+    final filteredCameras = widget.allCameras.where((camera) {
+      if (_searchQuery.isEmpty) return true;
+      final query = _searchQuery.toLowerCase();
+      return camera.name.toLowerCase().contains(query) ||
+          camera.ip.toLowerCase().contains(query) ||
+          camera.mac.toLowerCase().contains(query);
+    }).toList();
+
+    return Dialog(
+      backgroundColor: AppTheme.darkBackground,
+      child: Container(
+        width: 600,
+        height: 700,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              children: [
+                const Icon(Icons.video_library, color: AppTheme.primaryOrange),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Kamera Eşleştir',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Grup: ${widget.groupName}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+            const Divider(),
+            const SizedBox(height: 8),
+
+            // Search bar
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Kamera ara...',
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+                fillColor: Colors.grey[900],
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _searchQuery = value;
+                });
+              },
+            ),
+            const SizedBox(height: 12),
+
+            // Selection info
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryOrange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppTheme.primaryOrange.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, size: 16, color: AppTheme.primaryOrange),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${_selectedMacs.length} kamera seçildi',
+                    style: TextStyle(color: AppTheme.primaryOrange),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedMacs.clear();
+                      });
+                    },
+                    child: const Text('Tümünü Temizle'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedMacs.addAll(filteredCameras.map((c) => c.mac));
+                      });
+                    },
+                    child: const Text('Tümünü Seç'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Camera list
+            Expanded(
+              child: filteredCameras.isEmpty
+                  ? const Center(
+                      child: Text('Kamera bulunamadı'),
+                    )
+                  : ListView.builder(
+                      itemCount: filteredCameras.length,
+                      itemBuilder: (context, index) {
+                        final camera = filteredCameras[index];
+                        final isSelected = _selectedMacs.contains(camera.mac);
+
+                        return Card(
+                          color: isSelected
+                              ? AppTheme.primaryOrange.withOpacity(0.1)
+                              : Colors.grey[850],
+                          child: CheckboxListTile(
+                            value: isSelected,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  _selectedMacs.add(camera.mac);
+                                } else {
+                                  _selectedMacs.remove(camera.mac);
+                                }
+                              });
+                            },
+                            title: Text(
+                              camera.name.isEmpty ? 'Unknown Camera' : camera.name,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('MAC: ${camera.mac}'),
+                                if (camera.ip.isNotEmpty) Text('IP: ${camera.ip}'),
+                                if (camera.brand.isNotEmpty) Text('Brand: ${camera.brand}'),
+                              ],
+                            ),
+                            secondary: Icon(
+                              camera.connected ? Icons.videocam : Icons.videocam_off,
+                              color: camera.connected ? Colors.green : Colors.grey,
+                            ),
+                            activeColor: AppTheme.primaryOrange,
+                          ),
+                        );
+                      },
+                    ),
+            ),
+
+            const Divider(),
+
+            // Action buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('İptal'),
+                ),
+                const SizedBox(width: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(_selectedMacs);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryOrange,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Kaydet'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
