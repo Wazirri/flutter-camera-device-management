@@ -29,6 +29,24 @@ class CameraGridItem extends StatelessWidget {
            !camera.mac.contains('_cam_') && 
            !camera.mac.contains('_placeholder_');
   }
+  
+  // Check for missing critical information
+  List<String> _getMissingInfo(Camera camera) {
+    List<String> missing = [];
+    
+    if (camera.name.isEmpty) missing.add('Name');
+    if (camera.ip.isEmpty) missing.add('IP');
+    if (camera.currentDevice == null || camera.currentDevice!.deviceMac.isEmpty) missing.add('Device');
+    if (camera.recordUri.isEmpty && camera.subUri.isEmpty) missing.add('Stream URI');
+    if (camera.username.isEmpty) missing.add('Username');
+    if (camera.password.isEmpty) missing.add('Password');
+    
+    return missing;
+  }
+  
+  bool _hasIncompleteInfo(Camera camera) {
+    return _getMissingInfo(camera).isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,6 +161,28 @@ class CameraGridItem extends StatelessWidget {
                             color: Colors.white,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  
+                  // Incomplete info warning (bottom-right corner)
+                  if (_hasIncompleteInfo(camera))
+                    Positioned(
+                      bottom: 8,
+                      right: 8,
+                      child: Tooltip(
+                        message: 'Eksik bilgi: ${_getMissingInfo(camera).join(", ")}',
+                        child: Container(
+                          padding: const EdgeInsets.all(6.0),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.withOpacity(0.9),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Icon(
+                            Icons.warning_rounded,
+                            color: Colors.white,
+                            size: 16,
                           ),
                         ),
                       ),

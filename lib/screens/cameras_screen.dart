@@ -256,10 +256,28 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
           );
         }
         
-        // Group cameras by device MAC address - use devicesList
+        // Group ALL cameras by their assigned device MAC address
+        // This includes cameras from cameras_mac even if device is offline
         final groupedCamerasByMac = <String, List<Camera>>{};
-        for (var device in provider.devicesList) {
-          groupedCamerasByMac[device.macKey] = device.cameras;
+        for (var camera in provider.cameras) {
+          // Skip device MAC addresses (m_*) and cameras without MAC
+          if (camera.mac.isEmpty || camera.mac.startsWith('m_')) continue;
+          
+          // Priority: Use currentDevice.deviceMac if available (from cameras_mac)
+          // Otherwise fall back to parentDeviceMacKey (from ecs_slaves)
+          String? deviceMac = camera.currentDevice?.deviceMac;
+          
+          // Only use parentDeviceMacKey if currentDevice is not set
+          if (deviceMac == null || deviceMac.isEmpty) {
+            deviceMac = camera.parentDeviceMacKey;
+          }
+          
+          // Group by device MAC, or put in "Unassigned" group
+          String groupKey = (deviceMac != null && deviceMac.isNotEmpty) ? deviceMac : 'Unassigned';
+          if (!groupedCamerasByMac.containsKey(groupKey)) {
+            groupedCamerasByMac[groupKey] = [];
+          }
+          groupedCamerasByMac[groupKey]!.add(camera);
         }
         
         // Build the MAC address filter chips
@@ -287,15 +305,17 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                   final deviceCount = groupedCamerasByMac[macAddress]
                       ?.where((camera) => camera.mac.isNotEmpty)
                       .length ?? 0;
-                  final deviceName = _getDeviceName(context, macAddress);
                   
                   // Skip devices with no cameras that have MAC
                   if (deviceCount == 0) return const SizedBox.shrink();
                   
+                  // Always show MAC address to distinguish between devices (unique identifier)
+                  final displayLabel = '$macAddress ($deviceCount)';
+                  
                   return Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: FilterChip(
-                      label: Text('$deviceName ($deviceCount)'),
+                      label: Text(displayLabel),
                       selected: selectedMacAddress == macAddress,
                       onSelected: (_) => _selectMacAddress(macAddress),
                       backgroundColor: Theme.of(context).cardColor,
@@ -317,13 +337,11 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
               .where((camera) => camera.mac.isNotEmpty)
               .toList();
         } else {
-          // Show all cameras from all devices - only include cameras with MAC address
-          baseFilteredCameras = [];
-          for (var device in provider.devicesList) {
-            baseFilteredCameras.addAll(
-              device.cameras.where((camera) => camera.mac.isNotEmpty)
-            );
-          }
+          // Show ALL cameras from cameras_mac (source of truth)
+          // This includes cameras even if their device is offline
+          baseFilteredCameras = provider.cameras
+              .where((camera) => camera.mac.isNotEmpty && !camera.mac.startsWith('m_'))
+              .toList();
         }
         
         // Apply active filter if needed

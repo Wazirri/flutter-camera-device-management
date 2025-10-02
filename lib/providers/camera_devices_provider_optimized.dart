@@ -474,11 +474,22 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   // Handle current and history device assignment data
   Future<void> _handleDeviceAssignment(Camera camera, List<String> parts, dynamic value) async {
     String assignmentType = parts[2]; // 'current' or 'history'
-    String property = parts.length > 4 ? parts[4] : parts[3]; // property name
     
     if (assignmentType == 'current') {
-      // Handle current device assignment: cameras_mac.MAC.current.property
-      await _updateCurrentDeviceAssignment(camera, property, value);
+      // Handle current device assignment: cameras_mac.MAC.current.DEVICE_MAC.property
+      // parts[3] is the device MAC, parts[4] is the property name
+      if (parts.length >= 5) {
+        String deviceMac = parts[3]; // Device MAC that camera is assigned to
+        String property = parts[4]; // Property name
+        
+        // First, ensure we set the device_mac if we haven't already
+        if (camera.currentDevice == null || camera.currentDevice!.deviceMac.isEmpty) {
+          await _updateCurrentDeviceAssignment(camera, 'device_mac', deviceMac);
+        }
+        
+        // Then update the specific property
+        await _updateCurrentDeviceAssignment(camera, property, value);
+      }
     } else if (assignmentType == 'history') {
       // Handle history device assignment: cameras_mac.MAC.history.TIMESTAMP.property
       if (parts.length >= 5) {
@@ -503,7 +514,37 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     
     switch (property.toLowerCase()) {
       case 'device_mac':
-        camera.currentDevice = camera.currentDevice!.copyWith(deviceMac: value.toString());
+        String deviceMac = value.toString();
+        camera.currentDevice = camera.currentDevice!.copyWith(deviceMac: deviceMac);
+        
+        // Link camera to device when device_mac is set
+        if (deviceMac.isNotEmpty) {
+          CameraDevice? device = _devices[deviceMac];
+          
+          if (device != null) {
+            // Check if camera is already in device's cameras list
+            bool alreadyLinked = device.cameras.any((c) => c.mac == camera.mac);
+            
+            if (!alreadyLinked) {
+              // Find next available index
+              int nextIndex = device.cameras.length;
+              
+              // Add camera to device with proper index
+              camera.index = nextIndex;
+              camera.parentDeviceMacKey = device.macKey;
+              device.cameras.add(camera);
+              
+              print('CDP_OPT: ✅ Linked MAC-defined camera ${camera.mac} (${camera.name}) to device ${device.macKey} at index $nextIndex');
+              
+              // Invalidate caches
+              _cachedDevicesList = null;
+            } else {
+              print('CDP_OPT: Camera ${camera.mac} already linked to device ${device.macKey}');
+            }
+          } else {
+            print('CDP_OPT: Device $deviceMac not found for camera ${camera.mac}, camera will appear when device comes online');
+          }
+        }
         break;
       case 'device_ip':
         camera.currentDevice = camera.currentDevice!.copyWith(deviceIp: value.toString());
@@ -523,43 +564,6 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     }
     
     print('CDP_OPT: Updated current device for camera ${camera.mac}: ${camera.currentDevice}');
-    
-    // If camera has current device assignment, link it to that device
-    if (camera.currentDevice != null && camera.currentDevice!.deviceMac.isNotEmpty) {
-      _linkCameraToDevice(camera, camera.currentDevice!.deviceMac);
-    }
-  }
-  
-  // Link camera to device based on MAC-defined camera's current device assignment
-  void _linkCameraToDevice(Camera camera, String deviceMac) {
-    // Find or create the device
-    CameraDevice? device = _devices[deviceMac];
-    
-    if (device == null) {
-      print('CDP_OPT: Device $deviceMac not found for camera ${camera.mac}, camera will appear when device comes online');
-      return;
-    }
-    
-    // Check if camera is already in device's cameras list
-    bool alreadyLinked = device.cameras.any((c) => c.mac == camera.mac);
-    
-    if (!alreadyLinked) {
-      // Find next available index or reuse existing empty slot
-      int nextIndex = device.cameras.length;
-      
-      // Add camera to device with proper index
-      camera.index = nextIndex;
-      camera.parentDeviceMacKey = device.macKey;
-      device.cameras.add(camera);
-      
-      print('CDP_OPT: ✅ Linked MAC-defined camera ${camera.mac} (${camera.name}) to device ${device.macKey} at index $nextIndex');
-      
-      // Invalidate caches
-      _cachedDevicesList = null;
-      _batchNotifyListeners();
-    } else {
-      print('CDP_OPT: Camera ${camera.mac} already linked to device ${device.macKey}');
-    }
   }
 
   // Update history device assignment for camera

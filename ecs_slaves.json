@@ -1,4342 +1,688 @@
-{
-	"m_CA_1A_E6_81_C9_F4" : {
-		"firsttime" : "2025-03-06 - 18:04:23",
-		"connected" : 1,
-		"name" : "m_CA_1A_E6_81_C9_F4",
-		"current_time" : "2025-09-13 - 23:44:16",
-		"version" : 6005,
-		"smartweb_version" : "1.0-D20250908T115423",
-		"cpuTemp" : "55.000000",
-		"ipv4" : "192.168.1.5",
-		"ipv6" : "fe80::c81a:e6ff:fe81:c9f4",
-		"last_seen_at" : "2025-09-13 - 23:44:16",
-		"isMaster" : 1,
-		"last_ts" : 1757796256,
-		"online" : 1,
-		"app_ready" : 0,
-		"system_ready" : 0,
-		"cam_ready" : 0,
-		"configuration_ready" : 0,
-		"camreports_ready" : 0,
-		"movita_ready" : 0,
-		"test_type" : "GSM",
-		"programs_ready" : 0,
-		"test" : {
-			"uptime" : "4589 Saat 39 Dakika"
-		}
-	},
-	"m_62_DA_83_F8_B0_00" : {
-		"firsttime" : "2025-09-07 - 03:02:35",
-		"connected" : 1,
-		"name" : "m_62_DA_83_F8_B0_00",
-		"current_time" : "2025-09-13 - 23:44:20",
-		"version" : 6006,
-		"smartweb_version" : "1.0-D20250826T113622",
-		"cpuTemp" : "78.125000",
-		"ipv4" : "192.168.1.169",
-		"ipv6" : "fe80::60da:83ff:fef8:b000",
-		"last_seen_at" : "2025-09-13 - 23:44:16",
-		"isMaster" : 0,
-		"last_ts" : 1757796256,
-		"online" : 1,
-		"app_ready" : 0,
-		"system_ready" : 0,
-		"programs_ready" : 0,
-		"cam_ready" : 0,
-		"configuration_ready" : 0,
-		"camreports_ready" : 0,
-		"movita_ready" : 0,
-		"registered" : 1,
-		"last_heartbeat_ts" : 1757796251,
-		"offline_since" : 0,
-		"app_version" : 6006,
-		"system_count" : 28,
-		"cam_count" : 4,
-		"camreports_count" : 5,
-		"is_closed_by_master" : 0,
-		"programs_count" : 5,
-		"test" : {
-			"uptime" : "164 Saat 41 Dakika",
-			"connection" : {
-				"count" : 74,
-				"last_update" : "2025-09-13 - 20:21:39",
-				"error" : 0
-			},
-			"is_error" : 1,
-			"kamera_baglanti" : {
-				"count" : 248,
-				"last_update" : "2025-09-13 - 23:38:55",
-				"error" : 0
-			},
-			"program" : {
-				"count" : 22,
-				"last_update" : "2025-09-13 - 12:03:57",
-				"error" : 0
-			}
-		},
-		"app" : {
-			"GUIMenu" : true,
-			"adbDoNotRun" : true,
-			"analogs" : {
-				"analog10" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog11" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog8" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog9" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"tester" : "nobody"
-			},
-			"autorecord" : 2,
-			"bundle_rp2040_version" : 22,
-			"cameraMode" : true,
-			"deviceType" : "MXVR6_v1",
-			"firmware_date" : "2025_06_26",
-			"firmware_version" : "1-debian61",
-			"gpsDataFlowStatus" : false,
-			"group" : 2,
-			"intConnection" : false,
-			"isai" : "0",
-			"libPath" : "/usr/local/lib",
-			"logPath" : "/mnt/sda/Log",
-			"macAddressPath" : "/sys/class/net/eth0/address",
-			"maxRecordDuration" : 15,
-			"minSpaceInMBytes" : 2360,
-			"movitabinPath" : "/root/Movita",
-			"movitarecPath" : "/root/Movita",
-			"netdev" : "br0",
-			"pinCode" : "",
-			"ppp" : true,
-			"recordOverTcp" : false,
-			"recordPath" : "/mnt/sda/Rec",
-			"recording" : true,
-			"recordingCameras" : 1,
-			"restartPlayerTimeout" : 60,
-			"rp2040version" : "23_1_8_2025",
-			"rxPacketPath" : "/sys/class/net/wwan0/statistics/rx_packets",
-			"seatMode" : false,
-			"seatPosition" : true,
-			"simStatus" : "",
-			"smartos" : {
-				"card" : "/dev/dri/card0",
-				"screens" : {
-					"HDMI" : {
-						"cameralayout" : 5,
-						"mode" : 0
-					}
-				}
-			},
-			"templateId" : 9,
-			"txPacketPath" : "/sys/class/net/wwan0/statistics/tx_packets",
-			"udpport0" : 3000,
-			"udptarget" : "127.0.0.1",
-			"updatePath" : "/mnt/sda/Update",
-			"useai" : "0",
-			"version" : 6006,
-			"videoOutput" : "AV",
-			"wifiHotSpotName" : "movitab000",
-			"wifiHotSpotPass" : "movitab000"
-		},
-		"cam" : [
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.133",
-				"cameraRawIp" : 2231478464,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_27",
-				"mainSnapShot" : "http://192.168.1.133:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.133:554/stream1",
-				"name" : "KAMERA133",
-				"password" : "admin123",
-				"record" : 1,
-				"recordUri" : "rtsp://192.168.1.133:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.133:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.133:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.133:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.133:80",
-				"xAddrs" : "http://192.168.1.133:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.119",
-				"cameraRawIp" : 1996597440,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_23",
-				"mainSnapShot" : "http://192.168.1.119:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.119:554/stream1",
-				"name" : "KAMERA119",
-				"password" : "admin123",
-				"record" : 1,
-				"recordUri" : "rtsp://192.168.1.119:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.119:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.119:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.119:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.119:80",
-				"xAddrs" : "http://192.168.1.119:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.134",
-				"cameraRawIp" : 2248255680,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_28",
-				"mainSnapShot" : "http://192.168.1.134:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.134:554/stream1",
-				"name" : "KAMERA134",
-				"password" : "admin123",
-				"record" : 1,
-				"recordUri" : "rtsp://192.168.1.134:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.134:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.134:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.134:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.134:80",
-				"xAddrs" : "http://192.168.1.134:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.112",
-				"cameraRawIp" : 1879156928,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_80_8b",
-				"mainSnapShot" : "http://192.168.1.112:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.112:554/stream1",
-				"name" : "KAMERA112",
-				"password" : "admin123",
-				"record" : 1,
-				"recordUri" : "rtsp://192.168.1.112:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.112:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.112:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.112:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.112:80",
-				"xAddrs" : "http://192.168.1.112:80/onvif/device_service"
-			}
-		],
-		"camreports" : {
-			"KAMERA112" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:58",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA112/2025-09-13/23-00-00.m3u8"
-			},
-			"KAMERA119" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:58",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA119/2025-09-13/23-44-03.m3u8"
-			},
-			"KAMERA121" : {
-				"recording" : false
-			},
-			"KAMERA133" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-13 - 23:38:23",
-				"last_seen_at" : "2025-09-13 - 23:43:58",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA133/2025-09-13/23-00-00.m3u8"
-			},
-			"KAMERA134" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-13 - 10:27:41",
-				"last_seen_at" : "2025-09-13 - 23:43:58",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA134/2025-09-13/23-00-00.m3u8"
-			},
-			"checked" : "2025-09-13 - 23:44:13"
-		},
-		"system" : {
-			"awake" : 1,
-			"bootcount" : 900,
-			"cameras" : 4,
-			"cpuTemp" : "80.000000",
-			"diskfree" : "56/144 GB",
-			"diskrunning" : "Evet",
-			"emptySize" : 56,
-			"files" : {
-				"ai" : {
-					"at" : "2025-09-11 - 16:55:24",
-					"filename" : "/root/conf/ai.json"
-				},
-				"analogs" : {
-					"at" : "2025-09-13 - 23:42:31",
-					"filename" : "/root/conf/analogs.json"
-				},
-				"app" : {
-					"at" : "2025-09-13 - 23:42:31",
-					"filename" : "/root/conf/app.js"
-				},
-				"cam" : {
-					"at" : "2025-09-13 - 23:42:31",
-					"filename" : "/root/conf/cam.js"
-				},
-				"cameraLayout" : {
-					"at" : "2025-09-13 - 23:42:31",
-					"filename" : "/root/conf/cameraLayout.json"
-				},
-				"cameras_mac" : {
-					"at" : "2025-09-13 - 23:38:23",
-					"filename" : "/root/conf/cameras_mac.json"
-				},
-				"camreports" : {
-					"at" : "2025-09-13 - 23:38:23",
-					"filename" : "/root/conf/camreports.json"
-				},
-				"configuration" : {
-					"at" : "2025-09-11 - 16:55:24",
-					"filename" : "/root/conf/configuration.json"
-				},
-				"diskerror" : {
-					"at" : "2025-09-11 - 16:55:17",
-					"filename" : "/root/conf/diskerror.json"
-				},
-				"diskstatus" : {
-					"at" : "2025-09-13 - 23:38:21",
-					"filename" : "/root/conf/diskstatus.json"
-				},
-				"ecs" : {
-					"at" : "2025-09-13 - 23:38:29",
-					"filename" : "/root/conf/ecs.json"
-				},
-				"ecs_slaves" : {
-					"at" : "2025-09-11 - 16:55:08",
-					"filename" : "/root/conf/ecs_slaves.json"
-				},
-				"events" : {
-					"at" : "2025-09-11 - 16:55:24",
-					"filename" : "/root/conf/events.json"
-				},
-				"function" : {
-					"at" : "2025-09-11 - 16:55:09",
-					"filename" : "/root/conf/function.json"
-				},
-				"gpio" : {
-					"at" : "2025-09-11 - 16:55:09",
-					"filename" : "/root/conf/gpio.json"
-				},
-				"gpios" : {
-					"at" : "2025-09-11 - 16:55:09",
-					"filename" : "/root/conf/gpios.json"
-				},
-				"info" : {
-					"at" : "2025-09-13 - 23:42:31",
-					"filename" : "/root/conf/info.json"
-				},
-				"jlists" : {
-					"at" : "2025-09-11 - 16:55:24",
-					"filename" : "/root/conf/jlists.json"
-				},
-				"movita" : {
-					"at" : "2025-09-11 - 16:55:24",
-					"filename" : "/root/conf/movita.cfg"
-				},
-				"networking" : {
-					"at" : "2025-09-11 - 16:55:24",
-					"filename" : "/root/conf/networking.json"
-				},
-				"scripts" : {
-					"at" : "2025-09-11 - 16:55:24",
-					"filename" : "/root/conf/scripts.json"
-				},
-				"seatingLayout" : {
-					"at" : "2025-09-13 - 23:42:31",
-					"filename" : "/root/conf/seatingLayout.json"
-				},
-				"sensors" : {
-					"at" : "2025-09-11 - 16:55:24",
-					"filename" : "/root/conf/sensors.json"
-				}
-			},
-			"gateway" : "",
-			"gpsOk" : 0,
-			"gsm" : {
-				"activationtime" : "2025-09-13 - 23:44:09",
-				"active" : 0,
-				"deactivationtime" : "2025-09-13 - 23:44:09",
-				"device" : ""
-			},
-			"ignition" : 1,
-			"internetExists" : 0,
-			"ip" : "192.168.1.1",
-			"mac" : "62:DA:83:F8:B0:00",
-			"movitaDnsState" : 0,
-			"movitaServerExists" : 0,
-			"open_all_leds" : 1,
-			"pins" : {
-				"akuLed" : {
-					"is_static" : 1,
-					"pin" : 11,
-					"pullupdown" : "",
-					"type" : "input"
-				},
-				"camReg" : {
-					"is_static" : 1,
-					"pin" : 23,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"diskLed" : {
-					"is_static" : 1,
-					"pin" : 14,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 1,
-					"type" : "output"
-				},
-				"flash" : {
-					"is_static" : 0,
-					"pin" : 7,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"flashLed" : {
-					"is_static" : 1,
-					"pin" : 12,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 1,
-					"type" : "output"
-				},
-				"gpsLed" : {
-					"is_static" : 1,
-					"pin" : 9,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"gsmReg" : {
-					"is_static" : 1,
-					"pin" : 21,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"horn" : {
-					"is_static" : 0,
-					"pin" : 8,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"ignition" : {
-					"is_static" : 0,
-					"pin" : 3,
-					"pullupdown" : "pulldown",
-					"status" : 1,
-					"type" : "input"
-				},
-				"kayitLed" : {
-					"is_static" : 1,
-					"pin" : 13,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"kontakLed" : {
-					"is_static" : 1,
-					"pin" : 10,
-					"pullupdown" : "",
-					"type" : "input"
-				},
-				"networkReg" : {
-					"is_static" : 1,
-					"pin" : 18,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 0,
-					"type" : "output"
-				},
-				"panicButton" : {
-					"is_static" : 0,
-					"pin" : 25,
-					"pullupdown" : "pulldown",
-					"type" : "input"
-				},
-				"simLed" : {
-					"is_static" : 1,
-					"pin" : 6,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				}
-			},
-			"programs" : {
-				"smartcomm" : {
-					"started_at" : "2025-09-11 - 16:55:09"
-				},
-				"smartecs" : {
-					"started_at" : "2025-09-11 - 16:55:08"
-				},
-				"smartos" : {
-					"started_at" : "2025-09-13 - 23:42:31"
-				},
-				"smartweb" : {
-					"started_at" : "2025-09-11 - 16:55:24"
-				}
-			},
-			"progstate" : "EVENT_PROGRAM_TIMER",
-			"recordSize" : 144,
-			"recording" : 4,
-			"shmc_ready" : 1,
-			"timeset" : 0,
-			"uname" : {
-				"machine" : "aarch64",
-				"nodename" : "movita",
-				"release" : "6.1.99",
-				"str" : "Linux movita 6.1.99 #17 SMP Fri May  9 07:40:53 UTC 2025 aarch64",
-				"sysname" : "Linux",
-				"version" : "#17 SMP Fri May  9 07:40:53 UTC 2025"
-			},
-			"updatestatus" : " ",
-			"uykumodu" : 1
-		},
-		"configuration" : {
-			"autoscan" : false,
-			"cpuserial" : "519cb430adace37b",
-			"debug" : {
-				"count" : 100,
-				"on" : 0
-			},
-			"disk_config" : {
-				"main" : {
-					"disk" : "/dev/mmcblk1",
-					"mount_point" : "/mnt/sda"
-				}
-			},
-			"onvif" : {
-				"passwords" : [
-					"admin:admin123"
-				]
-			},
-			"soundRec" : true
-		},
-		"movita" : {
-			"config" : {
-				"mediaServerHost" : "45.10.154.232",
-				"mediaServerRestPort" : "8443",
-				"mediaServerRtspPort" : "554"
-			},
-			"ekcalismadakika" : "15",
-			"filo_id" : "0",
-			"serial" : "62:DA:83:F8:B0:00"
-		},
-		"programs" : {
-			"movitaman" : {
-				"last" : "2025-09-13 - 23:44:18",
-				"started" : "2025-09-11 - 16:55:17",
-				"version" : "1.0-D20250826T111928"
-			},
-			"smartcomm" : {
-				"current_time" : "2025-09-13 - 23:44:18",
-				"started_at" : "2025-09-11 - 16:55:09"
-			},
-			"smartecs" : {
-				"current_time" : "2025-09-13 - 23:44:18",
-				"started_at" : "2025-09-11 - 16:55:08"
-			},
-			"smartos" : {
-				"current_time" : "2025-09-13 - 23:44:18",
-				"started_at" : "2025-09-13 - 23:42:31"
-			},
-			"smartweb" : {
-				"current_time" : "2025-09-13 - 23:44:18",
-				"started_at" : "2025-09-11 - 16:55:24"
-			}
-		}
-	},
-	"m_0A_B3_D4_EE_8B_BC" : {
-		"firsttime" : "2025-09-11 - 03:00:40",
-		"connected" : 1,
-		"name" : "m_0A_B3_D4_EE_8B_BC",
-		"current_time" : "2025-09-13 - 23:44:20",
-		"version" : 6006,
-		"smartweb_version" : "1.0-D20250826T113622",
-		"cpuTemp" : "83.333000",
-		"ipv4" : "192.168.1.234",
-		"ipv6" : "fe80::8b3:d4ff:feee:8bbc",
-		"last_seen_at" : "2025-09-13 - 23:44:16",
-		"isMaster" : 0,
-		"last_ts" : 1757796256,
-		"online" : 1,
-		"app_ready" : 0,
-		"system_ready" : 0,
-		"programs_ready" : 0,
-		"cam_ready" : 0,
-		"configuration_ready" : 0,
-		"camreports_ready" : 0,
-		"movita_ready" : 0,
-		"registered" : 1,
-		"last_heartbeat_ts" : 1757796252,
-		"offline_since" : 0,
-		"app_version" : 6006,
-		"system_count" : 28,
-		"cam_count" : 2,
-		"camreports_count" : 12,
-		"is_closed_by_master" : 0,
-		"test" : {
-			"uptime" : "68 Saat 43 Dakika",
-			"kamera_baglanti" : {
-				"count" : 5,
-				"last_update" : "2025-09-13 - 00:02:34",
-				"error" : 0
-			},
-			"is_error" : 1,
-			"connection" : {
-				"count" : 2,
-				"last_update" : "2025-09-13 - 00:02:13",
-				"error" : 0
-			},
-			"program" : {
-				"count" : 2,
-				"last_update" : "2025-09-12 - 11:29:01",
-				"error" : 0
-			}
-		},
-		"app" : {
-			"GUIMenu" : true,
-			"adbDoNotRun" : true,
-			"analogs" : {
-				"analog10" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog11" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog8" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog9" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"tester" : "nobody"
-			},
-			"autorecord" : 2,
-			"bundle_rp2040_version" : 22,
-			"cameraMode" : true,
-			"deviceType" : "MXVR6_v1",
-			"firmware_date" : "2025_06_26",
-			"firmware_version" : "1-debian61",
-			"gpsDataFlowStatus" : false,
-			"group" : 2,
-			"intConnection" : false,
-			"isai" : "0",
-			"libPath" : "/usr/local/lib",
-			"logPath" : "/mnt/sda/Log",
-			"macAddressPath" : "/sys/class/net/eth0/address",
-			"maxRecordDuration" : 15,
-			"minSpaceInMBytes" : 2442,
-			"movitabinPath" : "/root/Movita",
-			"movitarecPath" : "/root/Movita",
-			"netdev" : "br0",
-			"pinCode" : "",
-			"ppp" : true,
-			"recordOverTcp" : false,
-			"recordPath" : "/mnt/sda/Rec",
-			"recording" : true,
-			"recordingCameras" : 1,
-			"restartPlayerTimeout" : 60,
-			"rp2040version" : "23_1_8_2025",
-			"rxPacketPath" : "/sys/class/net/wwan0/statistics/rx_packets",
-			"seatMode" : false,
-			"seatPosition" : true,
-			"simStatus" : "",
-			"smartos" : {
-				"card" : "/dev/dri/card0",
-				"screens" : {
-					"HDMI" : {
-						"cameralayout" : 5,
-						"mode" : 0
-					}
-				}
-			},
-			"templateId" : 9,
-			"txPacketPath" : "/sys/class/net/wwan0/statistics/tx_packets",
-			"udpport0" : 3000,
-			"udptarget" : "127.0.0.1",
-			"updatePath" : "/mnt/sda/Update",
-			"useai" : "0",
-			"version" : 6006,
-			"videoOutput" : "AV",
-			"wifiHotSpotName" : "movita8bbc",
-			"wifiHotSpotPass" : "movita8bbc"
-		},
-		"cam" : [
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.70",
-				"cameraRawIp" : 1174513856,
-				"country" : "",
-				"hw" : "H42",
-				"mac" : "me8_b7_23_0c_14_85",
-				"mainSnapShot" : "http://192.168.1.70:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.70:554/stream1",
-				"name" : "KAMERA70",
-				"password" : "admin123",
-				"record" : 1,
-				"recordUri" : "rtsp://192.168.1.70:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.70:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.70:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.70:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.70:80",
-				"xAddrs" : "http://192.168.1.70:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.104",
-				"cameraRawIp" : 1744939200,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_7f_c2",
-				"mainSnapShot" : "http://192.168.1.104:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.104:554/stream1",
-				"name" : "KAMERA104",
-				"password" : "admin123",
-				"record" : 1,
-				"recordUri" : "rtsp://192.168.1.104:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.104:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.104:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.104:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.104:80",
-				"xAddrs" : "http://192.168.1.104:80/onvif/device_service"
-			}
-		],
-		"camreports" : {
-			"KAMERA101" : {
-				"recording" : false
-			},
-			"KAMERA104" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-11 - 16:57:44",
-				"last_seen_at" : "2025-09-13 - 23:44:07",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA104/2025-09-13/23-00-00.m3u8"
-			},
-			"KAMERA120" : {
-				"recording" : false
-			},
-			"KAMERA121" : {
-				"recording" : false,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA121/2025-09-11/16-37-37.m3u8"
-			},
-			"KAMERA122" : {
-				"recording" : false
-			},
-			"KAMERA123" : {
-				"recording" : false
-			},
-			"KAMERA127" : {
-				"recording" : false
-			},
-			"KAMERA128" : {
-				"recording" : false,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA128/2025-09-11/16-37-38.m3u8"
-			},
-			"KAMERA129" : {
-				"recording" : false,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA129/2025-09-11/16-37-35.m3u8"
-			},
-			"KAMERA132" : {
-				"recording" : false
-			},
-			"KAMERA70" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-13 - 00:02:03",
-				"last_seen_at" : "2025-09-13 - 23:44:07",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA70/2025-09-13/23-00-00.m3u8"
-			},
-			"checked" : "2025-09-13 - 23:44:13"
-		},
-		"system" : {
-			"awake" : 1,
-			"bootcount" : 900,
-			"cameras" : 2,
-			"cpuTemp" : "83.888000",
-			"diskfree" : "71/148 GB",
-			"diskrunning" : "Evet",
-			"emptySize" : 71,
-			"files" : {
-				"ai" : {
-					"at" : "2025-09-11 - 16:56:12",
-					"filename" : "/root/conf/ai.json"
-				},
-				"analogs" : {
-					"at" : "2025-09-11 - 16:56:06",
-					"filename" : "/root/conf/analogs.json"
-				},
-				"app" : {
-					"at" : "2025-09-11 - 16:56:12",
-					"filename" : "/root/conf/app.js"
-				},
-				"cam" : {
-					"at" : "2025-09-11 - 16:56:12",
-					"filename" : "/root/conf/cam.js"
-				},
-				"cameraLayout" : {
-					"at" : "2025-09-11 - 16:56:12",
-					"filename" : "/root/conf/cameraLayout.json"
-				},
-				"cameras_mac" : {
-					"at" : "2025-09-11 - 17:00:33",
-					"filename" : "/root/conf/cameras_mac.json"
-				},
-				"camreports" : {
-					"at" : "2025-09-13 - 00:02:04",
-					"filename" : "/root/conf/camreports.json"
-				},
-				"configuration" : {
-					"at" : "2025-09-11 - 16:56:12",
-					"filename" : "/root/conf/configuration.json"
-				},
-				"diskerror" : {
-					"at" : "2025-09-11 - 16:56:13",
-					"filename" : "/root/conf/diskerror.json"
-				},
-				"diskstatus" : {
-					"at" : "2025-09-13 - 00:01:31",
-					"filename" : "/root/conf/diskstatus.json"
-				},
-				"ecs" : {
-					"at" : "2025-09-13 - 00:02:13",
-					"filename" : "/root/conf/ecs.json"
-				},
-				"ecs_slaves" : {
-					"at" : "2025-09-11 - 16:56:11",
-					"filename" : "/root/conf/ecs_slaves.json"
-				},
-				"events" : {
-					"at" : "2025-09-11 - 16:56:12",
-					"filename" : "/root/conf/events.json"
-				},
-				"function" : {
-					"at" : "2025-09-11 - 16:56:11",
-					"filename" : "/root/conf/function.json"
-				},
-				"gpio" : {
-					"at" : "2025-09-11 - 16:56:11",
-					"filename" : "/root/conf/gpio.json"
-				},
-				"gpios" : {
-					"at" : "2025-09-11 - 16:56:11",
-					"filename" : "/root/conf/gpios.json"
-				},
-				"info" : {
-					"at" : "2025-09-11 - 16:56:06",
-					"filename" : "/root/conf/info.json"
-				},
-				"jlists" : {
-					"at" : "2025-09-11 - 16:56:12",
-					"filename" : "/root/conf/jlists.json"
-				},
-				"movita" : {
-					"at" : "2025-09-11 - 16:56:13",
-					"filename" : "/root/conf/movita.cfg"
-				},
-				"networking" : {
-					"at" : "2025-09-11 - 16:56:12",
-					"filename" : "/root/conf/networking.json"
-				},
-				"scripts" : {
-					"at" : "2025-09-11 - 16:56:12",
-					"filename" : "/root/conf/scripts.json"
-				},
-				"seatingLayout" : {
-					"at" : "2025-09-11 - 16:56:07",
-					"filename" : "/root/conf/seatingLayout.json"
-				},
-				"sensors" : {
-					"at" : "2025-09-11 - 16:56:12",
-					"filename" : "/root/conf/sensors.json"
-				}
-			},
-			"gateway" : "",
-			"gpsOk" : 0,
-			"gsm" : {
-				"activationtime" : "2025-09-13 - 23:44:03",
-				"active" : 0,
-				"deactivationtime" : "2025-09-13 - 23:44:03",
-				"device" : ""
-			},
-			"ignition" : 1,
-			"internetExists" : 0,
-			"ip" : "192.168.1.1",
-			"mac" : "0A:B3:D4:EE:8B:BC",
-			"movitaDnsState" : 0,
-			"movitaServerExists" : 0,
-			"open_all_leds" : 1,
-			"pins" : {
-				"akuLed" : {
-					"is_static" : 1,
-					"pin" : 11,
-					"pullupdown" : "",
-					"type" : "input"
-				},
-				"camReg" : {
-					"is_static" : 1,
-					"pin" : 23,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"diskLed" : {
-					"is_static" : 1,
-					"pin" : 14,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 1,
-					"type" : "output"
-				},
-				"flash" : {
-					"is_static" : 0,
-					"pin" : 7,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"flashLed" : {
-					"is_static" : 1,
-					"pin" : 12,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 1,
-					"type" : "output"
-				},
-				"gpsLed" : {
-					"is_static" : 1,
-					"pin" : 9,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"gsmReg" : {
-					"is_static" : 1,
-					"pin" : 21,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"horn" : {
-					"is_static" : 0,
-					"pin" : 8,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"ignition" : {
-					"is_static" : 0,
-					"pin" : 3,
-					"pullupdown" : "pulldown",
-					"status" : 1,
-					"type" : "input"
-				},
-				"kayitLed" : {
-					"is_static" : 1,
-					"pin" : 13,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"kontakLed" : {
-					"is_static" : 1,
-					"pin" : 10,
-					"pullupdown" : "",
-					"type" : "input"
-				},
-				"networkReg" : {
-					"is_static" : 1,
-					"pin" : 18,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 0,
-					"type" : "output"
-				},
-				"panicButton" : {
-					"is_static" : 0,
-					"pin" : 25,
-					"pullupdown" : "pulldown",
-					"type" : "input"
-				},
-				"simLed" : {
-					"is_static" : 1,
-					"pin" : 6,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				}
-			},
-			"programs" : {
-				"smartcomm" : {
-					"started_at" : "2025-09-11 - 16:56:11"
-				},
-				"smartecs" : {
-					"started_at" : "2025-09-11 - 16:56:11"
-				},
-				"smartos" : {
-					"started_at" : "2025-09-11 - 16:56:07"
-				},
-				"smartweb" : {
-					"started_at" : "2025-09-11 - 16:56:12"
-				}
-			},
-			"progstate" : "EVENT_PROGRAM_TIMER",
-			"recordSize" : 148,
-			"recording" : 2,
-			"shmc_ready" : 1,
-			"timeset" : 0,
-			"uname" : {
-				"machine" : "aarch64",
-				"nodename" : "movita",
-				"release" : "6.1.99",
-				"str" : "Linux movita 6.1.99 #17 SMP Fri May  9 07:40:53 UTC 2025 aarch64",
-				"sysname" : "Linux",
-				"version" : "#17 SMP Fri May  9 07:40:53 UTC 2025"
-			},
-			"updatestatus" : " ",
-			"uykumodu" : 1
-		},
-		"configuration" : {
-			"autoscan" : false,
-			"cpuserial" : "f68a792e055558bb",
-			"debug" : {
-				"count" : 100,
-				"on" : 0
-			},
-			"disk_config" : {
-				"main" : {
-					"disk" : "/dev/sda",
-					"mount_point" : "/mnt/sda"
-				}
-			},
-			"onvif" : {
-				"passwords" : [
-					"admin:admin123"
-				]
-			},
-			"soundRec" : true
-		},
-		"movita" : {
-			"config" : {
-				"mediaServerHost" : "45.10.154.232",
-				"mediaServerRestPort" : "8443",
-				"mediaServerRtspPort" : "554"
-			},
-			"ekcalismadakika" : "15",
-			"filo_id" : "0",
-			"serial" : "0A:B3:D4:EE:8B:BC"
-		},
-		"programs" : {
-			"movitaman" : {
-				"last" : "2025-09-13 - 23:44:17",
-				"started" : "2025-09-11 - 16:56:13",
-				"version" : "1.0-D20250826T111928"
-			},
-			"smartcomm" : {
-				"current_time" : "2025-09-13 - 23:44:17",
-				"started_at" : "2025-09-11 - 16:56:11"
-			},
-			"smartecs" : {
-				"current_time" : "2025-09-13 - 23:44:17",
-				"started_at" : "2025-09-11 - 16:56:11"
-			},
-			"smartos" : {
-				"current_time" : "2025-09-13 - 23:44:17",
-				"started_at" : "2025-09-11 - 16:56:07"
-			},
-			"smartweb" : {
-				"current_time" : "2025-09-13 - 23:44:17",
-				"started_at" : "2025-09-11 - 16:56:12"
-			}
-		}
-	},
-	"m_D6_C9_00_07_6E_28" : {
-		"firsttime" : "2025-09-11 - 03:00:40",
-		"connected" : 1,
-		"name" : "m_D6_C9_00_07_6E_28",
-		"current_time" : "2025-09-13 - 23:44:16",
-		"version" : 6006,
-		"smartweb_version" : "1.0-D20250911T225925",
-		"cpuTemp" : "70.555000",
-		"ipv4" : "192.168.1.148",
-		"ipv6" : "fe80::d4c9:ff:fe07:6e28",
-		"last_seen_at" : "2025-09-13 - 23:44:16",
-		"isMaster" : 0,
-		"last_ts" : 1757796256,
-		"online" : 1,
-		"app_ready" : 0,
-		"system_ready" : 0,
-		"programs_ready" : 0,
-		"cam_ready" : 0,
-		"configuration_ready" : 0,
-		"camreports_ready" : 0,
-		"movita_ready" : 0,
-		"test" : {
-			"uptime" : "68 Saat 43 Dakika",
-			"connection" : {
-				"count" : 13,
-				"last_update" : "2025-09-13 - 16:01:46",
-				"error" : 0
-			},
-			"is_error" : 1
-		}
-	},
-	"m_82_4E_6A_0B_52_34" : {
-		"firsttime" : "2025-09-11 - 03:01:04",
-		"connected" : 1,
-		"name" : "m_82_4E_6A_0B_52_34",
-		"current_time" : "2025-09-13 - 23:44:18",
-		"version" : 6006,
-		"smartweb_version" : "1.0-D20250908T115423",
-		"cpuTemp" : "76.875000",
-		"ipv4" : "192.168.1.57",
-		"ipv6" : "fe80::804e:6aff:fe0b:5234",
-		"last_seen_at" : "2025-09-13 - 23:44:16",
-		"isMaster" : 0,
-		"last_ts" : 1757796256,
-		"online" : 1,
-		"app_ready" : 0,
-		"system_ready" : 0,
-		"programs_ready" : 0,
-		"cam_ready" : 0,
-		"configuration_ready" : 0,
-		"camreports_ready" : 0,
-		"movita_ready" : 0,
-		"registered" : 1,
-		"last_heartbeat_ts" : 1757796251,
-		"offline_since" : 0,
-		"app_version" : 6006,
-		"system_count" : 27,
-		"cam_count" : 3,
-		"camreports_count" : 10,
-		"is_closed_by_master" : 0,
-		"test" : {
-			"uptime" : "68 Saat 43 Dakika",
-			"connection" : {
-				"count" : 1,
-				"last_update" : "2025-09-12 - 11:28:38",
-				"error" : 0
-			},
-			"is_error" : 1,
-			"kamera_baglanti" : {
-				"count" : 1542,
-				"last_update" : "2025-09-13 - 23:43:53",
-				"error" : 1
-			}
-		},
-		"app" : {
-			"GUIMenu" : true,
-			"adbDoNotRun" : true,
-			"analogs" : {
-				"analog10" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog11" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog8" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog9" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"tester" : "nobody"
-			},
-			"autorecord" : 2,
-			"bundle_rp2040_version" : 22,
-			"cameraMode" : true,
-			"deviceType" : "MXVR6_v1",
-			"firmware_date" : "2025_06_26",
-			"firmware_version" : "1-debian61",
-			"gpsDataFlowStatus" : false,
-			"group" : 2,
-			"intConnection" : false,
-			"isai" : "0",
-			"libPath" : "/usr/local/lib",
-			"logPath" : "/mnt/sda/Log",
-			"macAddressPath" : "/sys/class/net/eth0/address",
-			"maxRecordDuration" : 15,
-			"minSpaceInMBytes" : 2360,
-			"movitabinPath" : "/root/Movita",
-			"movitarecPath" : "/root/Movita",
-			"netdev" : "br0",
-			"pinCode" : "",
-			"ppp" : true,
-			"recordOverTcp" : false,
-			"recordPath" : "/mnt/sda/Rec",
-			"recording" : true,
-			"recordingCameras" : 1,
-			"restartPlayerTimeout" : 60,
-			"rp2040version" : "23_1_8_2025",
-			"rxPacketPath" : "/sys/class/net/wwan0/statistics/rx_packets",
-			"seatMode" : false,
-			"seatPosition" : true,
-			"simStatus" : "",
-			"smartos" : {
-				"card" : "/dev/dri/card0",
-				"screens" : {
-					"HDMI" : {
-						"cameralayout" : 5,
-						"mode" : 0
-					}
-				}
-			},
-			"templateId" : 9,
-			"txPacketPath" : "/sys/class/net/wwan0/statistics/tx_packets",
-			"udpport0" : 3000,
-			"udptarget" : "127.0.0.1",
-			"updatePath" : "/mnt/sda/Update",
-			"useai" : "0",
-			"version" : 6006,
-			"videoOutput" : "AV",
-			"wifiHotSpotName" : "movita5234",
-			"wifiHotSpotPass" : "movita5234"
-		},
-		"cam" : [
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.132",
-				"cameraRawIp" : 2214701248,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_8e_c9",
-				"mainSnapShot" : "http://192.168.1.132:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.132:554/stream1",
-				"name" : "KAMERA132",
-				"password" : "admin123",
-				"record" : 1,
-				"recordUri" : "rtsp://192.168.1.132:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.132:554/stream1",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.132:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.132:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 640,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddrs" : "http://192.168.1.132:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.121",
-				"cameraRawIp" : 2030151872,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_24",
-				"mainSnapShot" : "http://192.168.1.121:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.121:554/stream1",
-				"name" : "KAMERA121",
-				"password" : "admin123",
-				"record" : 1,
-				"recordUri" : "rtsp://192.168.1.121:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.121:554/stream1",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.121:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.121:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 640,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddrs" : "http://192.168.1.121:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.139",
-				"cameraRawIp" : 2332141760,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_8e_d1",
-				"mainSnapShot" : "http://192.168.1.139:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.139:554/stream1",
-				"name" : "KAMERA139",
-				"password" : "admin123",
-				"record" : 1,
-				"recordUri" : "rtsp://192.168.1.139:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.139:554/stream1",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.139:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.139:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 640,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddrs" : "http://192.168.1.139:80/onvif/device_service"
-			}
-		],
-		"camreports" : {
-			"KAMERA1" : {
-				"recording" : false,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA1/2025-09-11/16-38-37.m3u8"
-			},
-			"KAMERA114" : {
-				"recording" : false
-			},
-			"KAMERA119" : {
-				"recording" : false
-			},
-			"KAMERA121" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:44:13",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA121/2025-09-13/23-00-00.m3u8"
-			},
-			"KAMERA132" : {
-				"connected" : 0,
-				"disconnected" : "2025-09-12 - 21:51:55",
-				"last_seen_at" : "2025-09-12 - 21:51:24",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA132/2025-09-13/23-44-15.m3u8",
-				"last_restart_time" : "2025-09-12 - 21:51:55"
-			},
-			"KAMERA135" : {
-				"recording" : false
-			},
-			"KAMERA136" : {
-				"recording" : false
-			},
-			"KAMERA139" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:44:13",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA139/2025-09-13/23-00-00.m3u8"
-			},
-			"KAMERA72" : {
-				"recording" : false
-			},
-			"KAMERA77" : {
-				"recording" : false
-			},
-			"checked" : "2025-09-13 - 23:44:13"
-		},
-		"system" : {
-			"awake" : 1,
-			"bootcount" : 900,
-			"cameras" : 3,
-			"cpuTemp" : "78.125000",
-			"diskfree" : "56/144 GB",
-			"diskrunning" : "Evet",
-			"emptySize" : 56,
-			"files" : {
-				"ai" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/ai.json"
-				},
-				"analogs" : {
-					"at" : "2025-09-11 - 16:57:11",
-					"filename" : "/root/conf/analogs.json"
-				},
-				"app" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/app.js"
-				},
-				"cam" : {
-					"at" : "2025-09-11 - 16:57:43",
-					"filename" : "/root/conf/cam.js"
-				},
-				"cameraLayout" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/cameraLayout.json"
-				},
-				"cameras_mac" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/cameras_mac.json"
-				},
-				"camreports" : {
-					"at" : "2025-09-12 - 11:28:43",
-					"filename" : "/root/conf/camreports.json"
-				},
-				"configuration" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/configuration.json"
-				},
-				"diskerror" : {
-					"at" : "2025-09-11 - 16:57:18",
-					"filename" : "/root/conf/diskerror.json"
-				},
-				"diskstatus" : {
-					"at" : "2025-09-12 - 11:28:32",
-					"filename" : "/root/conf/diskstatus.json"
-				},
-				"ecs" : {
-					"at" : "2025-09-12 - 11:28:35",
-					"filename" : "/root/conf/ecs.json"
-				},
-				"ecs_slaves" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/ecs_slaves.json"
-				},
-				"events" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/events.json"
-				},
-				"function" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/function.json"
-				},
-				"gpio" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/gpio.json"
-				},
-				"gpios" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/gpios.json"
-				},
-				"info" : {
-					"at" : "2025-09-11 - 16:57:11",
-					"filename" : "/root/conf/info.json"
-				},
-				"jlists" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/jlists.json"
-				},
-				"movita" : {
-					"at" : "2025-09-11 - 16:57:18",
-					"filename" : "/root/conf/movita.cfg"
-				},
-				"networking" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/networking.json"
-				},
-				"scripts" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/scripts.json"
-				},
-				"seatingLayout" : {
-					"at" : "2025-09-11 - 16:57:11",
-					"filename" : "/root/conf/seatingLayout.json"
-				},
-				"sensors" : {
-					"at" : "2025-09-11 - 16:57:16",
-					"filename" : "/root/conf/sensors.json"
-				}
-			},
-			"gateway" : "",
-			"gpsOk" : 0,
-			"gsm" : {
-				"activationtime" : "2025-09-13 - 23:44:07",
-				"active" : 0,
-				"deactivationtime" : "2025-09-13 - 23:44:07",
-				"device" : "",
-				"module_exists" : 0
-			},
-			"ignition" : 1,
-			"internetExists" : 0,
-			"ip" : "192.168.1.1",
-			"mac" : "82:4E:6A:0B:52:34",
-			"movitaDnsState" : 100,
-			"movitaServerExists" : 0,
-			"pins" : {
-				"akuLed" : {
-					"is_static" : 1,
-					"pin" : 11,
-					"pullupdown" : "",
-					"type" : "input"
-				},
-				"camReg" : {
-					"is_static" : 1,
-					"pin" : 23,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"diskLed" : {
-					"is_static" : 1,
-					"pin" : 14,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 1,
-					"type" : "output"
-				},
-				"flash" : {
-					"is_static" : 0,
-					"pin" : 7,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"flashLed" : {
-					"is_static" : 1,
-					"pin" : 12,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 1,
-					"type" : "output"
-				},
-				"gpsLed" : {
-					"is_static" : 1,
-					"pin" : 9,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"gsmReg" : {
-					"is_static" : 1,
-					"pin" : 21,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"horn" : {
-					"is_static" : 0,
-					"pin" : 8,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"ignition" : {
-					"is_static" : 0,
-					"pin" : 3,
-					"pullupdown" : "pulldown",
-					"status" : 1,
-					"type" : "input"
-				},
-				"kayitLed" : {
-					"is_static" : 1,
-					"pin" : 13,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"kontakLed" : {
-					"is_static" : 1,
-					"pin" : 10,
-					"pullupdown" : "",
-					"type" : "input"
-				},
-				"networkReg" : {
-					"is_static" : 1,
-					"pin" : 18,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 0,
-					"type" : "output"
-				},
-				"panicButton" : {
-					"is_static" : 0,
-					"pin" : 25,
-					"pullupdown" : "pulldown",
-					"type" : "input"
-				},
-				"simLed" : {
-					"is_static" : 1,
-					"pin" : 6,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				}
-			},
-			"programs" : {
-				"smartcomm" : {
-					"started_at" : "2025-09-11 - 16:57:16"
-				},
-				"smartecs" : {
-					"started_at" : "2025-09-11 - 16:57:16"
-				},
-				"smartos" : {
-					"started_at" : "2025-09-11 - 16:57:11"
-				},
-				"smartweb" : {
-					"started_at" : "2025-09-11 - 16:57:16"
-				}
-			},
-			"progstate" : "EVENT_PROGRAM_TIMER",
-			"recordSize" : 144,
-			"recording" : 3,
-			"rp2040" : {
-				"comm_ok" : 1
-			},
-			"timeset" : 0,
-			"uname" : {
-				"machine" : "aarch64",
-				"nodename" : "movita",
-				"release" : "6.1.99",
-				"str" : "Linux movita 6.1.99 #17 SMP Fri May  9 07:40:53 UTC 2025 aarch64",
-				"sysname" : "Linux",
-				"version" : "#17 SMP Fri May  9 07:40:53 UTC 2025"
-			},
-			"updatestatus" : " ",
-			"uykumodu" : 1
-		},
-		"configuration" : {
-			"autoscan" : false,
-			"cpuserial" : "4535a55f665459a6",
-			"debug" : {
-				"count" : 100,
-				"on" : 0
-			},
-			"disk_config" : {
-				"main" : {
-					"disk" : "/dev/mmcblk1",
-					"mount_point" : "/mnt/sda"
-				}
-			},
-			"disk_priority" : [
-				"nvme",
-				"sata",
-				"mmc"
-			],
-			"onvif" : {
-				"passwords" : [
-					"admin:admin123"
-				]
-			},
-			"soundRec" : true
-		},
-		"movita" : {
-			"config" : {
-				"mediaServerHost" : "45.10.154.232",
-				"mediaServerRestPort" : "8443",
-				"mediaServerRtspPort" : "554"
-			},
-			"ekcalismadakika" : "15",
-			"filo_id" : "0",
-			"serial" : "82:4E:6A:0B:52:34"
-		},
-		"programs" : {
-			"movitaman" : {
-				"last" : "2025-09-13 - 23:44:17",
-				"started" : "2025-09-11 - 16:57:18",
-				"version" : "1.0-D20250908T115423"
-			},
-			"smartcomm" : {
-				"current_time" : "2025-09-13 - 23:44:17",
-				"started_at" : "2025-09-11 - 16:57:16"
-			},
-			"smartecs" : {
-				"current_time" : "2025-09-13 - 23:44:17",
-				"started_at" : "2025-09-11 - 16:57:16"
-			},
-			"smartos" : {
-				"current_time" : "2025-09-13 - 23:44:18",
-				"started_at" : "2025-09-11 - 16:57:11"
-			},
-			"smartweb" : {
-				"current_time" : "2025-09-13 - 23:44:17",
-				"started_at" : "2025-09-11 - 16:57:16"
-			}
-		}
-	},
-	"m_5E_CE_F7_38_03_33" : {
-		"firsttime" : "2025-09-11 - 16:34:02",
-		"connected" : 1,
-		"name" : "m_5E_CE_F7_38_03_33",
-		"current_time" : "2025-09-13 - 23:44:17",
-		"version" : 6006,
-		"smartweb_version" : "1.0-D20250826T113622",
-		"cpuTemp" : "81.666000",
-		"ipv4" : "192.168.1.13",
-		"ipv6" : "fe80::5cce:f7ff:fe38:333",
-		"last_seen_at" : "2025-09-13 - 23:44:16",
-		"isMaster" : 0,
-		"last_ts" : 1757796256,
-		"online" : 1,
-		"app_ready" : 0,
-		"system_ready" : 0,
-		"programs_ready" : 0,
-		"cam_ready" : 0,
-		"configuration_ready" : 0,
-		"camreports_ready" : 0,
-		"movita_ready" : 0,
-		"registered" : 1,
-		"last_heartbeat_ts" : 1757796252,
-		"offline_since" : 0,
-		"app_version" : 6006,
-		"is_closed_by_master" : 0,
-		"system_count" : 27,
-		"camreports_count" : 3,
-		"test" : {
-			"uptime" : "55 Saat 10 Dakika",
-			"connection" : {
-				"count" : 1,
-				"last_update" : "2025-09-12 - 11:28:38",
-				"error" : 0
-			},
-			"is_error" : 1
-		},
-		"app" : {
-			"GUIMenu" : true,
-			"adbDoNotRun" : true,
-			"analogs" : {
-				"analog10" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog11" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog8" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog9" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"tester" : "nobody"
-			},
-			"autorecord" : 2,
-			"board_version_voltage" : "0.316703",
-			"bundle_rp2040_version" : 22,
-			"cameraMode" : true,
-			"deviceType" : "MXVR6_v1",
-			"firmware_date" : "2025_06_26",
-			"firmware_version" : "1-debian61",
-			"gpsDataFlowStatus" : false,
-			"group" : 2,
-			"intConnection" : false,
-			"isai" : "0",
-			"libPath" : "/usr/local/lib",
-			"logPath" : "/mnt/sda/Log",
-			"macAddressPath" : "/sys/class/net/eth0/address",
-			"maxRecordDuration" : 15,
-			"minSpaceInMBytes" : 2360,
-			"movitabinPath" : "/root/Movita",
-			"movitarecPath" : "/root/Movita",
-			"netdev" : "br0",
-			"pinCode" : "",
-			"ppp" : true,
-			"recordOverTcp" : false,
-			"recordPath" : "/mnt/sda/Rec",
-			"recording" : true,
-			"recordingCameras" : 1,
-			"restartPlayerTimeout" : 60,
-			"rp2040version" : "23_1_8_2025",
-			"rxPacketPath" : "/sys/class/net/wwan0/statistics/rx_packets",
-			"seatMode" : false,
-			"seatPosition" : true,
-			"simStatus" : "",
-			"smartos" : {
-				"card" : "/dev/dri/card0",
-				"screens" : {
-					"HDMI" : {
-						"cameralayout" : 5,
-						"mode" : 0
-					}
-				}
-			},
-			"templateId" : 9,
-			"txPacketPath" : "/sys/class/net/wwan0/statistics/tx_packets",
-			"udpport0" : 3000,
-			"udptarget" : "127.0.0.1",
-			"updatePath" : "/mnt/sda/Update",
-			"useai" : "0",
-			"version" : 6006,
-			"videoOutput" : "AV",
-			"wifiHotSpotName" : "movita0333",
-			"wifiHotSpotPass" : "movita0333"
-		},
-		"cam" : [
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.129",
-				"cameraRawIp" : 2164369600,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_80_8d",
-				"mainSnapShot" : "http://192.168.1.129:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.129:554/stream1",
-				"name" : "KAMERA129",
-				"password" : "admin123",
-				"record" : 1,
-				"recordUri" : "rtsp://192.168.1.129:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.129:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.129:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.129:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.129:80",
-				"xAddrs" : "http://192.168.1.129:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.122",
-				"cameraRawIp" : 2046929088,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_1c",
-				"mainSnapShot" : "http://192.168.1.122:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.122:554/stream1",
-				"name" : "KAMERA122",
-				"password" : "admin123",
-				"record" : 1,
-				"recordUri" : "rtsp://192.168.1.122:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.122:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.122:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.122:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.122:80",
-				"xAddrs" : "http://192.168.1.122:80/onvif/device_service"
-			},
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.127",
-				"cameraRawIp" : 2130815168,
-				"country" : "",
-				"hw" : "H42",
-				"mac" : "me8_b7_23_0c_14_8f",
-				"mainSnapShot" : "http://192.168.1.127:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.127:554/stream1",
-				"name" : "KAMERA127",
-				"password" : "admin123",
-				"record" : 1,
-				"recordUri" : "rtsp://192.168.1.127:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.127:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.127:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.127:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.127:80",
-				"xAddrs" : "http://192.168.1.127:80/onvif/device_service"
-			}
-		],
-		"camreports" : {
-			"KAMERA122" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:58",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA122/2025-09-11/17-01-34.m3u8"
-			},
-			"KAMERA127" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:58",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA127/2025-09-11/17-01-34.m3u8"
-			},
-			"KAMERA129" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:58",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA129/2025-09-11/17-01-34.m3u8"
-			},
-			"checked" : "2025-09-13 - 23:44:13"
-		},
-		"system" : {
-			"awake" : 1,
-			"bootcount" : 900,
-			"cameras" : 3,
-			"cpuTemp" : "81.111000",
-			"diskfree" : "125/231 GB",
-			"diskrunning" : "Evet",
-			"emptySize" : 125,
-			"files" : {
-				"ai" : {
-					"at" : "2025-09-11 - 17:00:23",
-					"filename" : "/root/conf/ai.json"
-				},
-				"analogs" : {
-					"at" : "2025-09-11 - 17:00:00",
-					"filename" : "/root/conf/analogs.json"
-				},
-				"app" : {
-					"at" : "2025-09-11 - 17:00:23",
-					"filename" : "/root/conf/app.js"
-				},
-				"cam" : {
-					"at" : "2025-09-11 - 17:01:26",
-					"filename" : "/root/conf/cam.js"
-				},
-				"cameraLayout" : {
-					"at" : "2025-09-11 - 17:00:23",
-					"filename" : "/root/conf/cameraLayout.json"
-				},
-				"cameras_mac" : {
-					"at" : "2025-09-12 - 11:28:44",
-					"filename" : "/root/conf/cameras_mac.json"
-				},
-				"camreports" : {
-					"at" : "2025-09-12 - 11:28:26",
-					"filename" : "/root/conf/camreports.json"
-				},
-				"configuration" : {
-					"at" : "2025-09-11 - 17:00:23",
-					"filename" : "/root/conf/configuration.json"
-				},
-				"diskerror" : {
-					"at" : "2025-09-11 - 17:00:17",
-					"filename" : "/root/conf/diskerror.json"
-				},
-				"diskstatus" : {
-					"at" : "2025-09-12 - 11:27:56",
-					"filename" : "/root/conf/diskstatus.json"
-				},
-				"ecs" : {
-					"at" : "2025-09-12 - 11:28:34",
-					"filename" : "/root/conf/ecs.json"
-				},
-				"ecs_slaves" : {
-					"at" : "2025-09-11 - 17:00:05",
-					"filename" : "/root/conf/ecs_slaves.json"
-				},
-				"events" : {
-					"at" : "2025-09-11 - 17:00:23",
-					"filename" : "/root/conf/events.json"
-				},
-				"function" : {
-					"at" : "2025-09-11 - 17:00:10",
-					"filename" : "/root/conf/function.json"
-				},
-				"gpio" : {
-					"at" : "2025-09-11 - 17:00:10",
-					"filename" : "/root/conf/gpio.json"
-				},
-				"gpios" : {
-					"at" : "2025-09-11 - 17:00:10",
-					"filename" : "/root/conf/gpios.json"
-				},
-				"info" : {
-					"at" : "2025-09-11 - 17:00:00",
-					"filename" : "/root/conf/info.json"
-				},
-				"jlists" : {
-					"at" : "2025-09-11 - 17:00:23",
-					"filename" : "/root/conf/jlists.json"
-				},
-				"movita" : {
-					"at" : "2025-09-11 - 17:00:23",
-					"filename" : "/root/conf/movita.cfg"
-				},
-				"networking" : {
-					"at" : "2025-09-11 - 17:00:23",
-					"filename" : "/root/conf/networking.json"
-				},
-				"scripts" : {
-					"at" : "2025-09-11 - 17:00:23",
-					"filename" : "/root/conf/scripts.json"
-				},
-				"seatingLayout" : {
-					"at" : "2025-09-11 - 17:00:00",
-					"filename" : "/root/conf/seatingLayout.json"
-				},
-				"sensors" : {
-					"at" : "2025-09-11 - 17:00:23",
-					"filename" : "/root/conf/sensors.json"
-				}
-			},
-			"gateway" : "",
-			"gpsOk" : 0,
-			"gsm" : {
-				"activationtime" : "2025-09-13 - 23:44:01",
-				"active" : 0,
-				"deactivationtime" : "2025-09-13 - 23:44:01",
-				"device" : ""
-			},
-			"ignition" : 1,
-			"internetExists" : 0,
-			"ip" : "192.168.1.1",
-			"mac" : "5E:CE:F7:38:03:33",
-			"movitaDnsState" : 0,
-			"movitaServerExists" : 0,
-			"pins" : {
-				"akuLed" : {
-					"is_static" : 1,
-					"pin" : 11,
-					"pullupdown" : "",
-					"type" : "input"
-				},
-				"camReg" : {
-					"is_static" : 1,
-					"pin" : 23,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"diskLed" : {
-					"is_static" : 1,
-					"pin" : 14,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 1,
-					"type" : "output"
-				},
-				"flash" : {
-					"is_static" : 0,
-					"pin" : 7,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"flashLed" : {
-					"is_static" : 1,
-					"pin" : 12,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 1,
-					"type" : "output"
-				},
-				"gpsLed" : {
-					"is_static" : 1,
-					"pin" : 9,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"gsmReg" : {
-					"is_static" : 1,
-					"pin" : 21,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"horn" : {
-					"is_static" : 0,
-					"pin" : 8,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"ignition" : {
-					"is_static" : 0,
-					"pin" : 3,
-					"pullupdown" : "pulldown",
-					"status" : 1,
-					"type" : "input"
-				},
-				"kayitLed" : {
-					"is_static" : 1,
-					"pin" : 13,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"kontakLed" : {
-					"is_static" : 1,
-					"pin" : 10,
-					"pullupdown" : "",
-					"type" : "input"
-				},
-				"networkReg" : {
-					"is_static" : 1,
-					"pin" : 18,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"panicButton" : {
-					"is_static" : 0,
-					"pin" : 25,
-					"pullupdown" : "pulldown",
-					"type" : "input"
-				},
-				"simLed" : {
-					"is_static" : 1,
-					"pin" : 6,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				}
-			},
-			"programs" : {
-				"smartcomm" : {
-					"started_at" : "2025-09-11 - 17:00:10"
-				},
-				"smartecs" : {
-					"started_at" : "2025-09-11 - 17:00:05"
-				},
-				"smartos" : {
-					"started_at" : "2025-09-11 - 17:00:00"
-				},
-				"smartweb" : {
-					"started_at" : "2025-09-11 - 17:00:23"
-				}
-			},
-			"progstate" : "EVENT_PROGRAM_TIMER",
-			"recordSize" : 231,
-			"recording" : 3,
-			"shmc_ready" : 1,
-			"timeset" : 0,
-			"uname" : {
-				"machine" : "aarch64",
-				"nodename" : "movita",
-				"release" : "6.1.99",
-				"str" : "Linux movita 6.1.99 #17 SMP Fri May  9 07:40:53 UTC 2025 aarch64",
-				"sysname" : "Linux",
-				"version" : "#17 SMP Fri May  9 07:40:53 UTC 2025"
-			},
-			"updatestatus" : " ",
-			"uykumodu" : 1
-		},
-		"configuration" : {
-			"autoscan" : false,
-			"cpuserial" : "fcdc7fa53a754ab2",
-			"debug" : {
-				"count" : 100,
-				"on" : 0
-			},
-			"disk_config" : {
-				"main" : {
-					"disk" : "/dev/mmcblk1",
-					"mount_point" : "/mnt/sda"
-				}
-			},
-			"onvif" : {
-				"passwords" : [
-					"admin:admin123"
-				]
-			},
-			"soundRec" : true
-		},
-		"movita" : {
-			"config" : {
-				"mediaServerHost" : "45.10.154.232",
-				"mediaServerRestPort" : "8443",
-				"mediaServerRtspPort" : "554"
-			},
-			"ekcalismadakika" : "15",
-			"filo_id" : "0",
-			"serial" : "5E:CE:F7:38:03:33"
-		},
-		"programs" : {
-			"movitaman" : {
-				"last" : "2025-09-13 - 23:44:15",
-				"started" : "2025-09-11 - 17:00:17",
-				"version" : "1.0-D20250826T111928"
-			},
-			"smartcomm" : {
-				"current_time" : "2025-09-13 - 23:44:15",
-				"started_at" : "2025-09-11 - 17:00:10"
-			},
-			"smartecs" : {
-				"current_time" : "2025-09-13 - 23:44:15",
-				"started_at" : "2025-09-11 - 17:00:05"
-			},
-			"smartos" : {
-				"current_time" : "2025-09-13 - 23:44:15",
-				"started_at" : "2025-09-11 - 17:00:00"
-			},
-			"smartweb" : {
-				"current_time" : "2025-09-13 - 23:44:15",
-				"started_at" : "2025-09-11 - 17:00:23"
-			}
-		}
-	},
-	"m_7E_68_3A_58_98_4D" : {
-		"firsttime" : "2025-09-11 - 16:40:53",
-		"connected" : 1,
-		"name" : "m_7E_68_3A_58_98_4D",
-		"current_time" : "2025-09-13 - 23:44:17",
-		"version" : 6002,
-		"smartweb_version" : "1.0-D20250908T115423",
-		"cpuTemp" : "83.333000",
-		"ipv4" : "192.168.1.216",
-		"ipv6" : "fe80::7c68:3aff:fe58:984d",
-		"last_seen_at" : "2025-09-13 - 23:44:16",
-		"isMaster" : 0,
-		"last_ts" : 1757796256,
-		"online" : 1,
-		"app_ready" : 0,
-		"system_ready" : 0,
-		"programs_ready" : 0,
-		"cam_ready" : 0,
-		"configuration_ready" : 0,
-		"camreports_ready" : 0,
-		"movita_ready" : 0,
-		"registered" : 1,
-		"last_heartbeat_ts" : 1757796255,
-		"offline_since" : 0,
-		"app_version" : 6002,
-		"is_closed_by_master" : 0,
-		"system_count" : 28,
-		"test" : {
-			"uptime" : "55 Saat 3 Dakika",
-			"diskrunning" : {
-				"count" : 3198,
-				"last_update" : "2025-09-13 - 23:44:13",
-				"error" : 1
-			},
-			"is_error" : 1,
-			"diskfree" : {
-				"count" : 3198,
-				"last_update" : "2025-09-13 - 23:44:13",
-				"error" : 1
-			},
-			"kamera_baglanti" : {
-				"count" : 2000,
-				"last_update" : "2025-09-13 - 23:43:28",
-				"error" : 1
-			},
-			"connection" : {
-				"count" : 448,
-				"last_update" : "2025-09-13 - 23:35:34",
-				"error" : 0
-			},
-			"program" : {
-				"count" : 88,
-				"last_update" : "2025-09-13 - 21:07:00",
-				"error" : 0
-			},
-			"time" : {
-				"count" : 1544,
-				"last_update" : "2025-09-13 - 23:44:13",
-				"error" : 1
-			}
-		},
-		"app" : {
-			"GUIMenu" : true,
-			"adbDoNotRun" : true,
-			"analogs" : {
-				"analog10" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog11" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog8" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog9" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"tester" : "nobody"
-			},
-			"autorecord" : 2,
-			"bundle_rp2040_version" : 22,
-			"cameraMode" : true,
-			"deviceType" : "MXVR6_v1",
-			"firmware_date" : "2025_06_26",
-			"firmware_version" : "1-debian61",
-			"gpsDataFlowStatus" : false,
-			"group" : 2,
-			"intConnection" : false,
-			"isai" : "0",
-			"libPath" : "/usr/local/lib",
-			"logPath" : "/mnt/sda/Log",
-			"macAddressPath" : "/sys/class/net/eth0/address",
-			"maxRecordDuration" : 15,
-			"minSpaceInMBytes" : 30608,
-			"movitabinPath" : "/root/Movita",
-			"movitarecPath" : "/root/Movita",
-			"netdev" : "br0",
-			"pinCode" : "",
-			"ppp" : true,
-			"recordOverTcp" : false,
-			"recordPath" : "/mnt/sda/Rec",
-			"recording" : true,
-			"recordingCameras" : 1,
-			"restartPlayerTimeout" : 60,
-			"rp2040version" : "23_1_8_2025",
-			"rxPacketPath" : "/sys/class/net/wwan0/statistics/rx_packets",
-			"seatMode" : false,
-			"seatPosition" : true,
-			"simStatus" : "",
-			"smartos" : {
-				"card" : "/dev/dri/card0",
-				"screens" : {
-					"HDMI" : {
-						"cameralayout" : 5,
-						"mode" : 0
-					}
-				}
-			},
-			"templateId" : 9,
-			"txPacketPath" : "/sys/class/net/wwan0/statistics/tx_packets",
-			"udpport0" : 3000,
-			"udptarget" : "127.0.0.1",
-			"updatePath" : "/mnt/sda/Update",
-			"useai" : "0",
-			"version" : 6002,
-			"videoOutput" : "AV",
-			"wifiHotSpotName" : "movita984d",
-			"wifiHotSpotPass" : "movita984d"
-		},
-		"cam" : [
-			{
-				"brand" : "Dahua",
-				"cameraIp" : "192.168.1.20",
-				"cameraRawIp" : 335653056,
-				"country" : "china",
-				"hw" : "IPC-HDW1230T-AS-0280B-S4",
-				"mac" : "mf8_ce_07_f2_77_40",
-				"mainSnapShot" : "http://192.168.1.20:80/onvifsnapshot/media_service/snapshot?channel=1&subtype=0",
-				"manufacturer" : "",
-				"mediaUri" : "rtsp://192.168.1.20:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif",
-				"name" : "KAMERA1",
-				"password" : "admin123",
-				"recordPath" : "",
-				"recordUri" : "rtsp://192.168.1.20:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif",
-				"recordcodec" : "H264",
-				"recordheight" : 1080,
-				"recordwidth" : 1920,
-				"remoteUri" : "rtsp://192.168.1.20:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.20:80/onvifsnapshot/media_service/snapshot?channel=1&subtype=0",
-				"subUri" : "rtsp://192.168.1.20:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif",
-				"subcodec" : "H264",
-				"subheight" : 576,
-				"subwidth" : 704,
-				"username" : "admin",
-				"xAddr" : "192.168.1.20:80",
-				"xAddrs" : "http://192.168.1.20:80/onvif/device_service"
-			},
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.21",
-				"cameraRawIp" : 352430272,
-				"country" : "",
-				"hw" : "H42",
-				"mainSnapShot" : "http://192.168.1.21:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.21:554/stream1",
-				"name" : "KAMERA2",
-				"password" : "admin123",
-				"recordPath" : "",
-				"recordUri" : "rtsp://192.168.1.21:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.21:554/stream2",
-				"subSnapShot" : "http://192.168.1.21:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.21:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.21:80",
-				"xAddrs" : "http://192.168.1.21:80/onvif/device_service"
-			},
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.22",
-				"cameraRawIp" : 369207488,
-				"country" : "",
-				"hw" : "H42",
-				"mainSnapShot" : "http://192.168.1.22:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.22:554/stream1",
-				"name" : "KAMERA3",
-				"password" : "admin123",
-				"recordPath" : "",
-				"recordUri" : "rtsp://192.168.1.22:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.22:554/stream2",
-				"subSnapShot" : "http://192.168.1.22:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.22:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.22:80",
-				"xAddrs" : "http://192.168.1.22:80/onvif/device_service"
-			},
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.30",
-				"cameraRawIp" : 503425216,
-				"country" : "",
-				"hw" : "H42",
-				"mainSnapShot" : "http://192.168.1.30:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.30:554/stream1",
-				"name" : "KAMERA30",
-				"password" : "admin123",
-				"recordPath" : "",
-				"recordUri" : "rtsp://192.168.1.30:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 1080,
-				"recordwidth" : 1920,
-				"remoteUri" : "rtsp://192.168.1.30:554/stream2",
-				"subSnapShot" : "http://192.168.1.30:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.30:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.30:80",
-				"xAddrs" : "http://192.168.1.30:80/onvif/device_service"
-			},
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.70",
-				"cameraRawIp" : 1174513856,
-				"country" : "",
-				"hw" : "H42",
-				"mac" : "me8_b7_23_0c_14_85",
-				"mainSnapShot" : "http://192.168.1.70:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.70:554/stream1",
-				"name" : "KAMERA70",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.70:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.70:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.70:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.70:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.70:80",
-				"xAddrs" : "http://192.168.1.70:80/onvif/device_service"
-			},
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.79",
-				"cameraRawIp" : 1325508800,
-				"country" : "",
-				"hw" : "H42",
-				"mac" : "me8_b7_23_0c_11_f8",
-				"mainSnapShot" : "http://192.168.1.79:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.79:554/stream1",
-				"name" : "KAMERA79",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.79:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.79:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.79:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.79:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.79:80",
-				"xAddrs" : "http://192.168.1.79:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.91",
-				"cameraRawIp" : 1526835392,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_93_17",
-				"mainSnapShot" : "http://192.168.1.91:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.91:554/stream1",
-				"name" : "KAMERA91",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.91:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 1080,
-				"recordwidth" : 1920,
-				"remoteUri" : "rtsp://192.168.1.91:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.91:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.91:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.91:80",
-				"xAddrs" : "http://192.168.1.91:80/onvif/device_service"
-			},
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.94",
-				"cameraRawIp" : 1577167040,
-				"country" : "",
-				"hw" : "H42",
-				"mac" : "me8_b7_23_0c_11_bb",
-				"mainSnapShot" : "http://192.168.1.94:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.94:554/stream1",
-				"name" : "KAMERA94",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.94:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 1080,
-				"recordwidth" : 1920,
-				"remoteUri" : "rtsp://192.168.1.94:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.94:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.94:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.94:80",
-				"xAddrs" : "http://192.168.1.94:80/onvif/device_service"
-			},
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.95",
-				"cameraRawIp" : 1593944256,
-				"country" : "",
-				"hw" : "H42",
-				"mac" : "me8_b7_23_0c_14_82",
-				"mainSnapShot" : "http://192.168.1.95:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.95:554/stream1",
-				"name" : "KAMERA95",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.95:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 1080,
-				"recordwidth" : 1920,
-				"remoteUri" : "rtsp://192.168.1.95:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.95:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.95:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.95:80",
-				"xAddrs" : "http://192.168.1.95:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.104",
-				"cameraRawIp" : 1744939200,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_7f_c2",
-				"mainSnapShot" : "http://192.168.1.104:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.104:554/stream1",
-				"name" : "KAMERA104",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.104:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.104:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.104:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.104:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.104:80",
-				"xAddrs" : "http://192.168.1.104:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.112",
-				"cameraRawIp" : 1879156928,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_80_8b",
-				"mainSnapShot" : "http://192.168.1.112:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.112:554/stream1",
-				"name" : "KAMERA112",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.112:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.112:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.112:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.112:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.112:80",
-				"xAddrs" : "http://192.168.1.112:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.114",
-				"cameraRawIp" : 1912711360,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_92_1c",
-				"mainSnapShot" : "http://192.168.1.114:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.114:554/stream1",
-				"name" : "KAMERA114",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.114:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.114:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.114:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.114:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.114:80",
-				"xAddrs" : "http://192.168.1.114:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.119",
-				"cameraRawIp" : 1996597440,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_23",
-				"mainSnapShot" : "http://192.168.1.119:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.119:554/stream1",
-				"name" : "KAMERA119",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.119:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.119:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.119:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.119:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.119:80",
-				"xAddrs" : "http://192.168.1.119:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.120",
-				"cameraRawIp" : 2013374656,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_20",
-				"mainSnapShot" : "http://192.168.1.120:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.120:554/stream1",
-				"name" : "KAMERA120",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.120:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.120:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.120:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.120:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.120:80",
-				"xAddrs" : "http://192.168.1.120:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.121",
-				"cameraRawIp" : 2030151872,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_24",
-				"mainSnapShot" : "http://192.168.1.121:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.121:554/stream1",
-				"name" : "KAMERA121",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.121:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.121:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.121:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.121:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.121:80",
-				"xAddrs" : "http://192.168.1.121:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.122",
-				"cameraRawIp" : 2046929088,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_1c",
-				"mainSnapShot" : "http://192.168.1.122:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.122:554/stream1",
-				"name" : "KAMERA122",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.122:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.122:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.122:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.122:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.122:80",
-				"xAddrs" : "http://192.168.1.122:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.126",
-				"cameraRawIp" : 2114037952,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_22",
-				"mainSnapShot" : "http://192.168.1.126:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.126:554/stream1",
-				"name" : "KAMERA126",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.126:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.126:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.126:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.126:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.126:80",
-				"xAddrs" : "http://192.168.1.126:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.129",
-				"cameraRawIp" : 2164369600,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_80_8d",
-				"mainSnapShot" : "http://192.168.1.129:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.129:554/stream1",
-				"name" : "KAMERA129",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.129:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.129:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.129:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.129:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.129:80",
-				"xAddrs" : "http://192.168.1.129:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.132",
-				"cameraRawIp" : 2214701248,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_8e_c9",
-				"mainSnapShot" : "http://192.168.1.132:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.132:554/stream1",
-				"name" : "KAMERA132",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.132:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.132:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.132:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.132:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.132:80",
-				"xAddrs" : "http://192.168.1.132:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.134",
-				"cameraRawIp" : 2248255680,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_28",
-				"mainSnapShot" : "http://192.168.1.134:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.134:554/stream1",
-				"name" : "KAMERA134",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.134:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.134:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.134:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.134:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.134:80",
-				"xAddrs" : "http://192.168.1.134:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.139",
-				"cameraRawIp" : 2332141760,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_8e_d1",
-				"mainSnapShot" : "http://192.168.1.139:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.139:554/stream1",
-				"name" : "KAMERA139",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.139:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.139:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.139:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.139:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.139:80",
-				"xAddrs" : "http://192.168.1.139:80/onvif/device_service"
-			}
-		],
-		"camreports" : {
-			"KAMERA1" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-13 - 19:47:44",
-				"last_seen_at" : "2025-09-13 - 23:44:00",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA1/2025-09-13/23-11-14.m3u8"
-			},
-			"KAMERA104" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:44:02",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA104/2025-09-13/20-06-46.m3u8"
-			},
-			"KAMERA112" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:44:02",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA112/2025-09-13/20-05-03.m3u8"
-			},
-			"KAMERA114" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-13 - 23:38:16",
-				"last_seen_at" : "2025-09-13 - 23:43:28",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA114/2025-09-13/23-44-05.m3u8"
-			},
-			"KAMERA119" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:28",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA119/2025-09-13/23-44-03.m3u8"
-			},
-			"KAMERA120" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:28",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA120/2025-09-13/23-18-56.m3u8"
-			},
-			"KAMERA121" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:28",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA121/2025-09-13/20-07-12.m3u8"
-			},
-			"KAMERA122" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:44:03",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA122/2025-09-13/20-07-45.m3u8"
-			},
-			"KAMERA126" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:44:03",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA126/2025-09-13/20-06-46.m3u8"
-			},
-			"KAMERA129" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:44:04",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA129/2025-09-13/20-09-28.m3u8"
-			},
-			"KAMERA132" : {
-				"connected" : 0,
-				"disconnected" : "2025-09-13 - 23:39:26",
-				"last_restart_time" : "2025-09-13 - 23:39:26",
-				"last_seen_at" : "2025-09-13 - 23:44:04",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA132/2025-09-13/23-44-14.m3u8"
-			},
-			"KAMERA134" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-13 - 10:26:13",
-				"last_seen_at" : "2025-09-13 - 23:44:04",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA134/2025-09-13/20-06-46.m3u8"
-			},
-			"KAMERA139" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:44:04",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA139/2025-09-13/20-08-55.m3u8"
-			},
-			"KAMERA1_1" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-11 - 16:43:47",
-				"recording" : false,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA1_1/2025-09-11/16-44-25.m3u8"
-			},
-			"KAMERA2" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-13 - 23:41:40",
-				"last_seen_at" : "2025-09-13 - 23:44:00",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA2/2025-09-13/23-44-13.m3u8"
-			},
-			"KAMERA3" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-13 - 23:43:26",
-				"last_seen_at" : "2025-09-13 - 23:44:01",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA3/2025-09-13/23-44-08.m3u8"
-			},
-			"KAMERA30" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-13 - 23:43:26",
-				"last_seen_at" : "2025-09-13 - 23:44:01",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA30/2025-09-13/23-44-08.m3u8"
-			},
-			"KAMERA70" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-13 - 19:47:52",
-				"last_seen_at" : "2025-09-13 - 23:44:01",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA70/2025-09-13/23-26-10.m3u8"
-			},
-			"KAMERA79" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-13 - 02:17:13",
-				"last_seen_at" : "2025-09-13 - 23:44:02",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA79/2025-09-13/23-26-00.m3u8"
-			},
-			"KAMERA91" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-12 - 21:41:07",
-				"last_seen_at" : "2025-09-13 - 23:44:02",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA91/2025-09-13/23-10-49.m3u8"
-			},
-			"KAMERA94" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:44:02",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA94/2025-09-13/23-10-47.m3u8"
-			},
-			"KAMERA95" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:44:02",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA95/2025-09-13/21-50-56.m3u8"
-			},
-			"checked" : "2025-09-13 - 23:44:13"
-		},
-		"system" : {
-			"awake" : 1,
-			"cam_synced" : 1,
-			"cameras" : 21,
-			"cpuTemp" : "83.333000",
-			"diskfree" : "0/0 GB",
-			"diskrunning" : "Hayir",
-			"files" : {
-				"ai" : {
-					"at" : "2025-09-13 - 21:06:52",
-					"filename" : "/root/conf/ai.json"
-				},
-				"analogs" : {
-					"at" : "2025-09-13 - 21:07:04",
-					"filename" : "/root/conf/analogs.json"
-				},
-				"app" : {
-					"at" : "2025-09-13 - 21:07:04",
-					"filename" : "/root/conf/app.js"
-				},
-				"cam" : {
-					"at" : "2025-09-13 - 21:07:04",
-					"filename" : "/root/conf/cam.js"
-				},
-				"cameraLayout" : {
-					"at" : "2025-09-13 - 21:07:04",
-					"filename" : "/root/conf/cameraLayout.json"
-				},
-				"cameras_mac" : {
-					"at" : "2025-09-13 - 23:39:36",
-					"filename" : "/root/conf/cameras_mac.json"
-				},
-				"camreports" : {
-					"at" : "2025-09-13 - 23:39:38",
-					"filename" : "/root/conf/camreports.json"
-				},
-				"configuration" : {
-					"at" : "2025-09-13 - 21:06:52",
-					"filename" : "/root/conf/configuration.json"
-				},
-				"diskerror" : {
-					"at" : "2025-09-11 - 17:01:14",
-					"filename" : "/root/conf/diskerror.json"
-				},
-				"diskstatus" : {
-					"at" : "2025-09-13 - 23:02:48",
-					"filename" : "/root/conf/diskstatus.json"
-				},
-				"ecs" : {
-					"at" : "2025-09-13 - 23:39:34",
-					"filename" : "/root/conf/ecs.json"
-				},
-				"ecs_slaves" : {
-					"at" : "2025-09-13 - 16:38:26",
-					"filename" : "/root/conf/ecs_slaves.json"
-				},
-				"events" : {
-					"at" : "2025-09-13 - 21:06:52",
-					"filename" : "/root/conf/events.json"
-				},
-				"function" : {
-					"at" : "2025-09-11 - 17:01:12",
-					"filename" : "/root/conf/function.json"
-				},
-				"gpio" : {
-					"at" : "2025-09-11 - 17:01:12",
-					"filename" : "/root/conf/gpio.json"
-				},
-				"gpios" : {
-					"at" : "2025-09-11 - 17:01:12",
-					"filename" : "/root/conf/gpios.json"
-				},
-				"info" : {
-					"at" : "2025-09-13 - 21:07:05",
-					"filename" : "/root/conf/info.json"
-				},
-				"jlists" : {
-					"at" : "2025-09-13 - 21:06:52",
-					"filename" : "/root/conf/jlists.json"
-				},
-				"movita" : {
-					"at" : "2025-09-13 - 21:06:52",
-					"filename" : "/root/conf/movita.cfg"
-				},
-				"networking" : {
-					"at" : "2025-09-13 - 21:06:52",
-					"filename" : "/root/conf/networking.json"
-				},
-				"scripts" : {
-					"at" : "2025-09-13 - 21:06:52",
-					"filename" : "/root/conf/scripts.json"
-				},
-				"seatingLayout" : {
-					"at" : "2025-09-13 - 21:07:05",
-					"filename" : "/root/conf/seatingLayout.json"
-				},
-				"sensors" : {
-					"at" : "2025-09-13 - 21:06:52",
-					"filename" : "/root/conf/sensors.json"
-				}
-			},
-			"gateway" : "",
-			"gpsOk" : 0,
-			"gsm" : {
-				"activationtime" : "2025-09-13 - 23:44:06",
-				"active" : 0,
-				"deactivationtime" : "2025-09-13 - 23:44:06",
-				"device" : "",
-				"module_exists" : 0
-			},
-			"ignition" : 1,
-			"internetExists" : 0,
-			"ip" : "192.168.1.1",
-			"mac" : "7E:68:3A:58:98:4D",
-			"movitaDnsState" : 100,
-			"movitaServerExists" : 0,
-			"pins" : {
-				"akuLed" : {
-					"is_static" : 1,
-					"pin" : 11,
-					"pullupdown" : "",
-					"type" : "input"
-				},
-				"camReg" : {
-					"is_static" : 1,
-					"pin" : 23,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"diskLed" : {
-					"is_static" : 1,
-					"pin" : 14,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"flash" : {
-					"is_static" : 0,
-					"pin" : 7,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"flashLed" : {
-					"is_static" : 1,
-					"pin" : 12,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 1,
-					"type" : "output"
-				},
-				"gpsLed" : {
-					"is_static" : 1,
-					"pin" : 9,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"gsmReg" : {
-					"is_static" : 1,
-					"pin" : 21,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"horn" : {
-					"is_static" : 0,
-					"pin" : 8,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"ignition" : {
-					"is_static" : 0,
-					"pin" : 3,
-					"pullupdown" : "pulldown",
-					"status" : 1,
-					"type" : "input"
-				},
-				"kayitLed" : {
-					"is_static" : 1,
-					"pin" : 13,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"kontakLed" : {
-					"is_static" : 1,
-					"pin" : 10,
-					"pullupdown" : "",
-					"type" : "input"
-				},
-				"networkReg" : {
-					"is_static" : 1,
-					"pin" : 18,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 0,
-					"type" : "output"
-				},
-				"panicButton" : {
-					"is_static" : 0,
-					"pin" : 25,
-					"pullupdown" : "pulldown",
-					"type" : "input"
-				},
-				"simLed" : {
-					"is_static" : 1,
-					"pin" : 6,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				}
-			},
-			"programs" : {
-				"smartcomm" : {
-					"started_at" : "2025-09-11 - 17:01:12"
-				},
-				"smartecs" : {
-					"started_at" : "2025-09-13 - 16:38:26"
-				},
-				"smartos" : {
-					"started_at" : "2025-09-13 - 21:07:05"
-				},
-				"smartweb" : {
-					"started_at" : "2025-09-13 - 21:06:52"
-				}
-			},
-			"progstate" : "EVENT_PROGRAM_TIMER",
-			"recording" : 21,
-			"rp2040" : {
-				"comm_ok" : 1
-			},
-			"time_error" : 1,
-			"time_error_at" : "2025-09-12 - 21:45:55",
-			"timeset" : 0,
-			"uname" : {
-				"machine" : "aarch64",
-				"nodename" : "movita",
-				"release" : "6.1.99",
-				"str" : "Linux movita 6.1.99 #17 SMP Fri May  9 07:40:53 UTC 2025 aarch64",
-				"sysname" : "Linux",
-				"version" : "#17 SMP Fri May  9 07:40:53 UTC 2025"
-			},
-			"updatestatus" : " ",
-			"uykumodu" : 1,
-			"wifi" : {
-				"active" : 1,
-				"connected_clients" : 0,
-				"dhcp_running" : 1,
-				"has_problems" : 0,
-				"hostapd_running" : 1,
-				"interface" : "wlan0",
-				"interface_up" : 1,
-				"last_checked" : "2025-09-13 - 23:44:12",
-				"problems" : {
-					"last_success_at" : "2025-09-13 - 23:44:12"
-				},
-				"signal_strength" : 0,
-				"ssid" : "movita984d",
-				"test_count" : 63265,
-				"test_duration_hours" : 54,
-				"test_duration_minutes" : 3282,
-				"test_duration_readable" : "54 saat 42 dakika 55 saniye",
-				"test_duration_seconds" : 196975,
-				"test_started_at" : "2025-09-11 - 17:01:16"
-			}
-		},
-		"configuration" : {
-			"autoscan" : false,
-			"cpuserial" : "6f53d5aaa19e4602",
-			"debug" : {
-				"count" : 100,
-				"on" : 0
-			},
-			"onvif" : {
-				"passwords" : [
-					"admin:admin123"
-				]
-			},
-			"soundRec" : true
-		},
-		"movita" : {
-			"config" : {
-				"mediaServerHost" : "45.10.154.232",
-				"mediaServerRestPort" : "8443",
-				"mediaServerRtspPort" : "554"
-			},
-			"ekcalismadakika" : "15",
-			"filo_id" : "0",
-			"serial" : "7E:68:3A:58:98:4D"
-		},
-		"programs" : {
-			"movitaman" : {
-				"last" : "2025-09-13 - 23:44:15",
-				"started" : "2025-09-11 - 17:01:14",
-				"version" : "1.0-D20250908T115423"
-			},
-			"smartcomm" : {
-				"current_time" : "2025-09-13 - 23:44:15",
-				"started_at" : "2025-09-11 - 17:01:12"
-			},
-			"smartecs" : {
-				"current_time" : "2025-09-13 - 23:44:15",
-				"started_at" : "2025-09-13 - 16:38:26"
-			},
-			"smartos" : {
-				"current_time" : "2025-09-13 - 23:44:15",
-				"started_at" : "2025-09-13 - 21:07:05"
-			},
-			"smartweb" : {
-				"current_time" : "2025-09-13 - 23:44:15",
-				"started_at" : "2025-09-13 - 21:06:52"
-			}
-		}
-	},
-	"m_6E_99_6B_70_09_4C" : {
-		"firsttime" : "2025-09-11 - 16:57:13",
-		"registered" : 1,
-		"last_heartbeat_ts" : 1757796253,
-		"online" : 1,
-		"offline_since" : 0,
-		"app_version" : 6002,
-		"connected" : 1,
-		"name" : "m_6E_99_6B_70_09_4C",
-		"current_time" : "2025-09-13 - 23:44:20",
-		"version" : 6002,
-		"smartweb_version" : "1.0-D20250908T115423",
-		"cpuTemp" : "82.777000",
-		"ipv4" : "192.168.1.223",
-		"ipv6" : "fe80::6c99:6bff:fe70:94c",
-		"last_seen_at" : "2025-09-13 - 23:44:16",
-		"isMaster" : 0,
-		"last_ts" : 1757796256,
-		"app_ready" : 0,
-		"system_ready" : 0,
-		"programs_ready" : 0,
-		"cam_ready" : 0,
-		"configuration_ready" : 0,
-		"camreports_ready" : 0,
-		"movita_ready" : 0,
-		"camreports_count" : 16,
-		"system_count" : 27,
-		"cam_count" : 15,
-		"is_closed_by_master" : 0,
-		"test" : {
-			"connection" : {
-				"count" : 16,
-				"last_update" : "2025-09-12 - 11:28:38",
-				"error" : 0
-			},
-			"is_error" : 1,
-			"uptime" : "54 Saat 47 Dakika",
-			"kamera_baglanti" : {
-				"count" : 3214,
-				"last_update" : "2025-09-13 - 23:44:03",
-				"error" : 1
-			},
-			"kamera_kayit" : {
-				"count" : 365,
-				"last_update" : "2025-09-12 - 00:00:01",
-				"error" : 0
-			}
-		},
-		"app" : {
-			"GUIMenu" : true,
-			"adbDoNotRun" : true,
-			"analogs" : {
-				"analog10" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog11" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog8" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"analog9" : {
-					"ok" : 1,
-					"res" : 2
-				},
-				"tester" : "nobody"
-			},
-			"autorecord" : 2,
-			"bundle_rp2040_version" : 22,
-			"cameraMode" : true,
-			"deviceType" : "MXVR6_v1",
-			"firmware_date" : "2025_06_26",
-			"firmware_version" : "1-debian61",
-			"gpsDataFlowStatus" : false,
-			"group" : 2,
-			"intConnection" : false,
-			"isai" : "0",
-			"libPath" : "/usr/local/lib",
-			"logPath" : "/mnt/sda/Log",
-			"macAddressPath" : "/sys/class/net/eth0/address",
-			"maxRecordDuration" : 15,
-			"minSpaceInMBytes" : 2442,
-			"movitabinPath" : "/root/Movita",
-			"movitarecPath" : "/root/Movita",
-			"netdev" : "br0",
-			"pinCode" : "",
-			"ppp" : true,
-			"recordOverTcp" : false,
-			"recordPath" : "/mnt/sda/Rec",
-			"recording" : true,
-			"recordingCameras" : 1,
-			"restartPlayerTimeout" : 60,
-			"rp2040version" : "23_1_8_2025",
-			"rxPacketPath" : "/sys/class/net/wwan0/statistics/rx_packets",
-			"seatMode" : false,
-			"seatPosition" : true,
-			"simStatus" : "",
-			"smartos" : {
-				"card" : "/dev/dri/card0",
-				"screens" : {
-					"HDMI" : {
-						"cameralayout" : 5,
-						"mode" : 0
-					}
-				}
-			},
-			"templateId" : 9,
-			"txPacketPath" : "/sys/class/net/wwan0/statistics/tx_packets",
-			"udpport0" : 3000,
-			"udptarget" : "127.0.0.1",
-			"updatePath" : "/mnt/sda/Update",
-			"useai" : "0",
-			"version" : 6002,
-			"videoOutput" : "AV",
-			"wifiHotSpotName" : "movita094c",
-			"wifiHotSpotPass" : "movita094c"
-		},
-		"cam" : [
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.21",
-				"cameraRawIp" : 352430272,
-				"country" : "",
-				"hw" : "H42",
-				"mainSnapShot" : "http://192.168.1.21:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.21:554/stream1",
-				"name" : "KAMERA2",
-				"password" : "admin123",
-				"recordPath" : "",
-				"recordUri" : "rtsp://192.168.1.21:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.21:554/stream2",
-				"subSnapShot" : "http://192.168.1.21:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.21:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.21:80",
-				"xAddrs" : "http://192.168.1.21:80/onvif/device_service"
-			},
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.22",
-				"cameraRawIp" : 369207488,
-				"country" : "",
-				"hw" : "H42",
-				"mainSnapShot" : "http://192.168.1.22:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.22:554/stream1",
-				"name" : "KAMERA3",
-				"password" : "admin123",
-				"recordPath" : "",
-				"recordUri" : "rtsp://192.168.1.22:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.22:554/stream2",
-				"subSnapShot" : "http://192.168.1.22:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.22:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.22:80",
-				"xAddrs" : "http://192.168.1.22:80/onvif/device_service"
-			},
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.30",
-				"cameraRawIp" : 503425216,
-				"country" : "",
-				"hw" : "H42",
-				"mainSnapShot" : "http://192.168.1.30:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.30:554/stream1",
-				"name" : "KAMERA30",
-				"password" : "admin123",
-				"recordPath" : "",
-				"recordUri" : "rtsp://192.168.1.30:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 1080,
-				"recordwidth" : 1920,
-				"remoteUri" : "rtsp://192.168.1.30:554/stream2",
-				"subSnapShot" : "http://192.168.1.30:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.30:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.30:80",
-				"xAddrs" : "http://192.168.1.30:80/onvif/device_service"
-			},
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.79",
-				"cameraRawIp" : 1325508800,
-				"country" : "",
-				"hw" : "H42",
-				"mac" : "me8_b7_23_0c_11_f8",
-				"mainSnapShot" : "http://192.168.1.79:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.79:554/stream1",
-				"name" : "KAMERA79",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.79:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.79:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.79:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.79:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.79:80",
-				"xAddrs" : "http://192.168.1.79:80/onvif/device_service"
-			},
-			{
-				"brand" : "H42",
-				"cameraIp" : "192.168.1.94",
-				"cameraRawIp" : 1577167040,
-				"country" : "",
-				"hw" : "H42",
-				"mac" : "me8_b7_23_0c_11_bb",
-				"mainSnapShot" : "",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.94:554/stream1",
-				"name" : "KAMERA94",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.94:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 1080,
-				"recordwidth" : 1920,
-				"remoteUri" : "rtsp://192.168.1.94:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "",
-				"subUri" : "rtsp://192.168.1.94:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.94:80",
-				"xAddrs" : "http://192.168.1.94:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.118",
-				"cameraRawIp" : 1979820224,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_1f",
-				"mainSnapShot" : "",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.118:554/stream1",
-				"name" : "KAMERA118",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.118:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.118:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "",
-				"subUri" : "rtsp://192.168.1.118:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.118:80",
-				"xAddrs" : "http://192.168.1.118:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.119",
-				"cameraRawIp" : 1996597440,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_23",
-				"mainSnapShot" : "http://192.168.1.119:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.119:554/stream1",
-				"name" : "KAMERA119",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.119:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.119:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.119:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.119:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.119:80",
-				"xAddrs" : "http://192.168.1.119:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.122",
-				"cameraRawIp" : 2046929088,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_1c",
-				"mainSnapShot" : "http://192.168.1.122:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.122:554/stream1",
-				"name" : "KAMERA122",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.122:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.122:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.122:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.122:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.122:80",
-				"xAddrs" : "http://192.168.1.122:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.126",
-				"cameraRawIp" : 2114037952,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_22",
-				"mainSnapShot" : "http://192.168.1.126:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.126:554/stream1",
-				"name" : "KAMERA126",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.126:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.126:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.126:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.126:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.126:80",
-				"xAddrs" : "http://192.168.1.126:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.131",
-				"cameraRawIp" : 2197924032,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_7e_ee",
-				"mainSnapShot" : "http://192.168.1.131:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.131:554/stream1",
-				"name" : "KAMERA131",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.131:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.131:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.131:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.131:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.131:80",
-				"xAddrs" : "http://192.168.1.131:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.133",
-				"cameraRawIp" : 2231478464,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_82_27",
-				"mainSnapShot" : "http://192.168.1.133:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.133:554/stream1",
-				"name" : "KAMERA133",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.133:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.133:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.133:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.133:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.133:80",
-				"xAddrs" : "http://192.168.1.133:80/onvif/device_service"
-			},
-			{
-				"brand" : "H41",
-				"cameraIp" : "192.168.1.140",
-				"cameraRawIp" : 2348918976,
-				"country" : "",
-				"hw" : "H41",
-				"mac" : "me8_b7_23_0f_8e_db",
-				"mainSnapShot" : "http://192.168.1.140:80/cgi-bin/snapshot.cgi",
-				"manufacturer" : "Vatilon",
-				"mediaUri" : "rtsp://192.168.1.140:554/stream1",
-				"name" : "KAMERA140",
-				"password" : "admin123",
-				"recordUri" : "rtsp://192.168.1.140:554/stream1",
-				"recordcodec" : "H264",
-				"recordheight" : 720,
-				"recordwidth" : 1280,
-				"remoteUri" : "rtsp://192.168.1.140:554/stream2",
-				"soundRec" : true,
-				"subSnapShot" : "http://192.168.1.140:80/cgi-bin/snapshot.cgi",
-				"subUri" : "rtsp://192.168.1.140:554/stream2",
-				"subcodec" : "H264",
-				"subheight" : 480,
-				"subwidth" : 640,
-				"username" : "admin",
-				"xAddr" : "192.168.1.140:80",
-				"xAddrs" : "http://192.168.1.140:80/onvif/device_service"
-			}
-		],
-		"camreports" : {
-			"KAMERA1" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-11 - 16:57:39",
-				"recording" : false,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA1/2025-09-11/16-58-38.m3u8"
-			},
-			"KAMERA118" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:55",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA118/2025-09-13/23-00-32.m3u8"
-			},
-			"KAMERA119" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:23",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA119/2025-09-13/23-44-11.m3u8"
-			},
-			"KAMERA120" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-11 - 17:02:48",
-				"recording" : false,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA120/2025-09-11/17-03-14.m3u8"
-			},
-			"KAMERA122" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:23",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA122/2025-09-13/23-00-32.m3u8"
-			},
-			"KAMERA126" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:23",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA126/2025-09-13/23-00-32.m3u8"
-			},
-			"KAMERA127" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-11 - 17:02:48",
-				"recording" : false,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA127/2025-09-11/17-03-14.m3u8"
-			},
-			"KAMERA129" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-11 - 17:02:48",
-				"recording" : false,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA129/2025-09-11/17-02-52.m3u8"
-			},
-			"KAMERA131" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:23",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA131/2025-09-13/23-00-32.m3u8"
-			},
-			"KAMERA133" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-11 - 17:00:25",
-				"last_seen_at" : "2025-09-13 - 23:43:23",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA133/2025-09-13/23-00-32.m3u8"
-			},
-			"KAMERA140" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_seen_at" : "2025-09-13 - 23:43:55",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA140/2025-09-13/23-01-04.m3u8"
-			},
-			"KAMERA2" : {
-				"connected" : 0,
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA2/2025-09-13/23-44-14.m3u8"
-			},
-			"KAMERA3" : {
-				"connected" : 0,
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA3/2025-09-13/23-44-17.m3u8"
-			},
-			"KAMERA30" : {
-				"connected" : 0,
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA30/2025-09-13/23-44-14.m3u8"
-			},
-			"KAMERA79" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-11 - 17:48:52",
-				"last_seen_at" : "2025-09-13 - 23:43:55",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA79/2025-09-13/23-00-32.m3u8"
-			},
-			"KAMERA94" : {
-				"connected" : 1,
-				"disconnected" : "-",
-				"last_restart_time" : "2025-09-11 - 17:06:35",
-				"last_seen_at" : "2025-09-13 - 23:43:55",
-				"recording" : true,
-				"recordingPath" : "/mnt/sda/Rec/KAMERA94/2025-09-13/23-01-04.m3u8"
-			},
-			"checked" : "2025-09-13 - 23:44:13"
-		},
-		"system" : {
-			"awake" : 1,
-			"cameras" : 12,
-			"cpuTemp" : "83.333000",
-			"diskfree" : "99/148 GB",
-			"diskrunning" : "Evet",
-			"emptySize" : 99,
-			"files" : {
-				"ai" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/ai.json"
-				},
-				"analogs" : {
-					"at" : "2025-09-11 - 17:02:09",
-					"filename" : "/root/conf/analogs.json"
-				},
-				"app" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/app.js"
-				},
-				"cam" : {
-					"at" : "2025-09-11 - 17:02:57",
-					"filename" : "/root/conf/cam.js"
-				},
-				"cameraLayout" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/cameraLayout.json"
-				},
-				"cameras_mac" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/cameras_mac.json"
-				},
-				"camreports" : {
-					"at" : "2025-09-12 - 11:28:45",
-					"filename" : "/root/conf/camreports.json"
-				},
-				"configuration" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/configuration.json"
-				},
-				"diskerror" : {
-					"at" : "2025-09-11 - 17:02:16",
-					"filename" : "/root/conf/diskerror.json"
-				},
-				"diskstatus" : {
-					"at" : "2025-09-12 - 11:28:25",
-					"filename" : "/root/conf/diskstatus.json"
-				},
-				"ecs" : {
-					"at" : "2025-09-12 - 11:28:36",
-					"filename" : "/root/conf/ecs.json"
-				},
-				"ecs_slaves" : {
-					"at" : "2025-09-11 - 17:02:14",
-					"filename" : "/root/conf/ecs_slaves.json"
-				},
-				"events" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/events.json"
-				},
-				"function" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/function.json"
-				},
-				"gpio" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/gpio.json"
-				},
-				"gpios" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/gpios.json"
-				},
-				"info" : {
-					"at" : "2025-09-11 - 17:02:09",
-					"filename" : "/root/conf/info.json"
-				},
-				"jlists" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/jlists.json"
-				},
-				"movita" : {
-					"at" : "2025-09-11 - 17:02:16",
-					"filename" : "/root/conf/movita.cfg"
-				},
-				"networking" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/networking.json"
-				},
-				"scripts" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/scripts.json"
-				},
-				"seatingLayout" : {
-					"at" : "2025-09-11 - 17:02:09",
-					"filename" : "/root/conf/seatingLayout.json"
-				},
-				"sensors" : {
-					"at" : "2025-09-11 - 17:02:15",
-					"filename" : "/root/conf/sensors.json"
-				}
-			},
-			"gateway" : "",
-			"gpsOk" : 0,
-			"gsm" : {
-				"activationtime" : "2025-09-13 - 23:44:11",
-				"active" : 0,
-				"deactivationtime" : "2025-09-13 - 23:44:11",
-				"device" : "",
-				"module_exists" : 0
-			},
-			"ignition" : 1,
-			"internetExists" : 0,
-			"ip" : "192.168.1.1",
-			"mac" : "6E:99:6B:70:09:4C",
-			"movitaDnsState" : 100,
-			"movitaServerExists" : 0,
-			"pins" : {
-				"akuLed" : {
-					"is_static" : 1,
-					"pin" : 11,
-					"pullupdown" : "",
-					"type" : "input"
-				},
-				"camReg" : {
-					"is_static" : 1,
-					"pin" : 23,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"diskLed" : {
-					"is_static" : 1,
-					"pin" : 14,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 1,
-					"type" : "output"
-				},
-				"flash" : {
-					"is_static" : 0,
-					"pin" : 7,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"flashLed" : {
-					"is_static" : 1,
-					"pin" : 12,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"gpsLed" : {
-					"is_static" : 1,
-					"pin" : 9,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"gsmReg" : {
-					"is_static" : 1,
-					"pin" : 21,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 1,
-					"type" : "output"
-				},
-				"horn" : {
-					"is_static" : 0,
-					"pin" : 8,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"ignition" : {
-					"is_static" : 0,
-					"pin" : 3,
-					"pullupdown" : "pulldown",
-					"status" : 1,
-					"type" : "input"
-				},
-				"kayitLed" : {
-					"is_static" : 1,
-					"pin" : 13,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				},
-				"kontakLed" : {
-					"is_static" : 1,
-					"pin" : 10,
-					"pullupdown" : "",
-					"type" : "input"
-				},
-				"networkReg" : {
-					"is_static" : 1,
-					"pin" : 18,
-					"pullupdown" : "",
-					"set" : 1,
-					"status" : 0,
-					"type" : "output"
-				},
-				"panicButton" : {
-					"is_static" : 0,
-					"pin" : 25,
-					"pullupdown" : "pulldown",
-					"type" : "input"
-				},
-				"simLed" : {
-					"is_static" : 1,
-					"pin" : 6,
-					"pullupdown" : "",
-					"set" : 0,
-					"status" : 0,
-					"type" : "output"
-				}
-			},
-			"programs" : {
-				"smartcomm" : {
-					"started_at" : "2025-09-11 - 17:02:15"
-				},
-				"smartecs" : {
-					"started_at" : "2025-09-11 - 17:02:14"
-				},
-				"smartos" : {
-					"started_at" : "2025-09-11 - 17:02:09"
-				},
-				"smartweb" : {
-					"started_at" : "2025-09-11 - 17:02:15"
-				}
-			},
-			"progstate" : "EVENT_PROGRAM_TIMER",
-			"recordSize" : 148,
-			"recording" : 12,
-			"rp2040" : {
-				"comm_ok" : 1
-			},
-			"timeset" : 0,
-			"uname" : {
-				"machine" : "aarch64",
-				"nodename" : "movita",
-				"release" : "6.1.99",
-				"str" : "Linux movita 6.1.99 #17 SMP Fri May  9 07:40:53 UTC 2025 aarch64",
-				"sysname" : "Linux",
-				"version" : "#17 SMP Fri May  9 07:40:53 UTC 2025"
-			},
-			"updatestatus" : " ",
-			"uykumodu" : 1,
-			"wifi" : {
-				"active" : 1,
-				"connected_clients" : 0,
-				"dhcp_running" : 1,
-				"has_problems" : 0,
-				"hostapd_running" : 1,
-				"interface" : "wlan0",
-				"interface_up" : 1,
-				"last_checked" : "2025-09-13 - 23:44:16",
-				"problems" : {
-					"last_success_at" : "2025-09-13 - 23:44:16"
-				},
-				"signal_strength" : 0,
-				"ssid" : "movita094c",
-				"test_count" : 67876,
-				"test_duration_hours" : 54,
-				"test_duration_minutes" : 3281,
-				"test_duration_readable" : "54 saat 41 dakika 59 saniye",
-				"test_duration_seconds" : 196919,
-				"test_started_at" : "2025-09-11 - 17:02:17"
-			}
-		},
-		"configuration" : {
-			"autoscan" : false,
-			"cpuserial" : "dd4d5a31c80f5625",
-			"debug" : {
-				"count" : 100,
-				"on" : 0
-			},
-			"disk_config" : {
-				"main" : {
-					"disk" : "/dev/sda",
-					"mount_point" : "/mnt/sda"
-				}
-			},
-			"disk_priority" : [
-				"nvme",
-				"sata",
-				"mmc"
-			],
-			"onvif" : {
-				"passwords" : [
-					"admin:admin123"
-				]
-			},
-			"soundRec" : true
-		},
-		"movita" : {
-			"config" : {
-				"mediaServerHost" : "45.10.154.232",
-				"mediaServerRestPort" : "8443",
-				"mediaServerRtspPort" : "554"
-			},
-			"ekcalismadakika" : "15",
-			"filo_id" : "0",
-			"serial" : "6E:99:6B:70:09:4C"
-		},
-		"programs" : {
-			"movitaman" : {
-				"last" : "2025-09-13 - 23:44:19",
-				"started" : "2025-09-11 - 17:02:16",
-				"version" : "1.0-D20250908T115423"
-			},
-			"smartcomm" : {
-				"current_time" : "2025-09-13 - 23:44:19",
-				"started_at" : "2025-09-11 - 17:02:15"
-			},
-			"smartecs" : {
-				"current_time" : "2025-09-13 - 23:44:19",
-				"started_at" : "2025-09-11 - 17:02:14"
-			},
-			"smartos" : {
-				"current_time" : "2025-09-13 - 23:44:19",
-				"started_at" : "2025-09-11 - 17:02:09"
-			},
-			"smartweb" : {
-				"current_time" : "2025-09-13 - 23:44:19",
-				"started_at" : "2025-09-11 - 17:02:15"
-			}
-		}
-	}
-}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.firsttime", "val": "2025-10-02 - 20:22:24"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.connected", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.name", "val": "CA:1A:E6:81:C9:F4"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.current_time", "val": "2025-10-03 - 00:17:24"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.version", "val": 6001}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.smartweb_version", "val": "1.0-D20251002T145501"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cpuTemp", "val": "50.625000"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.ipv4", "val": "192.168.1.5"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.ipv6", "val": "fe80::c81a:e6ff:fe81:c9f4"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.last_seen_at", "val": "2025-10-03 - 00:17:24"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.isMaster", "val": "master"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.last_ts", "val": 1759439844}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.online", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.programs_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.configuration_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.camreports_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.test.uptime", "val": "3 Saat 54 Dakika"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.test.diskrunning.count", "val": 44}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.test.diskrunning.last_update", "val": "2025-10-03 - 00:16:45"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.test.diskrunning.error", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.test.is_error", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.test.diskfree.count", "val": 44}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.test.diskfree.last_update", "val": "2025-10-03 - 00:16:45"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.test.diskfree.error", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.registered", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.lastSeen", "val": "2025-10-03 - 00:17:24"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].xAddrs", "val": "http://192.168.1.119:80/onvif/device_service"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].username", "val": "admin"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].mac", "val": "E8:B7:23:0F:82:23"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].record", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].password", "val": "admin123"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].cameraIp", "val": "192.168.1.119"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].name", "val": "KAMERA119"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].brand", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].hw", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].country", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].recordheight", "val": 720}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].subwidth", "val": 640}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].subheight", "val": 480}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].cameraRawIp", "val": 1996597440}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].subUri", "val": "rtsp://192.168.1.119:554/stream2"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].recordUri", "val": "rtsp://192.168.1.119:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].remoteUri", "val": "rtsp://192.168.1.119:554/stream2"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].mediaUri", "val": "rtsp://192.168.1.119:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].subSnapShot", "val": "http://192.168.1.119:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].mainSnapShot", "val": "http://192.168.1.119:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].soundRec", "val": true}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[0].xAddr", "val": "192.168.1.119:80"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].xAddrs", "val": "http://192.168.1.134:80/onvif/device_service"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].username", "val": "admin"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].mac", "val": "E8:B7:23:0F:82:28"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].record", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].password", "val": "admin123"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].cameraIp", "val": "192.168.1.134"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].name", "val": "KAMERA134"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].brand", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].hw", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].country", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].recordheight", "val": 720}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].subwidth", "val": 640}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].subheight", "val": 480}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].cameraRawIp", "val": 2248255680}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].subUri", "val": "rtsp://192.168.1.134:554/stream2"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].recordUri", "val": "rtsp://192.168.1.134:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].remoteUri", "val": "rtsp://192.168.1.134:554/stream2"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].mediaUri", "val": "rtsp://192.168.1.134:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].subSnapShot", "val": "http://192.168.1.134:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].mainSnapShot", "val": "http://192.168.1.134:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].soundRec", "val": true}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[1].xAddr", "val": "192.168.1.134:80"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].xAddrs", "val": "http://192.168.1.112:80/onvif/device_service"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].username", "val": "admin"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].mac", "val": "E8:B7:23:0F:80:8B"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].record", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].password", "val": "admin123"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].cameraIp", "val": "192.168.1.112"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].name", "val": "KAMERA112"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].brand", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].hw", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].country", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].recordheight", "val": 720}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].subwidth", "val": 640}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].subheight", "val": 480}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].cameraRawIp", "val": 1879156928}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].subUri", "val": "rtsp://192.168.1.112:554/stream2"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].recordUri", "val": "rtsp://192.168.1.112:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].remoteUri", "val": "rtsp://192.168.1.112:554/stream2"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].mediaUri", "val": "rtsp://192.168.1.112:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].subSnapShot", "val": "http://192.168.1.112:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].mainSnapShot", "val": "http://192.168.1.112:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].soundRec", "val": true}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.cam[2].xAddr", "val": "192.168.1.112:80"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.files", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.awake", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.uykumodu", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.timeset", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.progstate", "val": "EVENT_PROGRAM_TIMER"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.mac", "val": "CA:1A:E6:81:C9:F4"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.gpsOk", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.pins", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.programs", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.ip", "val": "192.168.1.5"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.gateway", "val": "192.168.1.2"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.gsm", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.internetExists", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.movitaDnsState", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.movitaServerExists", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.wifi", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.diskrunning", "val": "Hayir"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.diskfree", "val": "0/0 GB"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.recording", "val": 3}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.not_recording", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.cameras", "val": 3}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.uname", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.bridge", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.updatestatus", "val": " "}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.cpuTemp", "val": "55.000000"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.movitaServerIp", "val": "161.97.107.99"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.cam_synced", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.cam_sync_time", "val": "2025-10-02 - 23:55:24"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.cam_sync_source", "val": "cam_objesi_veya_camjs"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.system.camjs", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.GUIMenu", "val": true}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.adbDoNotRun", "val": true}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.cameraMode", "val": true}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.deviceType", "val": "MXVR6_v1"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.group", "val": 2}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.intConnection", "val": false}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.libPath", "val": "/usr/local/lib"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.logPath", "val": "/mnt/sda/Log"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.macAddressPath", "val": "/sys/class/net/eth0/address"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.maxRecordDuration", "val": 15}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.minSpaceInMBytes", "val": 30608}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.movitabinPath", "val": "/root/Movita"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.movitarecPath", "val": "/root/Movita"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.pinCode", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.recordOverTcp", "val": false}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.recordPath", "val": "/mnt/sda/Rec"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.recording", "val": true}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.recordingCameras", "val": 1}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.restartPlayerTimeout", "val": 60}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.rxPacketPath", "val": "/sys/class/net/wwan0/statistics/rx_packets"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.seatMode", "val": false}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.seatPosition", "val": true}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.simStatus", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.templateId", "val": 9}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.txPacketPath", "val": "/sys/class/net/wwan0/statistics/tx_packets"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.updatePath", "val": "/mnt/sda/Update"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.videoOutput", "val": "AV"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.smartos", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.netdev", "val": "br0"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.useai", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.gpsDataFlowStatus", "val": false}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.ppp", "val": true}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.autorecord", "val": 2}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.isai", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.firmware_version", "val": "1-debian61"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.firmware_date", "val": "2025_06_26"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.analogs", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.udptarget", "val": "127.0.0.1"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.udpport0", "val": 3000}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.version", "val": 6001}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.wifiHotSpotName", "val": "movitac9f4"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.wifiHotSpotPass", "val": "movitac9f4"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.bundle_rp2040_version", "val": 22}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.password", "val": 111111}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.autoscan", "val": true}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.app.passwordHash", "val": "28ec08758246a2df7db95d20e420c4b9"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.configuration.autoscan", "val": false}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.configuration.soundRec", "val": true}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.configuration.debug", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.configuration.onvif", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.configuration.cpuserial", "val": "083fc5755ceff2a2"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.configuration.cameraGroups", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.config", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.ekcalismadakika", "val": 15}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.serial", "val": "CA:1A:E6:81:C9:F4"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.filo_id", "val": 15}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.plaka", "val": "TIMKO1.5"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.sinyal_frekansi", "val": 6}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.rolanti_katsayisi", "val": 7}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.biriktirme_katsayisi", "val": 2}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.toplu_gonderim", "val": 40}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.sms_mesafe", "val": 2000}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.sysUtcDate", "val": 1759439742}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.utcOffset", "val": 10800}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.minSpaceInMBytes", "val": 400}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.kapanis_konum_x", "val": "0.000000"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.kapanis_konum_y", "val": "0.000000"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.kapanis_mesafe", "val": "0.000000"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.filo_adi", "val": "smarteq"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.api_url", "val": "http://movita.com.tr:8011"}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.uyandirmadakika", "val": 0}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.movita.uyandirmatarih", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.camreports.KAMERA108", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.camreports.KAMERA140", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.camreports.KAMERA131", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.camreports.KAMERA69", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.camreports.KAMERA128", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.camreports.KAMERA94", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.camreports.KAMERA119", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.camreports.KAMERA134", "val": ""}
+{"c":"changed", "data":"ecs_slaves.CA:1A:E6:81:C9:F4.camreports.KAMERA112", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.firsttime", "val": "2025-10-02 - 20:22:24"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.connected", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.name", "val": "82:4E:6A:0B:52:34"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.current_time", "val": "2025-10-03 - 00:17:24"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.version", "val": 6001}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.smartweb_version", "val": "1.0-D20251002T145501"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cpuTemp", "val": "71.111000"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.ipv4", "val": "192.168.1.57"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.ipv6", "val": "fe80::804e:6aff:fe0b:5234"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.last_seen_at", "val": "2025-10-03 - 00:17:24"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.isMaster", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.last_ts", "val": 1759439844}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.online", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.programs_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.configuration_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.movita_ready", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.uptime", "val": "3 Saat 54 Dakika"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.kamera_baglanti.count", "val": 19}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.kamera_baglanti.last_update", "val": "2025-10-02 - 20:43:32"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.kamera_baglanti.error", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.is_error", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.time.count", "val": 33}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.time.last_update", "val": "2025-10-02 - 20:57:05"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.time.error", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.kamera_kayit.count", "val": 5}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.kamera_kayit.last_update", "val": "2025-10-02 - 23:25:54"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.kamera_kayit.error", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.connection.count", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.connection.last_update", "val": "2025-10-02 - 20:57:04"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.connection.error", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.program.count", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.program.last_update", "val": "2025-10-02 - 23:55:42"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.test.program.error", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.registered", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.last_heartbeat_ts", "val": 1759439841}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.offline_since", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app_version", "val": 6001}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam_count", "val": 5}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports_count", "val": 5}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system_count", "val": 30}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.GUIMenu", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.adbDoNotRun", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.analogs.analog10.ok", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.analogs.analog10.res", "val": 2}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.analogs.analog11.ok", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.analogs.analog11.res", "val": 2}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.analogs.analog8.ok", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.analogs.analog8.res", "val": 2}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.analogs.analog9.ok", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.analogs.analog9.res", "val": 2}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.analogs.tester", "val": "nobody"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.autorecord", "val": 2}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.bundle_rp2040_version", "val": 22}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.cameraMode", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.deviceType", "val": "MXVR6_v1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.firmware_date", "val": "2025_06_26"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.firmware_version", "val": "1-debian61"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.gpsDataFlowStatus", "val": false}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.group", "val": 2}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.intConnection", "val": false}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.isai", "val": "0"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.libPath", "val": "/usr/local/lib"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.logPath", "val": "/mnt/sda/Log"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.macAddressPath", "val": "/sys/class/net/eth0/address"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.maxRecordDuration", "val": 15}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.minSpaceInMBytes", "val": 2360}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.movitabinPath", "val": "/root/Movita"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.movitarecPath", "val": "/root/Movita"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.netdev", "val": "br0"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.password", "val": "1111"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.passwordHash", "val": "ecf31e984659b432b9a64bcd203fd254"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.pinCode", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.ppp", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.recordOverTcp", "val": false}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.recordPath", "val": "/mnt/sda/Rec"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.recording", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.recordingCameras", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.restartPlayerTimeout", "val": 60}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.rp2040version", "val": "23_1_8_2025"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.rxPacketPath", "val": "/sys/class/net/wwan0/statistics/rx_packets"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.seatMode", "val": false}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.seatPosition", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.simStatus", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.smartos.card", "val": "/dev/dri/card0"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.smartos.screens.HDMI.cameralayout", "val": 5}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.smartos.screens.HDMI.mode", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.templateId", "val": 9}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.txPacketPath", "val": "/sys/class/net/wwan0/statistics/tx_packets"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.udpport0", "val": 3000}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.udptarget", "val": "127.0.0.1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.updatePath", "val": "/mnt/sda/Update"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.useai", "val": "0"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.version", "val": 6001}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.videoOutput", "val": "AV"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.wifiHotSpotName", "val": "movita5234"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.app.wifiHotSpotPass", "val": "movita5234"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.awake", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.bootcount", "val": 900}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.bridge.smartweb_connected", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.bridge.smartweb_initialized", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.cameras", "val": 5}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.cpuTemp", "val": "70.000000"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.diskfree", "val": "140/144 GB"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.diskrunning", "val": "Evet"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.emptySize", "val": 140}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.ai.at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.ai.filename", "val": "/root/conf/ai.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.analogs.at", "val": "2025-10-02 - 20:56:54"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.analogs.filename", "val": "/root/conf/analogs.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.app.at", "val": "2025-10-02 - 20:57:02"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.app.filename", "val": "/root/conf/app.js"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.cam.at", "val": "2025-10-02 - 23:26:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.cam.filename", "val": "/root/conf/cam.js"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.cameraLayout.at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.cameraLayout.filename", "val": "/root/conf/cameraLayout.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.cameras.at", "val": "2025-10-02 - 23:55:15"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.cameras.filename", "val": "/etc/movita/cameras.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.cameras_mac.at", "val": "2025-10-02 - 20:57:34"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.cameras_mac.filename", "val": "/etc/movita/cameras_mac.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.camreports.at", "val": "2025-10-02 - 23:54:37"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.camreports.filename", "val": "/root/conf/camreports.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.configuration.at", "val": "2025-10-02 - 20:57:02"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.configuration.filename", "val": "/root/conf/configuration.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.diskerror.at", "val": "2025-10-02 - 20:57:01"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.diskerror.filename", "val": "/root/conf/diskerror.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.diskstatus.at", "val": "2025-10-02 - 23:54:26"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.diskstatus.filename", "val": "/root/conf/diskstatus.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.ecs.at", "val": "2025-10-02 - 23:25:30"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.ecs.filename", "val": "/root/conf/ecs.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.ecs_slaves.at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.ecs_slaves.filename", "val": "/root/conf/ecs_slaves.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.events.at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.events.filename", "val": "/root/conf/events.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.fatal_errors.at", "val": "2025-10-02 - 23:54:37"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.fatal_errors.filename", "val": "/root/conf/fatal_errors.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.function.at", "val": "2025-10-02 - 20:57:02"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.function.filename", "val": "/root/conf/function.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.gpio.at", "val": "2025-10-02 - 20:57:02"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.gpio.filename", "val": "/root/conf/gpio.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.gpios.at", "val": "2025-10-02 - 20:57:02"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.gpios.filename", "val": "/root/conf/gpios.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.groups.at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.groups.filename", "val": "/root/conf/groups.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.info.at", "val": "2025-10-02 - 20:56:54"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.info.filename", "val": "/root/conf/info.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.jlists.at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.jlists.filename", "val": "/root/conf/jlists.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.movita.at", "val": "2025-10-02 - 20:57:01"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.movita.filename", "val": "/etc/movita/movita.cfg"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.networking.at", "val": "2025-10-02 - 20:57:02"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.networking.filename", "val": "/root/conf/networking.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.scripts.at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.scripts.filename", "val": "/root/conf/scripts.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.seatingLayout.at", "val": "2025-10-02 - 20:56:55"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.seatingLayout.filename", "val": "/root/conf/seatingLayout.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.sensors.at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.sensors.filename", "val": "/root/conf/sensors.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.smarteq_media_config.at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.smarteq_media_config.filename", "val": "/etc/movita/smarteq_media_config.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.users.at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.files.users.filename", "val": "/root/conf/users.json"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.gateway", "val": "192.168.1.2"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.gpsOk", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.gsm.activationtime", "val": "2025-10-03 - 00:17:11"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.gsm.active", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.gsm.deactivationtime", "val": "2025-10-03 - 00:17:11"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.gsm.device", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.gsm.module_exists", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.ignition", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.internetExists", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.ip", "val": "192.168.1.1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.mac", "val": "82:4E:6A:0B:52:34"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.movitaDnsState", "val": 100}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.movitaServerExists", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.not_recording", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.akuLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.akuLed.pin", "val": 11}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.akuLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.akuLed.type", "val": "input"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.camReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.camReg.pin", "val": 23}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.camReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.camReg.set", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.camReg.status", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.camReg.type", "val": "output"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.diskLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.diskLed.pin", "val": 14}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.diskLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.diskLed.set", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.diskLed.status", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.diskLed.type", "val": "output"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.flash.is_static", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.flash.pin", "val": 7}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.flash.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.flash.set", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.flash.status", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.flash.type", "val": "output"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.flashLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.flashLed.pin", "val": 12}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.flashLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.flashLed.set", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.flashLed.status", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.flashLed.type", "val": "output"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.gpsLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.gpsLed.pin", "val": 9}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.gpsLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.gpsLed.set", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.gpsLed.status", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.gpsLed.type", "val": "output"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.gsmReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.gsmReg.pin", "val": 21}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.gsmReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.gsmReg.set", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.gsmReg.status", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.gsmReg.type", "val": "output"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.horn.is_static", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.horn.pin", "val": 8}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.horn.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.horn.set", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.horn.status", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.horn.type", "val": "output"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.ignition.is_static", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.ignition.pin", "val": 3}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.ignition.pullupdown", "val": "pulldown"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.ignition.status", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.ignition.type", "val": "input"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.kayitLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.kayitLed.pin", "val": 13}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.kayitLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.kayitLed.set", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.kayitLed.status", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.kayitLed.type", "val": "output"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.kontakLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.kontakLed.pin", "val": 10}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.kontakLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.kontakLed.type", "val": "input"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.networkReg.is_static", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.networkReg.pin", "val": 18}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.networkReg.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.networkReg.set", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.networkReg.status", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.networkReg.type", "val": "output"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.panicButton.is_static", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.panicButton.pin", "val": 25}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.panicButton.pullupdown", "val": "pulldown"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.panicButton.type", "val": "input"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.simLed.is_static", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.simLed.pin", "val": 6}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.simLed.pullupdown", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.simLed.set", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.simLed.status", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.pins.simLed.type", "val": "output"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.programs.smartcomm.started_at", "val": "2025-10-02 - 20:57:02"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.programs.smartecs.started_at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.programs.smartos.started_at", "val": "2025-10-02 - 20:56:55"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.programs.smartweb.started_at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.progstate", "val": "EVENT_PROGRAM_TIMER"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.recordSize", "val": 144}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.recording", "val": 5}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.rp2040.comm_ok", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.timeset", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.uname.machine", "val": "aarch64"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.uname.nodename", "val": "movita"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.uname.release", "val": "6.1.99"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.uname.str", "val": "Linux movita 6.1.99 #17 SMP Fri May  9 07:40:53 UTC 2025 aarch64"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.uname.sysname", "val": "Linux"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.uname.version", "val": "#17 SMP Fri May  9 07:40:53 UTC 2025"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.updatestatus", "val": " "}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.uykumodu", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.active", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.connected_clients", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.dhcp_running", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.has_problems", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.hostapd_running", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.interface", "val": "wlan0"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.interface_up", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.last_checked", "val": "2025-10-03 - 00:17:21"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.problems.last_success_at", "val": "2025-10-03 - 00:17:21"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.signal_strength", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.ssid", "val": "movita5234"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.test_count", "val": 4353}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.test_duration_hours", "val": 3}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.test_duration_minutes", "val": 200}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.test_duration_readable", "val": "3 saat 20 dakika 18 saniye"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.test_duration_seconds", "val": 12018}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.system.wifi.test_started_at", "val": "2025-10-02 - 20:57:03"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.configuration.autoscan", "val": false}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.configuration.cpuserial", "val": "4535a55f665459a6"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.configuration.debug.count", "val": 100}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.configuration.debug.on", "val": 0}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.configuration.disk_config.main.disk", "val": "/dev/mmcblk1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.configuration.disk_config.main.mount_point", "val": "/mnt/sda"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.configuration.disk_priority[0]", "val": "nvme"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.configuration.disk_priority[1]", "val": "sata"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.configuration.disk_priority[2]", "val": "mmc"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.configuration.onvif.passwords[0]", "val": "admin:admin123"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.configuration.soundRec", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.movita.config.mediaServerHost", "val": "45.10.154.232"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.movita.config.mediaServerRestPort", "val": "8443"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.movita.config.mediaServerRtspPort", "val": "554"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.movita.ekcalismadakika", "val": "15"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.movita.filo_id", "val": "0"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.movita.serial", "val": "82:4E:6A:0B:52:34"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.programs.movitaman.last", "val": "2025-10-03 - 00:17:22"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.programs.movitaman.started", "val": "2025-10-02 - 20:57:01"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.programs.movitaman.version", "val": "1.0-D20251001T112343"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.programs.smartcomm.current_time", "val": "2025-10-03 - 00:17:22"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.programs.smartcomm.started_at", "val": "2025-10-02 - 20:57:02"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.programs.smartecs.current_time", "val": "2025-10-03 - 00:17:23"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.programs.smartecs.started_at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.programs.smartos.current_time", "val": "2025-10-03 - 00:17:23"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.programs.smartos.started_at", "val": "2025-10-02 - 20:56:55"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.programs.smartweb.current_time", "val": "2025-10-03 - 00:17:23"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.programs.smartweb.started_at", "val": "2025-10-02 - 20:57:00"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].brand", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].cameraIp", "val": "192.168.1.140"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].cameraRawIp", "val": 2348918976}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].country", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].hw", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].mac", "val": "E8:B7:23:0F:8E:DB"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].mainSnapShot", "val": "http://192.168.1.140:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].mediaUri", "val": "rtsp://192.168.1.140:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].name", "val": "KAMERA140"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].password", "val": "admin123"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].record", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].recordUri", "val": "rtsp://192.168.1.140:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].recordheight", "val": 720}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].remoteUri", "val": "rtsp://192.168.1.140:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].soundRec", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].subSnapShot", "val": "http://192.168.1.140:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].subUri", "val": "rtsp://192.168.1.140:554/stream2"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].subheight", "val": 640}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].subwidth", "val": 640}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].username", "val": "admin"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[0].xAddrs", "val": "http://192.168.1.140:80/onvif/device_service"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].brand", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].cameraIp", "val": "192.168.1.131"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].cameraRawIp", "val": 2197924032}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].country", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].hw", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].mac", "val": "E8:B7:23:0F:7E:EE"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].mainSnapShot", "val": "http://192.168.1.131:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].mediaUri", "val": "rtsp://192.168.1.131:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].name", "val": "KAMERA131"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].password", "val": "admin123"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].record", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].recordUri", "val": "rtsp://192.168.1.131:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].recordheight", "val": 720}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].remoteUri", "val": "rtsp://192.168.1.131:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].soundRec", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].subSnapShot", "val": "http://192.168.1.131:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].subUri", "val": "rtsp://192.168.1.131:554/stream2"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].subheight", "val": 640}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].subwidth", "val": 640}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].username", "val": "admin"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[1].xAddrs", "val": "http://192.168.1.131:80/onvif/device_service"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].brand", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].cameraIp", "val": "192.168.1.69"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].cameraRawIp", "val": 1157736640}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].country", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].hw", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].mac", "val": "E8:B7:23:16:D7:A0"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].mainSnapShot", "val": "http://192.168.1.69:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].mediaUri", "val": "rtsp://192.168.1.69:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].name", "val": "KAMERA69"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].password", "val": "admin123"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].record", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].recordUri", "val": "rtsp://192.168.1.69:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].recordheight", "val": 720}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].remoteUri", "val": "rtsp://192.168.1.69:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].soundRec", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].subSnapShot", "val": "http://192.168.1.69:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].subUri", "val": "rtsp://192.168.1.69:554/stream2"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].subheight", "val": 640}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].subwidth", "val": 640}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].username", "val": "admin"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[2].xAddrs", "val": "http://192.168.1.69:80/onvif/device_service"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].brand", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].cameraIp", "val": "192.168.1.128"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].cameraRawIp", "val": 2147592384}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].country", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].hw", "val": "H41"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].mac", "val": "E8:B7:23:0F:8E:50"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].mainSnapShot", "val": "http://192.168.1.128:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].mediaUri", "val": "rtsp://192.168.1.128:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].name", "val": "KAMERA128"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].password", "val": "admin123"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].record", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].recordUri", "val": "rtsp://192.168.1.128:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].recordheight", "val": 720}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].recordwidth", "val": 1280}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].remoteUri", "val": "rtsp://192.168.1.128:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].soundRec", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].subSnapShot", "val": "http://192.168.1.128:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].subUri", "val": "rtsp://192.168.1.128:554/stream2"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].subheight", "val": 640}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].subwidth", "val": 640}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].username", "val": "admin"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[3].xAddrs", "val": "http://192.168.1.128:80/onvif/device_service"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].brand", "val": "H42"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].cameraIp", "val": "192.168.1.94"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].cameraRawIp", "val": 1577167040}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].country", "val": ""}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].hw", "val": "H42"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].mac", "val": "E8:B7:23:0C:11:BB"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].mainSnapShot", "val": "http://192.168.1.94:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].manufacturer", "val": "Vatilon"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].mediaUri", "val": "rtsp://192.168.1.94:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].name", "val": "KAMERA94"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].password", "val": "admin123"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].record", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].recordUri", "val": "rtsp://192.168.1.94:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].recordcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].recordheight", "val": 1080}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].recordwidth", "val": 1920}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].remoteUri", "val": "rtsp://192.168.1.94:554/stream1"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].soundRec", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].subSnapShot", "val": "http://192.168.1.94:80/cgi-bin/snapshot.cgi"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].subUri", "val": "rtsp://192.168.1.94:554/stream2"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].subcodec", "val": "H264"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].subheight", "val": 640}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].subwidth", "val": 640}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].username", "val": "admin"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.cam[4].xAddrs", "val": "http://192.168.1.94:80/onvif/device_service"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA140.recording", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA140.recordingPath", "val": "/mnt/sda/Rec/KAMERA140/2025-10-03/00-00-00.m3u8"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA140.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA140.connected", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA140.last_seen_at", "val": "2025-10-03 - 00:16:56"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA131.recording", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA131.recordingPath", "val": "/mnt/sda/Rec/KAMERA131/2025-10-03/00-00-00.m3u8"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA131.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA131.connected", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA131.last_seen_at", "val": "2025-10-03 - 00:16:56"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA69.recording", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA69.recordingPath", "val": "/mnt/sda/Rec/KAMERA69/2025-10-03/00-00-00.m3u8"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA69.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA69.connected", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA69.last_seen_at", "val": "2025-10-03 - 00:16:56"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA128.recording", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA128.recordingPath", "val": "/mnt/sda/Rec/KAMERA128/2025-10-03/00-00-00.m3u8"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA128.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA128.connected", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA128.last_seen_at", "val": "2025-10-03 - 00:16:56"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA94.recording", "val": true}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA94.recordingPath", "val": "/mnt/sda/Rec/KAMERA94/2025-10-03/00-00-00.m3u8"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA94.disconnected", "val": "-"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA94.connected", "val": 1}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.KAMERA94.last_seen_at", "val": "2025-10-03 - 00:16:56"}
+{"c":"changed", "data":"ecs_slaves.82:4E:6A:0B:52:34.camreports.checked", "val": "2025-10-03 - 00:17:20"}
