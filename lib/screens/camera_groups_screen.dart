@@ -384,7 +384,6 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
     
     // Filter cameras by search query and active status if necessary
     List<Camera> filteredCameras = camerasInGroup;
-    print("CameraGroupsScreen: _buildCameraGroup for '${group.name}': Initial cameras: ${camerasInGroup.length}");
     
     if (_searchQuery.isNotEmpty) {
       final String lowercaseQuery = _searchQuery.toLowerCase();
@@ -393,20 +392,14 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
         camera.ip.toLowerCase().contains(lowercaseQuery) ||
         camera.brand.toLowerCase().contains(lowercaseQuery)
       ).toList();
-      print("CameraGroupsScreen: After search filter for '${group.name}': ${filteredCameras.length} cameras");
     }
     
+    // Apply active filter only if enabled
     if (_showOnlyActive) {
-      final beforeActiveFilter = filteredCameras.length;
       filteredCameras = filteredCameras.where((camera) => camera.connected).toList();
-      print("CameraGroupsScreen: After active filter for '${group.name}': ${filteredCameras.length} cameras (was $beforeActiveFilter, showOnlyActive=$_showOnlyActive)");
-      for (final camera in camerasInGroup) {
-        print("CameraGroupsScreen:   - ${camera.name}: connected=${camera.connected}");
-      }
     }
     
     final String subtitle = '${filteredCameras.length} camera${filteredCameras.length != 1 ? 's' : ''}';
-    print("CameraGroupsScreen: Final subtitle for '${group.name}': $subtitle");
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8.0),
@@ -708,7 +701,8 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
     print("CameraGroupsScreen: Rendering ${cameraGroups.length} groups from UserGroupProvider: ${cameraGroups.map((g) => g.name).toList()}");
     
     // For each group, get the cameras in that group
-    final Map<CameraGroup, List<Camera>> groupedCameras = {};
+    // Use group name as key instead of CameraGroup object to avoid instance mismatch
+    final Map<String, List<Camera>> groupedCameras = {};
     for (final group in cameraGroups) {
       // Get cameras by MACs listed in the group
       print("CameraGroupsScreen: Looking for cameras in group '${group.name}' with MACs: ${group.cameraMacs}");
@@ -742,7 +736,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
           })
           .where((camera) => camera.name != 'Unknown') // Filter out not found cameras
           .toList();
-      groupedCameras[group] = camerasInGroup;
+      groupedCameras[group.name] = camerasInGroup;
       print("CameraGroupsScreen: Group '${group.name}' has ${camerasInGroup.length} cameras from ${group.cameraMacs.length} MACs");
     }
     
@@ -757,7 +751,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
         }
         
         // Check if any camera in the group matches
-        final camerasInGroup = groupedCameras[group] ?? [];
+        final camerasInGroup = groupedCameras[group.name] ?? [];
         return camerasInGroup.any((camera) => 
           camera.name.toLowerCase().contains(lowercaseQuery) || 
           camera.ip.toLowerCase().contains(lowercaseQuery)
@@ -887,7 +881,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
                         itemCount: filteredGroups.length,
                         itemBuilder: (context, index) {
                           final group = filteredGroups[index];
-                          final camerasInGroup = groupedCameras[group] ?? [];
+                          final camerasInGroup = groupedCameras[group.name] ?? [];
                           return _buildCameraGroup(context, group, camerasInGroup);
                         },
                       ),
