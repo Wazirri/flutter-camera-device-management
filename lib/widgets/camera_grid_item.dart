@@ -483,15 +483,12 @@ class CameraGridItem extends StatelessWidget {
     try {
       final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
       
-      // Convert device MAC to the format used in devices map (from m_XX_XX_XX_XX_XX_XX to XX:XX:XX:XX:XX:XX)
+      // Use MAC address as-is, no formatting
       String normalizedMac = deviceMac;
-      if (deviceMac.startsWith('m_')) {
-        normalizedMac = deviceMac.substring(2).replaceAll('_', ':');
-      }
       
       // Find device by MAC address
       for (var device in provider.devices.values) {
-        if (device.macAddress == normalizedMac || device.macKey == deviceMac) {
+        if (device.macAddress == normalizedMac || device.macKey == deviceMac || provider.devices.containsKey(deviceMac)) {
           return device.deviceName?.isNotEmpty == true 
               ? device.deviceName! 
               : device.deviceType.isNotEmpty 

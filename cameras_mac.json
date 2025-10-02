@@ -1,887 +1,443 @@
-smarteq@MacBook-Air ~ % clear
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-smarteq@MacBook-Air ~ % 
-smarteq@MacBook-Air ~ % 
-smarteq@MacBook-Air ~ % websocat ws://192.168.1.5:80 | grep cameras_mac
-LOGIN "admin" "1111"
-Monitor ecs_slaves
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.xaddr", "val": "http://192.168.1.134:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.seen", "val": "2025-09-16 - 13:54:26"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.cameraIp", "val": "192.168.1.134"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.brand", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.hw", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.name", "val": "KAMERA134"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.subUri", "val": "rtsp://192.168.1.134:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.recordUri", "val": "rtsp://192.168.1.134:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.subSnapShot", "val": "http://192.168.1.134:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.mainSnapShot", "val": "http://192.168.1.134:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.cameraRawIp", "val": 2248255680}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.recordwidth", "val": 1280}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.recordheight", "val": 720}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.current.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.current.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.current.cameraIp", "val": "192.168.1.134"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.current.name", "val": "KAMERA134"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_28.current.start_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.xaddr", "val": "http://192.168.1.131:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.seen", "val": "2025-09-16 - 13:54:23"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.cameraIp", "val": "192.168.1.131"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.brand", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.hw", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.name", "val": "KAMERA131"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.subUri", "val": "rtsp://192.168.1.131:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.recordUri", "val": "rtsp://192.168.1.131:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.subSnapShot", "val": "http://192.168.1.131:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.mainSnapShot", "val": "http://192.168.1.131:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.cameraRawIp", "val": 2197924032}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.recordwidth", "val": 1280}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.recordheight", "val": 720}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.current.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.current.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.current.cameraIp", "val": "192.168.1.131"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.current.name", "val": "KAMERA131"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7e_ee.current.start_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.xaddr", "val": "http://192.168.1.79:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.seen", "val": "2025-09-16 - 13:54:30"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.cameraIp", "val": "192.168.1.79"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.brand", "val": "H42"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.hw", "val": "H42"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.name", "val": "KAMERA79"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.subUri", "val": "rtsp://192.168.1.79:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.recordUri", "val": "rtsp://192.168.1.79:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.subSnapShot", "val": "http://192.168.1.79:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.mainSnapShot", "val": "http://192.168.1.79:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.cameraRawIp", "val": 1325508800}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.recordwidth", "val": 1280}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.recordheight", "val": 720}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.current.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.current.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.current.cameraIp", "val": "192.168.1.79"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.current.name", "val": "KAMERA79"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_f8.current.start_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.xaddr", "val": "http://192.168.1.112:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.seen", "val": "2025-09-16 - 13:54:23"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.cameraIp", "val": "192.168.1.112"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.brand", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.hw", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.name", "val": "KAMERA112"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.subUri", "val": "rtsp://192.168.1.112:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.recordUri", "val": "rtsp://192.168.1.112:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.subSnapShot", "val": "http://192.168.1.112:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.mainSnapShot", "val": "http://192.168.1.112:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.cameraRawIp", "val": 1879156928}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.recordwidth", "val": 1280}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.recordheight", "val": 720}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.current.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.current.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.current.cameraIp", "val": "192.168.1.112"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.current.name", "val": "KAMERA112"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_80_8b.current.start_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.xaddr", "val": "http://:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.seen", "val": "2025-09-16 - 13:54:26"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.cameraIp", "val": "192.168.1.128"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.brand", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.hw", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.name", "val": "KAMERA128"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.subUri", "val": "rtsp://192.168.1.128:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.recordUri", "val": "rtsp://192.168.1.128:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.subSnapShot", "val": "http://192.168.1.128:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.mainSnapShot", "val": "http://192.168.1.128:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.cameraRawIp", "val": 2147592384}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.recordwidth", "val": 1280}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.recordheight", "val": 720}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.current.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.current.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.current.cameraIp", "val": "192.168.1.128"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.current.name", "val": "KAMERA128"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_50.current.start_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.xaddr", "val": "http://192.168.1.70:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.seen", "val": "2025-09-16 - 13:54:24"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.cameraIp", "val": "192.168.1.70"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.brand", "val": "H42"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.hw", "val": "H42"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.name", "val": "KAMERA70"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.subUri", "val": "rtsp://192.168.1.70:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.recordUri", "val": "rtsp://192.168.1.70:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.subSnapShot", "val": "http://192.168.1.70:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.mainSnapShot", "val": "http://192.168.1.70:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.cameraRawIp", "val": 1174513856}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.recordwidth", "val": 1280}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.recordheight", "val": 720}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.current.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.current.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.current.cameraIp", "val": "192.168.1.70"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.current.name", "val": "KAMERA70"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_85.current.start_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.xaddr", "val": "http://192.168.1.133:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.seen", "val": "2025-09-16 - 12:10:12"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.cameraIp", "val": "192.168.1.133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.brand", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.hw", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.name", "val": "KAMERA133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.subUri", "val": "rtsp://192.168.1.133:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.recordUri", "val": "rtsp://192.168.1.133:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.subSnapShot", "val": "http://192.168.1.133:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.mainSnapShot", "val": "http://192.168.1.133:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.cameraRawIp", "val": 2231478464}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.recordwidth", "val": 1280}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.recordheight", "val": 720}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013232.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013232.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013232.cameraIp", "val": "192.168.1.133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013232.name", "val": "KAMERA133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013232.start_date", "val": 1758013232}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013232.end_date", "val": 1758013264}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013264.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013264.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013264.cameraIp", "val": "192.168.1.133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013264.name", "val": "KAMERA133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013264.start_date", "val": 1758013264}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013264.end_date", "val": 1758013536}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013536.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013536.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013536.cameraIp", "val": "192.168.1.133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013536.name", "val": "KAMERA133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013536.start_date", "val": 1758013536}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758013536.end_date", "val": 1758014049}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014049.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014049.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014049.cameraIp", "val": "192.168.1.133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014049.name", "val": "KAMERA133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014049.start_date", "val": 1758014049}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014049.end_date", "val": 1758014382}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014382.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014382.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014382.cameraIp", "val": "192.168.1.133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014382.name", "val": "KAMERA133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014382.start_date", "val": 1758014382}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014382.end_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014656.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014656.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014656.cameraIp", "val": "192.168.1.133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014656.name", "val": "KAMERA133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014656.start_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014656.end_date", "val": 1758014778}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014778.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014778.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014778.cameraIp", "val": "192.168.1.133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014778.name", "val": "KAMERA133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014778.start_date", "val": 1758014778}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758014778.end_date", "val": 1758014931}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758019247.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758019247.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758019247.cameraIp", "val": "192.168.1.133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758019247.name", "val": "KAMERA133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758019247.start_date", "val": 1758019247}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758019247.end_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758019701.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758019701.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758019701.cameraIp", "val": "192.168.1.133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758019701.name", "val": "KAMERA133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758019701.start_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.history.1758019701.end_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.current.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.current.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.current.cameraIp", "val": "192.168.1.133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.current.name", "val": "KAMERA133"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_27.current.start_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.xaddr", "val": "http://192.168.1.140:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.seen", "val": "2025-09-16 - 13:54:26"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.cameraIp", "val": "192.168.1.140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.brand", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.hw", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.name", "val": "KAMERA140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.subUri", "val": "rtsp://192.168.1.140:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.recordUri", "val": "rtsp://192.168.1.140:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.subSnapShot", "val": "http://192.168.1.140:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.mainSnapShot", "val": "http://192.168.1.140:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.cameraRawIp", "val": 2348918976}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.recordwidth", "val": 1280}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.recordheight", "val": 720}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013232.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013232.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013232.cameraIp", "val": "192.168.1.140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013232.name", "val": "KAMERA140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013232.start_date", "val": 1758013232}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013232.end_date", "val": 1758013264}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013264.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013264.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013264.cameraIp", "val": "192.168.1.140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013264.name", "val": "KAMERA140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013264.start_date", "val": 1758013264}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013264.end_date", "val": 1758013536}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013536.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013536.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013536.cameraIp", "val": "192.168.1.140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013536.name", "val": "KAMERA140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013536.start_date", "val": 1758013536}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758013536.end_date", "val": 1758014049}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014049.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014049.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014049.cameraIp", "val": "192.168.1.140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014049.name", "val": "KAMERA140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014049.start_date", "val": 1758014049}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014049.end_date", "val": 1758014382}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014382.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014382.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014382.cameraIp", "val": "192.168.1.140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014382.name", "val": "KAMERA140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014382.start_date", "val": 1758014382}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014382.end_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014656.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014656.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014656.cameraIp", "val": "192.168.1.140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014656.name", "val": "KAMERA140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014656.start_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014656.end_date", "val": 1758014778}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014778.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014778.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014778.cameraIp", "val": "192.168.1.140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014778.name", "val": "KAMERA140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014778.start_date", "val": 1758014778}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758014778.end_date", "val": 1758014931}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758019247.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758019247.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758019247.cameraIp", "val": "192.168.1.140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758019247.name", "val": "KAMERA140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758019247.start_date", "val": 1758019247}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758019247.end_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758019701.device_mac", "val": "m_6E_99_6B_70_09_4C"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758019701.device_ip", "val": "192.168.1.223"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758019701.cameraIp", "val": "192.168.1.140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758019701.name", "val": "KAMERA140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758019701.start_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.history.1758019701.end_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.current.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.current.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.current.cameraIp", "val": "192.168.1.140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.current.name", "val": "KAMERA140"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_8e_db.current.start_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.xaddr", "val": "http://192.168.1.95:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.seen", "val": "2025-09-16 - 13:54:30"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.cameraIp", "val": "192.168.1.95"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.brand", "val": "H42"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.hw", "val": "H42"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.name", "val": "KAMERA95"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.subUri", "val": "rtsp://192.168.1.95:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.recordUri", "val": "rtsp://192.168.1.95:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.subSnapShot", "val": "http://192.168.1.95:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.mainSnapShot", "val": "http://192.168.1.95:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.cameraRawIp", "val": 1593944256}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.recordwidth", "val": 1920}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.recordheight", "val": 1080}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.current.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.current.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.current.cameraIp", "val": "192.168.1.95"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.current.name", "val": "KAMERA95"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_14_82.current.start_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.xaddr", "val": "http://192.168.1.119:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.seen", "val": "2025-09-16 - 13:54:23"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.cameraIp", "val": "192.168.1.119"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.brand", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.hw", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.name", "val": "KAMERA119"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.subUri", "val": "rtsp://192.168.1.119:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.recordUri", "val": "rtsp://192.168.1.119:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.subSnapShot", "val": "http://192.168.1.119:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.mainSnapShot", "val": "http://192.168.1.119:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.cameraRawIp", "val": 1996597440}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.recordwidth", "val": 1280}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.recordheight", "val": 720}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.current.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.current.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.current.cameraIp", "val": "192.168.1.119"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.current.name", "val": "KAMERA119"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_23.current.start_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.xaddr", "val": "http://192.168.1.104:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.seen", "val": "2025-09-16 - 13:54:23"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.cameraIp", "val": "192.168.1.104"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.brand", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.hw", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.name", "val": "KAMERA104"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.subUri", "val": "rtsp://192.168.1.104:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.recordUri", "val": "rtsp://192.168.1.104:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.subSnapShot", "val": "http://192.168.1.104:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.mainSnapShot", "val": "http://192.168.1.104:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.cameraRawIp", "val": 1744939200}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.recordwidth", "val": 1280}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.recordheight", "val": 720}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.current.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.current.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.current.cameraIp", "val": "192.168.1.104"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.current.name", "val": "KAMERA104"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_7f_c2.current.start_date", "val": 1758019763}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.xaddr", "val": "http://192.168.1.120:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.seen", "val": "2025-09-16 - 12:10:12"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.cameraIp", "val": "192.168.1.120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.brand", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.hw", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.name", "val": "KAMERA120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.subUri", "val": "rtsp://192.168.1.120:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.recordUri", "val": "rtsp://192.168.1.120:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.subSnapShot", "val": "http://192.168.1.120:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.mainSnapShot", "val": "http://192.168.1.120:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.cameraRawIp", "val": 2013374656}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.recordwidth", "val": 1280}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.recordheight", "val": 720}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758013537.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758013537.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758013537.cameraIp", "val": "192.168.1.120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758013537.name", "val": "KAMERA120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758013537.start_date", "val": 1758013537}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758013537.end_date", "val": 1758014050}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014050.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014050.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014050.cameraIp", "val": "192.168.1.120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014050.name", "val": "KAMERA120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014050.start_date", "val": 1758014050}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014050.end_date", "val": 1758014383}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014383.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014383.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014383.cameraIp", "val": "192.168.1.120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014383.name", "val": "KAMERA120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014383.start_date", "val": 1758014383}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014383.end_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014656.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014656.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014656.cameraIp", "val": "192.168.1.120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014656.name", "val": "KAMERA120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014656.start_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014656.end_date", "val": 1758014779}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014779.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014779.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014779.cameraIp", "val": "192.168.1.120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014779.name", "val": "KAMERA120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014779.start_date", "val": 1758014779}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758014779.end_date", "val": 1758014932}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758019248.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758019248.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758019248.cameraIp", "val": "192.168.1.120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758019248.name", "val": "KAMERA120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758019248.start_date", "val": 1758019248}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758019248.end_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758019701.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758019701.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758019701.cameraIp", "val": "192.168.1.120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758019701.name", "val": "KAMERA120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758019701.start_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.history.1758019701.end_date", "val": 1758019764}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.current.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.current.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.current.cameraIp", "val": "192.168.1.120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.current.name", "val": "KAMERA120"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_82_20.current.start_date", "val": 1758019764}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.xaddr", "val": "http://192.168.1.91:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.seen", "val": "2025-09-16 - 13:54:23"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.cameraIp", "val": "192.168.1.91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.brand", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.hw", "val": "H41"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.name", "val": "KAMERA91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.subUri", "val": "rtsp://192.168.1.91:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.recordUri", "val": "rtsp://192.168.1.91:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.subSnapShot", "val": "http://192.168.1.91:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.mainSnapShot", "val": "http://192.168.1.91:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.cameraRawIp", "val": 1526835392}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.recordwidth", "val": 1920}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.recordheight", "val": 1080}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758013537.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758013537.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758013537.cameraIp", "val": "192.168.1.91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758013537.name", "val": "KAMERA91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758013537.start_date", "val": 1758013537}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758013537.end_date", "val": 1758014050}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014050.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014050.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014050.cameraIp", "val": "192.168.1.91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014050.name", "val": "KAMERA91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014050.start_date", "val": 1758014050}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014050.end_date", "val": 1758014383}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014383.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014383.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014383.cameraIp", "val": "192.168.1.91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014383.name", "val": "KAMERA91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014383.start_date", "val": 1758014383}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014383.end_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014656.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014656.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014656.cameraIp", "val": "192.168.1.91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014656.name", "val": "KAMERA91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014656.start_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014656.end_date", "val": 1758014779}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014779.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014779.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014779.cameraIp", "val": "192.168.1.91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014779.name", "val": "KAMERA91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014779.start_date", "val": 1758014779}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758014779.end_date", "val": 1758014932}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758019248.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758019248.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758019248.cameraIp", "val": "192.168.1.91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758019248.name", "val": "KAMERA91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758019248.start_date", "val": 1758019248}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758019248.end_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758019701.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758019701.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758019701.cameraIp", "val": "192.168.1.91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758019701.name", "val": "KAMERA91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758019701.start_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.history.1758019701.end_date", "val": 1758019764}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.current.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.current.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.current.cameraIp", "val": "192.168.1.91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.current.name", "val": "KAMERA91"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0f_93_17.current.start_date", "val": 1758019764}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.xaddr", "val": "http://192.168.1.94:80/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.seen", "val": "2025-09-16 - 13:54:25"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.cameraIp", "val": "192.168.1.94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.brand", "val": "H42"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.hw", "val": "H42"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.country", "val": ""}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.manufacturer", "val": "Vatilon"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.name", "val": "KAMERA94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.subUri", "val": "rtsp://192.168.1.94:554/stream2"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.recordUri", "val": "rtsp://192.168.1.94:554/stream1"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.subSnapShot", "val": "http://192.168.1.94:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.mainSnapShot", "val": "http://192.168.1.94:80/cgi-bin/snapshot.cgi"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.cameraRawIp", "val": 1577167040}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.recordwidth", "val": 1920}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.recordheight", "val": 1080}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.firsttime", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.record", "val": true}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758013537.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758013537.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758013537.cameraIp", "val": "192.168.1.94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758013537.name", "val": "KAMERA94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758013537.start_date", "val": 1758013537}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758013537.end_date", "val": 1758014050}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014050.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014050.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014050.cameraIp", "val": "192.168.1.94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014050.name", "val": "KAMERA94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014050.start_date", "val": 1758014050}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014050.end_date", "val": 1758014383}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014383.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014383.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014383.cameraIp", "val": "192.168.1.94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014383.name", "val": "KAMERA94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014383.start_date", "val": 1758014383}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014383.end_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014656.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014656.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014656.cameraIp", "val": "192.168.1.94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014656.name", "val": "KAMERA94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014656.start_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014656.end_date", "val": 1758014779}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014779.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014779.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014779.cameraIp", "val": "192.168.1.94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014779.name", "val": "KAMERA94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014779.start_date", "val": 1758014779}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758014779.end_date", "val": 1758014932}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758019248.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758019248.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758019248.cameraIp", "val": "192.168.1.94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758019248.name", "val": "KAMERA94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758019248.start_date", "val": 1758019248}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758019248.end_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758019701.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758019701.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758019701.cameraIp", "val": "192.168.1.94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758019701.name", "val": "KAMERA94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758019701.start_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.history.1758019701.end_date", "val": 1758019764}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.current.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.current.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.current.cameraIp", "val": "192.168.1.94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.current.name", "val": "KAMERA94"}
-{"c":"changed", "data":"cameras_mac.me8_b7_23_0c_11_bb.current.start_date", "val": 1758019764}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.xaddr", "val": "http://192.168.1.20/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.seen", "val": "2025-09-16 - 13:54:16"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.cameraIp", "val": "192.168.1.20"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.error", "val": " "}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.brand", "val": "Dahua"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.hw", "val": "IPC-HDW1230T-AS-0280B-S4"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.country", "val": "china"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.manufacturer", "val": ""}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.name", "val": "KAMERA1"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.subUri", "val": "rtsp://192.168.1.20:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.recordUri", "val": "rtsp://192.168.1.20:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.subSnapShot", "val": "http://192.168.1.20:80/onvifsnapshot/media_service/snapshot?channel=1&subtype=0"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.mainSnapShot", "val": "http://192.168.1.20:80/onvifsnapshot/media_service/snapshot?channel=1&subtype=1"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.cameraRawIp", "val": 335653056}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.recordcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.recordwidth", "val": 1920}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.recordheight", "val": 1080}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.subwidth", "val": 704}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.subheight", "val": 576}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.firsttime", "val": "2025-09-16 - 11:59:46"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.record", "val": true}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758013537.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758013537.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758013537.cameraIp", "val": "192.168.1.20"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758013537.name", "val": "KAMERA1"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758013537.start_date", "val": 1758013537}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758013537.end_date", "val": 1758014050}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014050.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014050.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014050.cameraIp", "val": "192.168.1.20"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014050.name", "val": "KAMERA1"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014050.start_date", "val": 1758014050}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014050.end_date", "val": 1758014383}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014383.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014383.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014383.cameraIp", "val": "192.168.1.20"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014383.name", "val": "KAMERA1"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014383.start_date", "val": 1758014383}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014383.end_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014656.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014656.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014656.cameraIp", "val": "192.168.1.20"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014656.name", "val": "KAMERA1"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014656.start_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014656.end_date", "val": 1758014779}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014779.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014779.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014779.cameraIp", "val": "192.168.1.20"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014779.name", "val": "KAMERA1"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014779.start_date", "val": 1758014779}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758014779.end_date", "val": 1758014932}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758019248.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758019248.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758019248.cameraIp", "val": "192.168.1.20"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758019248.name", "val": "KAMERA1"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758019248.start_date", "val": 1758019248}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758019248.end_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758019701.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758019701.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758019701.cameraIp", "val": "192.168.1.20"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758019701.name", "val": "KAMERA1"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758019701.start_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.history.1758019701.end_date", "val": 1758019764}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.current.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.current.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.current.cameraIp", "val": "192.168.1.20"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.current.name", "val": "KAMERA1"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_77_40.current.start_date", "val": 1758019764}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.detected", "val": "2025-09-16 - 11:59:39"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.xaddr", "val": "http://192.168.1.108/onvif/device_service"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.seen", "val": "2025-09-16 - 13:54:19"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.cameraIp", "val": "192.168.1.108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.port", "val": 80}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.error", "val": ""}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.username", "val": "admin"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.password", "val": "admin123"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.brand", "val": "Dahua"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.hw", "val": "IPC-HDW1230T-AS-0280B-S4"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.country", "val": "china"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.manufacturer", "val": ""}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.name", "val": "KAMERA108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.subUri", "val": "rtsp://192.168.1.108:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.recordUri", "val": "rtsp://192.168.1.108:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.subSnapShot", "val": "http://192.168.1.108:80/onvifsnapshot/media_service/snapshot?channel=1&subtype=0"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.mainSnapShot", "val": "http://192.168.1.108:80/onvifsnapshot/media_service/snapshot?channel=1&subtype=1"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.cameraRawIp", "val": 1812048064}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.recordcodec", "val": ""}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.recordwidth", "val": 0}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.recordheight", "val": 0}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.subcodec", "val": "H264"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.subwidth", "val": 640}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.subheight", "val": 480}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.firsttime", "val": "2025-09-16 - 11:59:44"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.connected", "val": 1}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.record", "val": true}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758013537.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758013537.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758013537.cameraIp", "val": "192.168.1.108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758013537.name", "val": "KAMERA108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758013537.start_date", "val": 1758013537}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758013537.end_date", "val": 1758014050}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014050.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014050.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014050.cameraIp", "val": "192.168.1.108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014050.name", "val": "KAMERA108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014050.start_date", "val": 1758014050}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014050.end_date", "val": 1758014383}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014383.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014383.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014383.cameraIp", "val": "192.168.1.108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014383.name", "val": "KAMERA108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014383.start_date", "val": 1758014383}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014383.end_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014656.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014656.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014656.cameraIp", "val": "192.168.1.108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014656.name", "val": "KAMERA108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014656.start_date", "val": 1758014656}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014656.end_date", "val": 1758014779}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014779.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014779.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014779.cameraIp", "val": "192.168.1.108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014779.name", "val": "KAMERA108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014779.start_date", "val": 1758014779}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758014779.end_date", "val": 1758014932}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758019248.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758019248.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758019248.cameraIp", "val": "192.168.1.108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758019248.name", "val": "KAMERA108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758019248.start_date", "val": 1758019248}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758019248.end_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758019701.device_mac", "val": "m_82_4E_6A_0B_52_34"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758019701.device_ip", "val": "192.168.1.57"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758019701.cameraIp", "val": "192.168.1.108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758019701.name", "val": "KAMERA108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758019701.start_date", "val": 1758019701}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.history.1758019701.end_date", "val": 1758019764}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.current.device_mac", "val": "m_D6_C9_00_07_6E_28"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.current.device_ip", "val": "192.168.1.148"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.current.cameraIp", "val": "192.168.1.108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.current.name", "val": "KAMERA108"}
-{"c":"changed", "data":"cameras_mac.mf8_ce_07_f2_8c_b6.current.start_date", "val": 1758019764}
-{"c":"changedone", "name":"cameras_mac"}
-{"c":"changed", "data":"ecs_slaves.m_6E_99_6B_70_09_4C.system.files.cameras_mac.at", "val": "2025-09-16 - 11:21:32"}
-{"c":"changed", "data":"ecs_slaves.m_6E_99_6B_70_09_4C.system.files.cameras_mac.filename", "val": "/root/conf/cameras_mac.json"}
-^C
-smarteq@MacBook-Air ~ % websocat ws://192.168.1.5:80 | grep cameras_mac
+{
+	"E8:B7:23:0F:8E:DB" : {
+		"detected" : "2025-10-02 - 20:42:41",
+		"xaddr" : "http://192.168.1.140:80/onvif/device_service",
+		"seen" : "2025-10-02 - 23:42:32",
+		"cameraIp" : "192.168.1.140",
+		"port" : 80,
+		"error" : "",
+		"username" : "admin",
+		"password" : "admin123",
+		"brand" : "H41",
+		"hw" : "H41",
+		"country" : "",
+		"manufacturer" : "Vatilon",
+		"recordPath" : "/mnt/sda/Rec",
+		"httpPath" : ":8080/Rec",
+		"name" : "KAMERA140",
+		"subUri" : "rtsp://192.168.1.140:554/stream2",
+		"recordUri" : "rtsp://192.168.1.140:554/stream1",
+		"subSnapShot" : "http://192.168.1.140:80/cgi-bin/snapshot.cgi",
+		"mainSnapShot" : "http://192.168.1.140:80/cgi-bin/snapshot.cgi",
+		"cameraRawIp" : 2348918976,
+		"recordcodec" : "H264",
+		"recordwidth" : 1280,
+		"recordheight" : 720,
+		"subcodec" : "H264",
+		"subwidth" : 640,
+		"subheight" : 480,
+		"firsttime" : "2025-10-02 - 20:42:41",
+		"connected" : 1,
+		"record" : true,
+		"history" : {
+			"1759436729_1759436760" : {
+				"device_mac" : "CA:1A:E6:81:C9:F4",
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.140",
+				"name" : "KAMERA140",
+				"start_date" : 1759436729,
+				"end_date" : 1759436760
+			}
+		},
+		"current" : {
+			"82:4E:6A:0B:52:34" : {
+				"device_ip" : "192.168.1.57",
+				"cameraIp" : "192.168.1.140",
+				"name" : "KAMERA140",
+				"start_date" : 1759436760
+			}
+		}
+	},
+	"E8:B7:23:0F:7E:EE" : {
+		"detected" : "2025-10-02 - 20:42:41",
+		"xaddr" : "http://192.168.1.131:80/onvif/device_service",
+		"seen" : "2025-10-02 - 23:42:33",
+		"cameraIp" : "192.168.1.131",
+		"port" : 80,
+		"error" : "",
+		"username" : "admin",
+		"password" : "admin123",
+		"brand" : "H41",
+		"hw" : "H41",
+		"country" : "",
+		"manufacturer" : "Vatilon",
+		"recordPath" : "/mnt/sda/Rec",
+		"httpPath" : ":8080/Rec",
+		"name" : "KAMERA131",
+		"subUri" : "rtsp://192.168.1.131:554/stream2",
+		"recordUri" : "rtsp://192.168.1.131:554/stream1",
+		"subSnapShot" : "http://192.168.1.131:80/cgi-bin/snapshot.cgi",
+		"mainSnapShot" : "http://192.168.1.131:80/cgi-bin/snapshot.cgi",
+		"cameraRawIp" : 2197924032,
+		"recordcodec" : "H264",
+		"recordwidth" : 1280,
+		"recordheight" : 720,
+		"subcodec" : "H264",
+		"subwidth" : 640,
+		"subheight" : 480,
+		"firsttime" : "2025-10-02 - 20:42:41",
+		"connected" : 1,
+		"record" : true,
+		"history" : {
+			"1759436729_1759436760" : {
+				"device_mac" : "CA:1A:E6:81:C9:F4",
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.131",
+				"name" : "KAMERA131",
+				"start_date" : 1759436729,
+				"end_date" : 1759436760
+			}
+		},
+		"current" : {
+			"82:4E:6A:0B:52:34" : {
+				"device_ip" : "192.168.1.57",
+				"cameraIp" : "192.168.1.131",
+				"name" : "KAMERA131",
+				"start_date" : 1759436760
+			}
+		}
+	},
+	"E8:B7:23:16:D7:A0" : {
+		"detected" : "2025-10-02 - 20:42:41",
+		"xaddr" : "http://192.168.1.69:80/onvif/device_service",
+		"seen" : "2025-10-02 - 23:42:33",
+		"cameraIp" : "192.168.1.69",
+		"port" : 80,
+		"error" : "",
+		"username" : "admin",
+		"password" : "admin123",
+		"brand" : "H41",
+		"hw" : "H41",
+		"country" : "",
+		"manufacturer" : "Vatilon",
+		"recordPath" : "/mnt/sda/Rec",
+		"httpPath" : ":8080/Rec",
+		"name" : "KAMERA69",
+		"subUri" : "rtsp://192.168.1.69:554/stream2",
+		"recordUri" : "rtsp://192.168.1.69:554/stream1",
+		"subSnapShot" : "http://192.168.1.69:80/cgi-bin/snapshot.cgi",
+		"mainSnapShot" : "http://192.168.1.69:80/cgi-bin/snapshot.cgi",
+		"cameraRawIp" : 1157736640,
+		"recordcodec" : "H264",
+		"recordwidth" : 1280,
+		"recordheight" : 720,
+		"subcodec" : "H264",
+		"subwidth" : 640,
+		"subheight" : 480,
+		"firsttime" : "2025-10-02 - 20:42:41",
+		"connected" : 1,
+		"record" : true,
+		"history" : {
+			"1759436729_1759436760" : {
+				"device_mac" : "CA:1A:E6:81:C9:F4",
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.69",
+				"name" : "KAMERA69",
+				"start_date" : 1759436729,
+				"end_date" : 1759436760
+			}
+		},
+		"current" : {
+			"82:4E:6A:0B:52:34" : {
+				"device_ip" : "192.168.1.57",
+				"cameraIp" : "192.168.1.69",
+				"name" : "KAMERA69",
+				"start_date" : 1759436760
+			}
+		}
+	},
+	"E8:B7:23:0F:8E:50" : {
+		"detected" : "2025-10-02 - 20:42:41",
+		"xaddr" : "http://192.168.1.128:80/onvif/device_service",
+		"seen" : "2025-10-02 - 23:42:33",
+		"cameraIp" : "192.168.1.128",
+		"port" : 80,
+		"error" : "",
+		"username" : "admin",
+		"password" : "admin123",
+		"brand" : "H41",
+		"hw" : "H41",
+		"country" : "",
+		"manufacturer" : "Vatilon",
+		"recordPath" : "/mnt/sda/Rec",
+		"httpPath" : ":8080/Rec",
+		"name" : "KAMERA128",
+		"subUri" : "rtsp://192.168.1.128:554/stream2",
+		"recordUri" : "rtsp://192.168.1.128:554/stream1",
+		"subSnapShot" : "http://192.168.1.128:80/cgi-bin/snapshot.cgi",
+		"mainSnapShot" : "http://192.168.1.128:80/cgi-bin/snapshot.cgi",
+		"cameraRawIp" : 2147592384,
+		"recordcodec" : "H264",
+		"recordwidth" : 1280,
+		"recordheight" : 720,
+		"subcodec" : "H264",
+		"subwidth" : 640,
+		"subheight" : 480,
+		"firsttime" : "2025-10-02 - 20:42:41",
+		"connected" : 1,
+		"record" : true,
+		"history" : {
+			"1759436729_1759436760" : {
+				"device_mac" : "CA:1A:E6:81:C9:F4",
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.128",
+				"name" : "KAMERA128",
+				"start_date" : 1759436729,
+				"end_date" : 1759436760
+			}
+		},
+		"current" : {
+			"82:4E:6A:0B:52:34" : {
+				"device_ip" : "192.168.1.57",
+				"cameraIp" : "192.168.1.128",
+				"name" : "KAMERA128",
+				"start_date" : 1759436760
+			}
+		}
+	},
+	"E8:B7:23:0C:11:BB" : {
+		"detected" : "2025-10-02 - 20:42:41",
+		"xaddr" : "http://192.168.1.94:80/onvif/device_service",
+		"seen" : "2025-10-02 - 23:42:32",
+		"cameraIp" : "192.168.1.94",
+		"port" : 80,
+		"error" : "",
+		"username" : "admin",
+		"password" : "admin123",
+		"brand" : "H42",
+		"hw" : "H42",
+		"country" : "",
+		"manufacturer" : "Vatilon",
+		"recordPath" : "/mnt/sda/Rec",
+		"httpPath" : ":8080/Rec",
+		"name" : "KAMERA94",
+		"subUri" : "rtsp://192.168.1.94:554/stream2",
+		"recordUri" : "rtsp://192.168.1.94:554/stream1",
+		"subSnapShot" : "http://192.168.1.94:80/cgi-bin/snapshot.cgi",
+		"mainSnapShot" : "http://192.168.1.94:80/cgi-bin/snapshot.cgi",
+		"cameraRawIp" : 1577167040,
+		"recordcodec" : "H264",
+		"recordwidth" : 1920,
+		"recordheight" : 1080,
+		"subcodec" : "H264",
+		"subwidth" : 640,
+		"subheight" : 480,
+		"firsttime" : "2025-10-02 - 20:42:41",
+		"connected" : 1,
+		"record" : true,
+		"history" : {
+			"1759436729_1759436760" : {
+				"device_mac" : "CA:1A:E6:81:C9:F4",
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.94",
+				"name" : "KAMERA94",
+				"start_date" : 1759436729,
+				"end_date" : 1759436760
+			}
+		},
+		"current" : {
+			"82:4E:6A:0B:52:34" : {
+				"device_ip" : "192.168.1.57",
+				"cameraIp" : "192.168.1.94",
+				"name" : "KAMERA94",
+				"start_date" : 1759436760
+			}
+		}
+	},
+	"F8:CE:07:F2:8C:B6" : {
+		"detected" : "2025-10-02 - 20:42:41",
+		"xaddr" : "http://192.168.1.108/onvif/device_service",
+		"seen" : "2025-10-02 - 21:02:33",
+		"cameraIp" : "192.168.1.108",
+		"port" : 80,
+		"error" : "",
+		"username" : "admin",
+		"password" : "admin123",
+		"brand" : "Dahua",
+		"hw" : "IPC-HDW1230T-AS-0280B-S4",
+		"country" : "china",
+		"manufacturer" : "",
+		"recordPath" : "/mnt/sda/Rec",
+		"httpPath" : ":8080/Rec",
+		"name" : "KAMERA108",
+		"subUri" : "rtsp://192.168.1.108:554/cam/realmonitor?channel=1&subtype=1&unicast=true&proto=Onvif",
+		"recordUri" : "",
+		"subSnapShot" : "http://192.168.1.108:80/onvifsnapshot/media_service/snapshot?channel=1&subtype=0",
+		"mainSnapShot" : "http://192.168.1.108:80/onvifsnapshot/media_service/snapshot?channel=1&subtype=1",
+		"cameraRawIp" : 1812048064,
+		"recordcodec" : "",
+		"recordwidth" : 0,
+		"recordheight" : 0,
+		"subcodec" : "H264",
+		"subwidth" : 640,
+		"subheight" : 480,
+		"firsttime" : "2025-10-02 - 21:02:33",
+		"connected" : 1,
+		"record" : true,
+		"history" : {
+			"1759436729_1759436761" : {
+				"device_mac" : "CA:1A:E6:81:C9:F4",
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.108",
+				"name" : "KAMERA108",
+				"start_date" : 1759436729,
+				"end_date" : 1759436761
+			}
+		},
+		"current" : {
+			"CA:1A:E6:81:C9:F4" : {
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.108",
+				"name" : "KAMERA108",
+				"start_date" : 1759436761
+			}
+		}
+	},
+	"E8:B7:23:0F:82:23" : {
+		"detected" : "2025-10-02 - 20:57:06",
+		"xaddr" : "http://192.168.1.119:80/onvif/device_service",
+		"seen" : "2025-10-02 - 23:42:32",
+		"cameraIp" : "192.168.1.119",
+		"port" : 80,
+		"error" : "",
+		"username" : "admin",
+		"password" : "admin123",
+		"brand" : "H41",
+		"hw" : "H41",
+		"country" : "",
+		"manufacturer" : "Vatilon",
+		"recordPath" : "/mnt/sda/Rec",
+		"httpPath" : ":8080/Rec",
+		"name" : "KAMERA119",
+		"subUri" : "rtsp://192.168.1.119:554/stream2",
+		"recordUri" : "rtsp://192.168.1.119:554/stream1",
+		"subSnapShot" : "http://192.168.1.119:80/cgi-bin/snapshot.cgi",
+		"mainSnapShot" : "http://192.168.1.119:80/cgi-bin/snapshot.cgi",
+		"cameraRawIp" : 1996597440,
+		"recordcodec" : "H264",
+		"recordwidth" : 1280,
+		"recordheight" : 720,
+		"subcodec" : "H264",
+		"subwidth" : 640,
+		"subheight" : 480,
+		"firsttime" : "2025-10-02 - 20:57:07",
+		"connected" : 1,
+		"record" : true,
+		"history" : {
+			"1759436729_1759436761" : {
+				"device_mac" : "CA:1A:E6:81:C9:F4",
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.119",
+				"name" : "KAMERA119",
+				"start_date" : 1759436729,
+				"end_date" : 1759436761
+			}
+		},
+		"current" : {
+			"CA:1A:E6:81:C9:F4" : {
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.119",
+				"name" : "KAMERA119",
+				"start_date" : 1759436761
+			}
+		}
+	},
+	"E8:B7:23:0F:82:28" : {
+		"detected" : "2025-10-02 - 20:57:06",
+		"xaddr" : "http://192.168.1.134:80/onvif/device_service",
+		"seen" : "2025-10-02 - 23:42:32",
+		"cameraIp" : "192.168.1.134",
+		"port" : 80,
+		"error" : "",
+		"username" : "admin",
+		"password" : "admin123",
+		"brand" : "H41",
+		"hw" : "H41",
+		"country" : "",
+		"manufacturer" : "Vatilon",
+		"recordPath" : "/mnt/sda/Rec",
+		"httpPath" : ":8080/Rec",
+		"name" : "KAMERA134",
+		"subUri" : "rtsp://192.168.1.134:554/stream2",
+		"recordUri" : "rtsp://192.168.1.134:554/stream1",
+		"subSnapShot" : "http://192.168.1.134:80/cgi-bin/snapshot.cgi",
+		"mainSnapShot" : "http://192.168.1.134:80/cgi-bin/snapshot.cgi",
+		"cameraRawIp" : 2248255680,
+		"recordcodec" : "H264",
+		"recordwidth" : 1280,
+		"recordheight" : 720,
+		"subcodec" : "H264",
+		"subwidth" : 640,
+		"subheight" : 480,
+		"firsttime" : "2025-10-02 - 20:57:07",
+		"connected" : 1,
+		"record" : true,
+		"history" : {
+			"1759436729_1759436761" : {
+				"device_mac" : "CA:1A:E6:81:C9:F4",
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.134",
+				"name" : "KAMERA134",
+				"start_date" : 1759436729,
+				"end_date" : 1759436761
+			}
+		},
+		"current" : {
+			"CA:1A:E6:81:C9:F4" : {
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.134",
+				"name" : "KAMERA134",
+				"start_date" : 1759436761
+			}
+		}
+	},
+	"E8:B7:23:0F:80:8B" : {
+		"detected" : "2025-10-02 - 20:57:09",
+		"xaddr" : "http://192.168.1.112:80/onvif/device_service",
+		"seen" : "2025-10-02 - 23:42:24",
+		"cameraIp" : "192.168.1.112",
+		"port" : 80,
+		"error" : "",
+		"username" : "admin",
+		"password" : "admin123",
+		"brand" : "H41",
+		"hw" : "H41",
+		"country" : "",
+		"manufacturer" : "Vatilon",
+		"recordPath" : "/mnt/sda/Rec",
+		"httpPath" : ":8080/Rec",
+		"name" : "KAMERA112",
+		"subUri" : "rtsp://192.168.1.112:554/stream2",
+		"recordUri" : "rtsp://192.168.1.112:554/stream1",
+		"subSnapShot" : "http://192.168.1.112:80/cgi-bin/snapshot.cgi",
+		"mainSnapShot" : "http://192.168.1.112:80/cgi-bin/snapshot.cgi",
+		"cameraRawIp" : 1879156928,
+		"recordcodec" : "H264",
+		"recordwidth" : 1280,
+		"recordheight" : 720,
+		"subcodec" : "H264",
+		"subwidth" : 640,
+		"subheight" : 480,
+		"firsttime" : "2025-10-02 - 20:57:10",
+		"connected" : 1,
+		"record" : true,
+		"history" : {
+			"1759436729_1759436761" : {
+				"device_mac" : "CA:1A:E6:81:C9:F4",
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.112",
+				"name" : "KAMERA112",
+				"start_date" : 1759436729,
+				"end_date" : 1759436761
+			}
+		},
+		"current" : {
+			"CA:1A:E6:81:C9:F4" : {
+				"device_ip" : "192.168.1.5",
+				"cameraIp" : "192.168.1.112",
+				"name" : "KAMERA112",
+				"start_date" : 1759436761
+			}
+		}
+	}
+}

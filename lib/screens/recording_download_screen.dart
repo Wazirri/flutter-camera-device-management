@@ -41,7 +41,19 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
       ),
       body: Consumer2<CameraDevicesProviderOptimized, WebSocketProviderOptimized>(
         builder: (context, cameraProvider, webSocketProvider, child) {
-          final cameras = cameraProvider.allCameras;
+          // Only include cameras with MAC address and remove duplicates
+          final allCamerasWithMac = cameraProvider.allCameras
+              .where((camera) => camera.mac.isNotEmpty)
+              .toList();
+          
+          // Remove duplicate cameras (same MAC address)
+          final Map<String, Camera> uniqueCamerasByMac = {};
+          for (var camera in allCamerasWithMac) {
+            if (!uniqueCamerasByMac.containsKey(camera.mac)) {
+              uniqueCamerasByMac[camera.mac] = camera;
+            }
+          }
+          final cameras = uniqueCamerasByMac.values.toList();
           final devices = cameraProvider.devicesList;
           
           return SingleChildScrollView(

@@ -986,8 +986,8 @@ class Camera {
        deviceHistory = deviceHistory ?? [];
   
   // Added id getter to uniquely identify cameras
-  // Using a combination of name and index as id
-  String get id => "${name}_$index";
+  // Using MAC address as primary ID, fallback to name_index for cameras without MAC
+  String get id => mac.isNotEmpty ? mac : "${parentDeviceMacKey}_${name}_$index";
   
   // Copy with method for immutable updates
   Camera copyWith({

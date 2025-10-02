@@ -283,8 +283,15 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                 
                 // MAC address filter chips
                 ...groupedCamerasByMac.keys.map((macAddress) {
-                  final deviceCount = groupedCamerasByMac[macAddress]?.length ?? 0;
+                  // Only count cameras with MAC address
+                  final deviceCount = groupedCamerasByMac[macAddress]
+                      ?.where((camera) => camera.mac.isNotEmpty)
+                      .length ?? 0;
                   final deviceName = _getDeviceName(context, macAddress);
+                  
+                  // Skip devices with no cameras that have MAC
+                  if (deviceCount == 0) return const SizedBox.shrink();
+                  
                   return Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: FilterChip(
@@ -305,13 +312,17 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         List<Camera> baseFilteredCameras = [];
         
         if (selectedMacAddress != null) {
-          // Filter by selected MAC address
-          baseFilteredCameras = groupedCamerasByMac[selectedMacAddress] ?? [];
+          // Filter by selected MAC address - only show cameras with MAC
+          baseFilteredCameras = (groupedCamerasByMac[selectedMacAddress] ?? [])
+              .where((camera) => camera.mac.isNotEmpty)
+              .toList();
         } else {
-          // Show all cameras from all devices
+          // Show all cameras from all devices - only include cameras with MAC address
           baseFilteredCameras = [];
           for (var device in provider.devicesList) {
-            baseFilteredCameras.addAll(device.cameras);
+            baseFilteredCameras.addAll(
+              device.cameras.where((camera) => camera.mac.isNotEmpty)
+            );
           }
         }
         
@@ -319,6 +330,15 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         if (showOnlyActive) {
           baseFilteredCameras = baseFilteredCameras.where((camera) => camera.connected).toList();
         }
+        
+        // Remove duplicate cameras (same MAC address) - keep only one instance per MAC
+        final Map<String, Camera> uniqueCamerasByMac = {};
+        for (var camera in baseFilteredCameras) {
+          if (!uniqueCamerasByMac.containsKey(camera.mac)) {
+            uniqueCamerasByMac[camera.mac] = camera;
+          }
+        }
+        baseFilteredCameras = uniqueCamerasByMac.values.toList();
 
         // Group the filtered cameras by their actual device assignment
         final Map<String, List<Camera>> camerasGroupedByDevice = {};
@@ -411,10 +431,19 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         // Group cameras by their camera groups
         final Map<String, List<Camera>> camerasGroupedByName = {};
         
-        // Get all cameras
+        // Get all cameras - only include cameras with MAC address
         List<Camera> allCameras = showOnlyActive 
-          ? provider.cameras.where((camera) => camera.connected).toList()
-          : provider.cameras;
+          ? provider.cameras.where((camera) => camera.connected && camera.mac.isNotEmpty).toList()
+          : provider.cameras.where((camera) => camera.mac.isNotEmpty).toList();
+        
+        // Remove duplicate cameras (same MAC address)
+        final Map<String, Camera> uniqueCamerasByMac = {};
+        for (var camera in allCameras) {
+          if (!uniqueCamerasByMac.containsKey(camera.mac)) {
+            uniqueCamerasByMac[camera.mac] = camera;
+          }
+        }
+        allCameras = uniqueCamerasByMac.values.toList();
         
         // Track which cameras are assigned to groups
         Set<String> assignedCameraIds = {};
@@ -816,37 +845,20 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
     try {
       final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
       
-      // Convert device MAC to the format used in devices map (from m_XX_XX_XX_XX_XX_XX to XX:XX:XX:XX:XX:XX)
+      // Use MAC address as-is, no formatting
       String normalizedMac = deviceMac;
-      if (deviceMac.startsWith('m_')) {
-        normalizedMac = deviceMac.substring(2).replaceAll('_', ':');
-      }
       
       // Find device by MAC address
       for (var device in provider.devices.values) {
-        if (device.macAddress == normalizedMac || device.macKey == deviceMac) {
+        if (device.macAddress == normalizedMac || device.macKey == deviceMac || provider.devices.containsKey(deviceMac)) {
           String deviceName = '';
           if (device.deviceName?.isNotEmpty == true) {
             deviceName = device.deviceName!;
           } else if (device.deviceType.isNotEmpty) {
             deviceName = device.deviceType;
           } else {
-            // Use shortened MAC as fallback for readability
-            String shortMac;
-            if (deviceMac.startsWith('m_')) {
-              // For MAC format like mf8_ce_07_f2_8c_b6, extract meaningful part
-              final macPart = deviceMac.substring(1); // remove 'm'
-              final parts = macPart.split('_');
-              if (parts.length >= 3) {
-                // Take first 3 parts: f8_ce_07
-                shortMac = '${parts[0]}_${parts[1]}_${parts[2]}';
-              } else {
-                shortMac = macPart;
-              }
-            } else {
-              shortMac = deviceMac;
-            }
-            deviceName = shortMac;
+            // Use MAC as-is for readability
+            deviceName = deviceMac;
           }
           
           // Add IP address if available
@@ -859,40 +871,13 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         }
       }
       
-      // If not found, return shortened MAC with better formatting
-      String shortMac;
-      if (deviceMac.startsWith('m_')) {
-        // For MAC format like mf8_ce_07_f2_8c_b6, extract meaningful part
-        final macPart = deviceMac.substring(1); // remove 'm'
-        final parts = macPart.split('_');
-        if (parts.length >= 3) {
-          // Take first 3 parts: f8_ce_07
-          shortMac = '${parts[0]}_${parts[1]}_${parts[2]}';
-        } else {
-          shortMac = macPart;
-        }
-      } else {
-        shortMac = deviceMac;
-      }
-      print('DEBUG: Device $deviceMac not found, using MAC "$shortMac"');
-      return shortMac;
+      // If not found, return MAC as-is
+      print('DEBUG: Device $deviceMac not found, using MAC as-is');
+      return deviceMac;
     } catch (e) {
-      String shortMac;
-      if (deviceMac.startsWith('m_')) {
-        // For MAC format like mf8_ce_07_f2_8c_b6, extract meaningful part
-        final macPart = deviceMac.substring(1); // remove 'm'
-        final parts = macPart.split('_');
-        if (parts.length >= 3) {
-          // Take first 3 parts: f8_ce_07
-          shortMac = '${parts[0]}_${parts[1]}_${parts[2]}';
-        } else {
-          shortMac = macPart;
-        }
-      } else {
-        shortMac = deviceMac;
-      }
-      print('DEBUG: Error for device $deviceMac, using fallback "$shortMac"');
-      return shortMac;
+      // On error, return MAC as-is
+      print('DEBUG: Error for device $deviceMac, using MAC as-is');
+      return deviceMac;
     }
   }
 }
