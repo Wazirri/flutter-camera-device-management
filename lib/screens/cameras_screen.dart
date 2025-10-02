@@ -299,8 +299,10 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                   ),
                 ),
                 
-                // MAC address filter chips
-                ...groupedCamerasByMac.keys.map((macAddress) {
+                // MAC address filter chips (sorted: device MACs first, then Unassigned)
+                ...groupedCamerasByMac.keys
+                    .where((key) => key != 'Unassigned') // Device MACs first
+                    .map((macAddress) {
                   // Only count cameras with MAC address
                   final deviceCount = groupedCamerasByMac[macAddress]
                       ?.where((camera) => camera.mac.isNotEmpty)
@@ -323,6 +325,27 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                     ),
                   );
                 }).toList(),
+                
+                // Unassigned cameras chip (shown last)
+                if (groupedCamerasByMac.containsKey('Unassigned'))
+                  () {
+                    final unassignedCount = groupedCamerasByMac['Unassigned']
+                        ?.where((camera) => camera.mac.isNotEmpty)
+                        .length ?? 0;
+                    
+                    if (unassignedCount == 0) return const SizedBox.shrink();
+                    
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: FilterChip(
+                        label: Text('Unassigned ($unassignedCount)'),
+                        selected: selectedMacAddress == 'Unassigned',
+                        onSelected: (_) => _selectMacAddress('Unassigned'),
+                        backgroundColor: Colors.orange.withOpacity(0.1),
+                        selectedColor: Colors.orange.withOpacity(0.3),
+                      ),
+                    );
+                  }(),
               ],
             ),
           ),
