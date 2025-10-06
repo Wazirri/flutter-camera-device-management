@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import '../providers/websocket_provider_optimized.dart';
 import '../providers/camera_devices_provider_optimized.dart';
 import '../utils/responsive_helper.dart';
@@ -62,22 +65,21 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
         // Wait a bit for response and check
         await Future.delayed(const Duration(milliseconds: 500));
         
-        // Check if we got a response
-        final lastMessage = webSocketProvider.lastMessage;
-        if (lastMessage != null && lastMessage is Map<String, dynamic>) {
-          final command = lastMessage['c'];
-          if (command == 'conversions') {
-            print('[Conversions] Parsing conversions response');
-            try {
-              final conversionsResponse = ConversionsResponse.fromJson(lastMessage);
-              setState(() {
-                _conversionsData = conversionsResponse;
-                print('[Conversions] Parsed ${_conversionsData!.data.length} device(s)');
-              });
-            } catch (e) {
-              print('[Conversions] Error parsing conversions response: $e');
-            }
+        // Check if we got a response using dedicated conversions response
+        final conversionsMessage = webSocketProvider.lastConversionsResponse;
+        if (conversionsMessage != null) {
+          print('[Conversions] Parsing conversions response');
+          try {
+            final conversionsResponse = ConversionsResponse.fromJson(conversionsMessage);
+            setState(() {
+              _conversionsData = conversionsResponse;
+              print('[Conversions] Parsed ${_conversionsData!.data.length} device(s)');
+            });
+          } catch (e) {
+            print('[Conversions] Error parsing conversions response: $e');
           }
+        } else {
+          print('[Conversions] No conversions response received');
         }
       } else {
         print('[Conversions] Failed to send conversions request');
@@ -533,6 +535,8 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
             backgroundColor: Colors.green,
           ),
         );
+        // Refresh conversions list
+        _loadConversions();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -766,9 +770,16 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
   
   List<Widget> _buildConversionsList() {
     final widgets = <Widget>[];
+    final cameraProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
     
     _conversionsData!.data.forEach((macAddress, conversions) {
       if (conversions != null && conversions.isNotEmpty) {
+        // Find device by MAC address
+        final device = cameraProvider.devices.values.firstWhere(
+          (d) => d.macAddress == macAddress,
+          orElse: () => cameraProvider.devices.values.first,
+        );
+        
         widgets.add(
           ExpansionTile(
             title: Text('Device: $macAddress'),
@@ -798,13 +809,7 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.download),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Download: ${conversion.filePath}'),
-                        ),
-                      );
-                    },
+                    onPressed: () => _downloadConversion(conversion, device.ipv4),
                   ),
                 ),
               );
@@ -823,6 +828,83 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
       return DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
     } catch (e) {
       return isoTime;
+    }
+  }
+
+  Future<void> _downloadConversion(ConversionItem conversion, String deviceIp) async {
+    try {
+      // Extract camera name, date folder and filename from file path
+      // Example path: /mnt/sda/Rec/KAMERA91/2025-10-05/filename.mp4
+      final pathParts = conversion.filePath.split('/');
+      if (pathParts.length < 3) {
+        throw Exception('Invalid file path format');
+      }
+      
+      // Get the camera name (third to last), date folder (second to last) and filename (last part)
+      final filename = pathParts.last;
+      final dateFolder = pathParts[pathParts.length - 2];
+      final cameraName = pathParts[pathParts.length - 3];
+      
+      // Construct download URL: ip:8080/Rec/CAMERA/date/filename
+      final url = 'http://$deviceIp:8080/Rec/$cameraName/$dateFolder/$filename';
+      
+      print('Downloading conversion from: $url');
+      
+      // Get Downloads directory
+      final Directory? downloadsDir = await getDownloadsDirectory();
+      if (downloadsDir == null) {
+        throw Exception('Could not find Downloads directory');
+      }
+      
+      // Create unique filename if file already exists
+      String savePath = '${downloadsDir.path}/$filename';
+      int counter = 1;
+      while (File(savePath).existsSync()) {
+        final nameWithoutExt = filename.substring(0, filename.lastIndexOf('.'));
+        final ext = filename.substring(filename.lastIndexOf('.'));
+        savePath = '${downloadsDir.path}/${nameWithoutExt}_$counter$ext';
+        counter++;
+      }
+      
+      // Download the file
+      final response = await http.get(Uri.parse(url));
+      
+      if (response.statusCode == 200) {
+        final file = File(savePath);
+        await file.writeAsBytes(response.bodyBytes);
+      } else {
+        throw Exception('Failed to download file: ${response.statusCode}');
+      }
+      
+      print('File saved to: $savePath');
+      
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('File downloaded to Downloads folder: $filename'),
+          backgroundColor: Colors.green,
+          action: SnackBarAction(
+            label: 'Open',
+            textColor: Colors.white,
+            onPressed: () async {
+              if (Platform.isMacOS) {
+                await Process.run('open', ['-R', savePath]);
+              }
+            },
+          ),
+        ),
+      );
+    } catch (e) {
+      print('Download error: $e');
+      if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Download failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 }

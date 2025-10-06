@@ -42,6 +42,12 @@ class WebSocketProviderOptimized with ChangeNotifier {
   // Son gelen mesajı al
   dynamic get lastMessage => _lastMessage;
   
+  // Store last conversions response
+  Map<String, dynamic>? _lastConversionsResponse;
+  
+  // Get last conversions response
+  Map<String, dynamic>? get lastConversionsResponse => _lastConversionsResponse;
+  
   // Connection settings
   String _serverIp = '85.104.114.145';
   int _serverPort = 1200;
@@ -566,8 +572,9 @@ class WebSocketProviderOptimized with ChangeNotifier {
           break;
 
         case 'conversions':
-          // Store conversions response
+          // Store conversions response in dedicated variable
           _lastMessage = jsonData;
+          _lastConversionsResponse = jsonData;
           print('[${DateTime.now().toString().split('.').first}] Received conversions response');
           print('[Conversions] Data: ${jsonData['data']}');
           _batchNotifyListeners();
