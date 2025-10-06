@@ -5,6 +5,7 @@ import '../providers/websocket_provider_optimized.dart';
 import '../providers/camera_devices_provider_optimized.dart';
 import '../utils/responsive_helper.dart';
 import '../models/camera_device.dart';
+import '../models/conversion_item.dart';
 
 class RecordingDownloadScreen extends StatefulWidget {
   const RecordingDownloadScreen({Key? key}) : super(key: key);
@@ -27,8 +28,69 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
   
   bool _isLoading = false;
   
+  // Conversions data
+  ConversionsResponse? _conversionsData;
+  bool _isLoadingConversions = false;
+  
   // Available formats
   final List<String> _formats = ['mp4', 'avi', 'mkv', 'mov'];
+  
+  @override
+  void initState() {
+    super.initState();
+    // Load conversions when screen opens
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadConversions();
+    });
+  }
+  
+  Future<void> _loadConversions() async {
+    setState(() {
+      _isLoadingConversions = true;
+    });
+    
+    try {
+      final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
+      
+      // Send conversions command
+      print('[Conversions] Sending conversions request');
+      final success = await webSocketProvider.sendCommand('conversions');
+      
+      if (success) {
+        print('[Conversions] Conversions request sent successfully');
+        
+        // Wait a bit for response and check
+        await Future.delayed(const Duration(milliseconds: 500));
+        
+        // Check if we got a response
+        final lastMessage = webSocketProvider.lastMessage;
+        if (lastMessage != null && lastMessage is Map<String, dynamic>) {
+          final command = lastMessage['c'];
+          if (command == 'conversions') {
+            print('[Conversions] Parsing conversions response');
+            try {
+              final conversionsResponse = ConversionsResponse.fromJson(lastMessage);
+              setState(() {
+                _conversionsData = conversionsResponse;
+                print('[Conversions] Parsed ${_conversionsData!.data.length} device(s)');
+              });
+            } catch (e) {
+              print('[Conversions] Error parsing conversions response: $e');
+            }
+          }
+        }
+      } else {
+        print('[Conversions] Failed to send conversions request');
+      }
+      
+    } catch (e) {
+      print('[Conversions] Error loading conversions: $e');
+    } finally {
+      setState(() {
+        _isLoadingConversions = false;
+      });
+    }
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -317,6 +379,9 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
                       ),
                     ),
                   ),
+                  
+                  // Conversions Section
+                  _buildConversionsSection(),
                 ],
               ),
             ),
@@ -641,5 +706,123 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
         }
       },
     );
+  }
+  
+  Widget _buildConversionsSection() {
+    return Card(
+      margin: const EdgeInsets.only(top: 24),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Active Conversions',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: _loadConversions,
+                  tooltip: 'Refresh',
+                ),
+              ],
+            ),
+            const Divider(),
+            const SizedBox(height: 8),
+            
+            if (_isLoadingConversions)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(32.0),
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            else if (_conversionsData == null || _conversionsData!.data.isEmpty)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
+                    children: [
+                      Icon(Icons.inbox, size: 48, color: Colors.grey[400]),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No active conversions',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              ..._buildConversionsList(),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  List<Widget> _buildConversionsList() {
+    final widgets = <Widget>[];
+    
+    _conversionsData!.data.forEach((macAddress, conversions) {
+      if (conversions != null && conversions.isNotEmpty) {
+        widgets.add(
+          ExpansionTile(
+            title: Text('Device: $macAddress'),
+            subtitle: Text('${conversions.length} conversion(s)'),
+            initiallyExpanded: true,
+            children: conversions.map((conversion) {
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.blue[100],
+                    child: const Icon(Icons.video_file, color: Colors.blue),
+                  ),
+                  title: Text(conversion.cameraName),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 4),
+                      Text('Format: ${conversion.format.toUpperCase()}'),
+                      Text('Start: ${_formatTime(conversion.startTime)}'),
+                      Text('End: ${_formatTime(conversion.endTime)}'),
+                      Text(
+                        'File: ${conversion.filePath.split('/').last}',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.download),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Download: ${conversion.filePath}'),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      }
+    });
+    
+    return widgets;
+  }
+  
+  String _formatTime(String isoTime) {
+    try {
+      final dateTime = DateTime.parse(isoTime);
+      return DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+    } catch (e) {
+      return isoTime;
+    }
   }
 }

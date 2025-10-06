@@ -565,6 +565,14 @@ class WebSocketProviderOptimized with ChangeNotifier {
           }
           break;
 
+        case 'conversions':
+          // Store conversions response
+          _lastMessage = jsonData;
+          print('[${DateTime.now().toString().split('.').first}] Received conversions response');
+          print('[Conversions] Data: ${jsonData['data']}');
+          _batchNotifyListeners();
+          break;
+
         default:
           print('[${DateTime.now().toString().split('.').first}] Received unknown command: $command');
           break;
