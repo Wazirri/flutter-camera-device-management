@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import '../providers/websocket_provider_optimized.dart';
 import '../providers/camera_devices_provider_optimized.dart';
 import '../utils/responsive_helper.dart';
@@ -807,9 +809,20 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
                       ),
                     ],
                   ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.download),
-                    onPressed: () => _downloadConversion(conversion, device.ipv4),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.play_circle_outline),
+                        tooltip: 'İzle',
+                        onPressed: () => _playConversion(conversion, device.ipv4),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.download),
+                        tooltip: 'İndir',
+                        onPressed: () => _downloadConversion(conversion, device.ipv4),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -906,5 +919,103 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
         ),
       );
     }
+  }
+
+  void _playConversion(ConversionItem conversion, String deviceIp) {
+    try {
+      // Extract camera name, date folder and filename from file path
+      final pathParts = conversion.filePath.split('/');
+      if (pathParts.length < 3) {
+        throw Exception('Invalid file path format');
+      }
+      
+      final filename = pathParts.last;
+      final dateFolder = pathParts[pathParts.length - 2];
+      final cameraName = pathParts[pathParts.length - 3];
+      
+      // Construct video URL
+      final videoUrl = 'http://$deviceIp:8080/Rec/$cameraName/$dateFolder/$filename';
+      
+      print('Playing conversion from: $videoUrl');
+      
+      // Show video player dialog
+      showDialog(
+        context: context,
+        builder: (context) => Dialog(
+          child: Container(
+            width: 800,
+            height: 600,
+            child: Column(
+              children: [
+                AppBar(
+                  title: Text(conversion.cameraName),
+                  automaticallyImplyLeading: false,
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: _buildVideoPlayer(videoUrl),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } catch (e) {
+      print('Play error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to play video: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Widget _buildVideoPlayer(String videoUrl) {
+    return _ConversionVideoPlayer(videoUrl: videoUrl);
+  }
+}
+
+// Simple video player widget for conversions
+class _ConversionVideoPlayer extends StatefulWidget {
+  final String videoUrl;
+
+  const _ConversionVideoPlayer({required this.videoUrl});
+
+  @override
+  State<_ConversionVideoPlayer> createState() => _ConversionVideoPlayerState();
+}
+
+class _ConversionVideoPlayerState extends State<_ConversionVideoPlayer> {
+  late final Player player;
+  late final VideoController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    player = Player();
+    controller = VideoController(player);
+    
+    // Load and play the video
+    player.open(Media(widget.videoUrl));
+  }
+
+  @override
+  void dispose() {
+    player.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Video(
+      controller: controller,
+      controls: MaterialVideoControls,
+    );
   }
 }
