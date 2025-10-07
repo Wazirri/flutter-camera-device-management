@@ -120,7 +120,6 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
             }
           }
           final cameras = uniqueCamerasByMac.values.toList();
-          final devices = cameraProvider.devicesList;
           
           return SingleChildScrollView(
             padding: EdgeInsets.all(isDesktop ? 24.0 : 16.0),
@@ -249,7 +248,7 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
                   ),
                   const SizedBox(height: 16),
                   
-                  // Format and Target Device Selection
+                  // Format Selection
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -262,66 +261,27 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
                           ),
                           const SizedBox(height: 16),
                           
-                          Row(
-                            children: [
-                              // Format Selection
-                              Expanded(
-                                child: DropdownButtonFormField<String>(
-                                  value: _selectedFormat,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Output Format',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.video_file),
-                                  ),
-                                  items: _formats.map((format) {
-                                    return DropdownMenuItem<String>(
-                                      value: format,
-                                      child: Text(format.toUpperCase()),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedFormat = value!;
-                                    });
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              
-                              // Target Device Selection
-                              Expanded(
-                                child: DropdownButtonFormField<String>(
-                                  value: _selectedTargetSlaveMac,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Target Device',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.devices),
-                                  ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please select a target device';
-                                    }
-                                    return null;
-                                  },
-                                  items: devices.map((device) {
-                                    return DropdownMenuItem<String>(
-                                      value: device.macKey,
-                                      child: Text(
-                                        device.deviceName?.isNotEmpty == true 
-                                          ? '${device.deviceName} (${device.macAddress})'
-                                          : device.macAddress,
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedTargetSlaveMac = value;
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
+                          // Format Selection
+                          DropdownButtonFormField<String>(
+                            value: _selectedFormat,
+                            decoration: const InputDecoration(
+                              labelText: 'Output Format',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.video_file),
+                            ),
+                            items: _formats.map((format) {
+                              return DropdownMenuItem<String>(
+                                value: format,
+                                child: Text(format.toUpperCase()),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedFormat = value!;
+                              });
+                            },
                           ),
+                          // Target Device is auto-selected based on camera selection
                         ],
                       ),
                     ),
@@ -568,12 +528,15 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
     
     // Get camera groups
     final cameraGroups = cameraProvider.cameraGroupsList;
+    print('[RecordingDownload] Camera groups count: ${cameraGroups.length}');
+    print('[RecordingDownload] Total cameras: ${cameras.length}');
     
     // Group cameras by camera groups first
     Set<String> groupedCameraIds = {};
     if (cameraGroups.isNotEmpty) {
       for (final group in cameraGroups) {
         final camerasInGroup = cameraProvider.getCamerasInGroup(group.name);
+        print('[RecordingDownload] Group "${group.name}" has ${camerasInGroup.length} cameras');
         if (camerasInGroup.isNotEmpty) {
           camerasByGroup[group.name] = camerasInGroup;
           for (final camera in camerasInGroup) {

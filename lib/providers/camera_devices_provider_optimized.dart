@@ -115,19 +115,6 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   
   // Get or create camera
   Camera _getOrCreateMacDefinedCamera(String cameraMac) {
-    // Skip device MAC addresses (those starting with 'm_') - they are not actual cameras
-    if (cameraMac.startsWith('m_')) {
-      // Return a temporary camera object for device MACs, but don't store it
-      return Camera(
-        mac: cameraMac,
-        name: '',
-        ip: '',
-        index: -1,
-        connected: false,
-        isPlaceholder: true, // Mark as placeholder since it's not a real camera
-      );
-    }
-    
     if (!_macDefinedCameras.containsKey(cameraMac)) {
       _macDefinedCameras[cameraMac] = Camera(
         mac: cameraMac,
@@ -152,21 +139,17 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       final deviceMac = camera.currentDevice!.deviceMac;
       print('CDP_OPT: Camera has currentDevice assignment: $deviceMac');
       
-      // Use MAC address as-is, no formatting
-      String normalizedMac = deviceMac;
-      print('CDP_OPT: Using MAC as-is: $normalizedMac');
-      
       // Find device by MAC
       for (var entry in _devices.entries) {
         CameraDevice device = entry.value;
-        print('CDP_OPT: Checking device: ${device.macAddress} vs $normalizedMac (key: ${device.macKey} vs $deviceMac)');
-        if (device.macAddress == normalizedMac || device.macKey == deviceMac || entry.key == deviceMac) {
+        print('CDP_OPT: Checking device: ${device.macAddress} (key: ${device.macKey}) vs $deviceMac');
+        if (device.macAddress == deviceMac || device.macKey == deviceMac || entry.key == deviceMac) {
           print('CDP_OPT: Found device for camera ${camera.mac} via currentDevice: ${device.macAddress} (${device.ipv4})');
           return device;
         }
       }
       
-      print('CDP_OPT: currentDevice not found in devices list: $deviceMac -> $normalizedMac');
+      print('CDP_OPT: currentDevice not found in devices list: $deviceMac');
     }
     
     // Fallback: try to find by MAC address in device cameras
@@ -738,6 +721,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
 
   // Process WebSocket message
   Future<void> processWebSocketMessage(Map<String, dynamic> message) async {
+    print('CDP_OPT: 🔵 processWebSocketMessage CALLED with: ${message['data']}');
     try {
       String command = message['c'] ?? '';
       
@@ -766,8 +750,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       // Skip duplicate messages
       String messageKey = '${dataPath}_${value.toString()}';
       if (_processedMessages.containsKey(messageKey)) {
+        print('CDP_OPT: ⚠️ DUPLICATE MESSAGE SKIPPED: $messageKey');
         return;
       }
+      print('CDP_OPT: ✅ PROCESSING NEW MESSAGE: $messageKey');
       _processedMessages[messageKey] = true;
       
       // Cleanup old processed messages to prevent memory leaks
@@ -808,7 +794,6 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       }
       
       String pathDeviceIdentifier = parts[1];
-      // Use the MAC address as-is, without any formatting
       String canonicalDeviceMac = pathDeviceIdentifier;
       
       final device = _getOrCreateDevice(canonicalDeviceMac, pathDeviceIdentifier);
@@ -1212,33 +1197,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
             print("CDP_OPT: WARNING - Multiple cameras found for device ${device.macKey} at index $cameraIndex. Using first: ${cameraToUpdate.mac}. All: ${camsInDevice.map((c)=>c.mac).join(',')}");
         }
       } else {
-        // Kamera slot'u henüz oluşturulmamış, oluştur
-        print('CDP_OPT: *** No camera found at index $cameraIndex for device ${device.macKey}, creating camera slot ***');
-        
-        // Ensure device has enough camera slots
-        while (device.cameras.length <= cameraIndex) {
-          final newCamera = Camera(
-            mac: '',
-            name: '',
-            ip: '',
-            username: '',
-            password: '',
-            macPort: 80,
-            mediaUri: '',
-            recordUri: '',
-            mainSnapShot: '',
-            subUri: '',
-            subSnapShot: '',
-            recording: false,
-            parentDeviceMacKey: device.macKey,
-            index: device.cameras.length,
-          );
-          device.cameras.add(newCamera);
-          print('CDP_OPT: Created camera slot ${device.cameras.length - 1} for device ${device.macKey}');
-        }
-        
-        cameraToUpdate = device.cameras[cameraIndex];
-        print('CDP_OPT: *** Camera slot created at index $cameraIndex for device ${device.macKey}, will update property $propertyName ***');
+        // Kamera slot'u henüz oluşturulmamış
+        // MAC adresi olmadan kamera yaratmıyoruz - önce MAC gelmeli
+        print('CDP_OPT: *** No camera found at index $cameraIndex for device ${device.macKey}. Waiting for MAC assignment. Property $propertyName will be ignored for now. ***');
+        return; // MAC olmadan kamera property'leri işlenmiyor
       }
     }
 
