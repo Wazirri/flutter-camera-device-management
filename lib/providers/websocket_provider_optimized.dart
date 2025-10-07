@@ -580,6 +580,37 @@ class WebSocketProviderOptimized with ChangeNotifier {
           _batchNotifyListeners();
           break;
 
+        case 'error':
+          // Handle error messages
+          _lastMessage = jsonData;
+          print('[${DateTime.now().toString().split('.').first}] Error: $message');
+          
+          // Forward to UserGroupProvider to show error
+          if (_userGroupProvider != null) {
+            _userGroupProvider!.handleOperationResult(
+              success: false,
+              message: message,
+            );
+          }
+          _batchNotifyListeners();
+          break;
+
+        case 'success':
+          // Handle success messages
+          _lastMessage = jsonData;
+          final action = jsonData['action'] ?? '';
+          print('[${DateTime.now().toString().split('.').first}] Success: $message (action: $action)');
+          
+          // Forward to UserGroupProvider to show success
+          if (_userGroupProvider != null) {
+            _userGroupProvider!.handleOperationResult(
+              success: true,
+              message: message,
+            );
+          }
+          _batchNotifyListeners();
+          break;
+
         default:
           print('[${DateTime.now().toString().split('.').first}] Received unknown command: $command');
           break;

@@ -335,11 +335,32 @@ class UserGroupProvider with ChangeNotifier {
     }
   }
 
+  // Handle operation results (success/error messages)
+  String? _lastOperationMessage;
+  bool? _lastOperationSuccess;
+  
+  String? get lastOperationMessage => _lastOperationMessage;
+  bool? get lastOperationSuccess => _lastOperationSuccess;
+  
+  void handleOperationResult({required bool success, required String message}) {
+    _lastOperationSuccess = success;
+    _lastOperationMessage = message;
+    print('UGP: Operation result - Success: $success, Message: $message');
+    notifyListeners();
+  }
+  
+  void clearOperationResult() {
+    _lastOperationSuccess = null;
+    _lastOperationMessage = null;
+  }
+
   // Clear all data
   void clear() {
     _users.clear();
     _groups.clear();
     _usersCreated = null;
+    _lastOperationMessage = null;
+    _lastOperationSuccess = null;
     _notificationDebounceTimer?.cancel();
     _needsNotification = false;
     notifyListeners();

@@ -42,6 +42,34 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Listen for operation results and show snackbar
+    return Consumer<UserGroupProvider>(
+      builder: (context, userGroupProvider, _) {
+        // Show snackbar when there's an operation result
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (userGroupProvider.lastOperationMessage != null) {
+            final message = userGroupProvider.lastOperationMessage!;
+            final isSuccess = userGroupProvider.lastOperationSuccess ?? false;
+            
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(message),
+                backgroundColor: isSuccess ? Colors.green : Colors.red,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+            
+            // Clear the message after showing
+            userGroupProvider.clearOperationResult();
+          }
+        });
+        
+        return _buildScaffold(context);
+      },
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.darkBackground,
       appBar: AppBar(
@@ -249,6 +277,8 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
                 ),
               ),
             ],
+            // Kullanıcının gruplarını ve yetkilerini göster
+            _buildUserGroupsAndPermissions(context, user),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -530,6 +560,114 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
     }
   }
 
+  Widget _buildUserGroupsAndPermissions(BuildContext context, User user) {
+    final userGroupProvider = Provider.of<UserGroupProvider>(context, listen: false);
+    
+    // Bu kullanıcının ait olduğu grupları bul
+    final userGroups = userGroupProvider.groupsList.where((group) => 
+      group.users.contains(user.username)
+    ).toList();
+    
+    if (userGroups.isEmpty) {
+      return const SizedBox(height: 8);
+    }
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 12),
+        Text(
+          'Kullanıcı Grupları ve Yetkileri',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey[400],
+            fontSize: 13,
+          ),
+        ),
+        const SizedBox(height: 8),
+        ...userGroups.map((group) => Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryBlue.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: AppTheme.primaryBlue.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.groups, color: AppTheme.primaryBlue, size: 16),
+                  const SizedBox(width: 8),
+                  Text(
+                    group.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+              if (group.permissions.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                ...group.permissions.entries.map((entry) => Padding(
+                  padding: const EdgeInsets.only(left: 24, top: 4),
+                  child: Row(
+                    children: [
+                      Icon(
+                        entry.value == true || entry.value == 1 || entry.value == '1'
+                            ? Icons.check_circle
+                            : Icons.info_outline,
+                        color: entry.value == true || entry.value == 1 || entry.value == '1'
+                            ? Colors.green
+                            : Colors.grey,
+                        size: 14,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          '${entry.key}: ${entry.value}',
+                          style: TextStyle(
+                            color: Colors.grey[300],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )).toList(),
+              ],
+              if (group.cameraMacs.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.only(left: 24),
+                  child: Row(
+                    children: [
+                      Icon(Icons.videocam, color: Colors.grey[400], size: 14),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${group.cameraMacs.length} kamera',
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        )).toList(),
+      ],
+    );
+  }
+
   // ============= USER DIALOGS =============
 
   void _showCreateUserDialog() {
@@ -645,7 +783,7 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
                 listen: false,
               );
 
-              final success = await wsProvider.sendCreateUser(
+              await wsProvider.sendCreateUser(
                 usernameController.text,
                 passwordController.text,
                 nameController.text,
@@ -653,17 +791,8 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
               );
 
               Navigator.pop(context);
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    success
-                        ? 'Kullanıcı oluşturuldu'
-                        : 'Kullanıcı oluşturulamadı',
-                  ),
-                  backgroundColor: success ? Colors.green : Colors.red,
-                ),
-              );
+              
+              // Mesaj WebSocket'ten gelecek ve otomatik gösterilecek
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryBlue,
@@ -719,21 +848,14 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
                 listen: false,
               );
 
-              final success = await wsProvider.sendChangePassword(
+              await wsProvider.sendChangePassword(
                 user.username,
                 passwordController.text,
               );
 
               Navigator.pop(context);
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    success ? 'Şifre değiştirildi' : 'Şifre değiştirilemedi',
-                  ),
-                  backgroundColor: success ? Colors.green : Colors.red,
-                ),
-              );
+              
+              // Mesaj WebSocket'ten gelecek ve otomatik gösterilecek
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryBlue,
@@ -767,18 +889,11 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
                 listen: false,
               );
 
-              final success = await wsProvider.sendDeleteUser(user.username);
+              await wsProvider.sendDeleteUser(user.username);
 
               Navigator.pop(context);
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    success ? 'Kullanıcı silindi' : 'Kullanıcı silinemedi',
-                  ),
-                  backgroundColor: success ? Colors.green : Colors.red,
-                ),
-              );
+              
+              // Mesaj WebSocket'ten gelecek ve otomatik gösterilecek
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
@@ -875,22 +990,15 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
                 listen: false,
               );
 
-              final success = await wsProvider.sendCreateGroup(
+              await wsProvider.sendCreateGroup(
                 groupNameController.text,
                 descriptionController.text,
                 permissionsController.text,
               );
 
               Navigator.pop(context);
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    success ? 'Grup oluşturuldu' : 'Grup oluşturulamadı',
-                  ),
-                  backgroundColor: success ? Colors.green : Colors.red,
-                ),
-              );
+              
+              // Mesaj WebSocket'ten gelecek ve otomatik gösterilecek
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryBlue,
@@ -968,22 +1076,15 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
                 listen: false,
               );
 
-              final success = await wsProvider.sendModifyGroup(
+              await wsProvider.sendModifyGroup(
                 group.name,
                 descriptionController.text,
                 permissionsController.text,
               );
 
               Navigator.pop(context);
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    success ? 'Grup güncellendi' : 'Grup güncellenemedi',
-                  ),
-                  backgroundColor: success ? Colors.green : Colors.red,
-                ),
-              );
+              
+              // Mesaj WebSocket'ten gelecek ve otomatik gösterilecek
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryBlue,
@@ -1017,18 +1118,11 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
                 listen: false,
               );
 
-              final success = await wsProvider.sendDeleteGroup(group.name);
+              await wsProvider.sendDeleteGroup(group.name);
 
               Navigator.pop(context);
-
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    success ? 'Grup silindi' : 'Grup silinemedi',
-                  ),
-                  backgroundColor: success ? Colors.green : Colors.red,
-                ),
-              );
+              
+              // Mesaj WebSocket'ten gelecek ve otomatik gösterilecek
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
