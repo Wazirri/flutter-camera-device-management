@@ -294,10 +294,32 @@ class DeviceCard extends StatelessWidget {
                   color: Colors.grey.shade400,
                 ),
               ),
+              const SizedBox(height: 12),
+              // Settings button
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
+                  onPressed: () => _showNetworkSettings(context, device),
+                  icon: const Icon(Icons.settings, size: 18),
+                  label: const Text('Network Settings'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryBlue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+  
+  void _showNetworkSettings(BuildContext context, CameraDevice device) {
+    showDialog(
+      context: context,
+      builder: (context) => _NetworkSettingsDialog(device: device),
     );
   }
 }
@@ -998,5 +1020,260 @@ class CameraCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+// Network Settings Dialog
+class _NetworkSettingsDialog extends StatefulWidget {
+  final CameraDevice device;
+
+  const _NetworkSettingsDialog({required this.device});
+
+  @override
+  State<_NetworkSettingsDialog> createState() => _NetworkSettingsDialogState();
+}
+
+class _NetworkSettingsDialogState extends State<_NetworkSettingsDialog> {
+  late TextEditingController _ipController;
+  late TextEditingController _gatewayController;
+  bool _useDHCP = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ipController = TextEditingController(text: widget.device.ipv4);
+    _gatewayController = TextEditingController(text: '192.168.1.1');
+  }
+
+  @override
+  void dispose() {
+    _ipController.dispose();
+    _gatewayController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: AppTheme.darkSurface,
+      title: Row(
+        children: [
+          const Icon(Icons.network_check, color: AppTheme.primaryBlue),
+          const SizedBox(width: 8),
+          const Text(
+            'Network Settings',
+            style: TextStyle(color: Colors.white),
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Device info
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryBlue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.devices, size: 16, color: AppTheme.primaryBlue),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          widget.device.deviceType,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'MAC: ${widget.device.macAddress}',
+                    style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                  ),
+                  Text(
+                    'Current IP: ${widget.device.ipv4}',
+                    style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // IP Address
+            TextField(
+                controller: _ipController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'IP Address',
+                  labelStyle: TextStyle(color: Colors.grey[400]),
+                  hintText: '192.168.1.10',
+                  hintStyle: TextStyle(color: Colors.grey[600]),
+                  prefixIcon: const Icon(Icons.computer, color: AppTheme.primaryBlue),
+                  border: const OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey[600]!),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: AppTheme.primaryBlue),
+                  ),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 12),
+              
+              // Gateway
+              TextField(
+                controller: _gatewayController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Gateway',
+                  labelStyle: TextStyle(color: Colors.grey[400]),
+                  hintText: '192.168.1.1',
+                  hintStyle: TextStyle(color: Colors.grey[600]),
+                  prefixIcon: const Icon(Icons.router, color: AppTheme.primaryBlue),
+                  border: const OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey[600]!),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: AppTheme.primaryBlue),
+                  ),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            
+            const SizedBox(height: 16),
+            
+            // DHCP Server Toggle (for slave devices)
+            CheckboxListTile(
+              title: const Text(
+                'Enable DHCP Server',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                'Distribute IP addresses to slave devices',
+                style: TextStyle(color: Colors.grey[400], fontSize: 12),
+              ),
+              value: _useDHCP,
+              activeColor: AppTheme.primaryBlue,
+              onChanged: (value) {
+                setState(() {
+                  _useDHCP = value ?? false;
+                });
+              },
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // Warning message
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.warning_amber, color: Colors.orange, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Device will restart and may temporarily disconnect',
+                      style: TextStyle(color: Colors.orange[300], fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton.icon(
+          onPressed: _applyNetworkSettings,
+          icon: const Icon(Icons.check),
+          label: const Text('Apply'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.primaryBlue,
+            foregroundColor: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _applyNetworkSettings() async {
+    // Validate IP and Gateway (always required)
+    if (_ipController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter an IP address')),
+      );
+      return;
+    }
+    
+    if (_gatewayController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a gateway address')),
+      );
+      return;
+    }
+
+    try {
+      final provider = Provider.of<CameraDevicesProviderOptimized>(
+        context,
+        listen: false,
+      );
+
+      // Send SET_NETWORK command
+      // Format: SET_NETWORK ip gw dhcp mac
+      // dhcp: 1 = Enable DHCP server for slaves, 0 = Disable
+      final dhcpValue = _useDHCP ? '1' : '0';
+      final ip = _ipController.text;
+      final gw = _gatewayController.text;
+      
+      await provider.sendSetNetwork(
+        ip: ip,
+        gateway: gw,
+        dhcp: dhcpValue,
+        mac: widget.device.macAddress,
+      );
+
+      Navigator.pop(context);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Network settings updated for ${widget.device.deviceType}\n'
+            'IP: $ip, Gateway: $gw${_useDHCP ? ', DHCP Server: Enabled' : ''}',
+          ),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

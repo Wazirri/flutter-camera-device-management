@@ -353,6 +353,83 @@ class UserGroupProvider with ChangeNotifier {
     _lastOperationSuccess = null;
     _lastOperationMessage = null;
   }
+  
+  // Get user's groups
+  List<CameraGroup> getUserGroups(String username) {
+    print('UGP: 🔎 getUserGroups called for "$username"');
+    print('UGP: 🗂️ Total groups available: ${_groups.length}');
+    print('UGP: 📚 All groups: ${_groups.keys.toList()}');
+    
+    for (var entry in _groups.entries) {
+      print('UGP: 📌 Group "${entry.key}" users: ${entry.value.users}');
+    }
+    
+    final userGroups = _groups.values.where((group) => group.users.contains(username)).toList();
+    print('UGP: ✨ Found ${userGroups.length} groups for "$username"');
+    
+    return userGroups;
+  }
+  
+  // Get all camera MACs that a user has access to
+  Set<String> getUserAuthorizedCameraMacs(String username) {
+    final userGroups = getUserGroups(username);
+    final authorizedMacs = <String>{};
+    
+    print('UGP: 🔍 Getting authorized cameras for user "$username"');
+    print('UGP: 📋 User groups: ${userGroups.map((g) => g.name).toList()}');
+    
+    for (var group in userGroups) {
+      print('UGP: 📦 Group "${group.name}" has ${group.cameraMacs.length} cameras: ${group.cameraMacs}');
+      authorizedMacs.addAll(group.cameraMacs);
+    }
+    
+    print('UGP: ✅ User "$username" has access to ${authorizedMacs.length} cameras through ${userGroups.length} groups');
+    print('UGP: 📷 Authorized MACs: $authorizedMacs');
+    return authorizedMacs;
+  }
+  
+  // Check if user has specific permission
+  bool userHasPermission(String username, String permission) {
+    final userGroups = getUserGroups(username);
+    
+    for (var group in userGroups) {
+      final permValue = group.permissions[permission];
+      if (permValue == true || permValue == 1 || permValue == '1' || permValue?.toString().toLowerCase() == 'true') {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  // Get user's usertype
+  String? getUserType(String username) {
+    final userType = _users[username]?.usertype;
+    print('UGP: 👤 getUserType("$username") = $userType');
+    print('UGP: 👥 All users: ${_users.keys.toList()}');
+    return userType;
+  }
+
+  /// Remove a group from local state (called when group is deleted)
+  void removeGroupLocally(String groupName) {
+    if (_groups.containsKey(groupName)) {
+      _groups.remove(groupName);
+      print('🗑️ UGP: Removed group "$groupName" from local state');
+      
+      // Also remove users from this group
+      for (var user in _users.values) {
+        if (user.usertype == groupName) {
+          // Reset usertype if it was this group
+          _users[user.username] = user.copyWith(usertype: 'user');
+          print('👤 UGP: Reset usertype for ${user.username}');
+        }
+      }
+      
+      notifyListeners();
+    } else {
+      print('⚠️ UGP: Group "$groupName" not found in local state');
+    }
+  }
 
   // Clear all data
   void clear() {

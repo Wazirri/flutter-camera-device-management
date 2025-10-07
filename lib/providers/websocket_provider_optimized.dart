@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:movita_ecs/models/system_info.dart';
+import 'package:movita_ecs/models/permissions.dart';
 import 'camera_devices_provider_optimized.dart';
 import 'user_group_provider.dart';
 
@@ -22,6 +23,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
   bool _isWaitingForChangedone = false;
   String _errorMessage = '';
   SystemInfo? _systemInfo;
+  String? _currentLoggedInUsername; // Login yapan kullanıcının adı
   
   // Reference to CameraDevicesProvider
   CameraDevicesProviderOptimized? _cameraDevicesProvider;
@@ -98,6 +100,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
   bool get isWaitingForChangedone => _isWaitingForChangedone;
   String get errorMessage => _errorMessage;
   SystemInfo? get systemInfo => _systemInfo;
+  String? get currentLoggedInUsername => _currentLoggedInUsername;
   Stream<SystemInfo> get onSystemInfoUpdate => _systemInfoController.stream;
   String get serverIp => _serverIp;
   int get serverPort => _serverPort;
@@ -279,6 +282,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
     await disconnect();
     _lastUsername = null;
     _lastPassword = null;
+    _currentLoggedInUsername = null;
     _isLoggedIn = false;
     _isWaitingForChangedone = false;
     notifyListeners();
@@ -362,17 +366,22 @@ class WebSocketProviderOptimized with ChangeNotifier {
   
   /// Create a new group
   /// Format: CREATEGROUP groupname description permissions
-  /// Permissions: view,record,user_management
+  /// Permissions: 1111100000000000 (16-bit number)
   Future<bool> sendCreateGroup(String groupName, String description, String permissions) async {
-    final command = 'CREATEGROUP "$groupName" "$description" "$permissions"';
+    // Remove quotes from permissions if it's a number string (e.g., "1111100000000000")
+    final permValue = permissions.replaceAll('"', '');
+    final command = 'CREATEGROUP "$groupName" "$description" $permValue';
     print('WebSocketProvider: Sending create group command: $command');
     return await sendCommand(command);
   }
 
   /// Modify a group
   /// Format: MODIFYGROUP groupname description permissions
+  /// Permissions: 1111100000000000 (16-bit number)
   Future<bool> sendModifyGroup(String groupName, String description, String permissions) async {
-    final command = 'MODIFYGROUP "$groupName" "$description" "$permissions"';
+    // Remove quotes from permissions if it's a number string
+    final permValue = permissions.replaceAll('"', '');
+    final command = 'MODIFYGROUP "$groupName" "$description" $permValue';
     print('WebSocketProvider: Sending modify group command: $command');
     return await sendCommand(command);
   }
@@ -382,6 +391,20 @@ class WebSocketProviderOptimized with ChangeNotifier {
   Future<bool> sendDeleteGroup(String groupName) async {
     final command = 'DELETEGROUP "$groupName"';
     print('WebSocketProvider: Sending delete group command: $command');
+    return await sendCommand(command);
+  }
+
+  /// Set network configuration for a device
+  /// Format: SET_NETWORK ip gw dhcp mac
+  /// Example: SET_NETWORK 192.168.1.10 192.168.1.1 0 EA:FE:A9:B7:5B:55
+  Future<bool> sendSetNetwork({
+    required String ip,
+    required String gateway,
+    required String dhcp,
+    required String mac,
+  }) async {
+    final command = 'SET_NETWORK $ip $gateway $dhcp $mac';
+    print('WebSocketProvider: Sending set network command: $command');
     return await sendCommand(command);
   }
 
@@ -516,7 +539,8 @@ class WebSocketProviderOptimized with ChangeNotifier {
           _isLoggedIn = true;
           _isWaitingForChangedone = true;
           _errorMessage = '';
-          print('[${DateTime.now().toString().split('.').first}] Login successful, sending Monitor ecs_slaves');
+          _currentLoggedInUsername = _lastUsername; // Login yapan kullanıcıyı kaydet
+          print('[${DateTime.now().toString().split('.').first}] Login successful as $_currentLoggedInUsername, sending Monitor ecs_slaves');
           
           // Send Monitor ecs_slaves message immediately after loginok
           if (_socket != null) {
@@ -595,17 +619,105 @@ class WebSocketProviderOptimized with ChangeNotifier {
           _batchNotifyListeners();
           break;
 
+        case 'set_network':
+          // Handle network settings change response
+          final result = jsonData['result'] as int?;
+          final msg = message;
+          
+          print('🌐 WebSocket: Network settings response: $msg (result: $result)');
+          
+          if (result == 1) {
+            // Success - device network changed, wait 30 seconds then reconnect
+            print('⏳ Network settings updated successfully. Device will restart...');
+            print('⏳ Waiting 30 seconds before reconnecting...');
+            
+            // Show message to user
+            if (_userGroupProvider != null) {
+              _userGroupProvider!.handleOperationResult(
+                success: true,
+                message: '$msg\n\nCihaz yeniden başlatılıyor, 30 saniye içinde bağlantı yenilenecek...',
+              );
+            }
+            
+            // Schedule reconnection after 30 seconds
+            Future.delayed(const Duration(seconds: 30), () async {
+              print('🔄 Attempting to reconnect after network change...');
+              
+              // Disconnect current connection
+              await disconnect();
+              
+              // Wait a bit more then reconnect
+              await Future.delayed(const Duration(seconds: 2));
+              
+              // Use reconnect method which has saved credentials
+              final success = await reconnect();
+              
+              if (success) {
+                print('✅ Successfully reconnected after network change');
+                if (_userGroupProvider != null) {
+                  _userGroupProvider!.handleOperationResult(
+                    success: true,
+                    message: 'Bağlantı başarıyla yenilendi!',
+                  );
+                }
+              } else {
+                print('❌ Failed to reconnect after network change');
+                if (_userGroupProvider != null) {
+                  _userGroupProvider!.handleOperationResult(
+                    success: false,
+                    message: 'Bağlantı yenilenemedi. Lütfen manuel olarak giriş yapın.',
+                  );
+                }
+              }
+            });
+          } else {
+            // Failed
+            print('❌ Network settings update failed: $msg');
+            if (_userGroupProvider != null) {
+              _userGroupProvider!.handleOperationResult(
+                success: false,
+                message: msg,
+              );
+            }
+          }
+          _batchNotifyListeners();
+          break;
+
         case 'success':
           // Handle success messages
           _lastMessage = jsonData;
           final action = jsonData['action'] ?? '';
           print('[${DateTime.now().toString().split('.').first}] Success: $message (action: $action)');
           
-          // Forward to UserGroupProvider to show success
+          // Parse and enhance permission messages
+          String displayMessage = message;
+          if (message.contains('Yetkiler:')) {
+            displayMessage = _parsePermissionSuccessMessage(message);
+          }
+          
+          // Handle group operations
           if (_userGroupProvider != null) {
+            // Extract group name from success messages
+            if (message.contains('silindi')) {
+              // "Grup 'denememeeee' başarıyla silindi!"
+              final groupNameMatch = RegExp(r"Grup '([^']+)' başarıyla silindi").firstMatch(message);
+              if (groupNameMatch != null) {
+                final groupName = groupNameMatch.group(1);
+                print('🗑️ Deleting group from local state: $groupName');
+                _userGroupProvider!.removeGroupLocally(groupName!);
+              }
+            } else if (message.contains('oluşturuldu')) {
+              // "Grup 'name' başarıyla oluşturuldu!"
+              print('✅ Group created, will refresh on next GETGROUPLIST');
+            } else if (message.contains('güncellendi')) {
+              // "Grup 'name' başarıyla güncellendi!"
+              print('✅ Group updated, will refresh on next GETGROUPLIST');
+            }
+            
+            // Forward success message
             _userGroupProvider!.handleOperationResult(
               success: true,
-              message: message,
+              message: displayMessage,
             );
           }
           _batchNotifyListeners();
@@ -859,6 +971,45 @@ class WebSocketProviderOptimized with ChangeNotifier {
         _stopReconnectTimer();
       }
     });
+  }
+
+  /// Parse success messages containing permission info
+  /// Example: "Grup 'name' başarıyla oluşturuldu! (Yetkiler: 1111111111111111)"
+  /// Returns: "Grup 'name' başarıyla oluşturuldu! (VIEW, RECORD, USER, GROUP, ADMIN, ...)"
+  String _parsePermissionSuccessMessage(String message) {
+    try {
+      // Extract permission string from message
+      final regex = RegExp(r'Yetkiler:\s*(\d{16})');
+      final match = regex.firstMatch(message);
+      
+      if (match != null && match.groupCount >= 1) {
+        final permString = match.group(1)!;
+        
+        // Parse permissions
+        final grantedPerms = Permissions.parsePermissionString(permString);
+        
+        if (grantedPerms.isEmpty) {
+          return message.replaceAll(
+            RegExp(r'\(Yetkiler:.*?\)'),
+            '(Yetki yok)',
+          );
+        }
+        
+        // Create human-readable permission list
+        final permNames = grantedPerms.map((p) => p.name).join(', ');
+        
+        // Replace the permission string with names
+        return message.replaceAll(
+          RegExp(r'\(Yetkiler:.*?\)'),
+          '(Yetkiler: $permNames)',
+        );
+      }
+      
+      return message;
+    } catch (e) {
+      print('Error parsing permission message: $e');
+      return message;
+    }
   }
 
   // Clean up resources

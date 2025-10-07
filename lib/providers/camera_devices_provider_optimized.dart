@@ -63,6 +63,39 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     return _cachedFlatCameraList!;
   }
   
+  // Get cameras filtered by user authorization
+  List<Camera> getAuthorizedCameras(Set<String>? authorizedMacs) {
+    print('CDP: 🎬 getAuthorizedCameras called');
+    print('CDP: 📋 Total cameras: ${cameras.length}');
+    print('CDP: 🔑 Authorized MACs: ${authorizedMacs?.length ?? "ALL (admin)"}');
+    
+    if (authorizedMacs == null) {
+      print('CDP: 👑 Returning all cameras (admin or no restriction)');
+      return cameras;
+    }
+    
+    if (authorizedMacs.isEmpty) {
+      print('CDP: ⚠️ Empty authorized MACs - returning no cameras');
+      return [];
+    }
+    
+    // Filter cameras by authorized MACs
+    final filteredCameras = cameras.where((camera) {
+      final isAuthorized = authorizedMacs.contains(camera.mac);
+      if (!isAuthorized && camera.mac.isNotEmpty) {
+        print('CDP: ❌ Camera ${camera.name} (${camera.mac}) - NOT authorized');
+      }
+      return isAuthorized;
+    }).toList();
+    
+    print('CDP: ✅ Returning ${filteredCameras.length} authorized cameras');
+    for (var cam in filteredCameras) {
+      print('CDP: ✓ ${cam.name} (${cam.mac})');
+    }
+    
+    return filteredCameras;
+  }
+  
   int get selectedCameraIndex => _selectedCameraIndex;
   bool get isLoading => _isLoading;
   
@@ -1764,6 +1797,27 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     } catch (e) {
       print('CDP_OPT: Error processing sysinfo message: $e');
     }
+  }
+
+  /// Send network configuration command to device
+  Future<bool> sendSetNetwork({
+    required String ip,
+    required String gateway,
+    required String dhcp,
+    required String mac,
+  }) async {
+    if (_webSocketProvider == null) {
+      print('❌ CDP: WebSocketProvider not set');
+      return false;
+    }
+    
+    print('🌐 CDP: Sending SET_NETWORK for device $mac: IP=$ip, GW=$gateway, DHCP=$dhcp');
+    return await _webSocketProvider!.sendSetNetwork(
+      ip: ip,
+      gateway: gateway,
+      dhcp: dhcp,
+      mac: mac,
+    );
   }
   
   @override

@@ -7,6 +7,7 @@ import '../providers/camera_devices_provider_optimized.dart';
 import '../models/user.dart';
 import '../models/camera_group.dart';
 import '../models/camera_device.dart';
+import '../models/permissions.dart';
 import '../theme/app_theme.dart';
 
 class UserGroupManagementScreen extends StatefulWidget {
@@ -486,6 +487,20 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
   }
 
   Widget _buildPermissionsSection(Map<String, dynamic> permissions) {
+    // Parse permission string or number
+    Set<Permission> grantedPermissions = {};
+    if (permissions.containsKey('permissions')) {
+      // New format: permissions directly (can be string or number like 1111100000000000)
+      final permValue = permissions['permissions'];
+      grantedPermissions = Permissions.parsePermissionString(permValue);
+      print('✅ Parsed permissions from value: $permValue -> ${grantedPermissions.map((p) => p.code).toList()}');
+    } else if (permissions.containsKey('permissionString')) {
+      // Legacy format
+      final permString = permissions['permissionString'].toString();
+      grantedPermissions = Permissions.parsePermissionString(permString);
+      print('✅ Parsed permissions from string: $permString -> ${grantedPermissions.map((p) => p.code).toList()}');
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -497,29 +512,31 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
           ),
         ),
         const SizedBox(height: 8),
-        ...permissions.entries.map((entry) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Row(
-            children: [
-              Icon(
-                entry.value == true || entry.value == 1 || entry.value == '1'
-                    ? Icons.check_circle
-                    : Icons.info_outline,
-                color: entry.value == true || entry.value == 1 || entry.value == '1'
-                    ? Colors.green
-                    : AppTheme.primaryBlue,
-                size: 16,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  '${entry.key}: ${entry.value}',
-                  style: const TextStyle(color: Colors.white),
+        if (grantedPermissions.isEmpty)
+          Text(
+            'Yetki bulunamadı',
+            style: TextStyle(color: Colors.grey[500], fontStyle: FontStyle.italic),
+          )
+        else
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: grantedPermissions.map((permission) {
+              return Chip(
+                avatar: Icon(
+                  permission.icon,
+                  color: Colors.white,
+                  size: 16,
                 ),
-              ),
-            ],
+                label: Text(
+                  permission.name,
+                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                ),
+                backgroundColor: AppTheme.primaryBlue.withOpacity(0.7),
+                visualDensity: VisualDensity.compact,
+              );
+            }).toList(),
           ),
-        )).toList(),
       ],
     );
   }
@@ -615,32 +632,46 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
               ),
               if (group.permissions.isNotEmpty) ...[
                 const SizedBox(height: 8),
-                ...group.permissions.entries.map((entry) => Padding(
-                  padding: const EdgeInsets.only(left: 24, top: 4),
-                  child: Row(
-                    children: [
-                      Icon(
-                        entry.value == true || entry.value == 1 || entry.value == '1'
-                            ? Icons.check_circle
-                            : Icons.info_outline,
-                        color: entry.value == true || entry.value == 1 || entry.value == '1'
-                            ? Colors.green
-                            : Colors.grey,
-                        size: 14,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
+                Builder(
+                  builder: (context) {
+                    // Parse permissions
+                    Set<Permission> grantedPerms = {};
+                    if (group.permissions.containsKey('permissions')) {
+                      grantedPerms = Permissions.parsePermissionString(group.permissions['permissions']);
+                    } else if (group.permissions.containsKey('permissionString')) {
+                      grantedPerms = Permissions.parsePermissionString(group.permissions['permissionString']);
+                    }
+                    
+                    if (grantedPerms.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 24, top: 4),
                         child: Text(
-                          '${entry.key}: ${entry.value}',
-                          style: TextStyle(
-                            color: Colors.grey[300],
-                            fontSize: 12,
-                          ),
+                          'Yetki bulunamadı',
+                          style: TextStyle(color: Colors.grey[500], fontSize: 12, fontStyle: FontStyle.italic),
                         ),
+                      );
+                    }
+                    
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 24, top: 4),
+                      child: Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: grantedPerms.map((perm) => Chip(
+                          avatar: Icon(perm.icon, color: Colors.white, size: 12),
+                          label: Text(
+                            perm.name,
+                            style: const TextStyle(color: Colors.white, fontSize: 10),
+                          ),
+                          backgroundColor: Colors.green.withOpacity(0.7),
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        )).toList(),
                       ),
-                    ],
-                  ),
-                )).toList(),
+                    );
+                  },
+                ),
               ],
               if (group.cameraMacs.isNotEmpty) ...[
                 const SizedBox(height: 8),
@@ -910,17 +941,21 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
   void _showCreateGroupDialog() {
     final groupNameController = TextEditingController();
     final descriptionController = TextEditingController();
-    final permissionsController = TextEditingController(text: 'view');
+    final selectedPermissions = <Permission>{};
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
         backgroundColor: AppTheme.darkSurface,
         title: const Text('Yeni Yetki Grubu Oluştur', style: TextStyle(color: Colors.white)),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+        content: SizedBox(
+          width: 500,
+          height: 600,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
               TextField(
                 controller: groupNameController,
                 style: const TextStyle(color: Colors.white),
@@ -947,28 +982,48 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
                 ),
               ),
               const SizedBox(height: 12),
-              TextField(
-                controller: permissionsController,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelText: 'İzinler',
-                  labelStyle: TextStyle(color: Colors.grey[400]),
-                  border: const OutlineInputBorder(),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey[600]!),
-                  ),
-                  hintText: 'view,record,user_management',
-                  hintStyle: TextStyle(color: Colors.grey[600]),
-                ),
+              const Text(
+                'Yetkiler:',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              Text(
-                'İzin seçenekleri: view, record, user_management',
-                style: TextStyle(color: Colors.grey[600], fontSize: 12),
+              Container(
+                constraints: const BoxConstraints(maxHeight: 400),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: Permissions.all.length,
+                  itemBuilder: (context, index) {
+                    final permission = Permissions.all[index];
+                    final isSelected = selectedPermissions.contains(permission);
+                    
+                    return CheckboxListTile(
+                      title: Text(
+                        permission.name,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      subtitle: Text(
+                        permission.description,
+                        style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                      ),
+                      value: isSelected,
+                      activeColor: AppTheme.primaryBlue,
+                      onChanged: (value) {
+                        setDialogState(() {
+                          if (value == true) {
+                            selectedPermissions.add(permission);
+                          } else {
+                            selectedPermissions.remove(permission);
+                          }
+                        });
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),
-        ),
+          ), // SingleChildScrollView closing
+        ), // SizedBox closing
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -977,8 +1032,7 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
           ElevatedButton(
             onPressed: () async {
               if (groupNameController.text.isEmpty ||
-                  descriptionController.text.isEmpty ||
-                  permissionsController.text.isEmpty) {
+                  descriptionController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Tüm alanları doldurun')),
                 );
@@ -990,10 +1044,14 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
                 listen: false,
               );
 
+              // Convert permissions to string format
+              final permissionString = Permissions.toPermissionString(selectedPermissions);
+              print('Creating group with permission string: $permissionString');
+
               await wsProvider.sendCreateGroup(
                 groupNameController.text,
                 descriptionController.text,
-                permissionsController.text,
+                permissionString,
               );
 
               Navigator.pop(context);
@@ -1006,27 +1064,51 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
             child: const Text('Oluştur'),
           ),
         ],
+        ),
       ),
     );
   }
 
   void _showModifyGroupDialog(CameraGroup group) {
     final descriptionController = TextEditingController();
-    final permissionsController = TextEditingController(
-      text: group.permissions.entries.map((e) => e.key).join(','),
-    );
+    
+    // Parse existing permissions from group
+    Set<Permission> selectedPermissions = {};
+    // Check if permissions contain the permission value (new format)
+    if (group.permissions.containsKey('permissions')) {
+      final permValue = group.permissions['permissions'];
+      selectedPermissions = Permissions.parsePermissionString(permValue);
+      print('🔧 Loaded permissions for ${group.name}: $permValue -> ${selectedPermissions.map((p) => p.code).toList()}');
+    } else if (group.permissions.containsKey('permissionString')) {
+      // Legacy format
+      final permString = group.permissions['permissionString'].toString();
+      selectedPermissions = Permissions.parsePermissionString(permString);
+    } else if (group.permissions.isNotEmpty) {
+      // Very old legacy: try to match permission names
+      for (var entry in group.permissions.entries) {
+        final perm = Permissions.getByCode(entry.key);
+        if (perm != null && (entry.value == true || entry.value == 1 || entry.value == '1')) {
+          selectedPermissions.add(perm);
+        }
+      }
+    }
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
         backgroundColor: AppTheme.darkSurface,
         title: Text(
           '${group.name} - Yetki Grubu Düzenle',
           style: const TextStyle(color: Colors.white),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        content: SizedBox(
+          width: 500,
+          height: 600,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
             TextField(
               controller: descriptionController,
               style: const TextStyle(color: Colors.white),
@@ -1040,22 +1122,48 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
               ),
             ),
             const SizedBox(height: 12),
-            TextField(
-              controller: permissionsController,
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                labelText: 'İzinler',
-                labelStyle: TextStyle(color: Colors.grey[400]),
-                border: const OutlineInputBorder(),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey[600]!),
-                ),
-                hintText: 'view,record,user_management',
-                hintStyle: TextStyle(color: Colors.grey[600]),
+            const Text(
+              'Yetkiler:',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              constraints: const BoxConstraints(maxHeight: 400),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: Permissions.all.length,
+                itemBuilder: (context, index) {
+                  final permission = Permissions.all[index];
+                  final isSelected = selectedPermissions.contains(permission);
+                  
+                  return CheckboxListTile(
+                    title: Text(
+                      permission.name,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    subtitle: Text(
+                      permission.description,
+                      style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                    ),
+                    value: isSelected,
+                    activeColor: AppTheme.primaryBlue,
+                    onChanged: (value) {
+                      setDialogState(() {
+                        if (value == true) {
+                          selectedPermissions.add(permission);
+                        } else {
+                          selectedPermissions.remove(permission);
+                        }
+                      });
+                    },
+                  );
+                },
               ),
             ),
           ],
-        ),
+          ), // Column closing
+          ), // SingleChildScrollView closing
+        ), // SizedBox closing
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -1063,10 +1171,9 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
           ),
           ElevatedButton(
             onPressed: () async {
-              if (descriptionController.text.isEmpty ||
-                  permissionsController.text.isEmpty) {
+              if (descriptionController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Tüm alanları doldurun')),
+                  const SnackBar(content: Text('Açıklama alanını doldurun')),
                 );
                 return;
               }
@@ -1076,10 +1183,14 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
                 listen: false,
               );
 
+              // Convert permissions to string format
+              final permissionString = Permissions.toPermissionString(selectedPermissions);
+              print('Modifying group with permission string: $permissionString');
+
               await wsProvider.sendModifyGroup(
                 group.name,
                 descriptionController.text,
-                permissionsController.text,
+                permissionString,
               );
 
               Navigator.pop(context);
@@ -1093,6 +1204,7 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
           ),
         ],
       ),
+      ), // StatefulBuilder closing
     );
   }
 

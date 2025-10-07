@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/camera_device.dart';
 import '../widgets/camera_grid_item.dart';
 import '../providers/camera_devices_provider_optimized.dart';
+import '../providers/websocket_provider_optimized.dart';
+import '../providers/user_group_provider.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import 'live_view_screen.dart';
@@ -208,8 +210,38 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
   }
 
   Widget _buildDeviceGroupedView() {
-    return Consumer<CameraDevicesProviderOptimized>(
-      builder: (context, provider, child) {
+    return Consumer3<CameraDevicesProviderOptimized, WebSocketProviderOptimized, UserGroupProvider>(
+      builder: (context, provider, wsProvider, userGroupProvider, child) {
+        // Get authorized camera MACs for current user
+        final currentUsername = wsProvider.currentLoggedInUsername;
+        Set<String>? authorizedMacs;
+        
+        print('[CameraScreen] 🔍 Current logged in username: $currentUsername');
+        
+        if (currentUsername != null) {
+          // Check if user is admin
+          final userType = userGroupProvider.getUserType(currentUsername);
+          print('[CameraScreen] 👤 User type: $userType');
+          
+          if (userType == 'admin') {
+            // Admin sees all cameras
+            authorizedMacs = null;
+            print('[CameraScreen] 👑 Admin user - showing all cameras');
+          } else {
+            // Regular user - get authorized cameras
+            authorizedMacs = userGroupProvider.getUserAuthorizedCameraMacs(currentUsername);
+            print('[CameraScreen] 🔐 Regular user - authorized MACs: ${authorizedMacs.length} cameras');
+            print('[CameraScreen] 📷 Authorized camera MACs: $authorizedMacs');
+          }
+        } else {
+          print('[CameraScreen] ⚠️ No logged in user - showing all cameras');
+        }
+        
+        // Get filtered cameras based on authorization
+        final allCameras = provider.getAuthorizedCameras(authorizedMacs);
+        print('[CameraScreen] 📊 Total cameras available: ${provider.cameras.length}');
+        print('[CameraScreen] ✅ Filtered cameras to show: ${allCameras.length}');
+        
         // If loading, show a spinner
         if (provider.isLoading) {
           return const Center(
@@ -218,7 +250,7 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         }
         
         // If there are no cameras, show empty state
-        if (provider.cameras.isEmpty) {
+        if (allCameras.isEmpty) {
           return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -256,10 +288,10 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
           );
         }
         
-        // Group ALL cameras by their assigned device MAC address
+        // Group ALL authorized cameras by their assigned device MAC address
         // This includes cameras from cameras_mac even if device is offline
         final groupedCamerasByMac = <String, List<Camera>>{};
-        for (var camera in provider.cameras) {
+        for (var camera in allCameras) {
           // Skip device MAC addresses (m_*) and cameras without MAC
           if (camera.mac.isEmpty || camera.mac.startsWith('m_')) continue;
           
@@ -418,8 +450,38 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
   }
 
   Widget _buildCameraGroupedView() {
-    return Consumer<CameraDevicesProviderOptimized>(
-      builder: (context, provider, child) {
+    return Consumer3<CameraDevicesProviderOptimized, WebSocketProviderOptimized, UserGroupProvider>(
+      builder: (context, provider, wsProvider, userGroupProvider, child) {
+        // Get authorized camera MACs for current user
+        final currentUsername = wsProvider.currentLoggedInUsername;
+        Set<String>? authorizedMacs;
+        
+        print('[CameraScreen-Grouped] 🔍 Current logged in username: $currentUsername');
+        
+        if (currentUsername != null) {
+          // Check if user is admin
+          final userType = userGroupProvider.getUserType(currentUsername);
+          print('[CameraScreen-Grouped] 👤 User type: $userType');
+          
+          if (userType == 'admin') {
+            // Admin sees all cameras
+            authorizedMacs = null;
+            print('[CameraScreen-Grouped] 👑 Admin user - showing all cameras');
+          } else {
+            // Regular user - get authorized cameras
+            authorizedMacs = userGroupProvider.getUserAuthorizedCameraMacs(currentUsername);
+            print('[CameraScreen-Grouped] 🔐 Regular user - authorized MACs: ${authorizedMacs.length} cameras');
+            print('[CameraScreen-Grouped] 📷 Authorized camera MACs: $authorizedMacs');
+          }
+        } else {
+          print('[CameraScreen-Grouped] ⚠️ No logged in user - showing all cameras');
+        }
+        
+        // Get filtered cameras based on authorization
+        final allAuthorizedCameras = provider.getAuthorizedCameras(authorizedMacs);
+        print('[CameraScreen-Grouped] 📊 Total cameras available: ${provider.cameras.length}');
+        print('[CameraScreen-Grouped] ✅ Filtered cameras to show: ${allAuthorizedCameras.length}');
+        
         // If loading, show a spinner
         if (provider.isLoading) {
           return const Center(
@@ -427,8 +489,8 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
           );
         }
         
-        // If there are no cameras, show empty state
-        if (provider.cameras.isEmpty) {
+        // If there are no authorized cameras, show empty state
+        if (allAuthorizedCameras.isEmpty) {
           return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -472,19 +534,10 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         // Group cameras by their camera groups
         final Map<String, List<Camera>> camerasGroupedByName = {};
         
-        // Get all cameras - only include cameras with MAC address
-        List<Camera> allCameras = showOnlyActive 
-          ? provider.cameras.where((camera) => camera.connected && camera.mac.isNotEmpty).toList()
-          : provider.cameras.where((camera) => camera.mac.isNotEmpty).toList();
-        
-        // Remove duplicate cameras (same MAC address)
-        final Map<String, Camera> uniqueCamerasByMac = {};
-        for (var camera in allCameras) {
-          if (!uniqueCamerasByMac.containsKey(camera.mac)) {
-            uniqueCamerasByMac[camera.mac] = camera;
-          }
-        }
-        allCameras = uniqueCamerasByMac.values.toList();
+        // Use authorized cameras and apply active filter
+        List<Camera> filteredAuthorizedCameras = showOnlyActive 
+          ? allAuthorizedCameras.where((camera) => camera.connected).toList()
+          : allAuthorizedCameras;
         
         // Track which cameras are assigned to groups
         Set<String> assignedCameraIds = {};
@@ -498,10 +551,15 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
           // Get cameras for each group using the provider method
           for (final group in cameraGroups) {
             final camerasInGroup = provider.getCamerasInGroup(group.name);
-            // Apply active filter if needed
-            List<Camera> filteredCameras = showOnlyActive 
-              ? camerasInGroup.where((camera) => camera.connected).toList()
-              : camerasInGroup;
+            // Filter by authorization and active status
+            List<Camera> filteredCameras = camerasInGroup
+                .where((camera) => allAuthorizedCameras.any((ac) => ac.mac == camera.mac))
+                .toList();
+            
+            if (showOnlyActive) {
+              filteredCameras = filteredCameras.where((camera) => camera.connected).toList();
+            }
+            
             camerasGroupedByName[group.name] = filteredCameras;
             
             // Track assigned cameras
@@ -511,8 +569,8 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
           }
         }
         
-        // Find ungrouped cameras (not assigned to any group)
-        final ungroupedCameras = allCameras.where((camera) => !assignedCameraIds.contains(camera.id)).toList();
+        // Find ungrouped cameras (not assigned to any group) from authorized cameras
+        final ungroupedCameras = filteredAuthorizedCameras.where((camera) => !assignedCameraIds.contains(camera.id)).toList();
         
         // Add ungrouped cameras to a separate group if any exist
         if (ungroupedCameras.isNotEmpty) {
