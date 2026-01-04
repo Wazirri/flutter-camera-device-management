@@ -928,6 +928,9 @@ class Camera {
   // Flag to indicate if this is a placeholder camera (no physical device)
   bool isPlaceholder;
 
+  // Sharing active flag - indicates if the camera is being shared
+  bool sharingActive;
+
   // Current device assignment from cameras_mac.json
   CameraCurrentDevice? currentDevice;
 
@@ -980,6 +983,7 @@ class Camera {
     this.macStatus,
     this.parentDeviceMacKey,
     this.isPlaceholder = false,
+    this.sharingActive = false,
     this.currentDevice,
     List<CameraHistoryDevice>? deviceHistory,
   }) : groups = groups ?? [], 
@@ -1035,6 +1039,7 @@ class Camera {
     String? macStatus,
     String? parentDeviceMacKey, // Added parentDeviceMacKey to copyWith
     bool? isPlaceholder,
+    bool? sharingActive,
     CameraCurrentDevice? currentDevice,
     List<CameraHistoryDevice>? deviceHistory,
   }) {
@@ -1083,6 +1088,7 @@ class Camera {
       macStatus: macStatus ?? this.macStatus,
       parentDeviceMacKey: parentDeviceMacKey ?? this.parentDeviceMacKey, // Updated parentDeviceMacKey
       isPlaceholder: isPlaceholder ?? this.isPlaceholder,
+      sharingActive: sharingActive ?? this.sharingActive,
       currentDevice: currentDevice ?? this.currentDevice,
       deviceHistory: deviceHistory ?? List<CameraHistoryDevice>.from(this.deviceHistory),
     );

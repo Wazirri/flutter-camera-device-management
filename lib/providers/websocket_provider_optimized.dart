@@ -278,13 +278,55 @@ class WebSocketProviderOptimized with ChangeNotifier {
 
   /// Logout user: close socket and reset login state
   Future<void> logout() async {
-    print('[${DateTime.now().toString().split('.').first}] logout() called'); // CORRECTED THIS LINE
-    await disconnect();
+    print('[${DateTime.now().toString().split('.').first}] logout() called');
+    
+    // Stop all timers first
+    _stopHeartbeat();
+    _stopReconnectTimer();
+    _notificationDebounceTimer?.cancel();
+    _notificationDebounceTimer = null;
+    
+    // Close socket connection
+    if (_socket != null) {
+      try {
+        // Send a logout message if connected
+        if (_isConnected) {
+          try {
+            _socket!.add('logout');
+            print('[${DateTime.now().toString().split('.').first}] Sent logout command to server');
+          } catch (e) {
+            print('[${DateTime.now().toString().split('.').first}] Error sending logout command: $e');
+          }
+        }
+        
+        // Close the socket
+        await _socket!.close();
+        print('[${DateTime.now().toString().split('.').first}] WebSocket connection closed');
+      } catch (e) {
+        print('[${DateTime.now().toString().split('.').first}] Error closing socket during logout: $e');
+      }
+      _socket = null;
+    }
+    
+    // Reset all state
     _lastUsername = null;
     _lastPassword = null;
     _currentLoggedInUsername = null;
     _isLoggedIn = false;
+    _isConnected = false;
+    _isConnecting = false;
     _isWaitingForChangedone = false;
+    _errorMessage = '';
+    _lastMessage = null;
+    _lastConversionsResponse = null;
+    
+    // Clear message log
+    _messageLog.clear();
+    
+    // Notify camera devices provider to reset data
+    _cameraDevicesProvider?.resetData();
+    
+    print('[${DateTime.now().toString().split('.').first}] Logout complete - all connections closed and state reset');
     notifyListeners();
   }
 
@@ -303,7 +345,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
   // Send command via WebSocket
   Future<bool> sendCommand(String command) async {
     if (!_isConnected || _socket == null) {
-      _errorMessage = 'WebSocket bağlantısı yok. Komut gönderilemedi.';
+      _errorMessage = 'No WebSocket connection. Command could not be sent.';
       print('[${DateTime.now().toString().split('.').first}] $_errorMessage');
       _batchNotifyListeners();
       return false;
@@ -311,10 +353,10 @@ class WebSocketProviderOptimized with ChangeNotifier {
     
     try {
       _socket!.add(command);
-      print('[${DateTime.now().toString().split('.').first}] Komut gönderildi: $command');
+      print('[${DateTime.now().toString().split('.').first}] Command sent: $command');
       return true;
     } catch (e) {
-      _errorMessage = 'Komut gönderirken hata: $e';
+      _errorMessage = 'Error sending command: $e';
       print('[${DateTime.now().toString().split('.').first}] $_errorMessage');
       print(_errorMessage);
       _batchNotifyListeners();
@@ -491,7 +533,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
       // Handle "Şifre veya kullanıcı adı yanlış!" message - show error and disconnect
       if (message.trim() == "Şifre veya kullanıcı adı yanlış!") {
         print('[${DateTime.now().toString().split('.').first}] Login failed: wrong credentials');
-        _errorMessage = message;
+        _errorMessage = 'Invalid username or password';
         _isLoggedIn = false;
         _isWaitingForChangedone = false;
         // Disconnect on login failure
@@ -531,6 +573,22 @@ class WebSocketProviderOptimized with ChangeNotifier {
             }
           }
           
+          _batchNotifyListeners();
+          break;
+
+        case 'loginfail':
+          // Login failed - wrong password/username
+          _isLoggedIn = false;
+          _isWaitingForChangedone = false;
+          final errorMsg = jsonData['error'] ?? 'Login failed';
+          final remainingAttempts = jsonData['remaining_attempts'];
+          _errorMessage = remainingAttempts != null 
+              ? '$errorMsg (Remaining attempts: $remainingAttempts)' 
+              : errorMsg;
+          print('[${DateTime.now().toString().split('.').first}] Login failed: $_errorMessage');
+          disconnect().then((_) {
+            _batchNotifyListeners();
+          });
           _batchNotifyListeners();
           break;
 
@@ -635,7 +693,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
             if (_userGroupProvider != null) {
               _userGroupProvider!.handleOperationResult(
                 success: true,
-                message: '$msg\n\nCihaz yeniden başlatılıyor, 30 saniye içinde bağlantı yenilenecek...',
+                message: '$msg\n\nDevice is restarting, connection will be refreshed in 30 seconds...',
               );
             }
             
@@ -657,7 +715,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
                 if (_userGroupProvider != null) {
                   _userGroupProvider!.handleOperationResult(
                     success: true,
-                    message: 'Bağlantı başarıyla yenilendi!',
+                    message: 'Connection successfully refreshed!',
                   );
                 }
               } else {
@@ -665,7 +723,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
                 if (_userGroupProvider != null) {
                   _userGroupProvider!.handleOperationResult(
                     success: false,
-                    message: 'Bağlantı yenilenemedi. Lütfen manuel olarak giriş yapın.',
+                    message: 'Connection could not be refreshed. Please login manually.',
                   );
                 }
               }
@@ -721,6 +779,10 @@ class WebSocketProviderOptimized with ChangeNotifier {
             );
           }
           _batchNotifyListeners();
+          break;
+
+        case 'pong':
+          // Pong response from server - heartbeat acknowledgment, no action needed
           break;
 
         default:

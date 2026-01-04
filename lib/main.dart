@@ -10,6 +10,7 @@ import 'utils/keyboard_fix.dart'; // Import keyboard fix utilities
 import 'utils/file_logger_optimized.dart'; // Import optimized file logger
 import 'utils/error_monitor.dart'; // Import error monitor
 import 'screens/cameras_screen.dart';
+import 'screens/all_cameras_screen.dart';
 import 'screens/camera_devices_screen.dart';
 import 'screens/camera_groups_screen.dart';  // New camera groups screen
 import 'screens/recording_download_screen.dart';  // Recording download screen
@@ -274,6 +275,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           '/camera-layout-assignment': (context) => const AppShell(
             currentRoute: '/camera-layout-assignment',
             child: CameraLayoutAssignmentScreen(),
+          ),
+          '/all-cameras': (context) => const AppShell(
+            currentRoute: '/all-cameras',
+            child: AllCamerasScreen(),
           ),
         },
         // Custom page transitions and routes that require parameters

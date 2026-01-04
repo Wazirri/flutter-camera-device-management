@@ -471,6 +471,13 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       // 'record' from cameras_mac
       case 'record': camera.recording = value == true || value.toString().toLowerCase() == 'true'; break;
       
+      // Additional all_cameras properties
+      case 'httppath': camera.recordPath = value.toString(); break; // HTTP path for recordings
+      case 'sharing_active': 
+        camera.sharingActive = value == 1 || value == true || value.toString() == '1'; 
+        break; // Sharing active flag
+      case 'mac': camera.mac = value.toString(); break; // MAC address
+      
       default:
         print('CDP_OPT: Unhandled MAC-defined camera property: $propertyName for camera ${camera.mac}');
         break;
@@ -794,13 +801,14 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         _processedMessages.remove(_processedMessages.keys.first);
       }
 
-      if (dataPath.startsWith('cameras_mac.')) {
-        final parts = dataPath.split('.'); // cameras_mac.CAMERA_MAC.property or cameras_mac.CAMERA_MAC.group[0]
-        print('CDP_OPT: DATAPATH SPLIT: $dataPath -> Parts: $parts (length: ${parts.length})');
+      if (dataPath.startsWith('cameras_mac.') || dataPath.startsWith('all_cameras.')) {
+        final parts = dataPath.split('.'); // cameras_mac.CAMERA_MAC.property or all_cameras.CAMERA_MAC.property
+        final sourceType = parts[0]; // cameras_mac or all_cameras
+        print('CDP_OPT: DATAPATH SPLIT: $dataPath -> Parts: $parts (length: ${parts.length}) [source: $sourceType]');
         if (parts.length >= 3) {
           final cameraMac = parts[1]; // This is the camera's own MAC address
           if (cameraMac.isNotEmpty) {
-            print('CDP_OPT: *** CAMERAS_MAC: Processing ${parts[2]} for camera $cameraMac = $value ***');
+            print('CDP_OPT: *** $sourceType: Processing ${parts[2]} for camera $cameraMac = $value ***');
             if (parts[2].startsWith('group[')) {
               print('CDP_OPT: 🎯 GROUP MESSAGE DETECTED: ${parts[2]} = $value');
             }
@@ -808,10 +816,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
             await _updateMacDefinedCameraProperty(camera, parts, value);
             print('CDP_OPT: *** MAC-defined camera count: ${_macDefinedCameras.length} ***');
           } else {
-            print('CDP_OPT: Received cameras_mac message with empty camera MAC in path: $dataPath');
+            print('CDP_OPT: Received $sourceType message with empty camera MAC in path: $dataPath');
           }
         } else {
-          print('CDP_OPT: Invalid cameras_mac path: $dataPath');
+          print('CDP_OPT: Invalid $sourceType path: $dataPath');
         }
         return; // Message handled
       }
