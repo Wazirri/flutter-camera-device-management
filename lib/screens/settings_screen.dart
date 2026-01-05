@@ -4,6 +4,7 @@ import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
 import '../providers/websocket_provider_optimized.dart';
+import '../providers/camera_devices_provider_optimized.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -13,12 +14,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // Auto configuration settings
-  bool _autoScanEnabled = false;
-  bool _autoCameraSharingEnabled = false;
-  bool _masterHasCams = false;
-  int _imbalanceThreshold = 2;
-  
   // Network settings controllers
   final _defaultIpController = TextEditingController();
   final _defaultGwController = TextEditingController();
@@ -30,7 +25,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // ONVIF password controllers
   final _onvifUserController = TextEditingController();
   final _onvifPassController = TextEditingController();
-  List<String> _onvifPasswords = [];
+  
+  bool _networkControllersInitialized = false;
+  
+  void _initNetworkControllersFromProvider(CameraDevicesProviderOptimized cameraProvider) {
+    if (!_networkControllersInitialized) {
+      if (cameraProvider.networkDefaultIp.isNotEmpty) {
+        _defaultIpController.text = cameraProvider.networkDefaultIp;
+      }
+      if (cameraProvider.networkDefaultGw.isNotEmpty) {
+        _defaultGwController.text = cameraProvider.networkDefaultGw;
+      }
+      if (cameraProvider.networkDefaultNetmask.isNotEmpty) {
+        _defaultNetmaskController.text = cameraProvider.networkDefaultNetmask;
+      }
+      if (cameraProvider.networkDefaultDns.isNotEmpty) {
+        _defaultDnsController.text = cameraProvider.networkDefaultDns;
+      }
+      if (cameraProvider.networkDefaultIpStart.isNotEmpty) {
+        _defaultIpStartController.text = cameraProvider.networkDefaultIpStart;
+      }
+      if (cameraProvider.networkDefaultIpEnd.isNotEmpty) {
+        _defaultIpEndController.text = cameraProvider.networkDefaultIpEnd;
+      }
+      _networkControllersInitialized = true;
+    }
+  }
   
   @override
   void dispose() {
@@ -118,6 +138,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildAutoConfigSection(BuildContext context) {
     final wsProvider = Provider.of<WebSocketProviderOptimized>(context);
+    final cameraProvider = Provider.of<CameraDevicesProviderOptimized>(context);
+    
+    // Read values from provider (WebSocket'ten gelen veriler)
+    final autoScanEnabled = cameraProvider.autoScanEnabled;
+    final autoCameraSharingEnabled = cameraProvider.autoCameraSharingEnabled;
     
     return _buildSettingCard(
       title: 'Otomatik Konfigürasyon',
@@ -126,7 +151,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SwitchListTile(
           title: const Text('Otomatik Tarama'),
           subtitle: const Text('Sistem otomatik olarak cihazları tarar'),
-          value: _autoScanEnabled,
+          value: autoScanEnabled,
           thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
             if (states.contains(WidgetState.selected)) {
               return AppTheme.primaryBlue;
@@ -134,9 +159,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             return AppTheme.darkTextSecondary;
           }),
           onChanged: (value) async {
-            setState(() {
-              _autoScanEnabled = value;
-            });
             // Send SETBOOL command
             final command = 'SETBOOL configuration.autoscan $value';
             await wsProvider.sendCommand(command);
@@ -146,7 +168,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SwitchListTile(
           title: const Text('Otomatik Kamera Dağıtma'),
           subtitle: const Text('Kameralar otomatik olarak dağıtılır'),
-          value: _autoCameraSharingEnabled,
+          value: autoCameraSharingEnabled,
           thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
             if (states.contains(WidgetState.selected)) {
               return AppTheme.primaryBlue;
@@ -154,11 +176,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             return AppTheme.darkTextSecondary;
           }),
           onChanged: (value) async {
-            setState(() {
-              _autoCameraSharingEnabled = value;
-            });
-            // Send SETBOOL command
-            final command = 'SETBOOL bridge_auto_cam_sharing.is_cam_sharing $value';
+            // Send SETINT command
+            final command = 'SETINT ecs.bridge_auto_cam_sharing.auto_cam_share ${value ? 1 : 0}';
             await wsProvider.sendCommand(command);
           },
         ),
@@ -168,15 +187,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildMasterConfigSection(BuildContext context) {
     final wsProvider = Provider.of<WebSocketProviderOptimized>(context);
+    final cameraProvider = Provider.of<CameraDevicesProviderOptimized>(context);
+    
+    // Read values from provider (WebSocket'ten gelen veriler)
+    final masterHasCams = cameraProvider.masterHasCams;
+    final imbalanceThreshold = cameraProvider.imbalanceThreshold;
+    final lastScanTotalCameras = cameraProvider.lastScanTotalCameras;
+    final lastScanConnectedCameras = cameraProvider.lastScanConnectedCameras;
+    final lastScanActiveSlaves = cameraProvider.lastScanActiveSlaves;
+    final lastCamSharedAt = cameraProvider.lastCamSharedAt;
     
     return _buildSettingCard(
       title: 'Master Kamera Dağıtım',
       icon: Icons.share,
       children: [
+        // Kamera dağıtım istatistikleri
+        if (lastScanTotalCameras > 0 || lastScanActiveSlaves > 0)
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryBlue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildStatItem('Toplam Kamera', '$lastScanTotalCameras'),
+                    _buildStatItem('Bağlı Kamera', '$lastScanConnectedCameras'),
+                    _buildStatItem('Aktif Slave', '$lastScanActiveSlaves'),
+                  ],
+                ),
+                if (lastCamSharedAt.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    'Son Dağıtım: $lastCamSharedAt',
+                    style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                  ),
+                ],
+              ],
+            ),
+          ),
         SwitchListTile(
           title: const Text('Master\'a Kamera Ver'),
           subtitle: const Text('Master cihazın kamera almasını sağlar'),
-          value: _masterHasCams,
+          value: masterHasCams,
           thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
             if (states.contains(WidgetState.selected)) {
               return AppTheme.primaryBlue;
@@ -184,9 +243,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             return AppTheme.darkTextSecondary;
           }),
           onChanged: (value) async {
-            setState(() {
-              _masterHasCams = value;
-            });
             final command = 'SETINT ecs.bridge_auto_cam_sharing.masterhascams ${value ? 1 : 0}';
             await wsProvider.sendCommand(command);
           },
@@ -194,28 +250,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
         const Divider(),
         ListTile(
           title: const Text('Threshold Eşiği'),
-          subtitle: Text('Slave\'ler arası kamera sayısı farkı: $_imbalanceThreshold'),
+          subtitle: Text('Slave\'ler arası kamera sayısı farkı: $imbalanceThreshold'),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
                 icon: const Icon(Icons.remove_circle_outline),
-                onPressed: _imbalanceThreshold > 1 ? () async {
-                  setState(() {
-                    _imbalanceThreshold--;
-                  });
-                  final command = 'SETINT ecs.bridge_auto_cam_sharing.last_scan_imbalance $_imbalanceThreshold';
+                onPressed: imbalanceThreshold > 1 ? () async {
+                  final newValue = imbalanceThreshold - 1;
+                  final command = 'SETINT ecs.bridge_auto_cam_sharing.last_scan_imbalance $newValue';
                   await wsProvider.sendCommand(command);
                 } : null,
               ),
-              Text('$_imbalanceThreshold', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('$imbalanceThreshold', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               IconButton(
                 icon: const Icon(Icons.add_circle_outline),
-                onPressed: _imbalanceThreshold < 10 ? () async {
-                  setState(() {
-                    _imbalanceThreshold++;
-                  });
-                  final command = 'SETINT ecs.bridge_auto_cam_sharing.last_scan_imbalance $_imbalanceThreshold';
+                onPressed: imbalanceThreshold < 10 ? () async {
+                  final newValue = imbalanceThreshold + 1;
+                  final command = 'SETINT ecs.bridge_auto_cam_sharing.last_scan_imbalance $newValue';
                   await wsProvider.sendCommand(command);
                 } : null,
               ),
@@ -236,14 +288,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onPressed: () async {
               final command = 'SETINT ecs.bridge_auto_cam_sharing.share_force 1';
               await wsProvider.sendCommand(command);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Kamera dağıtım komutu gönderildi'),
-                  backgroundColor: Colors.green,
-                ),
-              );
             },
           ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildStatItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.primaryBlue,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(fontSize: 11, color: Colors.grey[500]),
         ),
       ],
     );
@@ -251,11 +316,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildNetworkSection(BuildContext context) {
     final wsProvider = Provider.of<WebSocketProviderOptimized>(context);
+    final cameraProvider = Provider.of<CameraDevicesProviderOptimized>(context);
+    
+    // Initialize controllers from provider values
+    _initNetworkControllersFromProvider(cameraProvider);
+    
+    // Read switch values from provider
+    final dhcpEnabled = cameraProvider.networkDhcp;
+    final shareInternetEnabled = cameraProvider.networkShareInternet;
     
     return _buildSettingCard(
       title: 'Network Ayarları',
       icon: Icons.wifi,
       children: [
+        // DHCP and Share Internet switches
+        SwitchListTile(
+          title: const Text('DHCP Sunucu'),
+          subtitle: const Text('Kameralara otomatik IP dağıtır'),
+          value: dhcpEnabled,
+          thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.selected)) {
+              return AppTheme.primaryBlue;
+            }
+            return AppTheme.darkTextSecondary;
+          }),
+          onChanged: (value) async {
+            final command = 'SETINT networking.dhcp ${value ? 1 : 0}';
+            await wsProvider.sendCommand(command);
+          },
+        ),
+        SwitchListTile(
+          title: const Text('İnternet Paylaşımı'),
+          subtitle: const Text('Cihazlara internet bağlantısı sağlar'),
+          value: shareInternetEnabled,
+          thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.selected)) {
+              return AppTheme.primaryBlue;
+            }
+            return AppTheme.darkTextSecondary;
+          }),
+          onChanged: (value) async {
+            final command = 'SETINT networking.share_internet ${value ? 1 : 0}';
+            await wsProvider.sendCommand(command);
+          },
+        ),
+        const Divider(height: 16),
         _buildNetworkField(
           controller: _defaultIpController,
           label: 'Varsayılan IP',
@@ -376,6 +481,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildOnvifPasswordsSection(BuildContext context) {
     final wsProvider = Provider.of<WebSocketProviderOptimized>(context);
+    final cameraProvider = Provider.of<CameraDevicesProviderOptimized>(context);
+    
+    // Read ONVIF passwords from provider (WebSocket'ten gelen veriler)
+    final onvifPasswords = cameraProvider.onvifPasswords;
     
     return _buildSettingCard(
       title: 'ONVIF Kullanıcı/Şifre',
@@ -437,11 +546,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   final credential = '$user:$pass';
                   final command = 'ARRAYADD configuration.onvif.passwords $credential';
                   await wsProvider.sendCommand(command);
-                  setState(() {
-                    _onvifPasswords.add(credential);
-                    _onvifUserController.clear();
-                    _onvifPassController.clear();
-                  });
+                  _onvifUserController.clear();
+                  _onvifPassController.clear();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -454,29 +560,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ],
         ),
-        if (_onvifPasswords.isNotEmpty) ...[
+        if (onvifPasswords.isNotEmpty) ...[
           const SizedBox(height: 16),
           const Text('Kayıtlı Kullanıcılar:', style: TextStyle(color: AppTheme.darkTextSecondary)),
           const SizedBox(height: 8),
-          ..._onvifPasswords.asMap().entries.map((entry) {
+          ...onvifPasswords.asMap().entries.map((entry) {
             final index = entry.key;
             final credential = entry.value;
             final parts = credential.split(':');
             final user = parts.isNotEmpty ? parts[0] : '';
+            final pass = parts.length > 1 ? parts[1] : '';
             
             return ListTile(
               dense: true,
               leading: const Icon(Icons.person, color: AppTheme.primaryBlue, size: 20),
               title: Text(user, style: const TextStyle(color: AppTheme.darkTextPrimary)),
-              subtitle: Text('••••••', style: TextStyle(color: Colors.grey[600])),
+              subtitle: Text(pass, style: TextStyle(color: Colors.grey[400])),
               trailing: IconButton(
                 icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                 onPressed: () async {
                   final command = 'ARRAYDEL configuration.onvif.passwords $index';
                   await wsProvider.sendCommand(command);
-                  setState(() {
-                    _onvifPasswords.removeAt(index);
-                  });
                 },
               ),
             );

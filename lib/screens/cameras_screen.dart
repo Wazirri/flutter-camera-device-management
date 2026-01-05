@@ -947,9 +947,30 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
       // Use MAC address as-is, no formatting
       String normalizedMac = deviceMac;
       
-      // Find device by MAC address
+      // First try direct lookup by key
+      if (provider.devices.containsKey(deviceMac)) {
+        final device = provider.devices[deviceMac]!;
+        String deviceName = '';
+        if (device.deviceName?.isNotEmpty == true) {
+          deviceName = device.deviceName!;
+        } else if (device.deviceType.isNotEmpty) {
+          deviceName = device.deviceType;
+        } else {
+          deviceName = deviceMac;
+        }
+        
+        if (device.ipv4.isNotEmpty) {
+          deviceName += ' (${device.ipv4})';
+        }
+        
+        print('DEBUG: Device $deviceMac found by key, using full name "$deviceName"');
+        return deviceName;
+      }
+      
+      // Find device by MAC address (case-insensitive comparison)
       for (var device in provider.devices.values) {
-        if (device.macAddress == normalizedMac || device.macKey == deviceMac || provider.devices.containsKey(deviceMac)) {
+        if (device.macAddress.toLowerCase() == normalizedMac.toLowerCase() || 
+            device.macKey.toLowerCase() == deviceMac.toLowerCase()) {
           String deviceName = '';
           if (device.deviceName?.isNotEmpty == true) {
             deviceName = device.deviceName!;

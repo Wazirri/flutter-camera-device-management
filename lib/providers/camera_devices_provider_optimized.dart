@@ -38,6 +38,51 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   // Camera name to device mapping for faster lookups
   final Map<String, String> _cameraNameToDeviceMap = {};
 
+  // ============= MASTER CONFIG DATA =============
+  // These values are read from WebSocket and can be modified via settings
+  bool _autoScanEnabled = false;
+  bool _autoCameraSharingEnabled = false;
+  bool _masterHasCams = false;
+  int _imbalanceThreshold = 2;
+  int _lastScanTotalCameras = 0;
+  int _lastScanConnectedCameras = 0;
+  int _lastScanActiveSlaves = 0;
+  String _lastCamSharedAt = '';
+  List<String> _onvifPasswords = [];
+  
+  // ============= NETWORKING DATA =============
+  String _networkDefaultIp = '';
+  String _networkDefaultNetmask = '';
+  String _networkDefaultGw = '';
+  String _networkDefaultDns = '';
+  String _networkDefaultIpStart = '';
+  String _networkDefaultIpEnd = '';
+  String _networkDefaultLeaseTime = '5m';
+  bool _networkShareInternet = false;
+  bool _networkDhcp = false;
+  
+  // Getters for master config
+  bool get autoScanEnabled => _autoScanEnabled;
+  bool get autoCameraSharingEnabled => _autoCameraSharingEnabled;
+  bool get masterHasCams => _masterHasCams;
+  int get imbalanceThreshold => _imbalanceThreshold;
+  int get lastScanTotalCameras => _lastScanTotalCameras;
+  int get lastScanConnectedCameras => _lastScanConnectedCameras;
+  int get lastScanActiveSlaves => _lastScanActiveSlaves;
+  String get lastCamSharedAt => _lastCamSharedAt;
+  List<String> get onvifPasswords => List.unmodifiable(_onvifPasswords);
+  
+  // Getters for networking
+  String get networkDefaultIp => _networkDefaultIp;
+  String get networkDefaultNetmask => _networkDefaultNetmask;
+  String get networkDefaultGw => _networkDefaultGw;
+  String get networkDefaultDns => _networkDefaultDns;
+  String get networkDefaultIpStart => _networkDefaultIpStart;
+  String get networkDefaultIpEnd => _networkDefaultIpEnd;
+  String get networkDefaultLeaseTime => _networkDefaultLeaseTime;
+  bool get networkShareInternet => _networkShareInternet;
+  bool get networkDhcp => _networkDhcp;
+
   // Batch notifications to reduce UI rebuilds
   bool _needsNotification = false;
   Timer? _notificationDebounceTimer;
@@ -821,6 +866,25 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         } else {
           print('CDP_OPT: Invalid $sourceType path: $dataPath');
         }
+        return; // Message handled
+      }
+      
+      // Handle ecs.bridge_auto_cam_sharing.* messages (global settings, not per-device)
+      if (dataPath.startsWith('ecs.bridge_auto_cam_sharing.')) {
+        final settingName = dataPath.split('.').last;
+        _processGlobalBridgeAutoSetting(settingName, value);
+        return; // Message handled
+      }
+      
+      // Handle configuration.* messages (global settings)
+      if (dataPath.startsWith('configuration.')) {
+        _processGlobalConfiguration(dataPath, value);
+        return; // Message handled
+      }
+      
+      // Handle networking.* messages (global network settings)
+      if (dataPath.startsWith('networking.')) {
+        _processNetworkingSettings(dataPath, value);
         return; // Message handled
       }
       
@@ -1666,10 +1730,197 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     print('CDP_OPT: Test data update for ${device.macAddress}: $property.$testProperty = $value');
   }
 
+  // Process global bridge_auto_cam_sharing settings (from ecs.bridge_auto_cam_sharing.*)
+  void _processGlobalBridgeAutoSetting(String settingName, dynamic value) {
+    switch (settingName) {
+      case 'masterhascams':
+        _masterHasCams = value == 1 || value == true;
+        print('CDP_OPT: ⚙️ Global MasterHasCams updated: $_masterHasCams');
+        break;
+      case 'auto_cam_share':
+        _autoCameraSharingEnabled = value == 1 || value == true;
+        print('CDP_OPT: ⚙️ Global AutoCamShare updated: $_autoCameraSharingEnabled');
+        break;
+      case 'last_scan_imbalance':
+        _imbalanceThreshold = int.tryParse(value.toString()) ?? 2;
+        print('CDP_OPT: ⚙️ Global ImbalanceThreshold updated: $_imbalanceThreshold');
+        break;
+      case 'last_scan_total_cameras':
+        _lastScanTotalCameras = int.tryParse(value.toString()) ?? 0;
+        print('CDP_OPT: ⚙️ Global LastScanTotalCameras updated: $_lastScanTotalCameras');
+        break;
+      case 'last_scan_connected_cameras':
+        _lastScanConnectedCameras = int.tryParse(value.toString()) ?? 0;
+        print('CDP_OPT: ⚙️ Global LastScanConnectedCameras updated: $_lastScanConnectedCameras');
+        break;
+      case 'last_scan_active_slaves':
+        _lastScanActiveSlaves = int.tryParse(value.toString()) ?? 0;
+        print('CDP_OPT: ⚙️ Global LastScanActiveSlaves updated: $_lastScanActiveSlaves');
+        break;
+      case 'last_cam_shared_at':
+        _lastCamSharedAt = value.toString();
+        print('CDP_OPT: ⚙️ Global LastCamSharedAt updated: $_lastCamSharedAt');
+        break;
+      case 'is_cam_shared':
+        // Could be used for status
+        print('CDP_OPT: ⚙️ Global IsCamShared: $value');
+        break;
+      default:
+        print('CDP_OPT: ⚙️ Unhandled global bridge setting: $settingName = $value');
+    }
+    _batchNotifyListeners();
+  }
+
+  // Process global configuration settings (from configuration.*)
+  void _processGlobalConfiguration(String dataPath, dynamic value) {
+    // configuration.autoscan
+    if (dataPath == 'configuration.autoscan') {
+      _autoScanEnabled = value == true || value == 1 || value.toString().toLowerCase() == 'true';
+      print('CDP_OPT: ⚙️ Global AutoScan updated: $_autoScanEnabled');
+      _batchNotifyListeners();
+      return;
+    }
+    
+    // configuration.onvif.passwords[X]
+    if (dataPath.contains('onvif.passwords')) {
+      final indexMatch = RegExp(r'passwords\[(\d+)\]').firstMatch(dataPath);
+      if (indexMatch != null) {
+        final index = int.parse(indexMatch.group(1)!);
+        final passwordValue = value.toString();
+        
+        // Ensure list is large enough
+        while (_onvifPasswords.length <= index) {
+          _onvifPasswords.add('');
+        }
+        _onvifPasswords[index] = passwordValue;
+        
+        // Remove empty entries
+        _onvifPasswords = _onvifPasswords.where((p) => p.isNotEmpty).toList();
+        
+        print('CDP_OPT: ⚙️ Global ONVIF Passwords updated: $_onvifPasswords');
+        _batchNotifyListeners();
+      }
+    }
+  }
+
+  // Process networking settings (from networking.*)
+  void _processNetworkingSettings(String dataPath, dynamic value) {
+    final settingName = dataPath.replaceFirst('networking.', '');
+    
+    switch (settingName) {
+      case 'default_ip':
+        _networkDefaultIp = value.toString();
+        print('CDP_OPT: 🌐 Network DefaultIP updated: $_networkDefaultIp');
+        break;
+      case 'default_netmask':
+        _networkDefaultNetmask = value.toString();
+        print('CDP_OPT: 🌐 Network DefaultNetmask updated: $_networkDefaultNetmask');
+        break;
+      case 'default_gw':
+        _networkDefaultGw = value.toString();
+        print('CDP_OPT: 🌐 Network DefaultGW updated: $_networkDefaultGw');
+        break;
+      case 'default_dns':
+        _networkDefaultDns = value.toString();
+        print('CDP_OPT: 🌐 Network DefaultDNS updated: $_networkDefaultDns');
+        break;
+      case 'default_ip_start':
+        _networkDefaultIpStart = value.toString();
+        print('CDP_OPT: 🌐 Network DefaultIpStart updated: $_networkDefaultIpStart');
+        break;
+      case 'default_ip_end':
+        _networkDefaultIpEnd = value.toString();
+        print('CDP_OPT: 🌐 Network DefaultIpEnd updated: $_networkDefaultIpEnd');
+        break;
+      case 'default_lease_time':
+        _networkDefaultLeaseTime = value.toString();
+        print('CDP_OPT: 🌐 Network LeaseTime updated: $_networkDefaultLeaseTime');
+        break;
+      case 'share_internet':
+        _networkShareInternet = value == 1 || value == true;
+        print('CDP_OPT: 🌐 Network ShareInternet updated: $_networkShareInternet');
+        break;
+      case 'dhcp':
+        _networkDhcp = value == 1 || value == true;
+        print('CDP_OPT: 🌐 Network DHCP updated: $_networkDhcp');
+        break;
+      default:
+        print('CDP_OPT: 🌐 Unhandled network setting: $settingName = $value');
+    }
+    _batchNotifyListeners();
+  }
+
   // Process configuration
   Future<void> _processConfiguration(CameraDevice device, String property, List<String> subPath, dynamic value) async {
     // Handle configuration updates
-    print('CDP_OPT: Configuration update for ${device.macAddress}: $property = $value');
+    print('CDP_OPT: Configuration update for ${device.macAddress}: $property.$subPath = $value');
+    
+    final fullPath = subPath.isNotEmpty ? '$property.${subPath.join('.')}' : property;
+    
+    // Process autoscan setting
+    if (fullPath == 'configuration.autoscan' || property == 'autoscan') {
+      _autoScanEnabled = value == true || value == 1 || value.toString().toLowerCase() == 'true';
+      print('CDP_OPT: ⚙️ AutoScan updated: $_autoScanEnabled');
+      _batchNotifyListeners();
+    }
+    
+    // Process bridge_auto_cam_sharing settings
+    if (fullPath.contains('bridge_auto_cam_sharing') || property.contains('bridge_auto_cam_sharing')) {
+      final settingName = subPath.isNotEmpty ? subPath.last : property.split('.').last;
+      
+      switch (settingName) {
+        case 'masterhascams':
+          _masterHasCams = value == 1 || value == true;
+          print('CDP_OPT: ⚙️ MasterHasCams updated: $_masterHasCams');
+          break;
+        case 'auto_cam_share':
+          _autoCameraSharingEnabled = value == 1 || value == true;
+          print('CDP_OPT: ⚙️ AutoCamShare updated: $_autoCameraSharingEnabled');
+          break;
+        case 'last_scan_imbalance':
+          _imbalanceThreshold = int.tryParse(value.toString()) ?? 2;
+          print('CDP_OPT: ⚙️ ImbalanceThreshold updated: $_imbalanceThreshold');
+          break;
+        case 'last_scan_total_cameras':
+          _lastScanTotalCameras = int.tryParse(value.toString()) ?? 0;
+          print('CDP_OPT: ⚙️ LastScanTotalCameras updated: $_lastScanTotalCameras');
+          break;
+        case 'last_scan_connected_cameras':
+          _lastScanConnectedCameras = int.tryParse(value.toString()) ?? 0;
+          print('CDP_OPT: ⚙️ LastScanConnectedCameras updated: $_lastScanConnectedCameras');
+          break;
+        case 'last_scan_active_slaves':
+          _lastScanActiveSlaves = int.tryParse(value.toString()) ?? 0;
+          print('CDP_OPT: ⚙️ LastScanActiveSlaves updated: $_lastScanActiveSlaves');
+          break;
+        case 'last_cam_shared_at':
+          _lastCamSharedAt = value.toString();
+          print('CDP_OPT: ⚙️ LastCamSharedAt updated: $_lastCamSharedAt');
+          break;
+      }
+      _batchNotifyListeners();
+    }
+    
+    // Process ONVIF passwords (e.g., configuration.onvif.passwords[0])
+    if (fullPath.contains('onvif.passwords')) {
+      final indexMatch = RegExp(r'passwords\[(\d+)\]').firstMatch(fullPath);
+      if (indexMatch != null) {
+        final index = int.parse(indexMatch.group(1)!);
+        final passwordValue = value.toString();
+        
+        // Ensure list is large enough
+        while (_onvifPasswords.length <= index) {
+          _onvifPasswords.add('');
+        }
+        _onvifPasswords[index] = passwordValue;
+        
+        // Remove empty entries
+        _onvifPasswords = _onvifPasswords.where((p) => p.isNotEmpty).toList();
+        
+        print('CDP_OPT: ⚙️ ONVIF Passwords updated: $_onvifPasswords');
+        _batchNotifyListeners();
+      }
+    }
   }
 
   // Process camera group definition
