@@ -227,6 +227,12 @@ class WebSocketProviderOptimized with ChangeNotifier {
   Future<bool> reconnect() async {
     print('[${DateTime.now().toString().split('.').first}] reconnect() called');
     
+    // Don't reconnect if user never logged in successfully
+    if (!_isLoggedIn && _lastUsername == null) {
+      print('Reconnect suppressed: user not logged in.');
+      return false;
+    }
+    
     // Check if we have saved credentials
     if (_lastUsername == null || _lastPassword == null) {
       print('No saved credentials available for reconnect');
@@ -785,8 +791,62 @@ class WebSocketProviderOptimized with ChangeNotifier {
           // Pong response from server - heartbeat acknowledgment, no action needed
           break;
 
+        case 'add_group_to_cam':
+          // Handle add camera to group response
+          final result = jsonData['result'] as int?;
+          final msg = jsonData['msg'] ?? '';
+          final cameraMac = jsonData['camera'] ?? jsonData['mac'] ?? '';
+          
+          print('📷 WebSocket: add_group_to_cam response: result=$result, msg=$msg, camera=$cameraMac');
+          
+          if (result == 0) {
+            // Failed - result 0 means error
+            print('❌ Failed to add camera to group: $msg');
+            if (_userGroupProvider != null) {
+              final errorMessage = cameraMac.isNotEmpty 
+                  ? 'Kamera $cameraMac: $msg'
+                  : msg;
+              _userGroupProvider!.handleOperationResult(
+                success: false,
+                message: errorMessage,
+              );
+            }
+          } else {
+            // Success - result 1 or other non-zero value
+            print('✅ Camera added to group successfully: $msg');
+            if (_userGroupProvider != null) {
+              final successMessage = cameraMac.isNotEmpty 
+                  ? 'Kamera $cameraMac: $msg'
+                  : msg;
+              _userGroupProvider!.handleOperationResult(
+                success: true,
+                message: successMessage,
+              );
+            }
+          }
+          _batchNotifyListeners();
+          break;
+
         default:
-          print('[${DateTime.now().toString().split('.').first}] Received unknown command: $command');
+          // Handle any command with result/msg pattern (generic command response handler)
+          // Format: {"c":"command_name", "result":1, "msg":"..."}
+          if (jsonData.containsKey('result')) {
+            final result = jsonData['result'] as int?;
+            final msg = jsonData['msg'] ?? message ?? '';
+            
+            print('📨 WebSocket: Command "$command" response: result=$result, msg=$msg');
+            
+            if (_userGroupProvider != null && msg.toString().isNotEmpty) {
+              final isSuccess = result == 1;
+              _userGroupProvider!.handleOperationResult(
+                success: isSuccess,
+                message: '$msg',
+              );
+            }
+            _batchNotifyListeners();
+          } else {
+            print('[${DateTime.now().toString().split('.').first}] Received unknown command: $command');
+          }
           break;
       }
     } catch (e) {
@@ -996,11 +1056,14 @@ class WebSocketProviderOptimized with ChangeNotifier {
   void _handleConnectionError() {
     print('[${DateTime.now().toString().split('.').first}] Connection error detected, starting auto-reconnect');
     
+    // Store login state before resetting
+    final wasLoggedIn = _isLoggedIn;
+    
     _isConnected = false;
     _isLoggedIn = false;
     
-    // Start auto-reconnect if we have saved credentials
-    if (_lastUsername != null && _lastPassword != null) {
+    // Start auto-reconnect only if user was previously logged in and we have saved credentials
+    if (wasLoggedIn && _lastUsername != null && _lastPassword != null) {
       _startAutoReconnect();
     }
     

@@ -1687,7 +1687,57 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   // Process camera report
   Future<void> _processCameraReport(CameraDevice device, String property, List<String> subPath, dynamic value) async {
     // Handle camera report updates
-    print('CDP_OPT: Camera report update for ${device.macAddress}: $property = $value');
+    // Path format: camreports.CAMERA_NAME.property (e.g., camreports.KAMERA35.connected)
+    print('CDP_OPT: Camera report update for ${device.macAddress}: $property subPath=$subPath val=$value');
+    
+    if (subPath.isEmpty) return;
+    
+    final cameraName = subPath[0]; // e.g., "KAMERA35"
+    final reportProperty = subPath.length > 1 ? subPath[1] : ''; // e.g., "connected", "recording"
+    
+    // Find camera by name in the device's cameras list
+    Camera? targetCamera;
+    for (var camera in device.cameras) {
+      if (camera.name == cameraName) {
+        targetCamera = camera;
+        break;
+      }
+    }
+    
+    if (targetCamera == null) {
+      print('CDP_OPT: Camera not found for camreport: $cameraName in device ${device.macAddress}');
+      return;
+    }
+    
+    // Update camera properties based on report
+    switch (reportProperty) {
+      case 'connected':
+        final isConnected = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        targetCamera.connected = isConnected;
+        print('CDP_OPT: Updated camera ${targetCamera.name} connected=$isConnected');
+        break;
+      case 'recording':
+        final isRecording = value == 1 || value == true || value.toString().toLowerCase() == 'true';
+        targetCamera.recording = isRecording;
+        print('CDP_OPT: Updated camera ${targetCamera.name} recording=$isRecording');
+        break;
+      case 'last_seen_at':
+        targetCamera.lastSeenAt = value.toString();
+        print('CDP_OPT: Updated camera ${targetCamera.name} lastSeenAt=${targetCamera.lastSeenAt}');
+        break;
+      case 'health':
+        targetCamera.health = value.toString();
+        print('CDP_OPT: Updated camera ${targetCamera.name} health=${targetCamera.health}');
+        break;
+      case 'report_error':
+        targetCamera.reportError = value.toString();
+        print('CDP_OPT: Updated camera ${targetCamera.name} reportError=${targetCamera.reportError}');
+        break;
+      default:
+        print('CDP_OPT: Unknown camreport property: $reportProperty for camera $cameraName');
+    }
+    
+    _batchNotifyListeners();
   }
 
   // Ensure group exists

@@ -158,7 +158,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       case AppLifecycleState.resumed:
         // App is resumed from background
         print('App resumed - ensuring WebSocket connection');
-        if (!webSocketProvider.isConnected) {
+        // Only reconnect if user was previously logged in
+        if (!webSocketProvider.isConnected && webSocketProvider.isLoggedIn) {
           print('WebSocket disconnected during background, reconnecting...');
           webSocketProvider.reconnect();
         }
@@ -360,7 +361,8 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
       case AppLifecycleState.resumed:
         // When app is resumed from background, check WebSocket connection
         print('App resumed - checking WebSocket connection');
-        if (!webSocketProvider.isConnected) {
+        // Only reconnect if user was previously logged in
+        if (!webSocketProvider.isConnected && webSocketProvider.isLoggedIn) {
           print('WebSocket disconnected, attempting to reconnect...');
           webSocketProvider.reconnect();
         }

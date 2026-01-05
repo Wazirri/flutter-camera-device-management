@@ -236,9 +236,70 @@ class DeviceCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              Text(
-                'Cameras: ${device.cameras.length}',
-                style: const TextStyle(fontSize: 14),
+              // Camera stats with online/recording badges
+              Row(
+                children: [
+                  Text(
+                    'Cameras: ${device.cameras.length}',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(width: 12),
+                  // Online cameras badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: device.cameras.where((c) => c.connected).isNotEmpty 
+                          ? Colors.green 
+                          : Colors.grey.shade600,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.wifi, size: 12, color: Colors.white),
+                        const SizedBox(width: 3),
+                        Text(
+                          '${device.cameras.where((c) => c.connected).length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Recording cameras badge - only show if there are recording cameras
+                  if (device.cameras.where((c) => c.recording).isNotEmpty) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.fiber_manual_record,
+                            size: 12,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            '${device.cameras.where((c) => c.recording).length}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               ),
               if (device.uptime.isNotEmpty) ...[
                 const SizedBox(height: 4),
@@ -739,6 +800,10 @@ class DeviceDetailsSheet extends StatelessWidget {
 
   // Kameralar Tab
   Widget _buildCamerasTab(BuildContext context) {
+    // Calculate camera stats from camreports data
+    final onlineCameras = device.cameras.where((c) => c.connected).length;
+    final recordingCameras = device.cameras.where((c) => c.recording).length;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -747,12 +812,71 @@ class DeviceDetailsSheet extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Kameralar (${device.cameras.length})',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+              // Camera count with online/recording stats
+              Row(
+                children: [
+                  Text(
+                    'Kameralar (${device.cameras.length})',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Online count badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: onlineCameras > 0 ? Colors.green : Colors.grey,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.wifi, size: 14, color: Colors.white),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$onlineCameras',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Recording count badge - only show if there are recording cameras
+                  if (recordingCameras > 0) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.fiber_manual_record,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '$recordingCameras',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
               ),
               if (device.cameras.isNotEmpty && device.connected)
                 TextButton.icon(

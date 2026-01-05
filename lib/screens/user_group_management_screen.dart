@@ -1038,6 +1038,17 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
                 );
                 return;
               }
+              
+              // Boşluk kontrolü
+              if (groupNameController.text.contains(' ')) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Grup adı boşluk içeremez, alt çizgi (_) kullanın'),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+                return;
+              }
 
               final wsProvider = Provider.of<WebSocketProviderOptimized>(
                 context,
@@ -1507,21 +1518,111 @@ class _CameraSelectionDialogState extends State<_CameraSelectionDialog> {
                                 }
                               });
                             },
-                            title: Text(
-                              camera.name.isEmpty ? 'Unknown Camera' : camera.name,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            title: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    camera.name.isEmpty ? 'Unknown Camera' : camera.name,
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                // Connection status badge
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: camera.connected 
+                                        ? Colors.green.withOpacity(0.2) 
+                                        : Colors.red.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: camera.connected ? Colors.green : Colors.red,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    camera.connected ? 'ONLINE' : 'OFFLINE',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: camera.connected ? Colors.green : Colors.red,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('MAC: ${camera.mac}'),
-                                if (camera.ip.isNotEmpty) Text('IP: ${camera.ip}'),
-                                if (camera.brand.isNotEmpty) Text('Brand: ${camera.brand}'),
+                                const SizedBox(height: 4),
+                                // MAC Address
+                                Row(
+                                  children: [
+                                    Icon(Icons.router, size: 14, color: Colors.grey[500]),
+                                    const SizedBox(width: 4),
+                                    Text('MAC: ${camera.mac}', style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                // IP Address
+                                if (camera.ip.isNotEmpty)
+                                  Row(
+                                    children: [
+                                      Icon(Icons.language, size: 14, color: Colors.grey[500]),
+                                      const SizedBox(width: 4),
+                                      Text('IP: ${camera.ip}', style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+                                    ],
+                                  ),
+                                const SizedBox(height: 2),
+                                // Brand and Model
+                                Row(
+                                  children: [
+                                    if (camera.brand.isNotEmpty) ...[
+                                      Icon(Icons.business, size: 14, color: Colors.blue[300]),
+                                      const SizedBox(width: 4),
+                                      Text(camera.brand, style: TextStyle(color: Colors.blue[300], fontSize: 12)),
+                                      const SizedBox(width: 12),
+                                    ],
+                                    // Resolution
+                                    if (camera.recordWidth > 0 && camera.recordHeight > 0) ...[
+                                      Icon(Icons.high_quality, size: 14, color: Colors.orange[300]),
+                                      const SizedBox(width: 4),
+                                      Text('${camera.recordWidth}x${camera.recordHeight}', style: TextStyle(color: Colors.orange[300], fontSize: 12)),
+                                    ],
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                // Groups (if any)
+                                if (camera.groups.isNotEmpty)
+                                  Row(
+                                    children: [
+                                      Icon(Icons.folder, size: 14, color: Colors.purple[300]),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          'Gruplar: ${camera.groups.join(", ")}',
+                                          style: TextStyle(color: Colors.purple[300], fontSize: 12),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                               ],
                             ),
-                            secondary: Icon(
-                              camera.connected ? Icons.videocam : Icons.videocam_off,
-                              color: camera.connected ? Colors.green : Colors.grey,
+                            secondary: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  camera.connected ? Icons.videocam : Icons.videocam_off,
+                                  color: camera.connected ? Colors.green : Colors.grey,
+                                  size: 28,
+                                ),
+                                if (camera.mainSnapShot.isNotEmpty)
+                                  const Icon(
+                                    Icons.image,
+                                    size: 16,
+                                    color: Colors.blue,
+                                  ),
+                              ],
                             ),
                             activeColor: AppTheme.primaryOrange,
                           ),

@@ -162,113 +162,6 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
     }
   }
 
-  // Show add group dialog
-  void _showAddGroupDialog() {
-    String groupName = '';
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Camera Group'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              autofocus: true,
-              decoration: const InputDecoration(
-                hintText: 'Enter group name',
-                prefixIcon: Icon(Icons.group),
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                groupName = value.trim();
-              },
-              onSubmitted: (value) {
-                if (value.trim().isNotEmpty) {
-                  Navigator.pop(context);
-                  _createGroup(value.trim());
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Group names should be unique and descriptive.',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CANCEL'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (groupName.isNotEmpty) {
-                Navigator.pop(context);
-                _createGroup(groupName);
-              }
-            },
-            child: const Text('CREATE'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Create a new camera group
-  void _createGroup(String groupName) async {
-    final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
-    
-    // Check if group already exists
-    final existingGroups = provider.cameraGroupsList;
-    if (existingGroups.any((group) => group.name.toLowerCase() == groupName.toLowerCase())) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Group "$groupName" already exists'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-    
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-      
-      // Create the group using provider
-      provider.createGroup(groupName);
-      
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Group "$groupName" created successfully'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      
-      // Refresh the groups list
-      await _loadCameraGroups();
-      
-    } catch (e) {
-      // Show error message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error creating group: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
   // Toggle the "only show active cameras" filter
   void _toggleActiveFilter() {
     setState(() {
@@ -744,12 +637,6 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
       appBar: AppBar(
         title: const Text('Camera Groups'),
         actions: [
-          // Add group button
-          IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: 'Add Camera Group',
-            onPressed: _showAddGroupDialog,
-          ),
           // Search field
           IconButton(
             icon: const Icon(Icons.search),
@@ -812,7 +699,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(
-                        Icons.group_add,
+                        Icons.group_work,
                         size: 64,
                         color: Colors.grey,
                       ),
@@ -827,23 +714,9 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        'Create your first camera group to organize your cameras',
+                        'Camera groups will appear here when available',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.grey),
-                      ),
-                      const SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        onPressed: _showAddGroupDialog,
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add Camera Group'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryBlue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                        ),
                       ),
                     ],
                   ),

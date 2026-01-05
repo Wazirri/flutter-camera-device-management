@@ -724,10 +724,10 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
     final online = allCameras.where((c) => c.connected).length;
     final offline = allCameras.where((c) => !c.connected).length;
     final recording = allCameras.where((c) => c.recording).length;
+    // A camera is assigned only if it has a currentDevice with a non-empty deviceMac
     final assigned = allCameras
         .where((c) =>
-            c.currentDevice != null ||
-            (c.parentDeviceMacKey != null && c.parentDeviceMacKey!.isNotEmpty))
+            c.currentDevice != null && c.currentDevice!.deviceMac.isNotEmpty)
         .length;
     final unassigned = allCameras.length - assigned;
     final sharing = allCameras.where((c) => c.sharingActive).length;
