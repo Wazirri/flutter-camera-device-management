@@ -3696,6 +3696,9 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
   bool _isBuffering = false;
   bool _hasError = false;
   String _errorMessage = '';
+  bool _isLiveStream = false; // Track if this is a live/EVENT HLS stream
+  Duration _playlistDuration = Duration.zero; // Calculated from playlist
+  Timer? _playlistRefreshTimer; // Timer to refresh playlist duration
 
   @override
   void initState() {
@@ -3704,8 +3707,32 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
     print(
         '[VideoPlayerPopup] initState called with seekTime: ${widget.seekTime}');
 
-    // Create separate player for popup
-    _popupPlayer = Player();
+    // Create separate player for popup with HLS live stream support
+    _popupPlayer = Player(
+      configuration: PlayerConfiguration(
+        // Enable large buffer for seeking back in HLS EVENT streams
+        bufferSize: 150 * 1024 * 1024, // 150MB buffer for long recordings
+      ),
+    );
+
+    // Set MPV options for HLS EVENT stream support
+    // This allows proper handling of growing playlists without #EXT-X-ENDLIST
+    if (_popupPlayer.platform is NativePlayer) {
+      final nativePlayer = _popupPlayer.platform as NativePlayer;
+      // Force demuxer to not cache playlist (reload for new segments)
+      nativePlayer.setProperty('demuxer-max-bytes', '150MiB');
+      nativePlayer.setProperty('demuxer-max-back-bytes', '100MiB');
+      // Cache settings for seeking
+      nativePlayer.setProperty('cache', 'yes');
+      nativePlayer.setProperty('cache-secs', '3600'); // 1 hour cache
+      // HLS specific options
+      nativePlayer.setProperty('hls-bitrate', 'max');
+      // Force stream to be seekable
+      nativePlayer.setProperty('force-seekable', 'yes');
+      // Reload playlist more frequently for EVENT streams
+      nativePlayer.setProperty('demuxer-lavf-o', 'live_start_index=-1');
+    }
+
     _popupController = VideoController(_popupPlayer);
 
     // Setup error listener
@@ -3729,6 +3756,80 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
 
     // Load and play the video
     _loadVideo();
+
+    // Check if this is a live HLS stream (no ENDLIST)
+    _checkIfLiveStream();
+  }
+
+  Future<void> _checkIfLiveStream() async {
+    // Only check for m3u8 files
+    if (!widget.recordingUrl.endsWith('.m3u8')) {
+      return;
+    }
+
+    try {
+      final response = await http.get(Uri.parse(widget.recordingUrl));
+      if (response.statusCode == 200) {
+        final content = response.body;
+        // If no ENDLIST tag, this is a live/EVENT stream
+        final isLive = !content.contains('#EXT-X-ENDLIST');
+
+        // Calculate total duration from EXTINF tags
+        final duration = _calculatePlaylistDuration(content);
+
+        if (mounted) {
+          setState(() {
+            _isLiveStream = isLive;
+            _playlistDuration = duration;
+          });
+          print(
+              '[VideoPlayerPopup] Playlist duration: $duration (${duration.inSeconds}s), isLive: $isLive');
+
+          if (isLive) {
+            print(
+                '[VideoPlayerPopup] Detected live HLS EVENT stream (no ENDLIST)');
+            // Start periodic refresh of playlist to update duration
+            _startPlaylistRefresh();
+          }
+        }
+      }
+    } catch (e) {
+      print('[VideoPlayerPopup] Error checking live stream status: $e');
+    }
+  }
+
+  Duration _calculatePlaylistDuration(String playlistContent) {
+    double totalSeconds = 0;
+    final lines = playlistContent.split('\n');
+    for (final line in lines) {
+      if (line.startsWith('#EXTINF:')) {
+        // Parse duration from #EXTINF:6.000000,
+        final match = RegExp(r'#EXTINF:([0-9.]+)').firstMatch(line);
+        if (match != null) {
+          totalSeconds += double.tryParse(match.group(1) ?? '0') ?? 0;
+        }
+      }
+    }
+    return Duration(milliseconds: (totalSeconds * 1000).round());
+  }
+
+  void _startPlaylistRefresh() {
+    // Refresh playlist every 10 seconds to update duration
+    _playlistRefreshTimer =
+        Timer.periodic(const Duration(seconds: 10), (_) async {
+      try {
+        final response = await http.get(Uri.parse(widget.recordingUrl));
+        if (response.statusCode == 200 && mounted) {
+          final duration = _calculatePlaylistDuration(response.body);
+          setState(() {
+            _playlistDuration = duration;
+          });
+          print('[VideoPlayerPopup] Updated playlist duration: $duration');
+        }
+      } catch (e) {
+        print('[VideoPlayerPopup] Error refreshing playlist: $e');
+      }
+    });
   }
 
   void _loadVideo() {
@@ -3778,6 +3879,7 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
 
   @override
   void dispose() {
+    _playlistRefreshTimer?.cancel();
     _popupPlayer.dispose();
     super.dispose();
   }
@@ -3857,6 +3959,23 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
           child: VideoControls(
             player: _popupPlayer,
             showFullScreenButton: true,
+            isLiveStream: _isLiveStream,
+            playlistDuration: _playlistDuration,
+            onSeekToLive: () {
+              // Seek to player's live edge (end of what player knows)
+              final playerDuration = _popupPlayer.state.duration;
+              if (playerDuration > const Duration(seconds: 5)) {
+                final liveEdge = playerDuration - const Duration(seconds: 3);
+                print(
+                    '[VideoPlayerPopup] Seeking to live: $liveEdge (player duration: $playerDuration)');
+                _popupPlayer.seek(liveEdge);
+              }
+            },
+            onSeekToStart: () {
+              // Just seek to 0 - player will go to the start of what's buffered
+              print('[VideoPlayerPopup] Seeking to start (0)');
+              _popupPlayer.seek(Duration.zero);
+            },
             onFullScreenToggle: () {
               // Close popup instead of fullscreen toggle
               Navigator.of(context).pop();
