@@ -1044,7 +1044,7 @@ class CameraCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      // Recording indicator
+                      // Recording indicator - show count if recording on multiple devices
                       if (camera.recording)
                         Container(
                           margin: const EdgeInsets.only(right: 8),
@@ -1056,17 +1056,19 @@ class CameraCard extends StatelessWidget {
                             color: Colors.red,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.fiber_manual_record,
                                 size: 12,
                                 color: Colors.white,
                               ),
-                              SizedBox(width: 4),
+                              const SizedBox(width: 4),
                               Text(
-                                'REC',
-                                style: TextStyle(
+                                camera.recordingCount > 1 
+                                    ? 'REC (${camera.recordingCount})' 
+                                    : 'REC',
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,

@@ -290,26 +290,27 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         
         // Group ALL authorized cameras by their assigned device MAC address
         // This includes cameras from cameras_mac even if device is offline
+        // A camera can be on MULTIPLE devices (currentDevices Map), so we add it to each device group
         final groupedCamerasByMac = <String, List<Camera>>{};
         for (var camera in allCameras) {
           // Skip device MAC addresses (m_*) and cameras without MAC
           if (camera.mac.isEmpty || camera.mac.startsWith('m_')) continue;
           
-          // Priority: Use currentDevice.deviceMac if available (from cameras_mac)
-          // Otherwise fall back to parentDeviceMacKey (from ecs_slaves)
-          String? deviceMac = camera.currentDevice?.deviceMac;
-          
-          // Only use parentDeviceMacKey if currentDevice is not set
-          if (deviceMac == null || deviceMac.isEmpty) {
-            deviceMac = camera.parentDeviceMacKey;
+          // Check if camera has currentDevices (can be on multiple devices)
+          if (camera.currentDevices.isNotEmpty) {
+            // Add camera to each device group it belongs to
+            for (var deviceMac in camera.currentDevices.keys) {
+              if (deviceMac.isNotEmpty) {
+                groupedCamerasByMac.putIfAbsent(deviceMac, () => []).add(camera);
+              }
+            }
+          } else if (camera.parentDeviceMacKey != null && camera.parentDeviceMacKey!.isNotEmpty) {
+            // Fall back to parentDeviceMacKey if no currentDevices
+            groupedCamerasByMac.putIfAbsent(camera.parentDeviceMacKey!, () => []).add(camera);
+          } else {
+            // No device assignment - put in "Unassigned" group
+            groupedCamerasByMac.putIfAbsent('Unassigned', () => []).add(camera);
           }
-          
-          // Group by device MAC, or put in "Unassigned" group
-          String groupKey = (deviceMac != null && deviceMac.isNotEmpty) ? deviceMac : 'Unassigned';
-          if (!groupedCamerasByMac.containsKey(groupKey)) {
-            groupedCamerasByMac[groupKey] = [];
-          }
-          groupedCamerasByMac[groupKey]!.add(camera);
         }
         
         // Build the MAC address filter chips
@@ -416,6 +417,15 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         // Group the filtered cameras by their actual device assignment
         final Map<String, List<Camera>> camerasGroupedByDevice = {};
         for (var camera in baseFilteredCameras) {
+          // If a specific device filter is selected, use that device for grouping
+          // This ensures camera shows under the selected device when it's on multiple devices
+          if (selectedMacAddress != null && camera.currentDevices.containsKey(selectedMacAddress)) {
+            final deviceName = _getDeviceName(context, selectedMacAddress!);
+            camerasGroupedByDevice.putIfAbsent(deviceName, () => []).add(camera);
+            print('DEBUG: Camera ${camera.name} (${camera.id}) grouped under selected filter device $deviceName ($selectedMacAddress)');
+            continue;
+          }
+          
           // Find which device this camera belongs to by checking devicesList
           String? deviceMac;
           String? deviceName;
@@ -429,11 +439,12 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
             }
           }
           
-          // Use device name if found, otherwise try to get from camera's currentDevice
-          if (deviceName == null && camera.currentDevice != null) {
-            deviceMac = camera.currentDevice!.deviceMac;
+          // Use device name if found, otherwise try to get from camera's currentDevices
+          if (deviceName == null && camera.currentDevices.isNotEmpty) {
+            // Use the first device in currentDevices map
+            deviceMac = camera.currentDevices.keys.first;
             deviceName = _getDeviceName(context, deviceMac);
-            print('DEBUG: Camera ${camera.name} (${camera.id}) using currentDevice $deviceName ($deviceMac)');
+            print('DEBUG: Camera ${camera.name} (${camera.id}) using currentDevices first entry $deviceName ($deviceMac)');
           }
           
           if (deviceName == null) {
@@ -802,30 +813,81 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                         ],
                                       ),
                                       const SizedBox(height: 4),
-                                      // Current device assignment
-                                      if (camera.currentDevice != null)
+                                      // Current device assignment(s) with count
+                                      if (camera.currentDevices.isNotEmpty) ...[
+                                        // Device count badge
                                         Row(
                                           children: [
-                                            Icon(
-                                              Icons.device_hub,
-                                              size: 12.0,
-                                              color: Colors.blue,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Expanded(
-                                              child: Text(
-                                                _getDeviceName(context, camera.currentDevice!.deviceMac),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 12.0,
-                                                  color: Colors.blue,
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: camera.currentDevices.length > 1 
+                                                    ? Colors.orange.withOpacity(0.2)
+                                                    : Colors.blue.withOpacity(0.2),
+                                                borderRadius: BorderRadius.circular(8),
+                                                border: Border.all(
+                                                  color: camera.currentDevices.length > 1 
+                                                      ? Colors.orange.withOpacity(0.5)
+                                                      : Colors.blue.withOpacity(0.5),
                                                 ),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    camera.currentDevices.length > 1 
+                                                        ? Icons.devices 
+                                                        : Icons.device_hub,
+                                                    size: 12.0,
+                                                    color: camera.currentDevices.length > 1 
+                                                        ? Colors.orange 
+                                                        : Colors.blue,
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    camera.currentDevices.length > 1
+                                                        ? '${camera.currentDevices.length} cihazda'
+                                                        : '1 cihazda',
+                                                    style: TextStyle(
+                                                      fontSize: 10.0,
+                                                      color: camera.currentDevices.length > 1 
+                                                          ? Colors.orange 
+                                                          : Colors.blue,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ],
                                         ),
-                                      if (camera.currentDevice != null) const SizedBox(height: 4),
+                                        const SizedBox(height: 4),
+                                        // Device names list
+                                        ...camera.currentDevices.keys.map((deviceMac) => Padding(
+                                          padding: const EdgeInsets.only(bottom: 2),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.arrow_right,
+                                                size: 14.0,
+                                                color: Colors.blue.withOpacity(0.7),
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                  _getDeviceName(context, deviceMac),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                    fontSize: 11.0,
+                                                    color: Colors.blue,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )).toList(),
+                                      ],
+                                      if (camera.currentDevices.isNotEmpty) const SizedBox(height: 4),
                                       // Resolution and additional info row
                                       Row(
                                         children: [
@@ -1044,7 +1106,6 @@ class CameraSearchDelegate extends SearchDelegate<Camera> {
           subHeight: 0,
           connected: false,
           lastSeenAt: '',
-          recording: false,
         ));
       },
     );

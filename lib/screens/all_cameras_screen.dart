@@ -372,11 +372,11 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                 case 'recording':
                   return cam.recording;
                 case 'assigned':
-                  return cam.currentDevice != null ||
+                  return cam.currentDevices.isNotEmpty ||
                       (cam.parentDeviceMacKey != null &&
                           cam.parentDeviceMacKey!.isNotEmpty);
                 case 'unassigned':
-                  return cam.currentDevice == null &&
+                  return cam.currentDevices.isEmpty &&
                       (cam.parentDeviceMacKey == null ||
                           cam.parentDeviceMacKey!.isEmpty);
                 case 'sharing':
@@ -724,10 +724,10 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
     final online = allCameras.where((c) => c.connected).length;
     final offline = allCameras.where((c) => !c.connected).length;
     final recording = allCameras.where((c) => c.recording).length;
-    // A camera is assigned only if it has a currentDevice with a non-empty deviceMac
+    // A camera is assigned only if it has currentDevices with non-empty deviceMac
     final assigned = allCameras
         .where((c) =>
-            c.currentDevice != null && c.currentDevice!.deviceMac.isNotEmpty)
+            c.currentDevices.isNotEmpty && c.currentDevices.keys.any((k) => k.isNotEmpty))
         .length;
     final unassigned = allCameras.length - assigned;
     final sharing = allCameras.where((c) => c.sharingActive).length;
@@ -1334,7 +1334,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
               ),
 
               // Device info (if camera is assigned to device(s))
-              if (camera.currentDevice != null ||
+              if (camera.currentDevices.isNotEmpty ||
                   camera.parentDeviceMacKey != null) ...[
                 const SizedBox(height: 12),
                 _buildDeviceInfoSection(camera),
@@ -1467,16 +1467,18 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Current Device
-          if (camera.currentDevice != null) ...[
+          // Current Devices (can be multiple)
+          if (camera.currentDevices.isNotEmpty) ...[
             // Device header
             Row(
               children: [
                 const Icon(Icons.devices, size: 14, color: Colors.blue),
                 const SizedBox(width: 6),
-                const Text(
-                  'Assigned Device',
-                  style: TextStyle(
+                Text(
+                  camera.currentDevices.length > 1
+                      ? 'Assigned Devices (${camera.currentDevices.length})'
+                      : 'Assigned Device',
+                  style: const TextStyle(
                     fontSize: 11,
                     color: Colors.blue,
                     fontWeight: FontWeight.w600,
@@ -1485,89 +1487,98 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            // Device details row
-            Row(
-              children: [
-                // Device MAC
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Device MAC',
-                        style: TextStyle(
-                          fontSize: 9,
-                          color: Colors.grey.shade500,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        camera.currentDevice!.deviceMac.isNotEmpty
-                            ? camera.currentDevice!.deviceMac.toUpperCase()
-                            : '-',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
+            // Device details for each assigned device
+            ...camera.currentDevices.entries.map((entry) {
+              final deviceMac = entry.key;
+              final deviceInfo = entry.value;
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: camera.currentDevices.entries.last.key != deviceMac ? 8.0 : 0,
                 ),
-                // Device IP
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Device IP',
-                        style: TextStyle(
-                          fontSize: 9,
-                          color: Colors.grey.shade500,
-                        ),
+                child: Row(
+                  children: [
+                    // Device MAC
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Device MAC',
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            deviceMac.isNotEmpty
+                                ? deviceMac.toUpperCase()
+                                : '-',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        camera.currentDevice!.deviceIp.isNotEmpty
-                            ? camera.currentDevice!.deviceIp
-                            : '-',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
+                    ),
+                    // Device IP
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Device IP',
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            deviceInfo.deviceIp.isNotEmpty
+                                ? deviceInfo.deviceIp
+                                : '-',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    // Assigned date
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Assigned',
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            deviceInfo.startDate > 0
+                                ? _formatTimestamp(deviceInfo.startDate)
+                                : '-',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                // Assigned date
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Assigned',
-                        style: TextStyle(
-                          fontSize: 9,
-                          color: Colors.grey.shade500,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        camera.currentDevice!.startDate > 0
-                            ? _formatTimestamp(camera.currentDevice!.startDate)
-                            : '-',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              );
+            }).toList(),
           ] else if (camera.parentDeviceMacKey != null &&
               camera.parentDeviceMacKey!.isNotEmpty) ...[
             Row(

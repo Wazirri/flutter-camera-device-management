@@ -169,19 +169,23 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                     DetailItem(name: 'Sub Resolution', value: '${camera.subWidth}x${camera.subHeight}'),
                   ],
                 ),
-                // Current Device Assignment
-                if (camera.currentDevice != null)
-                  _buildDetailGroup(
-                    context: context,
-                    title: 'Current Device Assignment',
-                    details: [
-                      DetailItem(name: 'Device MAC', value: camera.currentDevice!.deviceMac),
-                      DetailItem(name: 'Device IP', value: camera.currentDevice!.deviceIp),
-                      DetailItem(name: 'Camera IP', value: camera.currentDevice!.cameraIp),
-                      DetailItem(name: 'Name in Device', value: camera.currentDevice!.name),
-                      DetailItem(name: 'Assignment Date', value: _formatTimestamp(camera.currentDevice!.startDate)),
-                    ],
-                  ),
+                // Current Device Assignments (camera can be on multiple devices)
+                if (camera.currentDevices.isNotEmpty)
+                  ...camera.currentDevices.entries.map((entry) {
+                    final deviceMac = entry.key;
+                    final currentDevice = entry.value;
+                    return _buildDetailGroup(
+                      context: context,
+                      title: 'Device Assignment: ${deviceMac.substring(deviceMac.length > 8 ? deviceMac.length - 8 : 0)}',
+                      details: [
+                        DetailItem(name: 'Device MAC', value: currentDevice.deviceMac),
+                        DetailItem(name: 'Device IP', value: currentDevice.deviceIp),
+                        DetailItem(name: 'Camera IP', value: currentDevice.cameraIp),
+                        DetailItem(name: 'Name in Device', value: currentDevice.name),
+                        DetailItem(name: 'Assignment Date', value: _formatTimestamp(currentDevice.startDate)),
+                      ],
+                    );
+                  }),
                 // Device History
                 if (camera.deviceHistory.isNotEmpty)
                   _buildDeviceHistorySection(context),
@@ -750,8 +754,9 @@ void _showMoveCameraDialog(BuildContext context, Camera camera, WebSocketProvide
                   : () async {
                       // Find camera's current device (source device)
                       String? sourceMac;
-                      if (camera.currentDevice != null) {
-                        sourceMac = camera.currentDevice!.deviceMac;
+                      if (camera.currentDevices.isNotEmpty) {
+                        // Use first device as source (camera can be on multiple devices)
+                        sourceMac = camera.currentDevices.keys.first;
                       } else {
                         // Fallback: try to find from parent device
                         sourceMac = camera.parentDeviceMacKey;

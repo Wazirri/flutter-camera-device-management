@@ -380,7 +380,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
               index: -1, name: '', ip: '', username: '', password: '', brand: '', 
               mediaUri: '', recordUri: '', subUri: '', remoteUri: '', mainSnapShot: '', 
               subSnapShot: '', recordWidth: 0, recordHeight: 0, subWidth: 0, 
-              subHeight: 0, connected: false, lastSeenAt: '', recording: false,
+              subHeight: 0, connected: false, lastSeenAt: '',
             );
           },
         );
@@ -429,7 +429,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
       
       print('[MultiRecordings] Camera: ${camera.name} (MAC: ${camera.mac}, Index: ${camera.index})');
-      print('[MultiRecordings] Camera currentDevice: ${camera.currentDevice?.deviceMac ?? 'NULL'}');
+      print('[MultiRecordings] Camera currentDevices: ${camera.currentDevices.keys.join(", ")}');
       
       final device = cameraDevicesProvider.getDeviceForCamera(camera);
       

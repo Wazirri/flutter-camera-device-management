@@ -36,7 +36,7 @@ class CameraGridItem extends StatelessWidget {
     
     if (camera.name.isEmpty) missing.add('Name');
     if (camera.ip.isEmpty) missing.add('IP');
-    if (camera.currentDevice == null || camera.currentDevice!.deviceMac.isEmpty) missing.add('Device');
+    if (camera.currentDevices.isEmpty || camera.currentDevices.keys.every((k) => k.isEmpty)) missing.add('Device');
     if (camera.recordUri.isEmpty && camera.subUri.isEmpty) missing.add('Stream URI');
     if (camera.username.isEmpty) missing.add('Username');
     if (camera.password.isEmpty) missing.add('Password');
@@ -211,30 +211,33 @@ class CameraGridItem extends StatelessWidget {
                   
                   const SizedBox(height: 8),
                   
-                  // Current device assignment
-                  if (camera.currentDevice != null)
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.device_hub,
-                          size: 14.0,
-                          color: Colors.blue,
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            _getDeviceName(context, camera.currentDevice!.deviceMac),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 11.0,
-                              color: Colors.blue,
-                              fontWeight: FontWeight.w500,
+                  // Current device assignment(s)
+                  if (camera.currentDevices.isNotEmpty)
+                    ...camera.currentDevices.keys.map((deviceMac) => Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.device_hub,
+                            size: 14.0,
+                            color: Colors.blue,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              _getDeviceName(context, deviceMac),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 11.0,
+                                color: Colors.blue,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
+                    )).toList(),
                   
                   const SizedBox(height: 4),
                   

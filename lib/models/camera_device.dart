@@ -907,7 +907,17 @@ class Camera {
   bool connected;             // Whether the camera is connected
   String disconnected;        // Disconnection info
   String lastSeenAt;          // When the camera was last seen
-  bool recording;             // Whether the camera is currently recording
+  
+  // Recording per device - key: deviceMac, value: isRecording
+  // A camera can record on multiple devices simultaneously
+  final Map<String, bool> recordingDevices;
+  
+  // Computed property - true if recording on any device
+  bool get recording => recordingDevices.values.any((r) => r);
+  
+  // How many devices are recording this camera
+  int get recordingCount => recordingDevices.values.where((r) => r).length;
+  
   bool soundRec;
   String xAddr;
   
@@ -931,8 +941,19 @@ class Camera {
   // Sharing active flag - indicates if the camera is being shared
   bool sharingActive;
 
-  // Current device assignment from cameras_mac.json
-  CameraCurrentDevice? currentDevice;
+  // Current device assignments from cameras_mac.json - Map<DeviceMac, CameraCurrentDevice>
+  // A camera can be on multiple devices at the same time
+  Map<String, CameraCurrentDevice> currentDevices;
+  
+  // Legacy getter for backward compatibility - returns first current device or null
+  CameraCurrentDevice? get currentDevice => currentDevices.isNotEmpty ? currentDevices.values.first : null;
+  
+  // Legacy setter for backward compatibility
+  set currentDevice(CameraCurrentDevice? value) {
+    if (value != null && value.deviceMac.isNotEmpty) {
+      currentDevices[value.deviceMac] = value;
+    }
+  }
 
   // History of device assignments from cameras_mac.json  
   List<CameraHistoryDevice> deviceHistory;
@@ -971,7 +992,7 @@ class Camera {
     this.connected = false,
     this.disconnected = '-',
     this.lastSeenAt = '',
-    this.recording = false,
+    Map<String, bool>? recordingDevices,
     this.soundRec = false,
     this.xAddr = '',
     this.mac = '',
@@ -984,10 +1005,15 @@ class Camera {
     this.parentDeviceMacKey,
     this.isPlaceholder = false,
     this.sharingActive = false,
-    this.currentDevice,
+    CameraCurrentDevice? currentDevice,
+    Map<String, CameraCurrentDevice>? currentDevices,
     List<CameraHistoryDevice>? deviceHistory,
   }) : groups = groups ?? [], 
-       deviceHistory = deviceHistory ?? [];
+       deviceHistory = deviceHistory ?? [],
+       recordingDevices = recordingDevices ?? {},
+       currentDevices = currentDevices ?? (currentDevice != null && currentDevice.deviceMac.isNotEmpty 
+           ? {currentDevice.deviceMac: currentDevice} 
+           : {});
   
   // Added id getter to uniquely identify cameras
   // Using MAC address as primary ID, fallback to name_index for cameras without MAC
@@ -1027,7 +1053,7 @@ class Camera {
     bool? connected,
     String? disconnected,
     String? lastSeenAt,
-    bool? recording,
+    Map<String, bool>? recordingDevices,
     bool? soundRec,
     String? xAddr,
     String? mac,
@@ -1040,7 +1066,7 @@ class Camera {
     String? parentDeviceMacKey, // Added parentDeviceMacKey to copyWith
     bool? isPlaceholder,
     bool? sharingActive,
-    CameraCurrentDevice? currentDevice,
+    Map<String, CameraCurrentDevice>? currentDevices,
     List<CameraHistoryDevice>? deviceHistory,
   }) {
     return Camera(
@@ -1076,7 +1102,7 @@ class Camera {
       connected: connected ?? this.connected,
       disconnected: disconnected ?? this.disconnected,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
-      recording: recording ?? this.recording,
+      recordingDevices: recordingDevices ?? Map<String, bool>.from(this.recordingDevices),
       soundRec: soundRec ?? this.soundRec,
       xAddr: xAddr ?? this.xAddr,
       mac: mac ?? this.mac,
@@ -1089,7 +1115,7 @@ class Camera {
       parentDeviceMacKey: parentDeviceMacKey ?? this.parentDeviceMacKey, // Updated parentDeviceMacKey
       isPlaceholder: isPlaceholder ?? this.isPlaceholder,
       sharingActive: sharingActive ?? this.sharingActive,
-      currentDevice: currentDevice ?? this.currentDevice,
+      currentDevices: currentDevices ?? Map<String, CameraCurrentDevice>.from(this.currentDevices),
       deviceHistory: deviceHistory ?? List<CameraHistoryDevice>.from(this.deviceHistory),
     );
   }
@@ -1124,7 +1150,9 @@ class Camera {
       connected: json['connected'] ?? false,
       disconnected: json['disconnected'] ?? '',
       lastSeenAt: json['lastSeenAt'] ?? '',
-      recording: json['recording'] ?? false,
+      recordingDevices: (json['recordingDevices'] as Map<String, dynamic>?)?.map(
+        (key, value) => MapEntry(key, value as bool),
+      ) ?? {},
       soundRec: json['soundRec'] ?? false,
       xAddr: json['xAddr'] ?? '',
       health: json['health'] ?? '',
@@ -1137,9 +1165,11 @@ class Camera {
       macReportedError: json['macReportedError'] as String?,
       macStatus: json['macStatus'] as String?,
       parentDeviceMacKey: json['parentDeviceMacKey'] as String?,
-      currentDevice: json['currentDevice'] != null 
-          ? CameraCurrentDevice.fromJson(json['currentDevice'] as Map<String, dynamic>)
-          : null,
+      currentDevices: (json['currentDevices'] as Map<String, dynamic>?)?.map(
+        (key, value) => MapEntry(key, CameraCurrentDevice.fromJson(value as Map<String, dynamic>)),
+      ) ?? (json['currentDevice'] != null 
+          ? {(json['currentDevice']['device_mac'] ?? ''): CameraCurrentDevice.fromJson(json['currentDevice'] as Map<String, dynamic>)}
+          : {}),
       deviceHistory: (json['deviceHistory'] as List<dynamic>?)
           ?.map((e) => CameraHistoryDevice.fromJson(e as Map<String, dynamic>))
           .toList() ?? [],
@@ -1179,6 +1209,8 @@ class Camera {
       'disconnected': disconnected,
       'lastSeenAt': lastSeenAt,
       'recording': recording,
+      'recordingDevices': recordingDevices,
+      'recordingCount': recordingCount,
       'soundRec': soundRec,
       'xAddr': xAddr,
       'mac': mac,
@@ -1189,7 +1221,7 @@ class Camera {
       'macReportedError': macReportedError,
       'macStatus': macStatus,
       'parentDeviceMacKey': parentDeviceMacKey,
-      'currentDevice': currentDevice?.toJson(),
+      'currentDevices': currentDevices.map((key, value) => MapEntry(key, value.toJson())),
       'deviceHistory': deviceHistory.map((e) => e.toJson()).toList(),
     };
   }
