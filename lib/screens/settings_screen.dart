@@ -142,7 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     
     // Read values from provider (WebSocket'ten gelen veriler)
     final autoScanEnabled = cameraProvider.autoScanEnabled;
-    final autoCameraSharingEnabled = cameraProvider.autoCameraSharingEnabled;
+    final autoCameraDistributingEnabled = cameraProvider.autoCameraDistributingEnabled;
     
     return _buildSettingCard(
       title: 'Otomatik Konfigürasyon',
@@ -168,7 +168,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SwitchListTile(
           title: const Text('Otomatik Kamera Dağıtma'),
           subtitle: const Text('Kameralar otomatik olarak dağıtılır'),
-          value: autoCameraSharingEnabled,
+          value: autoCameraDistributingEnabled,
           thumbColor: WidgetStateProperty.resolveWith<Color>((states) {
             if (states.contains(WidgetState.selected)) {
               return AppTheme.primaryBlue;
@@ -177,7 +177,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           }),
           onChanged: (value) async {
             // Send SETINT command
-            final command = 'SETINT ecs.bridge_auto_cam_sharing.auto_cam_share ${value ? 1 : 0}';
+            final command = 'SETINT ecs.bridge_auto_cam_distributing.auto_cam_distribute ${value ? 1 : 0}';
             await wsProvider.sendCommand(command);
           },
         ),
@@ -195,7 +195,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final lastScanTotalCameras = cameraProvider.lastScanTotalCameras;
     final lastScanConnectedCameras = cameraProvider.lastScanConnectedCameras;
     final lastScanActiveSlaves = cameraProvider.lastScanActiveSlaves;
-    final lastCamSharedAt = cameraProvider.lastCamSharedAt;
+    final lastCamDistributedAt = cameraProvider.lastCamDistributedAt;
     
     return _buildSettingCard(
       title: 'Master Kamera Dağıtım',
@@ -222,10 +222,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildStatItem('Aktif Slave', '$lastScanActiveSlaves'),
                   ],
                 ),
-                if (lastCamSharedAt.isNotEmpty) ...[
+                if (lastCamDistributedAt.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(
-                    'Son Dağıtım: $lastCamSharedAt',
+                    'Son Dağıtım: $lastCamDistributedAt',
                     style: TextStyle(fontSize: 11, color: Colors.grey[500]),
                   ),
                 ],
@@ -243,7 +243,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             return AppTheme.darkTextSecondary;
           }),
           onChanged: (value) async {
-            final command = 'SETINT ecs.bridge_auto_cam_sharing.masterhascams ${value ? 1 : 0}';
+            final command = 'SETINT ecs.bridge_auto_cam_distributing.masterhascams ${value ? 1 : 0}';
             await wsProvider.sendCommand(command);
           },
         ),
@@ -258,7 +258,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: const Icon(Icons.remove_circle_outline),
                 onPressed: imbalanceThreshold > 1 ? () async {
                   final newValue = imbalanceThreshold - 1;
-                  final command = 'SETINT ecs.bridge_auto_cam_sharing.last_scan_imbalance $newValue';
+                  final command = 'SETINT ecs.bridge_auto_cam_distributing.last_scan_imbalance $newValue';
                   await wsProvider.sendCommand(command);
                 } : null,
               ),
@@ -267,7 +267,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: const Icon(Icons.add_circle_outline),
                 onPressed: imbalanceThreshold < 10 ? () async {
                   final newValue = imbalanceThreshold + 1;
-                  final command = 'SETINT ecs.bridge_auto_cam_sharing.last_scan_imbalance $newValue';
+                  final command = 'SETINT ecs.bridge_auto_cam_distributing.last_scan_imbalance $newValue';
                   await wsProvider.sendCommand(command);
                 } : null,
               ),
@@ -286,7 +286,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               foregroundColor: Colors.white,
             ),
             onPressed: () async {
-              final command = 'SETINT ecs.bridge_auto_cam_sharing.share_force 1';
+              final command = 'SETINT ecs.bridge_auto_cam_distributing.distribute_force 1';
               await wsProvider.sendCommand(command);
             },
           ),

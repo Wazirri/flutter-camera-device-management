@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
 import '../providers/camera_devices_provider.dart';
+import '../providers/websocket_provider.dart';
 
 class CameraGridItem extends StatelessWidget {
   final Camera camera;
@@ -25,25 +26,28 @@ class CameraGridItem extends StatelessWidget {
   bool _hasMacAddress(Camera camera) {
     // MAC adresi gerçek MAC format'ında mı kontrol et (örn: me8_b7_23_0c_12_43)
     // Geçici ID'ler genelde "deviceKey_cam_index" formatında
-    return camera.mac.isNotEmpty && 
-           !camera.mac.contains('_cam_') && 
-           !camera.mac.contains('_placeholder_');
+    return camera.mac.isNotEmpty &&
+        !camera.mac.contains('_cam_') &&
+        !camera.mac.contains('_placeholder_');
   }
-  
+
   // Check for missing critical information
   List<String> _getMissingInfo(Camera camera) {
     List<String> missing = [];
-    
+
     if (camera.name.isEmpty) missing.add('Name');
     if (camera.ip.isEmpty) missing.add('IP');
-    if (camera.currentDevices.isEmpty || camera.currentDevices.keys.every((k) => k.isEmpty)) missing.add('Device');
-    if (camera.recordUri.isEmpty && camera.subUri.isEmpty) missing.add('Stream URI');
+    if (camera.currentDevices.isEmpty ||
+        camera.currentDevices.keys.every((k) => k.isEmpty))
+      missing.add('Device');
+    if (camera.recordUri.isEmpty && camera.subUri.isEmpty)
+      missing.add('Stream URI');
     if (camera.username.isEmpty) missing.add('Username');
     if (camera.password.isEmpty) missing.add('Password');
-    
+
     return missing;
   }
-  
+
   bool _hasIncompleteInfo(Camera camera) {
     return _getMissingInfo(camera).isNotEmpty;
   }
@@ -59,9 +63,9 @@ class CameraGridItem extends StatelessWidget {
         ),
         elevation: isSelected ? 8.0 : 3.0,
         margin: const EdgeInsets.all(8.0),
-        color: isSelected 
-          ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-          : Theme.of(context).cardColor,
+        color: isSelected
+            ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
+            : Theme.of(context).cardColor,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -73,38 +77,39 @@ class CameraGridItem extends StatelessWidget {
                 children: [
                   // Camera image (placeholder or actual image)
                   Container(
-                    color: camera.isPlaceholder ? Colors.grey[800] : Colors.black,
+                    color:
+                        camera.isPlaceholder ? Colors.grey[800] : Colors.black,
                     child: _hasMacAddress(camera)
-                      ? camera.mainSnapShot.isNotEmpty
-                          ? Image.network(
-                              camera.mainSnapShot,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Center(
-                                  child: Icon(
-                                    Icons.broken_image_outlined,
-                                    size: 48.0,
-                                    color: Colors.white54,
-                                  ),
-                                );
-                              },
-                            )
-                          : const Center(
-                              child: Icon(
-                                Icons.videocam_off,
-                                size: 48.0,
-                                color: Colors.white54,
-                              ),
-                            )
-                      : const Center(
-                          child: Icon(
-                            Icons.videocam_off_outlined,
-                            size: 48.0,
-                            color: Colors.grey,
+                        ? camera.mainSnapShot.isNotEmpty
+                            ? Image.network(
+                                camera.mainSnapShot,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Center(
+                                    child: Icon(
+                                      Icons.broken_image_outlined,
+                                      size: 48.0,
+                                      color: Colors.white54,
+                                    ),
+                                  );
+                                },
+                              )
+                            : const Center(
+                                child: Icon(
+                                  Icons.videocam_off,
+                                  size: 48.0,
+                                  color: Colors.white54,
+                                ),
+                              )
+                        : const Center(
+                            child: Icon(
+                              Icons.videocam_off_outlined,
+                              size: 48.0,
+                              color: Colors.grey,
+                            ),
                           ),
-                        ),
                   ),
-                  
+
                   // Camera status overlay (top-left corner)
                   if (_hasMacAddress(camera))
                     Positioned(
@@ -140,7 +145,7 @@ class CameraGridItem extends StatelessWidget {
                         ),
                       ),
                     ),
-                  
+
                   // No MAC address indicator (top-right corner)
                   if (!_hasMacAddress(camera))
                     Positioned(
@@ -165,14 +170,15 @@ class CameraGridItem extends StatelessWidget {
                         ),
                       ),
                     ),
-                  
+
                   // Incomplete info warning (bottom-right corner)
                   if (_hasIncompleteInfo(camera))
                     Positioned(
                       bottom: 8,
                       right: 8,
                       child: Tooltip(
-                        message: 'Eksik bilgi: ${_getMissingInfo(camera).join(", ")}',
+                        message:
+                            'Eksik bilgi: ${_getMissingInfo(camera).join(", ")}',
                         child: Container(
                           padding: const EdgeInsets.all(6.0),
                           decoration: BoxDecoration(
@@ -190,7 +196,7 @@ class CameraGridItem extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Camera details
             Container(
               padding: const EdgeInsets.all(12.0),
@@ -208,48 +214,48 @@ class CameraGridItem extends StatelessWidget {
                       color: camera.isPlaceholder ? Colors.grey : null,
                     ),
                   ),
-                  
+
                   const SizedBox(height: 8),
-                  
+
                   // Current device assignment(s)
                   if (camera.currentDevices.isNotEmpty)
-                    ...camera.currentDevices.keys.map((deviceMac) => Padding(
-                      padding: const EdgeInsets.only(bottom: 2),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.device_hub,
-                            size: 14.0,
-                            color: Colors.blue,
-                          ),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              _getDeviceName(context, deviceMac),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 11.0,
-                                color: Colors.blue,
-                                fontWeight: FontWeight.w500,
+                    ...camera.currentDevices.keys
+                        .map((deviceMac) => Padding(
+                              padding: const EdgeInsets.only(bottom: 2),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.device_hub,
+                                    size: 14.0,
+                                    color: Colors.blue,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Expanded(
+                                    child: Text(
+                                      _getDeviceName(context, deviceMac),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 11.0,
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )).toList(),
-                  
+                            ))
+                        .toList(),
+
                   const SizedBox(height: 4),
-                  
+
                   // Camera status
                   Row(
                     children: [
                       Icon(
                         camera.connected ? Icons.link : Icons.link_off,
                         size: 14.0,
-                        color: camera.connected
-                          ? Colors.green
-                          : Colors.red,
+                        color: camera.connected ? Colors.green : Colors.red,
                       ),
                       const SizedBox(width: 4),
                       Expanded(
@@ -257,17 +263,15 @@ class CameraGridItem extends StatelessWidget {
                           camera.connected ? 'Connected' : 'Disconnected',
                           style: TextStyle(
                             fontSize: 11.0,
-                            color: camera.connected
-                              ? Colors.green
-                              : Colors.red,
+                            color: camera.connected ? Colors.green : Colors.red,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 4),
-                  
+
                   // Resolution info
                   if (camera.recordWidth > 0 && camera.recordHeight > 0)
                     Row(
@@ -287,14 +291,15 @@ class CameraGridItem extends StatelessWidget {
                         ),
                       ],
                     ),
-                  
+
                   const SizedBox(height: 4),
-                  
+
                   // History count and last seen
                   Row(
                     children: [
                       // History count - filter out empty entries
-                      if (camera.deviceHistory.any((h) => h.deviceMac.isNotEmpty)) ...[
+                      if (camera.deviceHistory
+                          .any((h) => h.deviceMac.isNotEmpty)) ...[
                         Icon(
                           Icons.history,
                           size: 14.0,
@@ -310,7 +315,7 @@ class CameraGridItem extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                       ],
-                      
+
                       // Last seen
                       if (camera.lastSeenAt.isNotEmpty) ...[
                         Icon(
@@ -333,9 +338,9 @@ class CameraGridItem extends StatelessWidget {
                       ],
                     ],
                   ),
-                  
+
                   const SizedBox(height: 4),
-                  
+
                   // Additional info row
                   Row(
                     children: [
@@ -357,7 +362,7 @@ class CameraGridItem extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                       ],
-                      
+
                       // Brand info
                       if (camera.brand.isNotEmpty) ...[
                         Icon(
@@ -383,7 +388,112 @@ class CameraGridItem extends StatelessWidget {
                 ],
               ),
             ),
-            
+
+            // Distribute Active Toggle Row
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              child: Consumer2<CameraDevicesProviderOptimized,
+                  WebSocketProviderOptimized>(
+                builder: (context, cameraProvider, websocketProvider, child) {
+                  return Row(
+                    children: [
+                      Icon(
+                        Icons.share,
+                        size: 16.0,
+                        color: camera.distribute
+                            ? Colors.green
+                            : Colors.grey,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Dağıtıma Dahil',
+                          style: TextStyle(
+                            fontSize: 11.0,
+                            color: camera.distribute
+                                ? Colors.green
+                                : Colors.grey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Transform.scale(
+                        scale: 0.8,
+                        child: Switch(
+                          value: camera.distribute,
+                          activeColor: Colors.green,
+                          onChanged: (value) async {
+                            // Check if camera has MAC address
+                            if (!_hasMacAddress(camera)) {
+                              // Show error for missing MAC
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '${camera.name}: MAC adresi eksik!',
+                                  ),
+                                  backgroundColor: Colors.orange,
+                                  duration: const Duration(seconds: 3),
+                                ),
+                              );
+                              return;
+                            }
+
+                            // Send SETINT command to toggle distributing
+                            try {
+                              final success = await websocketProvider
+                                  .toggleCameraDistribute(
+                                camera.mac,
+                                value,
+                              );
+
+                              if (success) {
+                                // Update local camera state
+                                final updatedCamera =
+                                    camera.copyWith(distribute: value);
+                                cameraProvider.updateCamera(updatedCamera);
+
+                                // Show feedback
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      value
+                                          ? '${camera.name} dağıtıma dahil edildi'
+                                          : '${camera.name} dağıtımdan çıkarıldı',
+                                    ),
+                                    backgroundColor: Colors.green,
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('İşlem başarısız oldu'),
+                                    backgroundColor: Colors.red,
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Hata: $e'),
+                                  backgroundColor: Colors.red,
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+
+            const Divider(height: 1),
+
             // Action buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -393,7 +503,8 @@ class CameraGridItem extends StatelessWidget {
                     Icons.videocam,
                     color: camera.isPlaceholder ? Colors.grey : null,
                   ),
-                  tooltip: !_hasMacAddress(camera) ? 'No MAC Address' : 'Live View',
+                  tooltip:
+                      !_hasMacAddress(camera) ? 'No MAC Address' : 'Live View',
                   onPressed: !_hasMacAddress(camera) ? null : onLiveView,
                 ),
                 IconButton(
@@ -401,7 +512,8 @@ class CameraGridItem extends StatelessWidget {
                     Icons.video_library,
                     color: camera.isPlaceholder ? Colors.grey : null,
                   ),
-                  tooltip: !_hasMacAddress(camera) ? 'No MAC Address' : 'Recordings',
+                  tooltip:
+                      !_hasMacAddress(camera) ? 'No MAC Address' : 'Recordings',
                   onPressed: !_hasMacAddress(camera) ? null : onPlayback,
                 ),
                 IconButton(
@@ -414,28 +526,35 @@ class CameraGridItem extends StatelessWidget {
                       builder: (dialogContext) {
                         // Parent device'ı bul (mac adresine göre)
                         String? macKey;
-                        for (var entry in Provider.of<CameraDevicesProviderOptimized>(context, listen: false).devices.entries) {
-                          if (entry.value.cameras.any((c) => c.index == camera.index)) {
+                        for (var entry
+                            in Provider.of<CameraDevicesProviderOptimized>(
+                                    context,
+                                    listen: false)
+                                .devices
+                                .entries) {
+                          if (entry.value.cameras
+                              .any((c) => c.index == camera.index)) {
                             macKey = entry.key;
                             break;
                           }
                         }
-                        
+
                         // CameraDevicesProvider'dan gelen kamera güncellemelerini dinle
-                        return Consumer<CameraDevicesProviderOptimized>(builder: (context, devicesProvider, child) {
+                        return Consumer<CameraDevicesProviderOptimized>(
+                            builder: (context, devicesProvider, child) {
                           // Kamera verilerini güncel olarak al
                           Camera updatedCamera = camera;
-                          
+
                           // MAC adresi biliniyorsa güncel veri almaya çalış
-                          if (macKey != null && devicesProvider.devices.containsKey(macKey)) {
+                          if (macKey != null &&
+                              devicesProvider.devices.containsKey(macKey)) {
                             final device = devicesProvider.devices[macKey]!;
                             final foundCamera = device.cameras.firstWhere(
-                              (c) => c.index == camera.index, 
-                              orElse: () => camera
-                            );
+                                (c) => c.index == camera.index,
+                                orElse: () => camera);
                             updatedCamera = foundCamera;
                           }
-                          
+
                           return AlertDialog(
                             title: Text('Camera: ${updatedCamera.name}'),
                             content: SingleChildScrollView(
@@ -445,12 +564,19 @@ class CameraGridItem extends StatelessWidget {
                                 children: [
                                   _buildDetailRow('IP', updatedCamera.ip),
                                   _buildDetailRow('Brand', updatedCamera.brand),
-                                  _buildDetailRow('Status', updatedCamera.connected ? 'Connected' : 'Disconnected'),
-                                  _buildDetailRow('Last Update', DateTime.now().toString().split('.')[0]),
-                                  if (updatedCamera.mediaUri.isNotEmpty) 
-                                    _buildDetailRow('Media URI', updatedCamera.mediaUri),
-                                  if (updatedCamera.recordUri.isNotEmpty) 
-                                    _buildDetailRow('Record URI', updatedCamera.recordUri),
+                                  _buildDetailRow(
+                                      'Status',
+                                      updatedCamera.connected
+                                          ? 'Connected'
+                                          : 'Disconnected'),
+                                  _buildDetailRow('Last Update',
+                                      DateTime.now().toString().split('.')[0]),
+                                  if (updatedCamera.mediaUri.isNotEmpty)
+                                    _buildDetailRow(
+                                        'Media URI', updatedCamera.mediaUri),
+                                  if (updatedCamera.recordUri.isNotEmpty)
+                                    _buildDetailRow(
+                                        'Record URI', updatedCamera.recordUri),
                                 ],
                               ),
                             ),
@@ -475,7 +601,7 @@ class CameraGridItem extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -522,37 +648,44 @@ class CameraGridItem extends StatelessWidget {
   // Get device name from MAC address
   String _getDeviceName(BuildContext context, String deviceMac) {
     try {
-      final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
-      
+      final provider =
+          Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+
       // Use MAC address as-is, no formatting
       String normalizedMac = deviceMac;
-      
+
       // Find device by MAC address
       for (var device in provider.devices.values) {
-        if (device.macAddress == normalizedMac || device.macKey == deviceMac || provider.devices.containsKey(deviceMac)) {
-          return device.deviceName?.isNotEmpty == true 
-              ? device.deviceName! 
-              : device.deviceType.isNotEmpty 
-                  ? device.deviceType 
+        if (device.macAddress == normalizedMac ||
+            device.macKey == deviceMac ||
+            provider.devices.containsKey(deviceMac)) {
+          return device.deviceName?.isNotEmpty == true
+              ? device.deviceName!
+              : device.deviceType.isNotEmpty
+                  ? device.deviceType
                   : device.macAddress.substring(0, 8) + '...';
         }
       }
-      
+
       // If not found, return shortened MAC
-      return deviceMac.length > 10 ? '${deviceMac.substring(0, 10)}...' : deviceMac;
+      return deviceMac.length > 10
+          ? '${deviceMac.substring(0, 10)}...'
+          : deviceMac;
     } catch (e) {
-      return deviceMac.length > 10 ? '${deviceMac.substring(0, 10)}...' : deviceMac;
+      return deviceMac.length > 10
+          ? '${deviceMac.substring(0, 10)}...'
+          : deviceMac;
     }
   }
 
   // Format last seen time
   String _formatLastSeen(String lastSeen) {
     if (lastSeen.isEmpty) return 'Never';
-    
+
     try {
       // Try to parse various date formats
       DateTime? dateTime;
-      
+
       // Format: "2025-09-16 - 13:54:26"
       if (lastSeen.contains(' - ')) {
         final parts = lastSeen.split(' - ');
@@ -564,11 +697,11 @@ class CameraGridItem extends StatelessWidget {
         // Try standard ISO format
         dateTime = DateTime.tryParse(lastSeen);
       }
-      
+
       if (dateTime != null) {
         final now = DateTime.now();
         final difference = now.difference(dateTime);
-        
+
         if (difference.inMinutes < 1) {
           return 'Just now';
         } else if (difference.inMinutes < 60) {
@@ -581,11 +714,15 @@ class CameraGridItem extends StatelessWidget {
           return '${dateTime.day}/${dateTime.month}';
         }
       }
-      
+
       // If parsing fails, return truncated string
-      return lastSeen.length > 12 ? '${lastSeen.substring(0, 12)}...' : lastSeen;
+      return lastSeen.length > 12
+          ? '${lastSeen.substring(0, 12)}...'
+          : lastSeen;
     } catch (e) {
-      return lastSeen.length > 12 ? '${lastSeen.substring(0, 12)}...' : lastSeen;
+      return lastSeen.length > 12
+          ? '${lastSeen.substring(0, 12)}...'
+          : lastSeen;
     }
   }
 }

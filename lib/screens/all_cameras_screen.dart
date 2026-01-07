@@ -14,7 +14,8 @@ import 'live_view_screen.dart';
 
 // Snapshot cache manager for efficient memory usage
 class SnapshotCacheManager {
-  static final SnapshotCacheManager _instance = SnapshotCacheManager._internal();
+  static final SnapshotCacheManager _instance =
+      SnapshotCacheManager._internal();
   factory SnapshotCacheManager() => _instance;
   SnapshotCacheManager._internal();
 
@@ -26,7 +27,8 @@ class SnapshotCacheManager {
 
   Uint8List? get(String url) {
     final timestamp = _cacheTimestamps[url];
-    if (timestamp != null && DateTime.now().difference(timestamp) > cacheExpiry) {
+    if (timestamp != null &&
+        DateTime.now().difference(timestamp) > cacheExpiry) {
       _cache.remove(url);
       _cacheTimestamps.remove(url);
       return null;
@@ -85,7 +87,7 @@ class _CameraSnapshotWidgetState extends State<CameraSnapshotWidget> {
   bool _isLoading = true;
   bool _hasError = false;
   static final _cacheManager = SnapshotCacheManager();
-  
+
   // Throttle concurrent requests
   static int _activeRequests = 0;
   static const int _maxConcurrentRequests = 10;
@@ -141,14 +143,17 @@ class _CameraSnapshotWidgetState extends State<CameraSnapshotWidget> {
       // Prepare headers with Basic Auth if credentials provided
       final headers = <String, String>{};
       if (widget.username != null && widget.username!.isNotEmpty) {
-        final credentials = base64Encode(utf8.encode('${widget.username}:${widget.password ?? ""}'));
+        final credentials = base64Encode(
+            utf8.encode('${widget.username}:${widget.password ?? ""}'));
         headers['Authorization'] = 'Basic $credentials';
       }
-      
-      final response = await http.get(
-        Uri.parse(widget.snapshotUrl),
-        headers: headers.isNotEmpty ? headers : null,
-      ).timeout(const Duration(seconds: 10));
+
+      final response = await http
+          .get(
+            Uri.parse(widget.snapshotUrl),
+            headers: headers.isNotEmpty ? headers : null,
+          )
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200 && mounted) {
         final data = response.bodyBytes;
@@ -289,7 +294,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
 
   // Search controller
   final TextEditingController _searchController = TextEditingController();
-  
+
   String _getSubnetFromIp(String ip) {
     if (ip.isEmpty) return '';
     final parts = ip.split('.');
@@ -392,8 +397,8 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                   return cam.currentDevices.isEmpty &&
                       (cam.parentDeviceMacKey == null ||
                           cam.parentDeviceMacKey!.isEmpty);
-                case 'sharing':
-                  return cam.sharingActive;
+                case 'distributing':
+                  return cam.distribute;
                 default:
                   return true;
               }
@@ -740,10 +745,11 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
     // A camera is assigned only if it has currentDevices with non-empty deviceMac
     final assigned = allCameras
         .where((c) =>
-            c.currentDevices.isNotEmpty && c.currentDevices.keys.any((k) => k.isNotEmpty))
+            c.currentDevices.isNotEmpty &&
+            c.currentDevices.keys.any((k) => k.isNotEmpty))
         .length;
     final unassigned = allCameras.length - assigned;
-    final sharing = allCameras.where((c) => c.sharingActive).length;
+    final distributing = allCameras.where((c) => c.distribute).length;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -863,14 +869,15 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
               Expanded(
                 child: _buildClickableStatChip(
                   icon: Icons.share,
-                  label: '$sharing',
-                  subtitle: 'Sharing',
+                  label: '$distributing',
+                  subtitle: 'Distributing',
                   color: Colors.purple,
-                  isSelected: _filterStatus == 'sharing',
+                  isSelected: _filterStatus == 'distributing',
                   onTap: () {
                     setState(() {
-                      _filterStatus =
-                          _filterStatus == 'sharing' ? null : 'sharing';
+                      _filterStatus = _filterStatus == 'distributing'
+                          ? null
+                          : 'distributing';
                     });
                   },
                 ),
@@ -945,7 +952,8 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                 },
                 borderRadius: BorderRadius.circular(16),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppTheme.primaryOrange.withOpacity(0.2)
@@ -965,7 +973,8 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                         '${entry.key}.x',
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.w500,
                           color: isSelected
                               ? AppTheme.primaryOrange
                               : Colors.grey.shade300,
@@ -973,7 +982,8 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                       ),
                       const SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? AppTheme.primaryOrange.withOpacity(0.3)
@@ -1195,16 +1205,17 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                 children: [
                   // Snapshot thumbnail (like cameras_screen) - tappable to show full size
                   GestureDetector(
-                    onTap: (camera.mainSnapShot.isNotEmpty || camera.subSnapShot.isNotEmpty)
+                    onTap: (camera.mainSnapShot.isNotEmpty ||
+                            camera.subSnapShot.isNotEmpty)
                         ? () => _showFullSnapshot(
-                            context,
-                            camera.subSnapShot.isNotEmpty 
-                                ? camera.subSnapShot 
-                                : camera.mainSnapShot,
-                            camera.displayName,
-                            camera.username,
-                            camera.password,
-                          )
+                              context,
+                              camera.subSnapShot.isNotEmpty
+                                  ? camera.subSnapShot
+                                  : camera.mainSnapShot,
+                              camera.displayName,
+                              camera.username,
+                              camera.password,
+                            )
                         : null,
                     child: Container(
                       width: 48,
@@ -1221,10 +1232,11 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(6),
-                        child: (camera.mainSnapShot.isNotEmpty || camera.subSnapShot.isNotEmpty)
+                        child: (camera.mainSnapShot.isNotEmpty ||
+                                camera.subSnapShot.isNotEmpty)
                             ? CameraSnapshotWidget(
-                                snapshotUrl: camera.subSnapShot.isNotEmpty 
-                                    ? camera.subSnapShot 
+                                snapshotUrl: camera.subSnapShot.isNotEmpty
+                                    ? camera.subSnapShot
                                     : camera.mainSnapShot,
                                 cameraId: camera.mac,
                                 height: 48,
@@ -1316,8 +1328,8 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                           ),
                         ),
                       ],
-                      // Sharing badge (if sharing active)
-                      if (camera.sharingActive) ...[
+                      // Distributing badge (if distributing active)
+                      if (camera.distribute) ...[
                         const SizedBox(height: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -1332,7 +1344,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                               Icon(Icons.share, color: Colors.white, size: 10),
                               SizedBox(width: 4),
                               Text(
-                                'Sharing',
+                                'Distributing',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
@@ -1436,9 +1448,78 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
 
               const SizedBox(height: 16),
 
-              // Action buttons
+              // Action buttons with distribute toggle
               Row(
                 children: [
+                  // Distribute toggle
+                  Consumer2<CameraDevicesProviderOptimized,
+                      WebSocketProviderOptimized>(
+                    builder:
+                        (context, cameraProvider, websocketProvider, child) {
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Dağıt',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: camera.distribute
+                                  ? Colors.green
+                                  : Colors.grey,
+                            ),
+                          ),
+                          Switch(
+                            value: camera.distribute,
+                            activeColor: Colors.green,
+                            onChanged: (value) async {
+                              if (camera.mac.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        '${camera.displayName}: MAC adresi eksik!'),
+                                    backgroundColor: Colors.orange,
+                                  ),
+                                );
+                                return;
+                              }
+
+                              final success = await websocketProvider
+                                  .toggleCameraDistribute(camera.mac, value);
+
+                              if (success) {
+                                final updatedCamera =
+                                    camera.copyWith(distribute: value);
+                                cameraProvider.updateCamera(updatedCamera);
+
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        value
+                                            ? '${camera.displayName} dağıtıma dahil edildi'
+                                            : '${camera.displayName} dağıtımdan çıkarıldı',
+                                      ),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                }
+                              } else {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('İşlem başarısız oldu'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.play_circle_outline, size: 18),
@@ -1508,7 +1589,9 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
               final deviceInfo = entry.value;
               return Padding(
                 padding: EdgeInsets.only(
-                  bottom: camera.currentDevices.entries.last.key != deviceMac ? 8.0 : 0,
+                  bottom: camera.currentDevices.entries.last.key != deviceMac
+                      ? 8.0
+                      : 0,
                 ),
                 child: Row(
                   children: [
@@ -1657,10 +1740,9 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
 
   void _showDeviceHistory(Camera camera) {
     // Filter out empty/incomplete history entries (no deviceMac)
-    final validHistory = camera.deviceHistory
-        .where((h) => h.deviceMac.isNotEmpty)
-        .toList();
-    
+    final validHistory =
+        camera.deviceHistory.where((h) => h.deviceMac.isNotEmpty).toList();
+
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.darkSurface,
@@ -2117,7 +2199,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                             setState(() => _filterStatus = val);
                             setModalState(() {});
                           }),
-                          _buildFilterOption('Sharing', 'sharing',
+                          _buildFilterOption('Distributing', 'distributing',
                               _filterStatus, Colors.purple, (val) {
                             setState(() => _filterStatus = val);
                             setModalState(() {});
@@ -2293,7 +2375,8 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
     );
   }
 
-  void _showFullSnapshot(BuildContext context, String snapshotUrl, String cameraName, String? username, String? password) {
+  void _showFullSnapshot(BuildContext context, String snapshotUrl,
+      String cameraName, String? username, String? password) {
     showDialog(
       context: context,
       barrierColor: Colors.black87,
@@ -2308,11 +2391,13 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 color: AppTheme.darkSurface,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(12)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.videocam, color: AppTheme.primaryOrange, size: 20),
+                  const Icon(Icons.videocam,
+                      color: AppTheme.primaryOrange, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -2341,10 +2426,12 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
               ),
               decoration: BoxDecoration(
                 color: Colors.black,
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(12)),
               ),
               child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(12)),
                 child: CameraSnapshotWidget(
                   snapshotUrl: snapshotUrl,
                   cameraId: snapshotUrl,

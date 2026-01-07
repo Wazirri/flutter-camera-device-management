@@ -18,7 +18,8 @@ class CamerasScreen extends StatefulWidget {
   _CamerasScreenState createState() => _CamerasScreenState();
 }
 
-class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProviderStateMixin {
+class _CamerasScreenState extends State<CamerasScreen>
+    with SingleTickerProviderStateMixin {
   Camera? selectedCamera;
   String searchQuery = '';
   bool showOnlyActive = false;
@@ -32,7 +33,8 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
     _tabController = TabController(length: 2, vsync: this);
     // Check if there's a selected device and auto-filter cameras for that device
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+      final provider =
+          Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
       final selectedDevice = provider.selectedDevice;
       if (selectedDevice != null) {
         setState(() {
@@ -52,20 +54,20 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
   bool _hasMacAddress(Camera camera) {
     // MAC adresi gerçek MAC format'ında mı kontrol et (örn: me8_b7_23_0c_12_43)
     // Geçici ID'ler genelde "deviceKey_cam_index" formatında
-    return camera.mac.isNotEmpty && 
-           !camera.mac.contains('_cam_') && 
-           !camera.mac.contains('_placeholder_');
+    return camera.mac.isNotEmpty &&
+        !camera.mac.contains('_cam_') &&
+        !camera.mac.contains('_placeholder_');
   }
-  
+
   void _selectCamera(Camera camera) {
     setState(() {
       selectedCamera = camera;
     });
-    
+
     // Kamera detaylarını BottomSheet olarak göster
     _showCameraDetails(camera);
   }
-  
+
   void _showCameraDetails(Camera camera) {
     showModalBottomSheet(
       context: context,
@@ -90,43 +92,43 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
       },
     );
   }
-  
+
   void _openLiveView(Camera camera) {
     Navigator.push(
-      context, 
+      context,
       MaterialPageRoute(
         builder: (context) => LiveViewScreen(camera: camera),
       ),
     );
   }
-  
+
   void _openRecordView(Camera camera) {
     Navigator.push(
-      context, 
+      context,
       MaterialPageRoute(
         builder: (context) => const MultiRecordingsScreen(),
       ),
     );
   }
-  
+
   void _updateSearchQuery(String query) {
     setState(() {
       searchQuery = query;
     });
   }
-  
+
   void _toggleActiveFilter() {
     setState(() {
       showOnlyActive = !showOnlyActive;
     });
   }
-  
+
   void _toggleViewMode() {
     setState(() {
       isGridView = !isGridView;
     });
   }
-  
+
   void _selectMacAddress(String? macAddress) {
     setState(() {
       if (selectedMacAddress == macAddress) {
@@ -173,28 +175,22 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
               );
             },
           ),
-          
+
           // Filter toggle
           IconButton(
             icon: Icon(
-              showOnlyActive 
-                ? Icons.filter_alt
-                : Icons.filter_alt_outlined,
+              showOnlyActive ? Icons.filter_alt : Icons.filter_alt_outlined,
             ),
             tooltip: 'Filter Active Cameras',
             onPressed: _toggleActiveFilter,
           ),
-          
+
           // View mode toggle
           IconButton(
             icon: Icon(
-              isGridView 
-                ? Icons.grid_view 
-                : Icons.list,
+              isGridView ? Icons.grid_view : Icons.list,
             ),
-            tooltip: isGridView 
-              ? 'Switch to List View' 
-              : 'Switch to Grid View',
+            tooltip: isGridView ? 'Switch to List View' : 'Switch to Grid View',
             onPressed: _toggleViewMode,
           ),
         ],
@@ -210,45 +206,50 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
   }
 
   Widget _buildDeviceGroupedView() {
-    return Consumer3<CameraDevicesProviderOptimized, WebSocketProviderOptimized, UserGroupProvider>(
+    return Consumer3<CameraDevicesProviderOptimized, WebSocketProviderOptimized,
+        UserGroupProvider>(
       builder: (context, provider, wsProvider, userGroupProvider, child) {
         // Get authorized camera MACs for current user
         final currentUsername = wsProvider.currentLoggedInUsername;
         Set<String>? authorizedMacs;
-        
+
         print('[CameraScreen] 🔍 Current logged in username: $currentUsername');
-        
+
         if (currentUsername != null) {
           // Check if user is admin
           final userType = userGroupProvider.getUserType(currentUsername);
           print('[CameraScreen] 👤 User type: $userType');
-          
+
           if (userType == 'admin') {
             // Admin sees all cameras
             authorizedMacs = null;
             print('[CameraScreen] 👑 Admin user - showing all cameras');
           } else {
             // Regular user - get authorized cameras
-            authorizedMacs = userGroupProvider.getUserAuthorizedCameraMacs(currentUsername);
-            print('[CameraScreen] 🔐 Regular user - authorized MACs: ${authorizedMacs.length} cameras');
+            authorizedMacs =
+                userGroupProvider.getUserAuthorizedCameraMacs(currentUsername);
+            print(
+                '[CameraScreen] 🔐 Regular user - authorized MACs: ${authorizedMacs.length} cameras');
             print('[CameraScreen] 📷 Authorized camera MACs: $authorizedMacs');
           }
         } else {
           print('[CameraScreen] ⚠️ No logged in user - showing all cameras');
         }
-        
+
         // Get filtered cameras based on authorization
         final allCameras = provider.getAuthorizedCameras(authorizedMacs);
-        print('[CameraScreen] 📊 Total cameras available: ${provider.cameras.length}');
-        print('[CameraScreen] ✅ Filtered cameras to show: ${allCameras.length}');
-        
+        print(
+            '[CameraScreen] 📊 Total cameras available: ${provider.cameras.length}');
+        print(
+            '[CameraScreen] ✅ Filtered cameras to show: ${allCameras.length}');
+
         // If loading, show a spinner
         if (provider.isLoading) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
-        
+
         // If there are no cameras, show empty state
         if (allCameras.isEmpty) {
           return Center(
@@ -287,7 +288,7 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
             ),
           );
         }
-        
+
         // Group ALL authorized cameras by their assigned device MAC address
         // This includes cameras from cameras_mac even if device is offline
         // A camera can be on MULTIPLE devices (currentDevices Map), so we add it to each device group
@@ -295,24 +296,29 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         for (var camera in allCameras) {
           // Skip device MAC addresses (m_*) and cameras without MAC
           if (camera.mac.isEmpty || camera.mac.startsWith('m_')) continue;
-          
+
           // Check if camera has currentDevices (can be on multiple devices)
           if (camera.currentDevices.isNotEmpty) {
             // Add camera to each device group it belongs to
             for (var deviceMac in camera.currentDevices.keys) {
               if (deviceMac.isNotEmpty) {
-                groupedCamerasByMac.putIfAbsent(deviceMac, () => []).add(camera);
+                groupedCamerasByMac
+                    .putIfAbsent(deviceMac, () => [])
+                    .add(camera);
               }
             }
-          } else if (camera.parentDeviceMacKey != null && camera.parentDeviceMacKey!.isNotEmpty) {
+          } else if (camera.parentDeviceMacKey != null &&
+              camera.parentDeviceMacKey!.isNotEmpty) {
             // Fall back to parentDeviceMacKey if no currentDevices
-            groupedCamerasByMac.putIfAbsent(camera.parentDeviceMacKey!, () => []).add(camera);
+            groupedCamerasByMac
+                .putIfAbsent(camera.parentDeviceMacKey!, () => [])
+                .add(camera);
           } else {
             // No device assignment - put in "Unassigned" group
             groupedCamerasByMac.putIfAbsent('Unassigned', () => []).add(camera);
           }
         }
-        
+
         // Build the MAC address filter chips
         final macAddressFilters = Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -331,22 +337,23 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                     selectedColor: AppTheme.primaryOrange.withOpacity(0.2),
                   ),
                 ),
-                
+
                 // MAC address filter chips (sorted: device MACs first, then Unassigned)
                 ...groupedCamerasByMac.keys
                     .where((key) => key != 'Unassigned') // Device MACs first
                     .map((macAddress) {
                   // Only count cameras with MAC address
                   final deviceCount = groupedCamerasByMac[macAddress]
-                      ?.where((camera) => camera.mac.isNotEmpty)
-                      .length ?? 0;
-                  
+                          ?.where((camera) => camera.mac.isNotEmpty)
+                          .length ??
+                      0;
+
                   // Skip devices with no cameras that have MAC
                   if (deviceCount == 0) return const SizedBox.shrink();
-                  
+
                   // Always show MAC address to distinguish between devices (unique identifier)
                   final displayLabel = '$macAddress ($deviceCount)';
-                  
+
                   return Padding(
                     padding: const EdgeInsets.only(right: 8.0),
                     child: FilterChip(
@@ -358,16 +365,17 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                     ),
                   );
                 }).toList(),
-                
+
                 // Unassigned cameras chip (shown last)
                 if (groupedCamerasByMac.containsKey('Unassigned'))
                   () {
                     final unassignedCount = groupedCamerasByMac['Unassigned']
-                        ?.where((camera) => camera.mac.isNotEmpty)
-                        .length ?? 0;
-                    
+                            ?.where((camera) => camera.mac.isNotEmpty)
+                            .length ??
+                        0;
+
                     if (unassignedCount == 0) return const SizedBox.shrink();
-                    
+
                     return Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: FilterChip(
@@ -383,10 +391,10 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
             ),
           ),
         );
-        
+
         // Filter cameras based on selected MAC address and active status
         List<Camera> baseFilteredCameras = [];
-        
+
         if (selectedMacAddress != null) {
           // Filter by selected MAC address - only show cameras with MAC
           baseFilteredCameras = (groupedCamerasByMac[selectedMacAddress] ?? [])
@@ -396,15 +404,17 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
           // Show ALL cameras from cameras_mac (source of truth)
           // This includes cameras even if their device is offline
           baseFilteredCameras = provider.cameras
-              .where((camera) => camera.mac.isNotEmpty && !camera.mac.startsWith('m_'))
+              .where((camera) =>
+                  camera.mac.isNotEmpty && !camera.mac.startsWith('m_'))
               .toList();
         }
-        
+
         // Apply active filter if needed
         if (showOnlyActive) {
-          baseFilteredCameras = baseFilteredCameras.where((camera) => camera.connected).toList();
+          baseFilteredCameras =
+              baseFilteredCameras.where((camera) => camera.connected).toList();
         }
-        
+
         // Remove duplicate cameras (same MAC address) - keep only one instance per MAC
         final Map<String, Camera> uniqueCamerasByMac = {};
         for (var camera in baseFilteredCameras) {
@@ -419,87 +429,104 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         for (var camera in baseFilteredCameras) {
           // If a specific device filter is selected, use that device for grouping
           // This ensures camera shows under the selected device when it's on multiple devices
-          if (selectedMacAddress != null && camera.currentDevices.containsKey(selectedMacAddress)) {
+          if (selectedMacAddress != null &&
+              camera.currentDevices.containsKey(selectedMacAddress)) {
             final deviceName = _getDeviceName(context, selectedMacAddress!);
-            camerasGroupedByDevice.putIfAbsent(deviceName, () => []).add(camera);
-            print('DEBUG: Camera ${camera.name} (${camera.id}) grouped under selected filter device $deviceName ($selectedMacAddress)');
+            camerasGroupedByDevice
+                .putIfAbsent(deviceName, () => [])
+                .add(camera);
+            print(
+                'DEBUG: Camera ${camera.name} (${camera.id}) grouped under selected filter device $deviceName ($selectedMacAddress)');
             continue;
           }
-          
+
           // Find which device this camera belongs to by checking devicesList
           String? deviceMac;
           String? deviceName;
-          
+
           for (var device in provider.devicesList) {
             if (device.cameras.any((c) => c.id == camera.id)) {
               deviceMac = device.macKey;
               deviceName = _getDeviceName(context, deviceMac);
-              print('DEBUG: Camera ${camera.name} (${camera.id}) found in device $deviceName ($deviceMac)');
+              print(
+                  'DEBUG: Camera ${camera.name} (${camera.id}) found in device $deviceName ($deviceMac)');
               break;
             }
           }
-          
+
           // Use device name if found, otherwise try to get from camera's currentDevices
           if (deviceName == null && camera.currentDevices.isNotEmpty) {
             // Use the first device in currentDevices map
             deviceMac = camera.currentDevices.keys.first;
             deviceName = _getDeviceName(context, deviceMac);
-            print('DEBUG: Camera ${camera.name} (${camera.id}) using currentDevices first entry $deviceName ($deviceMac)');
+            print(
+                'DEBUG: Camera ${camera.name} (${camera.id}) using currentDevices first entry $deviceName ($deviceMac)');
           }
-          
+
           if (deviceName == null) {
-            print('DEBUG: Camera ${camera.name} (${camera.id}) has no device assignment - adding to Ungrouped');
+            print(
+                'DEBUG: Camera ${camera.name} (${camera.id}) has no device assignment - adding to Ungrouped');
           }
-          
+
           final groupName = deviceName ?? 'Ungrouped Cameras';
           camerasGroupedByDevice.putIfAbsent(groupName, () => []).add(camera);
         }
 
-        return _buildGroupedCameraContent(camerasGroupedByDevice, macAddressFilters);
+        return _buildGroupedCameraContent(
+            camerasGroupedByDevice, macAddressFilters);
       },
     );
   }
 
   Widget _buildCameraGroupedView() {
-    return Consumer3<CameraDevicesProviderOptimized, WebSocketProviderOptimized, UserGroupProvider>(
+    return Consumer3<CameraDevicesProviderOptimized, WebSocketProviderOptimized,
+        UserGroupProvider>(
       builder: (context, provider, wsProvider, userGroupProvider, child) {
         // Get authorized camera MACs for current user
         final currentUsername = wsProvider.currentLoggedInUsername;
         Set<String>? authorizedMacs;
-        
-        print('[CameraScreen-Grouped] 🔍 Current logged in username: $currentUsername');
-        
+
+        print(
+            '[CameraScreen-Grouped] 🔍 Current logged in username: $currentUsername');
+
         if (currentUsername != null) {
           // Check if user is admin
           final userType = userGroupProvider.getUserType(currentUsername);
           print('[CameraScreen-Grouped] 👤 User type: $userType');
-          
+
           if (userType == 'admin') {
             // Admin sees all cameras
             authorizedMacs = null;
             print('[CameraScreen-Grouped] 👑 Admin user - showing all cameras');
           } else {
             // Regular user - get authorized cameras
-            authorizedMacs = userGroupProvider.getUserAuthorizedCameraMacs(currentUsername);
-            print('[CameraScreen-Grouped] 🔐 Regular user - authorized MACs: ${authorizedMacs.length} cameras');
-            print('[CameraScreen-Grouped] 📷 Authorized camera MACs: $authorizedMacs');
+            authorizedMacs =
+                userGroupProvider.getUserAuthorizedCameraMacs(currentUsername);
+            print(
+                '[CameraScreen-Grouped] 🔐 Regular user - authorized MACs: ${authorizedMacs.length} cameras');
+            print(
+                '[CameraScreen-Grouped] 📷 Authorized camera MACs: $authorizedMacs');
           }
         } else {
-          print('[CameraScreen-Grouped] ⚠️ No logged in user - showing all cameras');
+          print(
+              '[CameraScreen-Grouped] ⚠️ No logged in user - showing all cameras');
         }
-        
+
         // Get filtered cameras based on authorization
-        final allAuthorizedCameras = provider.getAuthorizedCameras(authorizedMacs);
-        print('[CameraScreen-Grouped] 📊 Total cameras available: ${provider.cameras.length}');
-        print('[CameraScreen-Grouped] ✅ Filtered cameras to show: ${allAuthorizedCameras.length}');
-        
+        final allAuthorizedCameras =
+            provider.getAuthorizedCameras(authorizedMacs);
+        print(
+            '[CameraScreen-Grouped] 📊 Total cameras available: ${provider.cameras.length}');
+        print(
+            '[CameraScreen-Grouped] ✅ Filtered cameras to show: ${allAuthorizedCameras.length}');
+
         // If loading, show a spinner
         if (provider.isLoading) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
-        
+
         // If there are no authorized cameras, show empty state
         if (allAuthorizedCameras.isEmpty) {
           return Center(
@@ -541,48 +568,52 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
 
         // Get camera groups using the same method as CameraGroupsScreen
         final cameraGroups = provider.cameraGroupsList;
-        
+
         // Group cameras by their camera groups
         final Map<String, List<Camera>> camerasGroupedByName = {};
-        
+
         // Use authorized cameras and apply active filter
-        List<Camera> filteredAuthorizedCameras = showOnlyActive 
-          ? allAuthorizedCameras.where((camera) => camera.connected).toList()
-          : allAuthorizedCameras;
-        
+        List<Camera> filteredAuthorizedCameras = showOnlyActive
+            ? allAuthorizedCameras.where((camera) => camera.connected).toList()
+            : allAuthorizedCameras;
+
         // Track which cameras are assigned to groups
         Set<String> assignedCameraIds = {};
-        
+
         if (cameraGroups.isNotEmpty) {
           // Initialize groups
           for (final group in cameraGroups) {
             camerasGroupedByName[group.name] = [];
           }
-          
+
           // Get cameras for each group using the provider method
           for (final group in cameraGroups) {
             final camerasInGroup = provider.getCamerasInGroup(group.name);
             // Filter by authorization and active status
             List<Camera> filteredCameras = camerasInGroup
-                .where((camera) => allAuthorizedCameras.any((ac) => ac.mac == camera.mac))
+                .where((camera) =>
+                    allAuthorizedCameras.any((ac) => ac.mac == camera.mac))
                 .toList();
-            
+
             if (showOnlyActive) {
-              filteredCameras = filteredCameras.where((camera) => camera.connected).toList();
+              filteredCameras =
+                  filteredCameras.where((camera) => camera.connected).toList();
             }
-            
+
             camerasGroupedByName[group.name] = filteredCameras;
-            
+
             // Track assigned cameras
             for (final camera in filteredCameras) {
               assignedCameraIds.add(camera.id);
             }
           }
         }
-        
+
         // Find ungrouped cameras (not assigned to any group) from authorized cameras
-        final ungroupedCameras = filteredAuthorizedCameras.where((camera) => !assignedCameraIds.contains(camera.id)).toList();
-        
+        final ungroupedCameras = filteredAuthorizedCameras
+            .where((camera) => !assignedCameraIds.contains(camera.id))
+            .toList();
+
         // Add ungrouped cameras to a separate group if any exist
         if (ungroupedCameras.isNotEmpty) {
           camerasGroupedByName['Ungrouped Cameras'] = ungroupedCameras;
@@ -596,7 +627,8 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildGroupedCameraContent(Map<String, List<Camera>> groupedCameras, Widget? filterChips) {
+  Widget _buildGroupedCameraContent(
+      Map<String, List<Camera>> groupedCameras, Widget? filterChips) {
     final sortedGroupNames = groupedCameras.keys.toList()
       ..sort((a, b) => a.compareTo(b));
 
@@ -632,7 +664,8 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                 sliver: SliverGrid.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    childAspectRatio: 1,
+                    childAspectRatio:
+                        0.75, // Daha uzun kartlar için (toggle görünsün)
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,
                   ),
@@ -658,7 +691,8 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                   (context, index) {
                     final camera = camerasInGroup[index];
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 4.0),
                       child: Card(
                         margin: const EdgeInsets.only(bottom: 8.0),
                         elevation: 2,
@@ -674,7 +708,9 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                   fit: StackFit.expand,
                                   children: [
                                     Container(
-                                      color: !_hasMacAddress(camera) ? Colors.grey[800] : Colors.black,
+                                      color: !_hasMacAddress(camera)
+                                          ? Colors.grey[800]
+                                          : Colors.black,
                                       child: !_hasMacAddress(camera)
                                           ? const Icon(
                                               Icons.videocam_off_outlined,
@@ -685,9 +721,11 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                               ? Image.network(
                                                   camera.mainSnapShot,
                                                   fit: BoxFit.cover,
-                                                  errorBuilder: (context, error, stackTrace) {
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
                                                     return const Icon(
-                                                      Icons.broken_image_outlined,
+                                                      Icons
+                                                          .broken_image_outlined,
                                                       size: 36.0,
                                                       color: Colors.white54,
                                                     );
@@ -709,8 +747,10 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                             vertical: 2.0,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.black.withOpacity(0.6),
-                                            borderRadius: BorderRadius.circular(8),
+                                            color:
+                                                Colors.black.withOpacity(0.6),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                           ),
                                           child: const Row(
                                             mainAxisSize: MainAxisSize.min,
@@ -740,7 +780,8 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                 child: Padding(
                                   padding: const EdgeInsets.all(12.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
@@ -752,17 +793,26 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 16.0,
-                                                color: !_hasMacAddress(camera) ? Colors.grey : null,
+                                                color: !_hasMacAddress(camera)
+                                                    ? Colors.grey
+                                                    : null,
                                               ),
                                             ),
                                           ),
                                           if (!_hasMacAddress(camera))
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 2),
                                               decoration: BoxDecoration(
-                                                color: Colors.orange.withOpacity(0.2),
-                                                borderRadius: BorderRadius.circular(4),
-                                                border: Border.all(color: Colors.orange, width: 1),
+                                                color: Colors.orange
+                                                    .withOpacity(0.2),
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                                border: Border.all(
+                                                    color: Colors.orange,
+                                                    width: 1),
                                               ),
                                               child: const Text(
                                                 'NO MAC',
@@ -779,16 +829,24 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                       Row(
                                         children: [
                                           Icon(
-                                            camera.connected ? Icons.link : Icons.link_off,
+                                            camera.connected
+                                                ? Icons.link
+                                                : Icons.link_off,
                                             size: 14.0,
-                                            color: camera.connected ? Colors.green : Colors.red,
+                                            color: camera.connected
+                                                ? Colors.green
+                                                : Colors.red,
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
-                                            camera.connected ? 'Connected' : 'Disconnected',
+                                            camera.connected
+                                                ? 'Connected'
+                                                : 'Disconnected',
                                             style: TextStyle(
                                               fontSize: 12.0,
-                                              color: camera.connected ? Colors.green : Colors.red,
+                                              color: camera.connected
+                                                  ? Colors.green
+                                                  : Colors.red,
                                             ),
                                           ),
                                         ],
@@ -819,41 +877,63 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                         Row(
                                           children: [
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 6,
+                                                      vertical: 2),
                                               decoration: BoxDecoration(
-                                                color: camera.currentDevices.length > 1 
-                                                    ? Colors.orange.withOpacity(0.2)
-                                                    : Colors.blue.withOpacity(0.2),
-                                                borderRadius: BorderRadius.circular(8),
+                                                color: camera.currentDevices
+                                                            .length >
+                                                        1
+                                                    ? Colors.orange
+                                                        .withOpacity(0.2)
+                                                    : Colors.blue
+                                                        .withOpacity(0.2),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                                 border: Border.all(
-                                                  color: camera.currentDevices.length > 1 
-                                                      ? Colors.orange.withOpacity(0.5)
-                                                      : Colors.blue.withOpacity(0.5),
+                                                  color: camera.currentDevices
+                                                              .length >
+                                                          1
+                                                      ? Colors.orange
+                                                          .withOpacity(0.5)
+                                                      : Colors.blue
+                                                          .withOpacity(0.5),
                                                 ),
                                               ),
                                               child: Row(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   Icon(
-                                                    camera.currentDevices.length > 1 
-                                                        ? Icons.devices 
+                                                    camera.currentDevices
+                                                                .length >
+                                                            1
+                                                        ? Icons.devices
                                                         : Icons.device_hub,
                                                     size: 12.0,
-                                                    color: camera.currentDevices.length > 1 
-                                                        ? Colors.orange 
+                                                    color: camera.currentDevices
+                                                                .length >
+                                                            1
+                                                        ? Colors.orange
                                                         : Colors.blue,
                                                   ),
                                                   const SizedBox(width: 4),
                                                   Text(
-                                                    camera.currentDevices.length > 1
+                                                    camera.currentDevices
+                                                                .length >
+                                                            1
                                                         ? '${camera.currentDevices.length} cihazda'
                                                         : '1 cihazda',
                                                     style: TextStyle(
                                                       fontSize: 10.0,
-                                                      color: camera.currentDevices.length > 1 
-                                                          ? Colors.orange 
-                                                          : Colors.blue,
-                                                      fontWeight: FontWeight.w600,
+                                                      color:
+                                                          camera.currentDevices
+                                                                      .length >
+                                                                  1
+                                                              ? Colors.orange
+                                                              : Colors.blue,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                     ),
                                                   ),
                                                 ],
@@ -863,36 +943,47 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                         ),
                                         const SizedBox(height: 4),
                                         // Device names list
-                                        ...camera.currentDevices.keys.map((deviceMac) => Padding(
-                                          padding: const EdgeInsets.only(bottom: 2),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                Icons.arrow_right,
-                                                size: 14.0,
-                                                color: Colors.blue.withOpacity(0.7),
-                                              ),
-                                              Expanded(
-                                                child: Text(
-                                                  _getDeviceName(context, deviceMac),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    fontSize: 11.0,
-                                                    color: Colors.blue,
+                                        ...camera.currentDevices.keys
+                                            .map((deviceMac) => Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 2),
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.arrow_right,
+                                                        size: 14.0,
+                                                        color: Colors.blue
+                                                            .withOpacity(0.7),
+                                                      ),
+                                                      Expanded(
+                                                        child: Text(
+                                                          _getDeviceName(
+                                                              context,
+                                                              deviceMac),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 11.0,
+                                                            color: Colors.blue,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )).toList(),
+                                                ))
+                                            .toList(),
                                       ],
-                                      if (camera.currentDevices.isNotEmpty) const SizedBox(height: 4),
+                                      if (camera.currentDevices.isNotEmpty)
+                                        const SizedBox(height: 4),
                                       // Resolution and additional info row
                                       Row(
                                         children: [
                                           // Resolution
-                                          if (camera.recordWidth > 0 && camera.recordHeight > 0) ...[
+                                          if (camera.recordWidth > 0 &&
+                                              camera.recordHeight > 0) ...[
                                             Icon(
                                               Icons.high_quality,
                                               size: 12.0,
@@ -909,7 +1000,8 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                             const SizedBox(width: 12),
                                           ],
                                           // History count - filter out empty entries
-                                          if (camera.deviceHistory.any((h) => h.deviceMac.isNotEmpty)) ...[
+                                          if (camera.deviceHistory.any((h) =>
+                                              h.deviceMac.isNotEmpty)) ...[
                                             Icon(
                                               Icons.history,
                                               size: 12.0,
@@ -949,24 +1041,36 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                   ),
                                 ),
                               ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
                                     icon: Icon(
                                       Icons.videocam,
-                                      color: !_hasMacAddress(camera) ? Colors.grey : null,
+                                      color: !_hasMacAddress(camera)
+                                          ? Colors.grey
+                                          : null,
                                     ),
-                                    onPressed: !_hasMacAddress(camera) ? null : () => _openLiveView(camera),
-                                    tooltip: !_hasMacAddress(camera) ? 'No MAC Address' : 'Live View',
+                                    onPressed: !_hasMacAddress(camera)
+                                        ? null
+                                        : () => _openLiveView(camera),
+                                    tooltip: !_hasMacAddress(camera)
+                                        ? 'No MAC Address'
+                                        : 'Live View',
                                   ),
                                   IconButton(
                                     icon: Icon(
                                       Icons.video_library,
-                                      color: !_hasMacAddress(camera) ? Colors.grey : null,
+                                      color: !_hasMacAddress(camera)
+                                          ? Colors.grey
+                                          : null,
                                     ),
-                                    onPressed: !_hasMacAddress(camera) ? null : () => _openRecordView(camera),
-                                    tooltip: !_hasMacAddress(camera) ? 'No MAC Address' : 'Recordings',
+                                    onPressed: !_hasMacAddress(camera)
+                                        ? null
+                                        : () => _openRecordView(camera),
+                                    tooltip: !_hasMacAddress(camera)
+                                        ? 'No MAC Address'
+                                        : 'Recordings',
                                   ),
                                 ],
                               ),
@@ -1004,11 +1108,12 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
   // Get device name and IP from MAC address
   String _getDeviceName(BuildContext context, String deviceMac) {
     try {
-      final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
-      
+      final provider =
+          Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+
       // Use MAC address as-is, no formatting
       String normalizedMac = deviceMac;
-      
+
       // First try direct lookup by key
       if (provider.devices.containsKey(deviceMac)) {
         final device = provider.devices[deviceMac]!;
@@ -1020,18 +1125,19 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
         } else {
           deviceName = deviceMac;
         }
-        
+
         if (device.ipv4.isNotEmpty) {
           deviceName += ' (${device.ipv4})';
         }
-        
-        print('DEBUG: Device $deviceMac found by key, using full name "$deviceName"');
+
+        print(
+            'DEBUG: Device $deviceMac found by key, using full name "$deviceName"');
         return deviceName;
       }
-      
+
       // Find device by MAC address (case-insensitive comparison)
       for (var device in provider.devices.values) {
-        if (device.macAddress.toLowerCase() == normalizedMac.toLowerCase() || 
+        if (device.macAddress.toLowerCase() == normalizedMac.toLowerCase() ||
             device.macKey.toLowerCase() == deviceMac.toLowerCase()) {
           String deviceName = '';
           if (device.deviceName?.isNotEmpty == true) {
@@ -1042,17 +1148,17 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
             // Use MAC as-is for readability
             deviceName = deviceMac;
           }
-          
+
           // Add IP address if available
           if (device.ipv4.isNotEmpty) {
             deviceName += ' (${device.ipv4})';
           }
-          
+
           print('DEBUG: Device $deviceMac using full name "$deviceName"');
           return deviceName;
         }
       }
-      
+
       // If not found, return MAC as-is
       print('DEBUG: Device $deviceMac not found, using MAC as-is');
       return deviceMac;
@@ -1087,26 +1193,28 @@ class CameraSearchDelegate extends SearchDelegate<Camera> {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
       onPressed: () {
-        close(context, Camera(
-          index: -1,
-          name: '',
-          ip: '',
-          username: '',
-          password: '',
-          brand: '',
-          mediaUri: '',
-          recordUri: '',
-          subUri: '',
-          remoteUri: '',
-          mainSnapShot: '',
-          subSnapShot: '',
-          recordWidth: 0,
-          recordHeight: 0,
-          subWidth: 0,
-          subHeight: 0,
-          connected: false,
-          lastSeenAt: '',
-        ));
+        close(
+            context,
+            Camera(
+              index: -1,
+              name: '',
+              ip: '',
+              username: '',
+              password: '',
+              brand: '',
+              mediaUri: '',
+              recordUri: '',
+              subUri: '',
+              remoteUri: '',
+              mainSnapShot: '',
+              subSnapShot: '',
+              recordWidth: 0,
+              recordHeight: 0,
+              subWidth: 0,
+              subHeight: 0,
+              connected: false,
+              lastSeenAt: '',
+            ));
       },
     );
   }
@@ -1122,7 +1230,8 @@ class CameraSearchDelegate extends SearchDelegate<Camera> {
   }
 
   Widget _buildSearchResults(BuildContext context) {
-    final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    final provider =
+        Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
     final cameras = provider.cameras;
 
     if (query.isEmpty) {

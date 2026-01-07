@@ -1,4 +1,3 @@
-
 enum DeviceStatus {
   online,
   offline,
@@ -10,11 +9,11 @@ enum DeviceStatus {
 
 // Current device assignment for camera from cameras_mac.json
 class CameraCurrentDevice {
-  final String deviceMac;      // Device MAC address camera is currently assigned to
-  final String deviceIp;      // Device IP address
-  final String cameraIp;      // Camera IP address
-  final String name;          // Camera name in current assignment
-  final int startDate;        // Timestamp when assigned to this device
+  final String deviceMac; // Device MAC address camera is currently assigned to
+  final String deviceIp; // Device IP address
+  final String cameraIp; // Camera IP address
+  final String name; // Camera name in current assignment
+  final int startDate; // Timestamp when assigned to this device
 
   CameraCurrentDevice({
     required this.deviceMac,
@@ -69,12 +68,13 @@ class CameraCurrentDevice {
 
 // Historical device assignment for camera from cameras_mac.json
 class CameraHistoryDevice {
-  final String deviceMac;      // Device MAC address camera was previously assigned to
-  final String deviceIp;      // Device IP address
-  final String cameraIp;      // Camera IP address  
-  final String name;          // Camera name in this historical assignment
-  final int startDate;        // Timestamp when assigned to this device
-  final int endDate;          // Timestamp when assignment ended
+  final String
+      deviceMac; // Device MAC address camera was previously assigned to
+  final String deviceIp; // Device IP address
+  final String cameraIp; // Camera IP address
+  final String name; // Camera name in this historical assignment
+  final int startDate; // Timestamp when assigned to this device
+  final int endDate; // Timestamp when assignment ended
 
   CameraHistoryDevice({
     required this.deviceMac,
@@ -141,9 +141,11 @@ class CameraDevice {
   bool online; // WebSocket field: online
   String firstTime; // WebSocket field: firsttime
   String uptime;
-  String deviceType; // Example: 'NVR', 'IPC' - might need to parse from other data
+  String
+      deviceType; // Example: 'NVR', 'IPC' - might need to parse from other data
   String firmwareVersion; // WebSocket field: version
-  String recordPath; // Usually from camera specific data, but can be a device default
+  String
+      recordPath; // Usually from camera specific data, but can be a device default
 
   // Newly added fields from WebSocket data
   String? deviceName; // WebSocket field: name
@@ -171,7 +173,7 @@ class CameraDevice {
   int camreportsCount;
   int programsCount;
   bool isClosedByMaster;
-  
+
   // Heartbeat and connection
   int lastHeartbeatTs;
   int offlineSince;
@@ -192,7 +194,7 @@ class CameraDevice {
   bool shmcReady;
   bool timeset;
   bool uykumodu; // sleep mode
-  
+
   // App configuration
   String? appDeviceType;
   String? firmwareDate;
@@ -217,7 +219,7 @@ class CameraDevice {
   int recordingCameras;
   int restartPlayerTimeout;
   String? rp2040version;
-  
+
   // Test information
   String? testUptime;
   int testConnectionCount;
@@ -260,7 +262,7 @@ class CameraDevice {
     this.isMaster,
     this.lastTs,
     this.camCount = 0,
-    
+
     // Ready states with defaults
     this.appReady = false,
     this.systemReady = false,
@@ -269,7 +271,7 @@ class CameraDevice {
     this.configurationReady = false,
     this.camreportsReady = false,
     this.movitaReady = false,
-    
+
     // Device status fields with defaults
     this.registered = false,
     this.appVersion = 0,
@@ -277,11 +279,11 @@ class CameraDevice {
     this.camreportsCount = 0,
     this.programsCount = 0,
     this.isClosedByMaster = false,
-    
+
     // Heartbeat and connection with defaults
     this.lastHeartbeatTs = 0,
     this.offlineSince = 0,
-    
+
     // System information with defaults
     this.systemMac,
     this.gateway,
@@ -298,7 +300,7 @@ class CameraDevice {
     this.shmcReady = false,
     this.timeset = false,
     this.uykumodu = false,
-    
+
     // App configuration with defaults
     this.appDeviceType,
     this.firmwareDate,
@@ -323,7 +325,7 @@ class CameraDevice {
     this.recordingCameras = 0,
     this.restartPlayerTimeout = 0,
     this.rp2040version,
-    
+
     // Test information with defaults
     this.testUptime,
     this.testConnectionCount = 0,
@@ -336,7 +338,6 @@ class CameraDevice {
     this.testProgramCount = 0,
     this.testProgramLastUpdate,
     this.testProgramError = 0,
-    
     this.totalRam = 0,
     this.freeRam = 0,
     this.networkInfo,
@@ -367,7 +368,7 @@ class CameraDevice {
     bool? isMaster,
     String? lastTs,
     int? camCount,
-    
+
     // Ready states
     bool? appReady,
     bool? systemReady,
@@ -376,7 +377,7 @@ class CameraDevice {
     bool? configurationReady,
     bool? camreportsReady,
     bool? movitaReady,
-    
+
     // Device status fields
     bool? registered,
     int? appVersion,
@@ -384,11 +385,11 @@ class CameraDevice {
     int? camreportsCount,
     int? programsCount,
     bool? isClosedByMaster,
-    
+
     // Heartbeat and connection
     int? lastHeartbeatTs,
     int? offlineSince,
-    
+
     // System information
     String? systemMac,
     String? gateway,
@@ -405,7 +406,7 @@ class CameraDevice {
     bool? shmcReady,
     bool? timeset,
     bool? uykumodu,
-    
+
     // App configuration
     String? appDeviceType,
     String? firmwareDate,
@@ -430,7 +431,7 @@ class CameraDevice {
     int? recordingCameras,
     int? restartPlayerTimeout,
     String? rp2040version,
-    
+
     // Test information
     String? testUptime,
     int? testConnectionCount,
@@ -443,7 +444,6 @@ class CameraDevice {
     int? testProgramCount,
     String? testProgramLastUpdate,
     int? testProgramError,
-    
     int? totalRam,
     int? freeRam,
     String? networkInfo,
@@ -471,7 +471,7 @@ class CameraDevice {
       isMaster: isMaster ?? this.isMaster,
       lastTs: lastTs ?? this.lastTs,
       camCount: camCount ?? this.camCount,
-      
+
       // Ready states
       appReady: appReady ?? this.appReady,
       systemReady: systemReady ?? this.systemReady,
@@ -480,7 +480,7 @@ class CameraDevice {
       configurationReady: configurationReady ?? this.configurationReady,
       camreportsReady: camreportsReady ?? this.camreportsReady,
       movitaReady: movitaReady ?? this.movitaReady,
-      
+
       // Device status fields
       registered: registered ?? this.registered,
       appVersion: appVersion ?? this.appVersion,
@@ -488,11 +488,11 @@ class CameraDevice {
       camreportsCount: camreportsCount ?? this.camreportsCount,
       programsCount: programsCount ?? this.programsCount,
       isClosedByMaster: isClosedByMaster ?? this.isClosedByMaster,
-      
+
       // Heartbeat and connection
       lastHeartbeatTs: lastHeartbeatTs ?? this.lastHeartbeatTs,
       offlineSince: offlineSince ?? this.offlineSince,
-      
+
       // System information
       systemMac: systemMac ?? this.systemMac,
       gateway: gateway ?? this.gateway,
@@ -509,7 +509,7 @@ class CameraDevice {
       shmcReady: shmcReady ?? this.shmcReady,
       timeset: timeset ?? this.timeset,
       uykumodu: uykumodu ?? this.uykumodu,
-      
+
       // App configuration
       appDeviceType: appDeviceType ?? this.appDeviceType,
       firmwareDate: firmwareDate ?? this.firmwareDate,
@@ -534,20 +534,25 @@ class CameraDevice {
       recordingCameras: recordingCameras ?? this.recordingCameras,
       restartPlayerTimeout: restartPlayerTimeout ?? this.restartPlayerTimeout,
       rp2040version: rp2040version ?? this.rp2040version,
-      
+
       // Test information
       testUptime: testUptime ?? this.testUptime,
       testConnectionCount: testConnectionCount ?? this.testConnectionCount,
-      testConnectionLastUpdate: testConnectionLastUpdate ?? this.testConnectionLastUpdate,
+      testConnectionLastUpdate:
+          testConnectionLastUpdate ?? this.testConnectionLastUpdate,
       testConnectionError: testConnectionError ?? this.testConnectionError,
       testIsError: testIsError ?? this.testIsError,
-      testKameraBaglantiCount: testKameraBaglantiCount ?? this.testKameraBaglantiCount,
-      testKameraBaglantiLastUpdate: testKameraBaglantiLastUpdate ?? this.testKameraBaglantiLastUpdate,
-      testKameraBaglantiError: testKameraBaglantiError ?? this.testKameraBaglantiError,
+      testKameraBaglantiCount:
+          testKameraBaglantiCount ?? this.testKameraBaglantiCount,
+      testKameraBaglantiLastUpdate:
+          testKameraBaglantiLastUpdate ?? this.testKameraBaglantiLastUpdate,
+      testKameraBaglantiError:
+          testKameraBaglantiError ?? this.testKameraBaglantiError,
       testProgramCount: testProgramCount ?? this.testProgramCount,
-      testProgramLastUpdate: testProgramLastUpdate ?? this.testProgramLastUpdate,
+      testProgramLastUpdate:
+          testProgramLastUpdate ?? this.testProgramLastUpdate,
       testProgramError: testProgramError ?? this.testProgramError,
-      
+
       totalRam: totalRam ?? this.totalRam,
       freeRam: freeRam ?? this.freeRam,
       networkInfo: networkInfo ?? this.networkInfo,
@@ -560,8 +565,8 @@ class CameraDevice {
   factory CameraDevice.fromJson(Map<String, dynamic> json) {
     var camerasList = <Camera>[];
     if (json['cameras'] != null) {
-      camerasList = List<Camera>.from(
-          json['cameras'].map((camJson) => Camera.fromJson(camJson as Map<String, dynamic>)));
+      camerasList = List<Camera>.from(json['cameras']
+          .map((camJson) => Camera.fromJson(camJson as Map<String, dynamic>)));
     }
 
     return CameraDevice(
@@ -571,24 +576,27 @@ class CameraDevice {
       lastSeenAt: json['last_seen_at'] as String? ?? '',
       connected: json['connected'] as bool? ?? false,
       online: json['online'] as bool? ?? false,
-      firstTime: json['firstTime'] as String? ?? json['firsttime'] as String? ?? '',
+      firstTime:
+          json['firstTime'] as String? ?? json['firsttime'] as String? ?? '',
       uptime: json['uptime'] as String? ?? '',
       deviceType: json['deviceType'] as String? ?? '',
-      firmwareVersion: json['firmwareVersion'] as String? ?? json['version']?.toString() ?? '',
+      firmwareVersion: json['firmwareVersion'] as String? ??
+          json['version']?.toString() ??
+          '',
       recordPath: json['recordPath'] as String? ?? '',
-      
+
       // Basic device info from WebSocket
       deviceName: json['name'] as String?,
       currentTime: json['current_time'] as String?,
       smartwebVersion: json['smartweb_version'] as String?,
-      cpuTemp: (json['cpuTemp'] is String) 
+      cpuTemp: (json['cpuTemp'] is String)
           ? double.tryParse(json['cpuTemp'] as String) ?? 0.0
           : (json['cpuTemp'] as num?)?.toDouble() ?? 0.0,
       ipv6: json['ipv6'] as String?,
       isMaster: json['isMaster'] as bool?,
       lastTs: json['last_ts']?.toString(),
       camCount: json['cam_count'] as int? ?? 0,
-      
+
       // Ready states from WebSocket
       appReady: json['app_ready'] as bool? ?? false,
       systemReady: json['system_ready'] as bool? ?? false,
@@ -597,7 +605,7 @@ class CameraDevice {
       configurationReady: json['configuration_ready'] as bool? ?? false,
       camreportsReady: json['camreports_ready'] as bool? ?? false,
       movitaReady: json['movita_ready'] as bool? ?? false,
-      
+
       // Device status fields from WebSocket
       registered: json['registered'] as bool? ?? false,
       appVersion: json['app_version'] as int? ?? json['version'] as int? ?? 0,
@@ -605,11 +613,11 @@ class CameraDevice {
       camreportsCount: json['camreports_count'] as int? ?? 0,
       programsCount: json['programs_count'] as int? ?? 0,
       isClosedByMaster: json['is_closed_by_master'] as bool? ?? false,
-      
+
       // Heartbeat and connection from WebSocket
       lastHeartbeatTs: json['last_heartbeat_ts'] as int? ?? 0,
       offlineSince: json['offline_since'] as int? ?? 0,
-      
+
       // System information from WebSocket system.* fields
       systemMac: json['system']?['mac'] as String?,
       gateway: json['system']?['gateway'] as String?,
@@ -626,7 +634,7 @@ class CameraDevice {
       shmcReady: json['system']?['shmc_ready'] as bool? ?? false,
       timeset: json['system']?['timeset'] as bool? ?? false,
       uykumodu: json['system']?['uykumodu'] as bool? ?? false,
-      
+
       // App configuration from WebSocket app.* fields
       appDeviceType: json['app']?['deviceType'] as String?,
       firmwareDate: json['app']?['firmwareDate'] as String?,
@@ -651,20 +659,25 @@ class CameraDevice {
       recordingCameras: json['app']?['recordingCameras'] as int? ?? 0,
       restartPlayerTimeout: json['app']?['restartPlayerTimeout'] as int? ?? 0,
       rp2040version: json['app']?['rp2040version'] as String?,
-      
+
       // Test information from WebSocket test.* fields
       testUptime: json['test']?['uptime'] as String?,
       testConnectionCount: json['test']?['connection']?['count'] as int? ?? 0,
-      testConnectionLastUpdate: json['test']?['connection']?['last_update'] as String?,
+      testConnectionLastUpdate:
+          json['test']?['connection']?['last_update'] as String?,
       testConnectionError: json['test']?['connection']?['error'] as int? ?? 0,
       testIsError: json['test']?['is_error'] as bool? ?? false,
-      testKameraBaglantiCount: json['test']?['kamera_baglanti']?['count'] as int? ?? 0,
-      testKameraBaglantiLastUpdate: json['test']?['kamera_baglanti']?['last_update'] as String?,
-      testKameraBaglantiError: json['test']?['kamera_baglanti']?['error'] as int? ?? 0,
+      testKameraBaglantiCount:
+          json['test']?['kamera_baglanti']?['count'] as int? ?? 0,
+      testKameraBaglantiLastUpdate:
+          json['test']?['kamera_baglanti']?['last_update'] as String?,
+      testKameraBaglantiError:
+          json['test']?['kamera_baglanti']?['error'] as int? ?? 0,
       testProgramCount: json['test']?['program']?['count'] as int? ?? 0,
-      testProgramLastUpdate: json['test']?['program']?['last_update'] as String?,
+      testProgramLastUpdate:
+          json['test']?['program']?['last_update'] as String?,
       testProgramError: json['test']?['program']?['error'] as int? ?? 0,
-      
+
       cameras: camerasList,
       totalRam: json['totalRam'] as int? ?? 0,
       freeRam: json['freeRam'] as int? ?? 0,
@@ -687,7 +700,7 @@ class CameraDevice {
         'deviceType': deviceType,
         'firmwareVersion': firmwareVersion,
         'recordPath': recordPath,
-        
+
         // Basic device info
         'name': deviceName,
         'current_time': currentTime,
@@ -697,7 +710,7 @@ class CameraDevice {
         'isMaster': isMaster,
         'last_ts': lastTs,
         'cam_count': camCount,
-        
+
         // Ready states
         'app_ready': appReady,
         'system_ready': systemReady,
@@ -706,7 +719,7 @@ class CameraDevice {
         'configuration_ready': configurationReady,
         'camreports_ready': camreportsReady,
         'movita_ready': movitaReady,
-        
+
         // Device status fields
         'registered': registered,
         'app_version': appVersion,
@@ -714,11 +727,11 @@ class CameraDevice {
         'camreports_count': camreportsCount,
         'programs_count': programsCount,
         'is_closed_by_master': isClosedByMaster,
-        
+
         // Heartbeat and connection
         'last_heartbeat_ts': lastHeartbeatTs,
         'offline_since': offlineSince,
-        
+
         // System information
         'system': {
           'mac': systemMac,
@@ -737,7 +750,7 @@ class CameraDevice {
           'timeset': timeset,
           'uykumodu': uykumodu,
         },
-        
+
         // App configuration
         'app': {
           'deviceType': appDeviceType,
@@ -764,7 +777,7 @@ class CameraDevice {
           'restartPlayerTimeout': restartPlayerTimeout,
           'rp2040version': rp2040version,
         },
-        
+
         // Test information
         'test': {
           'uptime': testUptime,
@@ -785,7 +798,7 @@ class CameraDevice {
             'error': testProgramError,
           },
         },
-        
+
         'cameras': cameras.map((camera) => camera.toJson()).toList(),
         'totalRam': totalRam,
         'freeRam': freeRam,
@@ -799,15 +812,18 @@ class CameraDevice {
     print('CameraDevice status getter invoked for $macAddress');
     // MODIFIED: Primary check for offline status is now solely based on 'connected'.
     // 'online' (powered state) is secondary; if not connected, it's offline to the system.
-    print('DeviceStatus: Evaluating status for device $macAddress. Device connected property: $connected, Device online property: $online');
-    if (!connected) { 
-      print('DeviceStatus: Device $macAddress determined as OFFLINE because device.connected is $connected.');
+    print(
+        'DeviceStatus: Evaluating status for device $macAddress. Device connected property: $connected, Device online property: $online');
+    if (!connected) {
+      print(
+          'DeviceStatus: Device $macAddress determined as OFFLINE because device.connected is $connected.');
       return DeviceStatus.offline;
     }
-    
+
     // If there are no cameras, and the device itself is connected, consider it online.
     if (cameras.isEmpty) {
-      print('DeviceStatus: Device $macAddress has no cameras. Reporting as ONLINE because device.connected is true and no cameras to check.');
+      print(
+          'DeviceStatus: Device $macAddress has no cameras. Reporting as ONLINE because device.connected is true and no cameras to check.');
       return DeviceStatus.online;
     }
 
@@ -815,32 +831,37 @@ class CameraDevice {
     // bool hasError = false; // This was previously unused. If error conditions for a device (not just camera) exist, logic to set this should be added.
 
     for (final camera in cameras) {
-      print('DeviceStatus: Checking camera ${camera.name} (index ${camera.index}) for device $macAddress. Camera connected property: ${camera.connected}');
+      print(
+          'DeviceStatus: Checking camera ${camera.name} (index ${camera.index}) for device $macAddress. Camera connected property: ${camera.connected}');
       if (!camera.connected) {
         hasWarning = true;
-        print('DeviceStatus: Camera ${camera.name} for device $macAddress is disconnected. Setting hasWarning to true.');
+        print(
+            'DeviceStatus: Camera ${camera.name} for device $macAddress is disconnected. Setting hasWarning to true.');
         break; // Optimization: if one camera causes a warning, no need to check further.
       }
     }
-    
+
     // if (hasError) { // This block is currently unreachable as hasError is never true.
     //   print('DeviceStatus: Device $macAddress has error. Returning DeviceStatus.error.');
     //   return DeviceStatus.error;
-    // } else 
+    // } else
     if (hasWarning) {
-      print('DeviceStatus: Device $macAddress determined as WARNING because device.connected is true, but one or more cameras are disconnected.');
+      print(
+          'DeviceStatus: Device $macAddress determined as WARNING because device.connected is true, but one or more cameras are disconnected.');
       return DeviceStatus.warning;
     } else {
-      print('DeviceStatus: Device $macAddress determined as ONLINE because device.connected is true and all cameras are connected.');
+      print(
+          'DeviceStatus: Device $macAddress determined as ONLINE because device.connected is true and all cameras are connected.');
       return DeviceStatus.online;
     }
   }
-  
+
   // Force status update - can be called when connected status changes
   void updateStatus() {
     // This method exists solely to make it clear when the status should be recalculated
     // The status is calculated on-demand via the getter
-    print('Status updated for device $macAddress: ${connected ? "Online" : "Offline"}');
+    print(
+        'Status updated for device $macAddress: ${connected ? "Online" : "Offline"}');
   }
 
   // Helper method to format uptime in a human-readable format
@@ -852,7 +873,7 @@ class CameraDevice {
       final int hours = (seconds % 86400) ~/ 3600;
       final int minutes = (seconds % 3600) ~/ 60;
       final int remainingSeconds = seconds % 60;
-      
+
       if (days > 0) {
         return '${days}d ${hours}h ${minutes}m';
       } else if (hours > 0) {
@@ -863,11 +884,11 @@ class CameraDevice {
         return '${remainingSeconds}s';
       }
     }
-    
+
     // If it's already formatted or can't be parsed, return as is
     return uptime;
   }
-  
+
   @override
   String toString() {
     return 'CameraDevice(macAddress: $macAddress, macKey: $macKey, ipv4: $ipv4, connected: $connected, online: $online, firstTime: $firstTime, uptime: $uptime, deviceName: $deviceName, firmwareVersion: $firmwareVersion, currentTime: $currentTime, smartwebVersion: $smartwebVersion, cpuTemp: $cpuTemp, ipv6: $ipv6, isMaster: $isMaster, lastTs: $lastTs, camCount: $camCount, totalRam: $totalRam, freeRam: $freeRam, networkInfo: $networkInfo, totalConnections: $totalConnections, totalSessions: $totalSessions, cameras: ${cameras.length})';
@@ -875,58 +896,58 @@ class CameraDevice {
 }
 
 class Camera {
-  String health;              // camreports için sağlık bilgisi (changed from final)
-  double temperature;         // camreports için sıcaklık bilgisi (changed from final)
-  String reportError;         // camreports.reported hatası (error: 1000 gibi)
-  String lastRestartTime;     // camreports.last_restart_time
-  String reportName;          // camreports için rapor adı (KAMERA1 gibi)
-  int index;                  // Index of the camera in the device\'s cameras array
-  String name;                // User-friendly name (e.g., KAMERA1)
-  String ip;                  // IP address of the camera (cameraIp)
-  int rawIp;                  // Raw IP address integer (cameraRawIp)
-  String username;            // Username for authentication
-  String password;            // Password for authentication
-  String brand;               // Camera brand
-  String hw;                  // Hardware identifier
-  String manufacturer;        // Camera manufacturer
-  String country;             // Camera country
-  String xAddrs;              // ONVIF device service address
-  String mediaUri;            // Main RTSP URI for live view
-  String recordUri;           // RTSP URI for recording stream
-  String subUri;              // RTSP URI for sub-stream (lower resolution)
-  String remoteUri;           // RTSP URI for remote viewing
-  String mainSnapShot;        // URL for main snapshot
-  String subSnapShot;         // URL for sub-stream snapshot
-  String recordPath;          // Recording path
-  String recordCodec;         // Recording codec (e.g., H264)
-  int recordWidth;            // Width of recording resolution
-  int recordHeight;           // Height of recording resolution
-  String subCodec;            // Sub-stream codec (e.g., H264)
-  int subWidth;               // Width of sub-stream resolution
-  int subHeight;              // Height of sub-stream resolution
-  bool connected;             // Whether the camera is connected
-  String disconnected;        // Disconnection info
-  String lastSeenAt;          // When the camera was last seen
-  
+  String health; // camreports için sağlık bilgisi (changed from final)
+  double temperature; // camreports için sıcaklık bilgisi (changed from final)
+  String reportError; // camreports.reported hatası (error: 1000 gibi)
+  String lastRestartTime; // camreports.last_restart_time
+  String reportName; // camreports için rapor adı (KAMERA1 gibi)
+  int index; // Index of the camera in the device\'s cameras array
+  String name; // User-friendly name (e.g., KAMERA1)
+  String ip; // IP address of the camera (cameraIp)
+  int rawIp; // Raw IP address integer (cameraRawIp)
+  String username; // Username for authentication
+  String password; // Password for authentication
+  String brand; // Camera brand
+  String hw; // Hardware identifier
+  String manufacturer; // Camera manufacturer
+  String country; // Camera country
+  String xAddrs; // ONVIF device service address
+  String mediaUri; // Main RTSP URI for live view
+  String recordUri; // RTSP URI for recording stream
+  String subUri; // RTSP URI for sub-stream (lower resolution)
+  String remoteUri; // RTSP URI for remote viewing
+  String mainSnapShot; // URL for main snapshot
+  String subSnapShot; // URL for sub-stream snapshot
+  String recordPath; // Recording path
+  String recordCodec; // Recording codec (e.g., H264)
+  int recordWidth; // Width of recording resolution
+  int recordHeight; // Height of recording resolution
+  String subCodec; // Sub-stream codec (e.g., H264)
+  int subWidth; // Width of sub-stream resolution
+  int subHeight; // Height of sub-stream resolution
+  bool connected; // Whether the camera is connected
+  String disconnected; // Disconnection info
+  String lastSeenAt; // When the camera was last seen
+
   // Recording per device - key: deviceMac, value: isRecording
   // A camera can record on multiple devices simultaneously
   final Map<String, bool> recordingDevices;
-  
+
   // Computed property - true if recording on any device
   bool get recording => recordingDevices.values.any((r) => r);
-  
+
   // How many devices are recording this camera
   int get recordingCount => recordingDevices.values.where((r) => r).length;
-  
+
   // Display name - uses MAC address if name is empty
   String get displayName => name.isNotEmpty ? name : mac;
-  
+
   bool soundRec;
   String xAddr;
-  
+
   // Additional properties for group management
-  String mac;                       // Camera MAC address for group assignment (changed from final)
-  final List<String> groups;        // Groups this camera belongs to
+  String mac; // Camera MAC address for group assignment (changed from final)
+  final List<String> groups; // Groups this camera belongs to
 
   // New fields from cameras_mac data
   String? macFirstSeen;
@@ -941,16 +962,17 @@ class Camera {
   // Flag to indicate if this is a placeholder camera (no physical device)
   bool isPlaceholder;
 
-  // Sharing active flag - indicates if the camera is being shared
-  bool sharingActive;
+  // Distribute active flag - indicates if the camera is being distributed
+  bool distribute;
 
   // Current device assignments from cameras_mac.json - Map<DeviceMac, CameraCurrentDevice>
   // A camera can be on multiple devices at the same time
   Map<String, CameraCurrentDevice> currentDevices;
-  
+
   // Legacy getter for backward compatibility - returns first current device or null
-  CameraCurrentDevice? get currentDevice => currentDevices.isNotEmpty ? currentDevices.values.first : null;
-  
+  CameraCurrentDevice? get currentDevice =>
+      currentDevices.isNotEmpty ? currentDevices.values.first : null;
+
   // Legacy setter for backward compatibility
   set currentDevice(CameraCurrentDevice? value) {
     if (value != null && value.deviceMac.isNotEmpty) {
@@ -958,9 +980,8 @@ class Camera {
     }
   }
 
-  // History of device assignments from cameras_mac.json  
+  // History of device assignments from cameras_mac.json
   List<CameraHistoryDevice> deviceHistory;
-
 
   Camera({
     required this.index,
@@ -1007,21 +1028,23 @@ class Camera {
     this.macStatus,
     this.parentDeviceMacKey,
     this.isPlaceholder = false,
-    this.sharingActive = false,
+    this.distribute = false,
     CameraCurrentDevice? currentDevice,
     Map<String, CameraCurrentDevice>? currentDevices,
     List<CameraHistoryDevice>? deviceHistory,
-  }) : groups = groups ?? [], 
-       deviceHistory = deviceHistory ?? [],
-       recordingDevices = recordingDevices ?? {},
-       currentDevices = currentDevices ?? (currentDevice != null && currentDevice.deviceMac.isNotEmpty 
-           ? {currentDevice.deviceMac: currentDevice} 
-           : {});
-  
+  })  : groups = groups ?? [],
+        deviceHistory = deviceHistory ?? [],
+        recordingDevices = recordingDevices ?? {},
+        currentDevices = currentDevices ??
+            (currentDevice != null && currentDevice.deviceMac.isNotEmpty
+                ? {currentDevice.deviceMac: currentDevice}
+                : {});
+
   // Added id getter to uniquely identify cameras
   // Using MAC address as primary ID, fallback to name_index for cameras without MAC
-  String get id => mac.isNotEmpty ? mac : "${parentDeviceMacKey}_${name}_$index";
-  
+  String get id =>
+      mac.isNotEmpty ? mac : "${parentDeviceMacKey}_${name}_$index";
+
   // Copy with method for immutable updates
   Camera copyWith({
     int? index, // Added index to copyWith
@@ -1068,7 +1091,7 @@ class Camera {
     String? macStatus,
     String? parentDeviceMacKey, // Added parentDeviceMacKey to copyWith
     bool? isPlaceholder,
-    bool? sharingActive,
+    bool? distribute,
     Map<String, CameraCurrentDevice>? currentDevices,
     List<CameraHistoryDevice>? deviceHistory,
   }) {
@@ -1105,7 +1128,8 @@ class Camera {
       connected: connected ?? this.connected,
       disconnected: disconnected ?? this.disconnected,
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
-      recordingDevices: recordingDevices ?? Map<String, bool>.from(this.recordingDevices),
+      recordingDevices:
+          recordingDevices ?? Map<String, bool>.from(this.recordingDevices),
       soundRec: soundRec ?? this.soundRec,
       xAddr: xAddr ?? this.xAddr,
       mac: mac ?? this.mac,
@@ -1115,14 +1139,17 @@ class Camera {
       macPort: macPort ?? this.macPort,
       macReportedError: macReportedError ?? this.macReportedError,
       macStatus: macStatus ?? this.macStatus,
-      parentDeviceMacKey: parentDeviceMacKey ?? this.parentDeviceMacKey, // Updated parentDeviceMacKey
+      parentDeviceMacKey: parentDeviceMacKey ??
+          this.parentDeviceMacKey, // Updated parentDeviceMacKey
       isPlaceholder: isPlaceholder ?? this.isPlaceholder,
-      sharingActive: sharingActive ?? this.sharingActive,
-      currentDevices: currentDevices ?? Map<String, CameraCurrentDevice>.from(this.currentDevices),
-      deviceHistory: deviceHistory ?? List<CameraHistoryDevice>.from(this.deviceHistory),
+      distribute: distribute ?? this.distribute,
+      currentDevices: currentDevices ??
+          Map<String, CameraCurrentDevice>.from(this.currentDevices),
+      deviceHistory:
+          deviceHistory ?? List<CameraHistoryDevice>.from(this.deviceHistory),
     );
   }
-  
+
   // Convert from JSON
   factory Camera.fromJson(Map<String, dynamic> json) {
     return Camera(
@@ -1153,13 +1180,17 @@ class Camera {
       connected: json['connected'] ?? false,
       disconnected: json['disconnected'] ?? '',
       lastSeenAt: json['lastSeenAt'] ?? '',
-      recordingDevices: (json['recordingDevices'] as Map<String, dynamic>?)?.map(
-        (key, value) => MapEntry(key, value as bool),
-      ) ?? {},
+      recordingDevices:
+          (json['recordingDevices'] as Map<String, dynamic>?)?.map(
+                (key, value) => MapEntry(key, value as bool),
+              ) ??
+              {},
       soundRec: json['soundRec'] ?? false,
       xAddr: json['xAddr'] ?? '',
       health: json['health'] ?? '',
-      temperature: (json['temperature'] is num) ? (json['temperature'] as num).toDouble() : double.tryParse(json['temperature']?.toString() ?? '') ?? 0.0,
+      temperature: (json['temperature'] is num)
+          ? (json['temperature'] as num).toDouble()
+          : double.tryParse(json['temperature']?.toString() ?? '') ?? 0.0,
       mac: json['mac'] ?? '',
       groups: (json['groups'] as List<dynamic>?)?.cast<String>() ?? [],
       macFirstSeen: json['macFirstSeen'] as String?,
@@ -1169,16 +1200,24 @@ class Camera {
       macStatus: json['macStatus'] as String?,
       parentDeviceMacKey: json['parentDeviceMacKey'] as String?,
       currentDevices: (json['currentDevices'] as Map<String, dynamic>?)?.map(
-        (key, value) => MapEntry(key, CameraCurrentDevice.fromJson(value as Map<String, dynamic>)),
-      ) ?? (json['currentDevice'] != null 
-          ? {(json['currentDevice']['device_mac'] ?? ''): CameraCurrentDevice.fromJson(json['currentDevice'] as Map<String, dynamic>)}
-          : {}),
+            (key, value) => MapEntry(key,
+                CameraCurrentDevice.fromJson(value as Map<String, dynamic>)),
+          ) ??
+          (json['currentDevice'] != null
+              ? {
+                  (json['currentDevice']['device_mac'] ?? ''):
+                      CameraCurrentDevice.fromJson(
+                          json['currentDevice'] as Map<String, dynamic>)
+                }
+              : {}),
       deviceHistory: (json['deviceHistory'] as List<dynamic>?)
-          ?.map((e) => CameraHistoryDevice.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [],
+              ?.map((e) =>
+                  CameraHistoryDevice.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
-  
+
   // Convert to JSON
   Map<String, dynamic> toJson() {
     return {
@@ -1224,48 +1263,56 @@ class Camera {
       'macReportedError': macReportedError,
       'macStatus': macStatus,
       'parentDeviceMacKey': parentDeviceMacKey,
-      'currentDevices': currentDevices.map((key, value) => MapEntry(key, value.toJson())),
+      'currentDevices':
+          currentDevices.map((key, value) => MapEntry(key, value.toJson())),
       'deviceHistory': deviceHistory.map((e) => e.toJson()).toList(),
     };
   }
-  
+
   // Get the appropriate RTSP URI for streaming
   String get rtspUri {
     try {
       String result = "";
-      print('RTSP_URI_LOG: Camera $name ($ip) - Evaluating RTSP URI. subUri: "$subUri", mediaUri: "$mediaUri", remoteUri: "$remoteUri", recordUri: "$recordUri"');
+      print(
+          'RTSP_URI_LOG: Camera $name ($ip) - Evaluating RTSP URI. subUri: "$subUri", mediaUri: "$mediaUri", remoteUri: "$remoteUri", recordUri: "$recordUri"');
 
       // Prefer subUri when available
       if (subUri.isNotEmpty) {
         result = _addCredentialsToUrl(subUri);
-        print('RTSP_URI_LOG: Camera $name - Using subUri. Initial: "$subUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
+        print(
+            'RTSP_URI_LOG: Camera $name - Using subUri. Initial: "$subUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
       } else if (mediaUri.isNotEmpty) {
         result = _addCredentialsToUrl(mediaUri);
-        print('RTSP_URI_LOG: Camera $name - Using mediaUri. Initial: "$mediaUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
+        print(
+            'RTSP_URI_LOG: Camera $name - Using mediaUri. Initial: "$mediaUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
       } else if (remoteUri.isNotEmpty) {
         result = _addCredentialsToUrl(remoteUri);
-        print('RTSP_URI_LOG: Camera $name - Using remoteUri. Initial: "$remoteUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
+        print(
+            'RTSP_URI_LOG: Camera $name - Using remoteUri. Initial: "$remoteUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
       } else if (recordUri.isNotEmpty) {
         result = _addCredentialsToUrl(recordUri);
-        print('RTSP_URI_LOG: Camera $name - Using recordUri. Initial: "$recordUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
+        print(
+            'RTSP_URI_LOG: Camera $name - Using recordUri. Initial: "$recordUri", Result with creds: "${_sanitizeUrlForLogging(result)}"');
       } else {
-        print('RTSP_URI_LOG: Camera $name - No suitable URI found (all URI fields are empty).');
+        print(
+            'RTSP_URI_LOG: Camera $name - No suitable URI found (all URI fields are empty).');
       }
-      
+
       // Final validation to prevent empty or malformed URLs
       if (result.isEmpty) {
         print('RTSP_URI_LOG: Camera $name - Final RTSP URI is empty.');
         return "";
       }
-      
-      print('RTSP_URI_LOG: Camera $name - Final RTSP URI to be used: "${_sanitizeUrlForLogging(result)}"');
+
+      print(
+          'RTSP_URI_LOG: Camera $name - Final RTSP URI to be used: "${_sanitizeUrlForLogging(result)}"');
       return result;
     } catch (e) {
       print('RTSP_URI_LOG: Camera $name - Error getting RTSP URI: $e');
       return ""; // Return empty string on error
     }
   }
-  
+
   // Sanitize URL for logging by hiding credentials
   String _sanitizeUrlForLogging(String url) {
     if (url.isEmpty) return "";
@@ -1283,56 +1330,64 @@ class Camera {
       return "[URL_PROCESSING_ERROR]";
     }
   }
-  
+
   // Add username and password to RTSP URL
   String _addCredentialsToUrl(String url) {
-    print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl called with URL: "$url"');
+    print(
+        'RTSP_URI_LOG: Camera $name - _addCredentialsToUrl called with URL: "$url"');
     // If URL is empty, return empty string to avoid null issues
     if (url.isEmpty) {
-      print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Empty URL provided.');
+      print(
+          'RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Empty URL provided.');
       return "";
     }
-    
+
     // If URL doesn\\'t start with rtsp://, return as is but log a warning
     if (!url.startsWith('rtsp://')) {
-      print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Non-RTSP URL provided: "$url"');
+      print(
+          'RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Non-RTSP URL provided: "$url"');
       return url;
     }
-    
+
     try {
       // If credentials are already in the URL, return as is
       if (url.contains('@')) {
-        print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: URL already contains credentials: "${_sanitizeUrlForLogging(url)}"');
+        print(
+            'RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: URL already contains credentials: "${_sanitizeUrlForLogging(url)}"');
         return url;
       }
-      
+
       // If username or password is empty, return URL as is
       if (username.isEmpty || password.isEmpty) {
-        print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Missing credentials (username: "$username", password: "${password.isNotEmpty ? "******" : ""}"). Returning original URL: "$url"');
+        print(
+            'RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Missing credentials (username: "$username", password: "${password.isNotEmpty ? "******" : ""}"). Returning original URL: "$url"');
         return url;
       }
-      
+
       // Encode username and password to handle special characters
       final encodedUsername = Uri.encodeComponent(username);
       final encodedPassword = Uri.encodeComponent(password);
-      
+
       // Extract protocol and rest of the URL
       final urlWithoutProtocol = url.substring(7);
-      
+
       // Create URL with encoded credentials
-      final resultUrl = 'rtsp://$encodedUsername:$encodedPassword@$urlWithoutProtocol';
-      print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Successfully added credentials. Result: "${_sanitizeUrlForLogging(resultUrl)}"');
+      final resultUrl =
+          'rtsp://$encodedUsername:$encodedPassword@$urlWithoutProtocol';
+      print(
+          'RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Successfully added credentials. Result: "${_sanitizeUrlForLogging(resultUrl)}"');
       return resultUrl;
     } catch (e) {
-      print('RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Error formatting RTSP URL: $e, Original URL: "$url"');
+      print(
+          'RTSP_URI_LOG: Camera $name - _addCredentialsToUrl: Error formatting RTSP URL: $e, Original URL: "$url"');
       // Return original URL on error to prevent null values
       return url.isNotEmpty ? url : "";
     }
   }
-  
+
   // Added getter for compatibility
   bool get isConnected => connected;
-  
+
   // Setter for connected status to handle various input types
   void setConnectedStatus(dynamic value) {
     if (value is bool) {
@@ -1347,10 +1402,10 @@ class Camera {
       connected = false;
     }
   }
-  
+
   // Added getter for compatibility
   bool get isRecording => recording;
-  
+
   // Set connected status with proper type conversion
   set isConnected(dynamic value) {
     if (value is bool) {
@@ -1360,7 +1415,7 @@ class Camera {
       connected = valueStr == '1' || valueStr.toLowerCase() == 'true';
     }
   }
-  
+
   // Get the camera status
   DeviceStatus get status {
     if (!connected) {
@@ -1368,7 +1423,7 @@ class Camera {
     }
     return DeviceStatus.online;
   }
-  
+
   // Override equality based on MAC address for proper Map/Set usage
   @override
   bool operator ==(Object other) {
@@ -1380,7 +1435,7 @@ class Camera {
 
   @override
   int get hashCode => mac.hashCode;
-  
+
   @override
   String toString() {
     return 'Camera{name: $name, ip: $ip, connected: $connected, recording: $recording}';

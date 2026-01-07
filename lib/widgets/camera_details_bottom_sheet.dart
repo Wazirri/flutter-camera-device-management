@@ -95,7 +95,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           const Divider(),
-          
+
           // Detaylar (Scrollable Area)
           Expanded(
             child: ListView(
@@ -107,11 +107,18 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   details: [
                     DetailItem(name: 'Name', value: camera.displayName),
                     DetailItem(name: 'IP Address', value: camera.ip),
-                    DetailItem(name: 'MAC Address', value: camera.mac), // Changed from camera.macKey to camera.mac
+                    DetailItem(
+                        name: 'MAC Address',
+                        value: camera
+                            .mac), // Changed from camera.macKey to camera.mac
                     DetailItem(name: 'Username', value: camera.username),
                     DetailItem(name: 'Password', value: camera.password),
-                    DetailItem(name: 'Connected', value: camera.connected ? 'Yes' : 'No'),
-                    DetailItem(name: 'Recording', value: camera.recording ? 'Yes' : 'No'),
+                    DetailItem(
+                        name: 'Connected',
+                        value: camera.connected ? 'Yes' : 'No'),
+                    DetailItem(
+                        name: 'Recording',
+                        value: camera.recording ? 'Yes' : 'No'),
                     DetailItem(name: 'Last Seen', value: camera.lastSeenAt),
                   ],
                 ),
@@ -121,10 +128,13 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   details: [
                     DetailItem(name: 'Hardware', value: camera.hw),
                     DetailItem(name: 'Brand', value: camera.brand),
-                    DetailItem(name: 'Manufacturer', value: camera.manufacturer),
+                    DetailItem(
+                        name: 'Manufacturer', value: camera.manufacturer),
                     DetailItem(name: 'Country', value: camera.country),
                     // Display sound recording status
-                    DetailItem(name: 'Sound Recording', value: camera.soundRec ? 'Enabled' : 'Disabled'),
+                    DetailItem(
+                        name: 'Sound Recording',
+                        value: camera.soundRec ? 'Enabled' : 'Disabled'),
                   ],
                 ),
                 _buildDetailGroup(
@@ -138,7 +148,8 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                     DetailItem(name: 'Record URI', value: camera.recordUri),
                     DetailItem(name: 'Sub URI', value: camera.subUri),
                     DetailItem(name: 'Remote URI', value: camera.remoteUri),
-                    DetailItem(name: 'Main Snapshot', value: camera.mainSnapShot),
+                    DetailItem(
+                        name: 'Main Snapshot', value: camera.mainSnapShot),
                     DetailItem(name: 'Sub Snapshot', value: camera.subSnapShot),
                   ],
                 ),
@@ -147,14 +158,23 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   title: 'Camera Reports',
                   details: [
                     DetailItem(name: 'Health Status', value: camera.health),
-                    DetailItem(name: 'Temperature', value: camera.temperature.toString() + (camera.temperature > 0 ? '°C' : '')),
-                    DetailItem(name: 'Last Restart', value: camera.lastRestartTime),
+                    DetailItem(
+                        name: 'Temperature',
+                        value: camera.temperature.toString() +
+                            (camera.temperature > 0 ? '°C' : '')),
+                    DetailItem(
+                        name: 'Last Restart', value: camera.lastRestartTime),
                     DetailItem(name: 'Report Error', value: camera.reportError),
                     DetailItem(name: 'Report Name', value: camera.reportName),
-                    DetailItem(name: 'Connected', value: camera.connected ? 'Yes' : 'No'),
-                    DetailItem(name: 'Disconnected At', value: camera.disconnected),
+                    DetailItem(
+                        name: 'Connected',
+                        value: camera.connected ? 'Yes' : 'No'),
+                    DetailItem(
+                        name: 'Disconnected At', value: camera.disconnected),
                     DetailItem(name: 'Last Seen At', value: camera.lastSeenAt),
-                    DetailItem(name: 'Recording', value: camera.recording ? 'Yes' : 'No'),
+                    DetailItem(
+                        name: 'Recording',
+                        value: camera.recording ? 'Yes' : 'No'),
                   ],
                 ),
                 // _buildDetailGroup for Recording Information
@@ -164,9 +184,13 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   details: [
                     DetailItem(name: 'Record Path', value: camera.recordPath),
                     DetailItem(name: 'Record Codec', value: camera.recordCodec),
-                    DetailItem(name: 'Record Resolution', value: '${camera.recordWidth}x${camera.recordHeight}'),
+                    DetailItem(
+                        name: 'Record Resolution',
+                        value: '${camera.recordWidth}x${camera.recordHeight}'),
                     DetailItem(name: 'Sub Codec', value: camera.subCodec),
-                    DetailItem(name: 'Sub Resolution', value: '${camera.subWidth}x${camera.subHeight}'),
+                    DetailItem(
+                        name: 'Sub Resolution',
+                        value: '${camera.subWidth}x${camera.subHeight}'),
                   ],
                 ),
                 // Current Device Assignments (camera can be on multiple devices)
@@ -176,13 +200,20 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                     final currentDevice = entry.value;
                     return _buildDetailGroup(
                       context: context,
-                      title: 'Device Assignment: ${deviceMac.substring(deviceMac.length > 8 ? deviceMac.length - 8 : 0)}',
+                      title:
+                          'Device Assignment: ${deviceMac.substring(deviceMac.length > 8 ? deviceMac.length - 8 : 0)}',
                       details: [
-                        DetailItem(name: 'Device MAC', value: currentDevice.deviceMac),
-                        DetailItem(name: 'Device IP', value: currentDevice.deviceIp),
-                        DetailItem(name: 'Camera IP', value: currentDevice.cameraIp),
-                        DetailItem(name: 'Name in Device', value: currentDevice.name),
-                        DetailItem(name: 'Assignment Date', value: _formatTimestamp(currentDevice.startDate)),
+                        DetailItem(
+                            name: 'Device MAC', value: currentDevice.deviceMac),
+                        DetailItem(
+                            name: 'Device IP', value: currentDevice.deviceIp),
+                        DetailItem(
+                            name: 'Camera IP', value: currentDevice.cameraIp),
+                        DetailItem(
+                            name: 'Name in Device', value: currentDevice.name),
+                        DetailItem(
+                            name: 'Assignment Date',
+                            value: _formatTimestamp(currentDevice.startDate)),
                       ],
                     );
                   }),
@@ -195,20 +226,26 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   title: 'MAC Address Information',
                   details: [
                     if (camera.macFirstSeen != null)
-                      DetailItem(name: 'First Seen', value: camera.macFirstSeen!),
+                      DetailItem(
+                          name: 'First Seen', value: camera.macFirstSeen!),
                     if (camera.macLastDetected != null)
-                      DetailItem(name: 'Last Detected', value: camera.macLastDetected!),
+                      DetailItem(
+                          name: 'Last Detected',
+                          value: camera.macLastDetected!),
                     if (camera.macPort != null)
-                      DetailItem(name: 'Port', value: camera.macPort.toString()),
+                      DetailItem(
+                          name: 'Port', value: camera.macPort.toString()),
                     if (camera.macReportedError != null)
-                      DetailItem(name: 'Reported Error', value: camera.macReportedError!),
+                      DetailItem(
+                          name: 'Reported Error',
+                          value: camera.macReportedError!),
                     if (camera.macStatus != null)
                       DetailItem(name: 'Status', value: camera.macStatus!),
                   ],
                 ),
                 // SizedBox to provide some spacing before the non-scrolling buttons if needed,
                 // but generally, the buttons will be outside this Expanded ListView.
-                // const SizedBox(height: 16), 
+                // const SizedBox(height: 16),
               ], // End of children for ListView
             ), // End of Expanded ListView for scrollable details
           ),
@@ -249,6 +286,75 @@ class CameraDetailsBottomSheet extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Distributing Active Toggle
+                  Consumer<CameraDevicesProviderOptimized>(
+                    builder: (context, cameraProvider, child) {
+                      return Card(
+                        color: AppTheme.darkSurface,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: SwitchListTile(
+                          title: const Text(
+                            'Kamerayı Dağıtıma Dahil Et',
+                            style: TextStyle(
+                              color: AppTheme.darkTextPrimary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          subtitle: Text(
+                            camera.distribute
+                                ? 'Kamera otomatik dağıtımda aktif'
+                                : 'Kamera otomatik dağıtımda pasif',
+                            style: const TextStyle(
+                              color: AppTheme.darkTextSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                          value: camera.distribute,
+                          activeColor: AppTheme.primaryBlue,
+                          onChanged: (value) async {
+                            // Send SETINT command to toggle distributing
+                            final success =
+                                await websocketProvider.toggleCameraDistribute(
+                              camera.mac,
+                              value,
+                            );
+
+                            if (success) {
+                              // Update local camera state
+                              final updatedCamera =
+                                  camera.copyWith(distribute: value);
+                              cameraProvider.updateCamera(updatedCamera);
+
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      value
+                                          ? 'Kamera dağıtıma dahil edildi'
+                                          : 'Kamera dağıtımdan çıkarıldı',
+                                    ),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
+                            } else {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('İşlem başarısız oldu'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
                   OutlinedButton.icon(
                     icon: const Icon(Icons.group_add),
                     label: const Text('Add Group to Camera'),
@@ -357,10 +463,9 @@ class CameraDetailsBottomSheet extends StatelessWidget {
   // Build device history section with proper formatting
   Widget _buildDeviceHistorySection(BuildContext context) {
     // Filter out empty/incomplete history entries
-    final validHistory = camera.deviceHistory
-        .where((h) => h.deviceMac.isNotEmpty)
-        .toList();
-    
+    final validHistory =
+        camera.deviceHistory.where((h) => h.deviceMac.isNotEmpty).toList();
+
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(16),
@@ -403,14 +508,15 @@ class CameraDetailsBottomSheet extends StatelessWidget {
             int index = entry.key;
             var history = entry.value;
             bool isLast = index == validHistory.length - 1;
-            
+
             return Container(
               margin: EdgeInsets.only(bottom: isLast ? 0 : 12),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: AppTheme.darkBackground,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppTheme.darkBorder.withOpacity(0.5), width: 1),
+                border: Border.all(
+                    color: AppTheme.darkBorder.withOpacity(0.5), width: 1),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -419,7 +525,8 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppTheme.primaryBlue.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(4),
@@ -454,11 +561,11 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   _buildHistoryDetailRow('Device IP', history.deviceIp),
                   _buildHistoryDetailRow('Camera IP', history.cameraIp),
                   _buildHistoryDetailRow('Camera Name', history.name),
-                  
+
                   const SizedBox(height: 8),
                   Divider(height: 1, color: AppTheme.darkBorder),
                   const SizedBox(height: 8),
-                  
+
                   // Time information
                   Row(
                     children: [
@@ -501,9 +608,13 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              history.endDate > 0 ? _formatTimestamp(history.endDate) : 'Active',
+                              history.endDate > 0
+                                  ? _formatTimestamp(history.endDate)
+                                  : 'Active',
                               style: TextStyle(
-                                color: history.endDate > 0 ? AppTheme.darkTextPrimary : Colors.green,
+                                color: history.endDate > 0
+                                    ? AppTheme.darkTextPrimary
+                                    : Colors.green,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -513,13 +624,14 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                       ),
                     ],
                   ),
-                  
+
                   // Duration calculation
                   if (history.endDate > 0)
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppTheme.darkSurface,
                           borderRadius: BorderRadius.circular(4),
@@ -583,233 +695,246 @@ class CameraDetailsBottomSheet extends StatelessWidget {
 }
 
 // Kameraya grup ekleme dialog'u
-void _showAddGroupDialog(BuildContext context, Camera camera, WebSocketProviderOptimized wsProvider) {
+void _showAddGroupDialog(BuildContext context, Camera camera,
+    WebSocketProviderOptimized wsProvider) {
   // Mevcut grupları almak için CameraDevicesProvider kullan
-  final devicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
-  final existingGroups = devicesProvider.cameraGroupsList; // veya groupsList, hangisi uygunsa
+  final devicesProvider =
+      Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+  final existingGroups =
+      devicesProvider.cameraGroupsList; // veya groupsList, hangisi uygunsa
   String? selectedGroupName;
 
   showDialog(
-    context: context,
-    builder: (dialogContext) {
-      return StatefulBuilder( // Dropdown değişikliğini yansıtmak için StatefulBuilder
-        builder: (context, setStateDialog) {
-          return AlertDialog(
-            backgroundColor: AppTheme.darkSurface,
-            title: const Text('Add Camera to Group'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Add camera ${camera.name} to an existing group:',
-                  style: const TextStyle(color: AppTheme.darkTextSecondary),
-                ),
-                const SizedBox(height: 24),
-                if (existingGroups.isEmpty)
-                  const Text('No groups available. Create a group first.', style: TextStyle(color: Colors.orangeAccent))
-                else
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Select Group',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    hint: const Text('Choose a group'),
-                    value: selectedGroupName,
-                    onChanged: (value) {
-                      setStateDialog(() { // Dialog state'ini güncelle
-                        selectedGroupName = value;
-                      });
-                    },
-                    items: existingGroups.map((group) {
-                      return DropdownMenuItem<String>(
-                        value: group.name, // Grup adını değer olarak kullan
-                        child: Text(group.name),
-                      );
-                    }).toList(),
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          // Dropdown değişikliğini yansıtmak için StatefulBuilder
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              backgroundColor: AppTheme.darkSurface,
+              title: const Text('Add Camera to Group'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Add camera ${camera.name} to an existing group:',
+                    style: const TextStyle(color: AppTheme.darkTextSecondary),
                   ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(dialogContext);
-                },
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryBlue,
-                ),
-                // Grup seçilmediyse veya grup yoksa butonu devre dışı bırak
-                onPressed: selectedGroupName == null || existingGroups.isEmpty
-                  ? null 
-                  : () async {
-                      // WebSocket command format: ADD_GROUP_TO_CAM <camera_mac> <group_name>
-                      // Example: ADD_GROUP_TO_CAM e8:b7:23:0c:11:b2 timko1
-                      // Use camera.mac directly without any conversion
-                      final String cameraIdentifier = camera.mac;
-                      
-                      if (cameraIdentifier.isEmpty) {
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Camera MAC address is missing.'),
-                            backgroundColor: Colors.red,
-                          ),
+                  const SizedBox(height: 24),
+                  if (existingGroups.isEmpty)
+                    const Text('No groups available. Create a group first.',
+                        style: TextStyle(color: Colors.orangeAccent))
+                  else
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: 'Select Group',
+                        border: OutlineInputBorder(),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                      hint: const Text('Choose a group'),
+                      value: selectedGroupName,
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          // Dialog state'ini güncelle
+                          selectedGroupName = value;
+                        });
+                      },
+                      items: existingGroups.map((group) {
+                        return DropdownMenuItem<String>(
+                          value: group.name, // Grup adını değer olarak kullan
+                          child: Text(group.name),
                         );
-                        return;
-                      }
-
-                      final success = await wsProvider.sendAddGroupToCamera(cameraIdentifier, selectedGroupName!);
-                      
-                      if (!context.mounted) return;
-                      Navigator.pop(dialogContext);
-                      
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            success
-                              ? 'Camera ${camera.name} added to group $selectedGroupName'
-                              : 'Failed to add camera ${camera.name} to group $selectedGroupName',
-                          ),
-                          backgroundColor: success ? Colors.green : Colors.red,
-                        ),
-                      );
-                    },
-                child: const Text('Add to Group'),
+                      }).toList(),
+                    ),
+                ],
               ),
-            ],
-          );
-        },
-      );
-    }
-  );
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryBlue,
+                  ),
+                  // Grup seçilmediyse veya grup yoksa butonu devre dışı bırak
+                  onPressed: selectedGroupName == null || existingGroups.isEmpty
+                      ? null
+                      : () async {
+                          // WebSocket command format: ADD_GROUP_TO_CAM <camera_mac> <group_name>
+                          // Example: ADD_GROUP_TO_CAM e8:b7:23:0c:11:b2 timko1
+                          // Use camera.mac directly without any conversion
+                          final String cameraIdentifier = camera.mac;
+
+                          if (cameraIdentifier.isEmpty) {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Camera MAC address is missing.'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+
+                          final success = await wsProvider.sendAddGroupToCamera(
+                              cameraIdentifier, selectedGroupName!);
+
+                          if (!context.mounted) return;
+                          Navigator.pop(dialogContext);
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                success
+                                    ? 'Camera ${camera.name} added to group $selectedGroupName'
+                                    : 'Failed to add camera ${camera.name} to group $selectedGroupName',
+                              ),
+                              backgroundColor:
+                                  success ? Colors.green : Colors.red,
+                            ),
+                          );
+                        },
+                  child: const Text('Add to Group'),
+                ),
+              ],
+            );
+          },
+        );
+      });
 }
 
 // Kamerayı cihaza taşıma dialog'u
-void _showMoveCameraDialog(BuildContext context, Camera camera, WebSocketProviderOptimized provider) {
+void _showMoveCameraDialog(
+    BuildContext context, Camera camera, WebSocketProviderOptimized provider) {
   // Tüm cihazları almak için CameraDevicesProvider kullan
-  final devicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+  final devicesProvider =
+      Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
   final devices = devicesProvider.devicesList;
   String? selectedDeviceMac;
 
   showDialog(
-    context: context,
-    builder: (dialogContext) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            backgroundColor: AppTheme.darkSurface,
-            title: const Text('Move Camera to Device'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Move camera ${camera.name} to another device',
-                  style: const TextStyle(color: AppTheme.darkTextSecondary),
-                ),
-                const SizedBox(height: 16),
-                const Text('Select Target Device:'),
-                const SizedBox(height: 8),
-                
-                // Cihaz seçimi için dropdown
-                if (devices.isEmpty)
-                  const Text('No devices available', style: TextStyle(color: Colors.red))
-                else
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    hint: const Text('Select a device'),
-                    value: selectedDeviceMac,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedDeviceMac = value;
-                      });
-                    },
-                    items: devices.map((device) {
-                      return DropdownMenuItem<String>(
-                        value: device.macKey,
-                        child: Text(
-                          device.deviceType.isEmpty 
-                            ? device.macKey 
-                            : '${device.deviceType} (${device.macKey})'
-                        ),
-                      );
-                    }).toList(),
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: AppTheme.darkSurface,
+              title: const Text('Move Camera to Device'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Move camera ${camera.name} to another device',
+                    style: const TextStyle(color: AppTheme.darkTextSecondary),
                   ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(dialogContext);
-                },
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryBlue,
-                ),
-                onPressed: selectedDeviceMac == null
-                  ? null // Cihaz seçilmediyse butonu devre dışı bırak
-                  : () async {
-                      // Find camera's current device (source device)
-                      String? sourceMac;
-                      if (camera.currentDevices.isNotEmpty) {
-                        // Use first device as source (camera can be on multiple devices)
-                        sourceMac = camera.currentDevices.keys.first;
-                      } else {
-                        // Fallback: try to find from parent device
-                        sourceMac = camera.parentDeviceMacKey;
-                      }
-                      
-                      if (sourceMac == null || sourceMac.isEmpty) {
-                        // Show error if we can't determine source device
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Cannot determine camera\'s current device'),
-                            backgroundColor: Colors.red,
-                          ),
+                  const SizedBox(height: 16),
+                  const Text('Select Target Device:'),
+                  const SizedBox(height: 8),
+
+                  // Cihaz seçimi için dropdown
+                  if (devices.isEmpty)
+                    const Text('No devices available',
+                        style: TextStyle(color: Colors.red))
+                  else
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                      hint: const Text('Select a device'),
+                      value: selectedDeviceMac,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedDeviceMac = value;
+                        });
+                      },
+                      items: devices.map((device) {
+                        return DropdownMenuItem<String>(
+                          value: device.macKey,
+                          child: Text(device.deviceType.isEmpty
+                              ? device.macKey
+                              : '${device.deviceType} (${device.macKey})'),
                         );
-                        return;
-                      }
-                      
-                      // Use camera's MAC address (with proper formatting)
-                      String cameraMac = camera.mac.isNotEmpty ? camera.mac : camera.ip.replaceAll('.', '_');
-                      
-                      final success = await provider.moveCamera(
-                        cameraMac,      // Camera MAC address
-                        sourceMac,      // Source device MAC
-                        selectedDeviceMac!, // Target device MAC
-                      );
-                      
-                      if (!context.mounted) return;
-                      Navigator.pop(dialogContext);
-                      
-                      // Sonuç bildirimi göster
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            success
-                              ? 'Camera ${camera.name} moved to selected device'
-                              : 'Failed to move camera to device',
-                          ),
-                          backgroundColor: success ? Colors.green : Colors.red,
-                        ),
-                      );
-                    },
-                child: const Text('Move Camera'),
+                      }).toList(),
+                    ),
+                ],
               ),
-            ],
-          );
-        },
-      );
-    }
-  );
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                  },
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryBlue,
+                  ),
+                  onPressed: selectedDeviceMac == null
+                      ? null // Cihaz seçilmediyse butonu devre dışı bırak
+                      : () async {
+                          // Find camera's current device (source device)
+                          String? sourceMac;
+                          if (camera.currentDevices.isNotEmpty) {
+                            // Use first device as source (camera can be on multiple devices)
+                            sourceMac = camera.currentDevices.keys.first;
+                          } else {
+                            // Fallback: try to find from parent device
+                            sourceMac = camera.parentDeviceMacKey;
+                          }
+
+                          if (sourceMac == null || sourceMac.isEmpty) {
+                            // Show error if we can't determine source device
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'Cannot determine camera\'s current device'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+
+                          // Use camera's MAC address (with proper formatting)
+                          String cameraMac = camera.mac.isNotEmpty
+                              ? camera.mac
+                              : camera.ip.replaceAll('.', '_');
+
+                          final success = await provider.moveCamera(
+                            cameraMac, // Camera MAC address
+                            sourceMac, // Source device MAC
+                            selectedDeviceMac!, // Target device MAC
+                          );
+
+                          if (!context.mounted) return;
+                          Navigator.pop(dialogContext);
+
+                          // Sonuç bildirimi göster
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                success
+                                    ? 'Camera ${camera.name} moved to selected device'
+                                    : 'Failed to move camera to device',
+                              ),
+                              backgroundColor:
+                                  success ? Colors.green : Colors.red,
+                            ),
+                          );
+                        },
+                  child: const Text('Move Camera'),
+                ),
+              ],
+            );
+          },
+        );
+      });
 }
 
 // Detayları temsil eden helper sınıf
@@ -823,7 +948,7 @@ class DetailItem {
 // Helper method to format timestamp
 String _formatTimestamp(int timestamp) {
   if (timestamp == 0) return 'N/A';
-  
+
   try {
     final date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
     return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
@@ -835,15 +960,15 @@ String _formatTimestamp(int timestamp) {
 // Helper method to format duration in seconds
 String _formatDuration(int durationSeconds) {
   if (durationSeconds <= 0) return 'N/A';
-  
+
   final days = durationSeconds ~/ 86400;
   final hours = (durationSeconds % 86400) ~/ 3600;
   final minutes = (durationSeconds % 3600) ~/ 60;
-  
+
   List<String> parts = [];
   if (days > 0) parts.add('${days}d');
   if (hours > 0) parts.add('${hours}h');
   if (minutes > 0) parts.add('${minutes}m');
-  
+
   return parts.isEmpty ? '< 1m' : parts.join(' ');
 }

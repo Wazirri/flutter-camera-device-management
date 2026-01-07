@@ -59,34 +59,34 @@ ADD_GROUP_TO_CAM me8_b7_23_0f_7e_ee guvenlik
 ### Kamera Dağıtım Ayarları
 ```javascript
 // Master'a kamera ver (1: aktif, 0: pasif)
-ws.send('SETINT ecs.bridge_auto_cam_sharing.masterhascams 1');
+ws.send('SETINT ecs.bridge_auto_cam_distributing.masterhascams 1');
 
 // Otomatik dağıtım aç/kapat
-ws.send('SETINT ecs.bridge_auto_cam_sharing.auto_cam_share 1');
+ws.send('SETINT ecs.bridge_auto_cam_distributing.auto_cam_distribute 1');
 
 // Kamerayı dağıtıma dahil et
-ws.send('SETINT all_cameras.<camera_mac>.sharing_active 1');
+ws.send('SETINT all_cameras.<camera_mac>.distribute 1');
 
 // Değişiklik beklemeden zorla dağıt
-ws.send('SETINT all_cameras.<camera_mac>.share_force 1');
+ws.send('SETINT all_cameras.<camera_mac>.distribute_force 1');
 
 // Slave'ler arası kamera sayısı threshold eşiği (1-5 arası)
-ws.send('SETINT ecs.bridge_auto_cam_sharing.last_scan_imbalance 2');
+ws.send('SETINT ecs.bridge_auto_cam_distributing.last_scan_imbalance 2');
 ```
 
 ### bridge_auto_cam_sharing Yapısı
 ```json
 {
   "masterhascams": 1,
-  "auto_cam_share": 1,
+  "auto_cam_distribute": 1,
   "last_scan_total_cameras": 9,
   "last_scan_connected_cameras": 9,
   "last_scan_active_slaves": 1,
   "last_scan_min_cameras_per_slave": 5,
   "last_scan_max_cameras_per_slave": 5,
   "last_scan_imbalance": 2,
-  "share_force": 0,
-  "last_cam_shared_at": "2026-01-05 - 14:27:59"
+  "distribute_force": 0,
+  "last_cam_distribute_at": "2026-01-05 - 14:27:59"
 }
 ```
 
