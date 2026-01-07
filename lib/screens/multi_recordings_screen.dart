@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../providers/camera_devices_provider_optimized.dart';
@@ -20,8 +21,9 @@ class RecordingTime {
   final Camera camera;
   final String recording;
   final DateTime timestamp;
+  final String? deviceMac; // For multi-device cameras
   
-  RecordingTime(this.camera, this.recording, this.timestamp);
+  RecordingTime(this.camera, this.recording, this.timestamp, {this.deviceMac});
 }
 
 class MultiRecordingsScreen extends StatefulWidget {
@@ -73,6 +75,9 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   String? _pendingCameraSelection;
   String? _pendingTargetTime;
   int? _pendingSeekTime; // Seconds to seek when video player opens
+  
+  // Timer for periodic refresh
+  Timer? _refreshTimer;
 
   @override
   void initState() {
@@ -113,6 +118,11 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     // Bugünü seç
     _selectedDay = DateTime.now();
     print('[MultiRecordings] Selected day initialized: $_selectedDay');
+    
+    // Her 1 dakikada bir yeni kayıtları kontrol et
+    _refreshTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+      _checkForNewRecordings();
+    });
   }
 
   // Parse timestamp from various filename formats
@@ -582,6 +592,181 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     _updateRecordingsForSelectedDay();
   }
   
+  // Check for new recordings periodically (called every 1 minute by timer)
+  Future<void> _checkForNewRecordings() async {
+    if (_selectedDay == null || _selectedCameras.isEmpty || !mounted) return;
+    
+    // Only check for today's recordings
+    final today = DateTime.now();
+    final selectedDate = _selectedDay!;
+    if (selectedDate.year != today.year || 
+        selectedDate.month != today.month || 
+        selectedDate.day != today.day) {
+      print('[MultiRecordings] Skipping refresh - not today');
+      return;
+    }
+    
+    print('[MultiRecordings] Checking for new recordings...');
+    
+    final selectedDayFormatted = DateFormat('yyyy_MM_dd').format(_selectedDay!);
+    final selectedDayFormattedAlt = DateFormat('yyyy-MM-dd').format(_selectedDay!);
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    
+    for (var camera in _selectedCameras) {
+      // Multi-device cameras
+      if (camera.currentDevices.length > 1) {
+        for (var deviceMac in camera.currentDevices.keys) {
+          CameraDevice? device;
+          String? recordingsUrl;
+          
+          try {
+            device = cameraDevicesProvider.devices.values.firstWhere(
+              (d) => d.macAddress == deviceMac || d.macKey == deviceMac,
+            );
+            recordingsUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/';
+          } catch (e) {
+            final deviceInfo = camera.currentDevices[deviceMac];
+            if (deviceInfo != null && deviceInfo.deviceIp.isNotEmpty) {
+              recordingsUrl = 'http://${deviceInfo.deviceIp}:8080/Rec/${camera.name}/';
+            }
+          }
+          
+          if (recordingsUrl != null) {
+            await _refreshRecordingsForDevice(camera, deviceMac, recordingsUrl, selectedDayFormatted, selectedDayFormattedAlt);
+          }
+        }
+      } else {
+        // Single device camera
+        CameraDevice? device;
+        final selectedDeviceMac = _cameraSelectedDevice[camera];
+        
+        if (selectedDeviceMac != null && camera.currentDevices.containsKey(selectedDeviceMac)) {
+          try {
+            device = cameraDevicesProvider.devices.values.firstWhere(
+              (d) => d.macAddress == selectedDeviceMac || d.macKey == selectedDeviceMac,
+            );
+          } catch (e) {
+            device = cameraDevicesProvider.getDeviceForCamera(camera);
+          }
+        } else {
+          device = cameraDevicesProvider.getDeviceForCamera(camera);
+        }
+        
+        if (device != null) {
+          final recordingsUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/';
+          await _refreshSingleCameraRecordings(camera, recordingsUrl, selectedDayFormatted, selectedDayFormattedAlt);
+        }
+      }
+    }
+    
+    print('[MultiRecordings] Refresh check completed');
+  }
+  
+  // Refresh recordings for a multi-device camera's specific device
+  Future<void> _refreshRecordingsForDevice(Camera camera, String deviceMac, String recordingsUrl, String formattedDate, String formattedDateAlt) async {
+    try {
+      final response = await http.get(Uri.parse(recordingsUrl));
+      if (response.statusCode == 200) {
+        final html = response.body;
+        final dateRegExp = RegExp(r'<a href="([^"]+)/">');
+        final dateMatches = dateRegExp.allMatches(html);
+        final dates = dateMatches.map((m) => m.group(1)!).toList();
+        
+        String? foundDate;
+        if (dates.contains(formattedDate)) {
+          foundDate = formattedDate;
+        } else if (dates.contains(formattedDateAlt)) {
+          foundDate = formattedDateAlt;
+        }
+        
+        if (foundDate != null) {
+          final dateUrl = '$recordingsUrl$foundDate/';
+          final dateResponse = await http.get(Uri.parse(dateUrl));
+          
+          if (dateResponse.statusCode == 200) {
+            final dateHtml = utf8.decode(dateResponse.bodyBytes);
+            
+            final mkvRegExp = RegExp(r'<a href="([^"]+\.mkv)"');
+            final m3u8RegExp = RegExp(r'<a href="([^"]+\.m3u8)"');
+            final mp4RegExp = RegExp(r'<a href="([^"]+\.mp4)"');
+            
+            final mkvRecordings = mkvRegExp.allMatches(dateHtml).map((m) => m.group(1)!).toList();
+            final m3u8Recordings = m3u8RegExp.allMatches(dateHtml).map((m) => m.group(1)!).toList();
+            final mp4Recordings = mp4RegExp.allMatches(dateHtml).map((m) => m.group(1)!).toList();
+            
+            final newRecordings = [...mkvRecordings, ...m3u8Recordings, ...mp4Recordings];
+            final existingRecordings = _cameraDeviceRecordings[camera]?[deviceMac] ?? [];
+            
+            if (newRecordings.length > existingRecordings.length) {
+              print('[MultiRecordings] New recordings found for ${camera.name}/$deviceMac: ${newRecordings.length - existingRecordings.length} new');
+              if (mounted) {
+                setState(() {
+                  if (_cameraDeviceRecordings[camera] == null) {
+                    _cameraDeviceRecordings[camera] = {};
+                  }
+                  _cameraDeviceRecordings[camera]![deviceMac] = newRecordings;
+                });
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('[MultiRecordings] Error refreshing recordings for ${camera.name}/$deviceMac: $e');
+    }
+  }
+  
+  // Refresh recordings for a single-device camera
+  Future<void> _refreshSingleCameraRecordings(Camera camera, String recordingsUrl, String formattedDate, String formattedDateAlt) async {
+    try {
+      final response = await http.get(Uri.parse(recordingsUrl));
+      if (response.statusCode == 200) {
+        final html = response.body;
+        final dateRegExp = RegExp(r'<a href="([^"]+)/">');
+        final dateMatches = dateRegExp.allMatches(html);
+        final dates = dateMatches.map((m) => m.group(1)!).toList();
+        
+        String? foundDate;
+        if (dates.contains(formattedDate)) {
+          foundDate = formattedDate;
+        } else if (dates.contains(formattedDateAlt)) {
+          foundDate = formattedDateAlt;
+        }
+        
+        if (foundDate != null) {
+          final dateUrl = '$recordingsUrl$foundDate/';
+          final dateResponse = await http.get(Uri.parse(dateUrl));
+          
+          if (dateResponse.statusCode == 200) {
+            final dateHtml = utf8.decode(dateResponse.bodyBytes);
+            
+            final mkvRegExp = RegExp(r'<a href="([^"]+\.mkv)"');
+            final m3u8RegExp = RegExp(r'<a href="([^"]+\.m3u8)"');
+            final mp4RegExp = RegExp(r'<a href="([^"]+\.mp4)"');
+            
+            final mkvRecordings = mkvRegExp.allMatches(dateHtml).map((m) => m.group(1)!).toList();
+            final m3u8Recordings = m3u8RegExp.allMatches(dateHtml).map((m) => m.group(1)!).toList();
+            final mp4Recordings = mp4RegExp.allMatches(dateHtml).map((m) => m.group(1)!).toList();
+            
+            final newRecordings = [...mkvRecordings, ...m3u8Recordings, ...mp4Recordings];
+            final existingRecordings = _cameraRecordings[camera] ?? [];
+            
+            if (newRecordings.length > existingRecordings.length) {
+              print('[MultiRecordings] New recordings found for ${camera.name}: ${newRecordings.length - existingRecordings.length} new');
+              if (mounted) {
+                setState(() {
+                  _cameraRecordings[camera] = newRecordings;
+                });
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('[MultiRecordings] Error refreshing recordings for ${camera.name}: $e');
+    }
+  }
+  
   void _updateRecordingsForSelectedDay() {
     if (_selectedDay == null || _selectedCameras.isEmpty) return;
     
@@ -1019,11 +1204,19 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     final device = _getDeviceForCamera(camera);
     
     if (device != null && _selectedDay != null) {
-      // Kamera için hangi tarih formatının çalıştığını kontrol et
-      final dateFormat = _cameraDateFormats[camera];
+      // Kamera için hangi tarih formatının çalıştığını kontrol et - MAC karşılaştırması ile
+      String? dateFormat;
+      for (var entry in _cameraDateFormats.entries) {
+        if (entry.key.mac == camera.mac) {
+          dateFormat = entry.value;
+          break;
+        }
+      }
+      dateFormat ??= _cameraDateFormats[camera];
+      
       final recordingUrl = dateFormat != null 
           ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$dateFormat/$recording'
-          : 'http://${device.ipv4}:8080/Rec/${camera.name}/${DateFormat('yyyy_MM_dd').format(_selectedDay!)}/$recording';
+          : 'http://${device.ipv4}:8080/Rec/${camera.name}/${DateFormat('yyyy-MM-dd').format(_selectedDay!)}/$recording';
       
       print('[MultiRecordings] Using recording URL: $recordingUrl');
       
@@ -1323,32 +1516,50 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   
   // Kayıtları ±5dk toleransla grupla
   List<List<RecordingTime>> _groupRecordingsByTime() {
-    if (_cameraRecordings.isEmpty) return [];
+    // Check if we have any recordings at all
+    if (_cameraRecordings.isEmpty && _cameraDeviceRecordings.isEmpty) return [];
     
     print('[MultiRecordings] Grouping recordings by time...');
     
     // Tüm kayıtlardan zaman damgalarını çıkar
     final List<RecordingTime> allRecordings = [];
     
+    // Add recordings from single-device cameras
     for (final entry in _cameraRecordings.entries) {
       final camera = entry.key;
       final recordings = entry.value;
       
-      print('[MultiRecordings] Camera ${camera.name} has ${recordings.length} recordings: $recordings');
+      print('[MultiRecordings] Camera ${camera.name} has ${recordings.length} recordings');
       
       for (final recording in recordings) {
         final recordingName = recording.contains('/') ? recording.split('/').last : recording;
         final timestamp = _parseTimestampFromFilename(recordingName);
         
-        // Enhanced debugging for file type tracking
-        final fileExtension = recordingName.toLowerCase().contains('.mkv') ? 'MKV' : 
-                            recordingName.toLowerCase().contains('.m3u8') ? 'M3U8' : 'UNKNOWN';
-        
         if (timestamp != null) {
-          print('[MultiRecordings] Parsed $recordingName ($fileExtension) -> $timestamp');
           allRecordings.add(RecordingTime(camera, recording, timestamp));
-        } else {
-          print('[MultiRecordings] ERROR: Could not parse timestamp from $recordingName ($fileExtension)');
+        }
+      }
+    }
+    
+    // Add recordings from multi-device cameras (all devices)
+    for (final entry in _cameraDeviceRecordings.entries) {
+      final camera = entry.key;
+      final deviceRecordings = entry.value;
+      
+      for (final deviceEntry in deviceRecordings.entries) {
+        final deviceMac = deviceEntry.key;
+        final recordings = deviceEntry.value;
+        
+        print('[MultiRecordings] Camera ${camera.name} from device $deviceMac has ${recordings.length} recordings');
+        
+        for (final recording in recordings) {
+          final recordingName = recording.contains('/') ? recording.split('/').last : recording;
+          final timestamp = _parseTimestampFromFilename(recordingName);
+          
+          if (timestamp != null) {
+            // Add with device info for later use
+            allRecordings.add(RecordingTime(camera, recording, timestamp, deviceMac: deviceMac));
+          }
         }
       }
     }
@@ -1431,10 +1642,65 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
 
   void _openMultiWatchScreen(List<RecordingTime> recordingGroup) {
     final Map<Camera, String> cameraRecordings = {};
+    final Map<Camera, String> cameraDeviceIps = {};
+    final Map<Camera, String> dateFormats = {};
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
     
     for (final recording in recordingGroup) {
       cameraRecordings[recording.camera] = recording.recording;
+      
+      // Get device IP for this camera (especially important for multi-device cameras)
+      if (recording.deviceMac != null) {
+        // Multi-device camera - find the specific device IP
+        try {
+          final device = cameraDevicesProvider.devices.values.firstWhere(
+            (d) => d.macAddress == recording.deviceMac || d.macKey == recording.deviceMac,
+          );
+          cameraDeviceIps[recording.camera] = device.ipv4;
+        } catch (e) {
+          // Try from currentDevices
+          final deviceInfo = recording.camera.currentDevices[recording.deviceMac];
+          if (deviceInfo != null && deviceInfo.deviceIp.isNotEmpty) {
+            cameraDeviceIps[recording.camera] = deviceInfo.deviceIp;
+          }
+        }
+        
+        // Get date format for this device
+        String? format;
+        for (var entry in _cameraDeviceDateFormats.entries) {
+          if (entry.key.mac == recording.camera.mac) {
+            format = entry.value[recording.deviceMac];
+            break;
+          }
+        }
+        if (format != null) {
+          dateFormats[recording.camera] = format;
+        }
+      } else {
+        // Single device camera - use regular lookup
+        final device = cameraDevicesProvider.getDeviceForCamera(recording.camera);
+        if (device != null) {
+          cameraDeviceIps[recording.camera] = device.ipv4;
+        }
+        
+        // Get date format
+        String? format;
+        for (var entry in _cameraDateFormats.entries) {
+          if (entry.key.mac == recording.camera.mac) {
+            format = entry.value;
+            break;
+          }
+        }
+        format ??= _cameraDateFormats[recording.camera];
+        if (format != null) {
+          dateFormats[recording.camera] = format;
+        }
+      }
     }
+    
+    print('[MultiRecordings] Opening MultiWatch with ${cameraRecordings.length} cameras');
+    print('[MultiRecordings] Device IPs: ${cameraDeviceIps.entries.map((e) => "${e.key.name}: ${e.value}").join(", ")}');
+    print('[MultiRecordings] Date formats: ${dateFormats.entries.map((e) => "${e.key.name}: ${e.value}").join(", ")}');
     
     // Multi Watch sayfasını aç
     Navigator.push(
@@ -1443,7 +1709,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         builder: (context) => MultiWatchScreen(
           cameraRecordings: cameraRecordings,
           selectedDate: _selectedDay!,
-          cameraDateFormats: _cameraDateFormats, // Pass the date formats
+          cameraDateFormats: dateFormats,
+          cameraDeviceIps: cameraDeviceIps,
         ),
       ),
     );
@@ -1454,14 +1721,33 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     
     // Find closest recordings from each selected camera
     final Map<Camera, String> closestRecordings = {};
+    final Map<Camera, String> cameraDeviceIps = {};
+    final Map<Camera, String> dateFormats = {};
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
     
     for (final camera in _selectedCameras) {
       final recordings = _cameraRecordings[camera];
       if (recordings != null && recordings.isNotEmpty) {
-        // For now, just take the first recording from each camera
-        // In a more sophisticated implementation, you might want to find recordings
-        // that are closest in time to a reference time (like the earliest recording)
         closestRecordings[camera] = recordings.first;
+        
+        // Get device IP
+        final device = cameraDevicesProvider.getDeviceForCamera(camera);
+        if (device != null) {
+          cameraDeviceIps[camera] = device.ipv4;
+        }
+        
+        // Get date format using MAC comparison
+        String? format;
+        for (var entry in _cameraDateFormats.entries) {
+          if (entry.key.mac == camera.mac) {
+            format = entry.value;
+            break;
+          }
+        }
+        format ??= _cameraDateFormats[camera];
+        if (format != null) {
+          dateFormats[camera] = format;
+        }
       }
     }
     
@@ -1473,7 +1759,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
           builder: (context) => MultiWatchScreen(
             cameraRecordings: closestRecordings,
             selectedDate: _selectedDay!,
-            cameraDateFormats: _cameraDateFormats, // Pass the date formats
+            cameraDateFormats: dateFormats,
+            cameraDeviceIps: cameraDeviceIps,
           ),
         ),
       );
@@ -1489,6 +1776,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
 
   @override
   void dispose() {
+    _refreshTimer?.cancel();
     _animationController.dispose();
     super.dispose();
   }
@@ -1875,11 +2163,18 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     if (resolvedDeviceIp.isNotEmpty && _selectedDay != null) {
       String? dateFormat;
       if (deviceMac != null) {
-        dateFormat = _cameraDeviceDateFormats[camera]?[deviceMac];
+        // Try MAC comparison first
+        for (var entry in _cameraDeviceDateFormats.entries) {
+          if (entry.key.mac == camera.mac) {
+            dateFormat = entry.value[deviceMac];
+            break;
+          }
+        }
+        dateFormat ??= _cameraDeviceDateFormats[camera]?[deviceMac];
       } else {
         dateFormat = _cameraDateFormats[camera];
       }
-      final formattedDate = dateFormat ?? DateFormat('yyyy_MM_dd').format(_selectedDay!);
+      final formattedDate = dateFormat ?? DateFormat('yyyy-MM-dd').format(_selectedDay!);
       recordingUrl = 'http://$resolvedDeviceIp:8080/Rec/${camera.name}/$formattedDate/$recording';
     }
     
@@ -1950,11 +2245,18 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
       if (deviceIp.isNotEmpty && _selectedDay != null) {
         String? dateFormat;
         if (deviceMac != null) {
-          dateFormat = _cameraDeviceDateFormats[camera]?[deviceMac];
+          // Try MAC comparison first
+          for (var entry in _cameraDeviceDateFormats.entries) {
+            if (entry.key.mac == camera.mac) {
+              dateFormat = entry.value[deviceMac];
+              break;
+            }
+          }
+          dateFormat ??= _cameraDeviceDateFormats[camera]?[deviceMac];
         } else {
           dateFormat = _cameraDateFormats[camera];
         }
-        final formattedDate = dateFormat ?? DateFormat('yyyy_MM_dd').format(_selectedDay!);
+        final formattedDate = dateFormat ?? DateFormat('yyyy-MM-dd').format(_selectedDay!);
         recordingUrl = 'http://$deviceIp:8080/Rec/${camera.name}/$formattedDate/$recording';
       }
       
@@ -1974,6 +2276,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   // Open video player for a specific device
   void _openVideoPlayerPopupWithDevice(Camera camera, String recording, String? deviceMac, String deviceIp) {
     print('[MultiRecordings] Opening video player for ${camera.name} from device $deviceMac ($deviceIp)');
+    print('[MultiRecordings] _cameraDeviceDateFormats keys: ${_cameraDeviceDateFormats.keys.map((c) => c.mac).toList()}');
+    print('[MultiRecordings] Looking for camera mac: ${camera.mac}');
     
     setState(() {
       _activeCamera = camera;
@@ -1985,12 +2289,25 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
     if (deviceIp.isNotEmpty && _selectedDay != null) {
       String? dateFormat;
       if (deviceMac != null) {
-        dateFormat = _cameraDeviceDateFormats[camera]?[deviceMac];
+        // Try to find the date format from the map using MAC comparison
+        for (var entry in _cameraDeviceDateFormats.entries) {
+          if (entry.key.mac == camera.mac) {
+            dateFormat = entry.value[deviceMac];
+            print('[MultiRecordings] Found date format via MAC comparison: $dateFormat');
+            break;
+          }
+        }
+        if (dateFormat == null) {
+          dateFormat = _cameraDeviceDateFormats[camera]?[deviceMac];
+          print('[MultiRecordings] Direct lookup dateFormat: $dateFormat');
+        }
       } else {
         dateFormat = _cameraDateFormats[camera];
       }
-      final formattedDate = dateFormat ?? DateFormat('yyyy_MM_dd').format(_selectedDay!);
+      // Default to yyyy-MM-dd (with dashes) as that's more common in this system
+      final formattedDate = dateFormat ?? DateFormat('yyyy-MM-dd').format(_selectedDay!);
       recordingUrl = 'http://$deviceIp:8080/Rec/${camera.name}/$formattedDate/$recording';
+      print('[MultiRecordings] Final dateFormat used: $formattedDate');
     }
     
     print('[MultiRecordings] Recording URL: $recordingUrl');
@@ -2237,10 +2554,19 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         // Use the same URL format as video player (with date format)
         String recordingUrl = '';
         if (device != null && _selectedDay != null) {
-          final dateFormat = _cameraDateFormats[camera];
+          // MAC karşılaştırması ile date format bul
+          String? dateFormat;
+          for (var entry in _cameraDateFormats.entries) {
+            if (entry.key.mac == camera.mac) {
+              dateFormat = entry.value;
+              break;
+            }
+          }
+          dateFormat ??= _cameraDateFormats[camera];
+          
           recordingUrl = dateFormat != null 
               ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$dateFormat/$recording'
-              : 'http://${device.ipv4}:8080/Rec/${camera.name}/${DateFormat('yyyy_MM_dd').format(_selectedDay!)}/$recording';
+              : 'http://${device.ipv4}:8080/Rec/${camera.name}/${DateFormat('yyyy-MM-dd').format(_selectedDay!)}/$recording';
         }
         
         final isSelected = _isMultiSelectionMode ? 
@@ -3024,8 +3350,19 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
   }
 
   void _loadVideo() {
+    print('[VideoPlayerPopup] Loading video URL: ${widget.recordingUrl}');
     try {
       _popupPlayer.open(Media(widget.recordingUrl), play: true);
+      
+      // Listen for player state changes
+      _popupPlayer.stream.playing.listen((playing) {
+        print('[VideoPlayerPopup] Playing state changed: $playing');
+      });
+      
+      // Listen for log messages
+      _popupPlayer.stream.log.listen((log) {
+        print('[VideoPlayerPopup] Player log: $log');
+      });
       
       // If we have a seek time, wait for the video to be ready and then seek
       if (widget.seekTime != null && widget.seekTime! > 0) {
@@ -3049,6 +3386,7 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
         });
       }
     } catch (e) {
+      print('[VideoPlayerPopup] Error in _loadVideo: $e');
       setState(() {
         _hasError = true;
         _errorMessage = 'Error loading recording: $e';

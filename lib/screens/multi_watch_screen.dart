@@ -12,12 +12,14 @@ class MultiWatchScreen extends StatefulWidget {
   final Map<Camera, String> cameraRecordings;
   final DateTime selectedDate;
   final Map<Camera, String>? cameraDateFormats; // Date format per camera
+  final Map<Camera, String>? cameraDeviceIps; // Device IP per camera (for multi-device cameras)
 
   const MultiWatchScreen({
     Key? key,
     required this.cameraRecordings,
     required this.selectedDate,
     this.cameraDateFormats,
+    this.cameraDeviceIps,
   }) : super(key: key);
 
   @override
@@ -127,16 +129,39 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   
   void _loadRecording(Camera camera, String recording) {
     final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
-    final device = cameraDevicesProvider.getDeviceForCamera(camera);
     
-    if (device != null) {
-      // Use the stored date format for this camera, or default to yyyy_MM_dd
-      final cameraDateFormat = widget.cameraDateFormats?[camera];
-      final selectedDayFormatted = cameraDateFormat ?? DateFormat('yyyy_MM_dd').format(widget.selectedDate);
+    // First check if we have a specific device IP for this camera
+    String? deviceIp;
+    for (var entry in widget.cameraDeviceIps?.entries ?? <MapEntry<Camera, String>>[]) {
+      if (entry.key.mac == camera.mac) {
+        deviceIp = entry.value;
+        break;
+      }
+    }
+    
+    // Fallback to provider lookup if no specific IP provided
+    if (deviceIp == null) {
+      final device = cameraDevicesProvider.getDeviceForCamera(camera);
+      deviceIp = device?.ipv4;
+    }
+    
+    if (deviceIp != null) {
+      // Use the stored date format for this camera - check by MAC first
+      String? cameraDateFormat;
+      for (var entry in widget.cameraDateFormats?.entries ?? <MapEntry<Camera, String>>[]) {
+        if (entry.key.mac == camera.mac) {
+          cameraDateFormat = entry.value;
+          break;
+        }
+      }
+      cameraDateFormat ??= widget.cameraDateFormats?[camera];
       
-      final recordingUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/$selectedDayFormatted/$recording';
+      // Default to yyyy-MM-dd (with dashes) as that's more common
+      final selectedDayFormatted = cameraDateFormat ?? DateFormat('yyyy-MM-dd').format(widget.selectedDate);
       
-      print('[MultiWatch] Loading recording for ${camera.name}: $recordingUrl (format: ${cameraDateFormat ?? 'default'})');
+      final recordingUrl = 'http://$deviceIp:8080/Rec/${camera.name}/$selectedDayFormatted/$recording';
+      
+      print('[MultiWatch] Loading recording for ${camera.name}: $recordingUrl (format: ${cameraDateFormat ?? 'default'}, ip: $deviceIp)');
       
       setState(() {
         _hasError[camera] = false;
@@ -156,7 +181,7 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
         }
       }
     } else {
-      print('[MultiWatch] No device found for camera: ${camera.name}');
+      print('[MultiWatch] No device IP found for camera: ${camera.name}');
       setState(() {
         _hasError[camera] = true;
         _errorMessages[camera] = 'Device not found for camera';
