@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
-import '../providers/camera_devices_provider_optimized.dart';
+import '../providers/camera_devices_provider.dart';
 
 class CameraGridItem extends StatelessWidget {
   final Camera camera;
@@ -293,8 +293,8 @@ class CameraGridItem extends StatelessWidget {
                   // History count and last seen
                   Row(
                     children: [
-                      // History count
-                      if (camera.deviceHistory.isNotEmpty) ...[
+                      // History count - filter out empty entries
+                      if (camera.deviceHistory.any((h) => h.deviceMac.isNotEmpty)) ...[
                         Icon(
                           Icons.history,
                           size: 14.0,
@@ -302,7 +302,7 @@ class CameraGridItem extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${camera.deviceHistory.length} history',
+                          '${camera.deviceHistory.where((h) => h.deviceMac.isNotEmpty).length} history',
                           style: const TextStyle(
                             fontSize: 11.0,
                             color: Colors.purple,
@@ -503,22 +503,20 @@ class CameraGridItem extends StatelessWidget {
 
   // Get shortened camera display name
   String _getCameraDisplayName(Camera camera) {
-    if (camera.name.isNotEmpty) {
-      // If camera name is too long, create a smart shortened version
-      if (camera.name.length > 20) {
-        // Try to find meaningful parts to keep
-        final parts = camera.name.split('_');
-        if (parts.length > 1) {
-          // Take first and last part if multiple parts
-          return '${parts.first}_${parts.last}';
-        } else {
-          // Just truncate
-          return '${camera.name.substring(0, 17)}...';
-        }
+    final name = camera.displayName; // Uses MAC if name is empty
+    // If camera name is too long, create a smart shortened version
+    if (name.length > 20) {
+      // Try to find meaningful parts to keep
+      final parts = name.split('_');
+      if (parts.length > 1) {
+        // Take first and last part if multiple parts
+        return '${parts.first}_${parts.last}';
+      } else {
+        // Just truncate
+        return '${name.substring(0, 17)}...';
       }
-      return camera.name;
     }
-    return 'Camera ${camera.index + 1}';
+    return name;
   }
 
   // Get device name from MAC address

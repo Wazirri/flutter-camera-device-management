@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
-import '../providers/websocket_provider_optimized.dart';
-import '../providers/camera_devices_provider_optimized.dart';
+import '../providers/websocket_provider.dart';
+import '../providers/camera_devices_provider.dart';
 
 class CameraDetailsBottomSheet extends StatelessWidget {
   final Camera camera;
@@ -54,7 +54,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      camera.name,
+                      camera.displayName,
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -105,7 +105,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   context: context,
                   title: 'Basic Information',
                   details: [
-                    DetailItem(name: 'Name', value: camera.name),
+                    DetailItem(name: 'Name', value: camera.displayName),
                     DetailItem(name: 'IP Address', value: camera.ip),
                     DetailItem(name: 'MAC Address', value: camera.mac), // Changed from camera.macKey to camera.mac
                     DetailItem(name: 'Username', value: camera.username),
@@ -186,8 +186,8 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                       ],
                     );
                   }),
-                // Device History
-                if (camera.deviceHistory.isNotEmpty)
+                // Device History - filter out empty entries
+                if (camera.deviceHistory.any((h) => h.deviceMac.isNotEmpty))
                   _buildDeviceHistorySection(context),
                 // MAC Address Information
                 _buildDetailGroup(
@@ -356,6 +356,11 @@ class CameraDetailsBottomSheet extends StatelessWidget {
 
   // Build device history section with proper formatting
   Widget _buildDeviceHistorySection(BuildContext context) {
+    // Filter out empty/incomplete history entries
+    final validHistory = camera.deviceHistory
+        .where((h) => h.deviceMac.isNotEmpty)
+        .toList();
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(16),
@@ -383,7 +388,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Text(
-                'Device Assignment History (${camera.deviceHistory.length} entries)',
+                'Device Assignment History (${validHistory.length} entries)',
                 style: const TextStyle(
                   color: AppTheme.darkTextPrimary,
                   fontSize: 16,
@@ -394,10 +399,10 @@ class CameraDetailsBottomSheet extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           // History entries
-          ...camera.deviceHistory.asMap().entries.map((entry) {
+          ...validHistory.asMap().entries.map((entry) {
             int index = entry.key;
             var history = entry.value;
-            bool isLast = index == camera.deviceHistory.length - 1;
+            bool isLast = index == validHistory.length - 1;
             
             return Container(
               margin: EdgeInsets.only(bottom: isLast ? 0 : 12),

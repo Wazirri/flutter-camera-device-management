@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:movita_ecs/models/system_info.dart';
 import 'package:movita_ecs/models/permissions.dart';
-import 'camera_devices_provider_optimized.dart';
+import 'camera_devices_provider.dart';
 import 'user_group_provider.dart';
 
 class WebSocketProviderOptimized with ChangeNotifier {
@@ -57,7 +57,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
   // Notification batching
   bool _needsNotification = false;
   Timer? _notificationDebounceTimer;
-  final int _notificationBatchWindow = 200; // milliseconds
+  final int _notificationBatchWindow = 500; // milliseconds - increased for better batching with many cameras
 
   // Constructor - load saved settings but don't auto-connect
   WebSocketProviderOptimized() {
@@ -114,27 +114,20 @@ class WebSocketProviderOptimized with ChangeNotifier {
     _batchNotifyListeners();
   }
 
-  // // Add message to log (with reduced logging for performance)
-  // void _logMessage(String message, {bool isImportant = false}) {
-  //   // Add timestamp to message
-  //   final timestamp = DateTime.now().toString().split('.').first;
-  //   final logEntry = '[$timestamp] $message';
+  // Add message to log
+  void _logMessage(String message) {
+    final timestamp = DateTime.now().toString().split('.').first;
+    final logEntry = '[$timestamp] $message';
     
-  //   // Only log important messages or a subset of regular messages for performance
-  //   if (isImportant || _messageLog.length % 10 == 0) {
-  //     _messageLog.add(logEntry);
-      
-  //     // Keep log size manageable (max 100 messages)
-  //     if (_messageLog.length > 100) {
-  //       _messageLog.removeAt(0);
-  //     }
-      
-  //     // Only notify for important messages or periodically
-  //     if (isImportant) {
-  //       _batchNotifyListeners();
-  //     }
-  //   }
-  // }
+    _messageLog.add(logEntry);
+    
+    // Keep log size manageable (max 100000 messages)
+    if (_messageLog.length > 10000000) {
+      _messageLog.removeAt(0);
+    }
+    
+    _batchNotifyListeners();
+  }
 
   // Connect to WebSocket server
   Future<bool> connect(String serverIp, int serverPort,
@@ -329,8 +322,11 @@ class WebSocketProviderOptimized with ChangeNotifier {
     // Clear message log
     _messageLog.clear();
     
-    // Notify camera devices provider to reset data
+    // Reset all provider data
+    print('[${DateTime.now().toString().split('.').first}] Resetting camera devices provider...');
     _cameraDevicesProvider?.resetData();
+    print('[${DateTime.now().toString().split('.').first}] Resetting user group provider...');
+    _userGroupProvider?.clear();
     
     print('[${DateTime.now().toString().split('.').first}] Logout complete - all connections closed and state reset');
     notifyListeners();
@@ -353,6 +349,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
     if (!_isConnected || _socket == null) {
       _errorMessage = 'No WebSocket connection. Command could not be sent.';
       print('[${DateTime.now().toString().split('.').first}] $_errorMessage');
+      _logMessage('ERROR: $_errorMessage');
       _batchNotifyListeners();
       return false;
     }
@@ -360,11 +357,12 @@ class WebSocketProviderOptimized with ChangeNotifier {
     try {
       _socket!.add(command);
       print('[${DateTime.now().toString().split('.').first}] Command sent: $command');
+      _logMessage('SENT: $command');
       return true;
     } catch (e) {
       _errorMessage = 'Error sending command: $e';
       print('[${DateTime.now().toString().split('.').first}] $_errorMessage');
-      print(_errorMessage);
+      _logMessage('ERROR: $_errorMessage');
       _batchNotifyListeners();
       return false;
     }
@@ -493,23 +491,23 @@ class WebSocketProviderOptimized with ChangeNotifier {
         }
         
         print('[$now] WebSocket raw message: $message');
-        // Log the message (truncate if too long)
-        final logMsg = message.length > 500 ? '${message.substring(0, 500)}...' : message;
-        print('[${DateTime.now().toString().split('.').first}] Received: $logMsg');
+        
+        // Log raw message to UI (truncate if too long for display)
+        final displayMsg = message.length > 500 ? '${message.substring(0, 500)}...' : message;
+        _logMessage(displayMsg);
+        
         // Try to parse JSON message
         try {
           final jsonData = jsonDecode(message);
-          print('WebSocket message parsed as JSON: $jsonData');
           _processJsonMessage(jsonData);
         } catch (e) {
-          print('WebSocket message is not valid JSON: $e');
           // Not a JSON message, check if it's a string command
           _processStringMessage(message);
         }
       }
     } catch (e) {
       print('Error handling message: $e');
-      print('[${DateTime.now().toString().split('.').first}] Error handling message: $e');
+      _logMessage('ERROR: $e');
     }
   }
   
@@ -601,7 +599,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
         case 'loginok':
           // Login successful - send Monitor ecs_slaves message
           _isLoggedIn = true;
-          _isWaitingForChangedone = true;
+          _isWaitingForChangedone = false; // Don't wait for changedone - let UI proceed immediately
           _errorMessage = '';
           _currentLoggedInUsername = _lastUsername; // Login yapan kullanıcıyı kaydet
           print('[${DateTime.now().toString().split('.').first}] Login successful as $_currentLoggedInUsername, sending Monitor ecs_slaves');

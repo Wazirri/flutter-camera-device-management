@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'file_logger_optimized.dart';
+import 'file_logger.dart';
 
 /// This class monitors for specific error conditions and takes appropriate actions
 /// to prevent app crashes or performance issues.

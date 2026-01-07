@@ -433,6 +433,7 @@ class UserGroupProvider with ChangeNotifier {
 
   // Clear all data
   void clear() {
+    print('UGP: 🧹 clear() called - clearing ${_users.length} users and ${_groups.length} groups');
     _users.clear();
     _groups.clear();
     _usersCreated = null;
@@ -440,6 +441,7 @@ class UserGroupProvider with ChangeNotifier {
     _lastOperationSuccess = null;
     _notificationDebounceTimer?.cancel();
     _needsNotification = false;
+    print('UGP: ✅ All data cleared');
     notifyListeners();
   }
 

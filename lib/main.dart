@@ -7,7 +7,7 @@ import 'package:media_kit/media_kit.dart'; // Import for MediaKit
 import 'package:fvp/fvp.dart' as fvp; // Import FVP for video player
 
 import 'utils/keyboard_fix.dart'; // Import keyboard fix utilities
-import 'utils/file_logger_optimized.dart'; // Import optimized file logger
+import 'utils/file_logger.dart'; // Import optimized file logger
 import 'utils/error_monitor.dart'; // Import error monitor
 import 'screens/cameras_screen.dart';
 import 'screens/all_cameras_screen.dart';
@@ -15,9 +15,9 @@ import 'screens/camera_devices_screen.dart';
 import 'screens/camera_groups_screen.dart';  // New camera groups screen
 import 'screens/recording_download_screen.dart';  // Recording download screen
 import 'screens/user_group_management_screen.dart';  // User and group management screen
-import 'screens/dashboard_screen_optimized.dart'; // Using optimized dashboard
+import 'screens/dashboard_screen.dart'; // Using optimized dashboard
 import 'screens/live_view_screen.dart';
-import 'screens/login_screen_optimized.dart';
+import 'screens/login_screen.dart';
 
 import 'screens/settings_screen.dart';
 import 'screens/websocket_log_screen.dart';
@@ -31,8 +31,8 @@ import 'utils/responsive_helper.dart';
 import 'utils/page_transitions.dart';
 import 'widgets/desktop_side_menu.dart';
 import 'widgets/mobile_bottom_navigation_bar.dart';
-import 'providers/websocket_provider_optimized.dart'; // Using optimized websocket provider
-import 'providers/camera_devices_provider_optimized.dart'; // Using optimized camera devices provider
+import 'providers/websocket_provider.dart'; // Using optimized websocket provider
+import 'providers/camera_devices_provider.dart'; // Using optimized camera devices provider
 import 'providers/multi_view_layout_provider.dart';
 import 'providers/multi_camera_view_provider.dart'; // Multi camera view provider
 import 'providers/user_group_provider.dart'; // User group provider

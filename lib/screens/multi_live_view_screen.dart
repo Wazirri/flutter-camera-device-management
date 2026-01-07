@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
-import '../providers/camera_devices_provider_optimized.dart';
+import '../providers/camera_devices_provider.dart';
 import '../providers/multi_view_layout_provider.dart';
 import '../models/camera_device.dart';
 import '../models/camera_layout.dart';
@@ -340,7 +340,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen> with Automati
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            camera.name,
+                            camera.displayName,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,

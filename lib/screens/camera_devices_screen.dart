@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 // Added import for DateFormat
 
 import '../models/camera_device.dart';
-import '../providers/camera_devices_provider_optimized.dart';
+import '../providers/camera_devices_provider.dart';
 import '../theme/app_theme.dart'; // Fixed import for AppTheme
 // Removed app_localizations import to fix build error
 

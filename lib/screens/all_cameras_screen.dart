@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import '../models/camera_device.dart';
-import '../providers/camera_devices_provider_optimized.dart';
-import '../providers/websocket_provider_optimized.dart';
+import '../providers/camera_devices_provider.dart';
+import '../providers/websocket_provider.dart';
 import '../providers/user_group_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/camera_details_bottom_sheet.dart';
@@ -60,6 +61,8 @@ class CameraSnapshotWidget extends StatefulWidget {
   final BoxFit fit;
   final String cameraId;
   final bool showRefreshButton;
+  final String? username;
+  final String? password;
 
   const CameraSnapshotWidget({
     Key? key,
@@ -69,6 +72,8 @@ class CameraSnapshotWidget extends StatefulWidget {
     this.height = 120,
     this.fit = BoxFit.cover,
     this.showRefreshButton = true,
+    this.username,
+    this.password,
   }) : super(key: key);
 
   @override
@@ -133,8 +138,16 @@ class _CameraSnapshotWidgetState extends State<CameraSnapshotWidget> {
     _activeRequests++;
 
     try {
+      // Prepare headers with Basic Auth if credentials provided
+      final headers = <String, String>{};
+      if (widget.username != null && widget.username!.isNotEmpty) {
+        final credentials = base64Encode(utf8.encode('${widget.username}:${widget.password ?? ""}'));
+        headers['Authorization'] = 'Basic $credentials';
+      }
+      
       final response = await http.get(
         Uri.parse(widget.snapshotUrl),
+        headers: headers.isNotEmpty ? headers : null,
       ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200 && mounted) {
@@ -1188,7 +1201,9 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                             camera.subSnapShot.isNotEmpty 
                                 ? camera.subSnapShot 
                                 : camera.mainSnapShot,
-                            camera.name,
+                            camera.displayName,
+                            camera.username,
+                            camera.password,
                           )
                         : null,
                     child: Container(
@@ -1214,6 +1229,8 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                                 cameraId: camera.mac,
                                 height: 48,
                                 showRefreshButton: false,
+                                username: camera.username,
+                                password: camera.password,
                               )
                             : Icon(
                                 isOnline ? Icons.videocam : Icons.videocam_off,
@@ -1231,9 +1248,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          camera.name.isNotEmpty
-                              ? camera.name
-                              : 'Unknown Camera',
+                          camera.displayName,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -1606,15 +1621,15 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
             ),
           ],
 
-          // Device History
-          if (camera.deviceHistory.isNotEmpty) ...[
+          // Device History - filter out empty entries
+          if (camera.deviceHistory.any((h) => h.deviceMac.isNotEmpty)) ...[
             const SizedBox(height: 8),
             Row(
               children: [
                 const Icon(Icons.history, size: 14, color: Colors.grey),
                 const SizedBox(width: 6),
                 Text(
-                  'History: ${camera.deviceHistory.length} device(s)',
+                  'History: ${camera.deviceHistory.where((h) => h.deviceMac.isNotEmpty).length} device(s)',
                   style: TextStyle(
                     fontSize: 11,
                     color: Colors.grey.shade400,
@@ -1641,6 +1656,11 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
   }
 
   void _showDeviceHistory(Camera camera) {
+    // Filter out empty/incomplete history entries (no deviceMac)
+    final validHistory = camera.deviceHistory
+        .where((h) => h.deviceMac.isNotEmpty)
+        .toList();
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.darkSurface,
@@ -1658,7 +1678,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                 const Icon(Icons.history, color: AppTheme.primaryOrange),
                 const SizedBox(width: 8),
                 Text(
-                  'Device History - ${camera.name}',
+                  'Device History - ${camera.displayName}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -1668,7 +1688,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            if (camera.deviceHistory.isEmpty)
+            if (validHistory.isEmpty)
               const Center(
                 child: Padding(
                   padding: EdgeInsets.all(24),
@@ -1685,9 +1705,9 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                 ),
                 child: ListView.builder(
                   shrinkWrap: true,
-                  itemCount: camera.deviceHistory.length,
+                  itemCount: validHistory.length,
                   itemBuilder: (context, index) {
-                    final history = camera.deviceHistory[index];
+                    final history = validHistory[index];
                     return Container(
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(12),
@@ -2273,7 +2293,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
     );
   }
 
-  void _showFullSnapshot(BuildContext context, String snapshotUrl, String cameraName) {
+  void _showFullSnapshot(BuildContext context, String snapshotUrl, String cameraName, String? username, String? password) {
     showDialog(
       context: context,
       barrierColor: Colors.black87,
@@ -2331,6 +2351,8 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                   height: MediaQuery.of(context).size.height * 0.5,
                   width: MediaQuery.of(context).size.width - 32,
                   showRefreshButton: true,
+                  username: username,
+                  password: password,
                 ),
               ),
             ),

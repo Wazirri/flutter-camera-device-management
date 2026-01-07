@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/websocket_provider_optimized.dart';
-import '../providers/camera_devices_provider_optimized.dart';
+import '../providers/websocket_provider.dart';
+import '../providers/camera_devices_provider.dart';
 import '../models/system_info.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';

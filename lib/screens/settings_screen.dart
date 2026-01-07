@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../utils/responsive_helper.dart';
 import '../widgets/custom_app_bar.dart';
-import '../providers/websocket_provider_optimized.dart';
-import '../providers/camera_devices_provider_optimized.dart';
+import '../providers/websocket_provider.dart';
+import '../providers/camera_devices_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);

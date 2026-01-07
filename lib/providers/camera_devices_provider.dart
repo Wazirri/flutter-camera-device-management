@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/camera_device.dart'; // Corrected import path
 import '../models/camera_group.dart';
-import 'websocket_provider_optimized.dart';
+import 'websocket_provider.dart';
 
 enum MessageCategory {
   camera,
@@ -86,7 +86,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   // Batch notifications to reduce UI rebuilds
   bool _needsNotification = false;
   Timer? _notificationDebounceTimer;
-  final int _notificationBatchWindow = 100; // milliseconds - reduced for faster status updates
+  final int _notificationBatchWindow = 500; // milliseconds - increased for better batching with many cameras
   
   // Cache variables to avoid redundant processing
   List<CameraDevice>? _cachedDevicesList;
@@ -400,6 +400,9 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
 
   // Reset all data (for login/logout)
   void resetData() {
+    print('CDP_OPT: 🧹 resetData() called');
+    print('CDP_OPT: Clearing ${_devices.length} devices, ${_macDefinedCameras.length} cameras, ${_cameraGroups.length} groups');
+    
     _devices.clear();
     _macDefinedCameras.clear();
     _cameraGroups.clear();
@@ -415,6 +418,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     _cachedFlatCameraList = null;
     _cachedGroupsList = null;
     
+    print('CDP_OPT: ✅ All data cleared');
     _batchNotifyListeners();
   }
 
@@ -2061,7 +2065,8 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     _notificationDebounceTimer = Timer(Duration(milliseconds: _notificationBatchWindow), () {
       if (_needsNotification) {
         _needsNotification = false;
-        _printDeviceSummary(); // Print summary before notifying UI
+        // Don't print summary on every notify - too much logging with many cameras
+        // _printDeviceSummary();
         notifyListeners();
       }
     });

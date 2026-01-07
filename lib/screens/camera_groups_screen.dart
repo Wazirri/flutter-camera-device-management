@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 
 import '../models/camera_device.dart';
 import '../models/camera_group.dart';
-import '../providers/camera_devices_provider_optimized.dart';
+import '../providers/camera_devices_provider.dart';
 import '../providers/user_group_provider.dart';
-import '../providers/websocket_provider_optimized.dart';
+import '../providers/websocket_provider.dart';
 import '../theme/app_theme.dart';
 import 'live_view_screen.dart';
 import 'multi_recordings_screen.dart';

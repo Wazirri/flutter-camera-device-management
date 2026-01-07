@@ -918,6 +918,9 @@ class Camera {
   // How many devices are recording this camera
   int get recordingCount => recordingDevices.values.where((r) => r).length;
   
+  // Display name - uses MAC address if name is empty
+  String get displayName => name.isNotEmpty ? name : mac;
+  
   bool soundRec;
   String xAddr;
   

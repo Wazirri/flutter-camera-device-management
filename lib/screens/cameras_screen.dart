@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/camera_device.dart';
 import '../widgets/camera_grid_item.dart';
-import '../providers/camera_devices_provider_optimized.dart';
-import '../providers/websocket_provider_optimized.dart';
+import '../providers/camera_devices_provider.dart';
+import '../providers/websocket_provider.dart';
 import '../providers/user_group_provider.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
@@ -746,7 +746,7 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              camera.name,
+                                              camera.displayName,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
@@ -908,8 +908,8 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                             ),
                                             const SizedBox(width: 12),
                                           ],
-                                          // History count
-                                          if (camera.deviceHistory.isNotEmpty) ...[
+                                          // History count - filter out empty entries
+                                          if (camera.deviceHistory.any((h) => h.deviceMac.isNotEmpty)) ...[
                                             Icon(
                                               Icons.history,
                                               size: 12.0,
@@ -917,7 +917,7 @@ class _CamerasScreenState extends State<CamerasScreen> with SingleTickerProvider
                                             ),
                                             const SizedBox(width: 4),
                                             Text(
-                                              '${camera.deviceHistory.length}',
+                                              '${camera.deviceHistory.where((h) => h.deviceMac.isNotEmpty).length}',
                                               style: const TextStyle(
                                                 fontSize: 11.0,
                                                 color: Colors.purple,
