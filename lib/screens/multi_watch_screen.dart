@@ -32,6 +32,13 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   final Map<Camera, String> _errorMessages = {};
   final Map<Camera, bool> _isPlaying = {};
   
+  // Synchronized playback control
+  bool _isSyncPlaying = false;
+  Duration _syncPosition = Duration.zero;
+  Duration _syncDuration = Duration.zero;
+  Player? _masterPlayer; // Reference player for sync
+  bool _isSeeking = false;
+  
   @override
   void initState() {
     super.initState();
@@ -39,6 +46,8 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   }
   
   void _initializePlayers() {
+    bool isFirst = true;
+    
     for (final entry in widget.cameraRecordings.entries) {
       final camera = entry.key;
       final recording = entry.value;
@@ -53,6 +62,37 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
       _hasError[camera] = false;
       _errorMessages[camera] = '';
       _isPlaying[camera] = false;
+      
+      // Set first player as master for sync
+      if (isFirst) {
+        _masterPlayer = player;
+        isFirst = false;
+        
+        // Listen to master player for sync position/duration
+        player.stream.position.listen((position) {
+          if (mounted && !_isSeeking) {
+            setState(() {
+              _syncPosition = position;
+            });
+          }
+        });
+        
+        player.stream.duration.listen((duration) {
+          if (mounted && duration != Duration.zero) {
+            setState(() {
+              _syncDuration = duration;
+            });
+          }
+        });
+        
+        player.stream.playing.listen((playing) {
+          if (mounted) {
+            setState(() {
+              _isSyncPlaying = playing;
+            });
+          }
+        });
+      }
       
       // Player event listeners
       player.stream.error.listen((error) {
@@ -142,6 +182,52 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
     }
   }
   
+  // Seek all players to a specific position
+  void _seekAll(Duration position) {
+    _isSeeking = true;
+    for (final player in _players.values) {
+      player.seek(position);
+    }
+    setState(() {
+      _syncPosition = position;
+    });
+    // Allow position updates after a brief delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _isSeeking = false;
+    });
+  }
+  
+  // Skip forward/backward all players
+  void _skipAll(int seconds) {
+    final newPosition = _syncPosition + Duration(seconds: seconds);
+    final clampedPosition = newPosition < Duration.zero 
+        ? Duration.zero 
+        : (newPosition > _syncDuration ? _syncDuration : newPosition);
+    _seekAll(clampedPosition);
+  }
+  
+  // Toggle play/pause for all players
+  void _togglePlayPause() {
+    if (_isSyncPlaying) {
+      _pauseAll();
+    } else {
+      _playAll();
+    }
+  }
+  
+  // Format duration to string
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+    
+    if (hours > 0) {
+      return '${twoDigits(hours)}:${twoDigits(minutes)}:${twoDigits(seconds)}';
+    }
+    return '${twoDigits(minutes)}:${twoDigits(seconds)}';
+  }
+  
   @override
   void dispose() {
     // Tüm player'ları temizle
@@ -181,9 +267,154 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: _buildPlayersGrid(cameraCount),
+      body: Column(
+        children: [
+          // Video grid
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _buildPlayersGrid(cameraCount),
+            ),
+          ),
+          
+          // Synchronized control bar at bottom
+          _buildSyncControlBar(),
+        ],
+      ),
+    );
+  }
+  
+  // Build the synchronized control bar
+  Widget _buildSyncControlBar() {
+    final progress = _syncDuration.inMilliseconds > 0
+        ? _syncPosition.inMilliseconds / _syncDuration.inMilliseconds
+        : 0.0;
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.grey[900],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Seek bar
+            Row(
+              children: [
+                // Current position
+                Text(
+                  _formatDuration(_syncPosition),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+                const SizedBox(width: 8),
+                
+                // Seek slider
+                Expanded(
+                  child: SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: AppTheme.primaryOrange,
+                      inactiveTrackColor: Colors.grey[600],
+                      thumbColor: AppTheme.primaryOrange,
+                      overlayColor: AppTheme.primaryOrange.withOpacity(0.2),
+                      trackHeight: 4,
+                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                    ),
+                    child: Slider(
+                      value: progress.clamp(0.0, 1.0),
+                      onChanged: (value) {
+                        final newPosition = Duration(
+                          milliseconds: (value * _syncDuration.inMilliseconds).round(),
+                        );
+                        _seekAll(newPosition);
+                      },
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(width: 8),
+                // Total duration
+                Text(
+                  _formatDuration(_syncDuration),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontFamily: 'monospace',
+                  ),
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 8),
+            
+            // Playback controls
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Skip backward 30s
+                IconButton(
+                  icon: const Icon(Icons.replay_30, color: Colors.white, size: 28),
+                  tooltip: '30 saniye geri',
+                  onPressed: () => _skipAll(-30),
+                ),
+                
+                // Skip backward 10s
+                IconButton(
+                  icon: const Icon(Icons.replay_10, color: Colors.white, size: 28),
+                  tooltip: '10 saniye geri',
+                  onPressed: () => _skipAll(-10),
+                ),
+                
+                const SizedBox(width: 16),
+                
+                // Play/Pause button
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryOrange,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      _isSyncPlaying ? Icons.pause : Icons.play_arrow,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                    tooltip: _isSyncPlaying ? 'Tümünü Duraklat' : 'Tümünü Oynat',
+                    onPressed: _togglePlayPause,
+                  ),
+                ),
+                
+                const SizedBox(width: 16),
+                
+                // Skip forward 10s
+                IconButton(
+                  icon: const Icon(Icons.forward_10, color: Colors.white, size: 28),
+                  tooltip: '10 saniye ileri',
+                  onPressed: () => _skipAll(10),
+                ),
+                
+                // Skip forward 30s
+                IconButton(
+                  icon: const Icon(Icons.forward_30, color: Colors.white, size: 28),
+                  tooltip: '30 saniye ileri',
+                  onPressed: () => _skipAll(30),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

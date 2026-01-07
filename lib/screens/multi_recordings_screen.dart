@@ -38,10 +38,17 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
   final Map<Camera, List<String>> _cameraRecordings = {};
   final Map<Camera, String> _cameraErrors = {}; // Her kamera için ayrı hata mesajları
   final Map<Camera, String> _cameraDateFormats = {}; // Her kamera için hangi tarih formatının çalıştığını sakla
+  final Map<Camera, String> _cameraSelectedDevice = {}; // Her kamera için seçilen cihaz MAC adresi
+  
+  // Multi-device recordings: Camera -> DeviceMAC -> List of recordings
+  final Map<Camera, Map<String, List<String>>> _cameraDeviceRecordings = {};
+  final Map<Camera, Map<String, String>> _cameraDeviceErrors = {}; // Camera -> DeviceMAC -> error message
+  final Map<Camera, Map<String, String>> _cameraDeviceDateFormats = {}; // Camera -> DeviceMAC -> date format
   
   // Aktif oynatılan kayıt bilgileri (sadece selection tracking için)
   Camera? _activeCamera;
   String? _activeRecording;
+  String? _activeDeviceMac; // Active device for multi-device cameras
   
   // Takvim değişkenleri
   DateTime _focusedDay = DateTime.now();
@@ -386,65 +393,310 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         );
         
         if (targetCamera.index != -1) {
-          _selectedCameras = [targetCamera];
-          _activeCamera = targetCamera;
+          // Use _selectCamera to handle multi-device selection
+          _selectCameraWithDeviceChoice(targetCamera);
           print('[MultiRecordings] Pre-selected camera from route arguments: ${targetCamera.name}');
         }
         _pendingCameraSelection = null; // Clear after use
       } 
       // Eğer hiç kamera seçilmemişse, ilk kamerayı seç
       else if (_selectedCameras.isEmpty && _availableCameras.isNotEmpty) {
-        _selectedCameras = [_availableCameras.first];
-        _activeCamera = _availableCameras.first;
+        // Use _selectCamera to handle multi-device selection
+        _selectCameraWithDeviceChoice(_availableCameras.first);
         print('[MultiRecordings] Auto-selected first camera: ${_availableCameras.first.name}');
       } else if (_availableCameras.isEmpty) {
         print('[MultiRecordings] No cameras available!');
       }
     });
+  }
+  
+  // Select camera and show device dialog if needed, then update recordings
+  Future<void> _selectCameraWithDeviceChoice(Camera camera) async {
+    if (camera.currentDevices.length > 1) {
+      // Show device selection dialog
+      final selectedDevice = await _showDeviceSelectionDialog(camera);
+      if (selectedDevice != null) {
+        _cameraSelectedDevice[camera] = selectedDevice;
+        setState(() {
+          _selectedCameras = [camera];
+          _activeCamera = camera;
+        });
+        _updateRecordingsForSelectedDay();
+      } else {
+        // User cancelled, still add camera with first device
+        _cameraSelectedDevice[camera] = camera.currentDevices.keys.first;
+        setState(() {
+          _selectedCameras = [camera];
+          _activeCamera = camera;
+        });
+        _updateRecordingsForSelectedDay();
+      }
+    } else if (camera.currentDevices.isNotEmpty) {
+      _cameraSelectedDevice[camera] = camera.currentDevices.keys.first;
+      setState(() {
+        _selectedCameras = [camera];
+        _activeCamera = camera;
+      });
+      _updateRecordingsForSelectedDay();
+    } else {
+      setState(() {
+        _selectedCameras = [camera];
+        _activeCamera = camera;
+      });
+      _updateRecordingsForSelectedDay();
+    }
+  }
+  
+  // Show device selection dialog for cameras on multiple devices
+  Future<String?> _showDeviceSelectionDialog(Camera camera) async {
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
     
-    // Kayıtları yükle
+    return showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.devices, color: Colors.orange),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  '${camera.name} - Cihaz Seçin',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Bu kamera ${camera.currentDevices.length} farklı cihazda bulunuyor. Kayıtları hangi cihazdan yüklemek istiyorsunuz?',
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 16),
+              ...camera.currentDevices.entries.map((entry) {
+                final deviceMac = entry.key;
+                final deviceInfo = entry.value;
+                
+                // Find device details from provider
+                CameraDevice? device;
+                try {
+                  device = cameraDevicesProvider.devices.values.firstWhere(
+                    (d) => d.macAddress == deviceMac || d.macKey == deviceMac,
+                  );
+                } catch (e) {
+                  device = null;
+                }
+                
+                final deviceName = device?.deviceName ?? deviceMac.toUpperCase();
+                final deviceIp = device?.ipv4 ?? deviceInfo.deviceIp;
+                
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.computer, color: Colors.blue),
+                    ),
+                    title: Text(
+                      deviceName.isNotEmpty ? deviceName : deviceMac.toUpperCase(),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('IP: ${deviceIp.isNotEmpty ? deviceIp : deviceInfo.deviceIp}'),
+                        Text(
+                          'MAC: ${deviceMac.toUpperCase()}',
+                          style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+                        ),
+                      ],
+                    ),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () => Navigator.pop(context, deviceMac),
+                  ),
+                );
+              }).toList(),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, null),
+              child: const Text('İptal'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
+  // Handle camera selection with device choice
+  Future<void> _selectCamera(Camera camera, bool select) async {
+    if (select) {
+      // Check if camera is on multiple devices
+      if (camera.currentDevices.length > 1) {
+        final selectedDevice = await _showDeviceSelectionDialog(camera);
+        if (selectedDevice == null) {
+          return; // User cancelled
+        }
+        _cameraSelectedDevice[camera] = selectedDevice;
+      } else if (camera.currentDevices.isNotEmpty) {
+        // Single device, auto-select it
+        _cameraSelectedDevice[camera] = camera.currentDevices.keys.first;
+      }
+      
+      if (!_selectedCameras.contains(camera)) {
+        setState(() {
+          _selectedCameras.add(camera);
+        });
+      }
+    } else {
+      setState(() {
+        _selectedCameras.remove(camera);
+        _cameraRecordings.remove(camera);
+        _cameraErrors.remove(camera);
+        _cameraSelectedDevice.remove(camera);
+        _cameraDeviceRecordings.remove(camera);
+        _cameraDeviceErrors.remove(camera);
+        _cameraDeviceDateFormats.remove(camera);
+      });
+    }
+    _updateRecordingsForSelectedDay();
+  }
+  
+  // Force reload all recordings (used when date changes)
+  void _reloadAllRecordings() {
+    setState(() {
+      _cameraRecordings.clear();
+      _cameraErrors.clear();
+      _cameraDateFormats.clear();
+      _cameraDeviceRecordings.clear();
+      _cameraDeviceErrors.clear();
+      _cameraDeviceDateFormats.clear();
+    });
     _updateRecordingsForSelectedDay();
   }
   
   void _updateRecordingsForSelectedDay() {
     if (_selectedDay == null || _selectedCameras.isEmpty) return;
     
+    // Don't clear all - only clean up cameras that are no longer selected
+    // Remove recordings for cameras that are no longer in selectedCameras
+    final camerasToRemove = <Camera>[];
+    for (var camera in _cameraRecordings.keys) {
+      if (!_selectedCameras.contains(camera)) {
+        camerasToRemove.add(camera);
+      }
+    }
+    for (var camera in _cameraDeviceRecordings.keys) {
+      if (!_selectedCameras.contains(camera) && !camerasToRemove.contains(camera)) {
+        camerasToRemove.add(camera);
+      }
+    }
+    for (var camera in camerasToRemove) {
+      _cameraRecordings.remove(camera);
+      _cameraErrors.remove(camera);
+      _cameraDateFormats.remove(camera);
+      _cameraDeviceRecordings.remove(camera);
+      _cameraDeviceErrors.remove(camera);
+      _cameraDeviceDateFormats.remove(camera);
+    }
+    
+    // Find cameras that need loading (not yet in recordings maps)
+    final camerasToLoad = <Camera>[];
+    for (var camera in _selectedCameras) {
+      final hasRegularRecordings = _cameraRecordings.containsKey(camera);
+      final hasDeviceRecordings = _cameraDeviceRecordings.containsKey(camera);
+      if (!hasRegularRecordings && !hasDeviceRecordings) {
+        camerasToLoad.add(camera);
+      }
+    }
+    
+    // If no cameras need loading, just return
+    if (camerasToLoad.isEmpty) {
+      print('[MultiRecordings] All cameras already have recordings loaded');
+      return;
+    }
+    
     setState(() {
       _isLoadingRecordings = true;
       _loadingError = '';
-      _cameraRecordings.clear();
-      _cameraErrors.clear(); // Kamera hatalarını temizle
-      _cameraDateFormats.clear(); // Tarih formatlarını temizle
     });
     
-    print('[MultiRecordings] Loading recordings for ${_selectedCameras.length} selected cameras');
+    print('[MultiRecordings] Loading recordings for ${camerasToLoad.length} cameras (${_selectedCameras.length} total selected)');
     
-    // Seçili gün için seçili kameraların kayıtlarını yükle
     final selectedDayFormatted = DateFormat('yyyy_MM_dd').format(_selectedDay!);
     final selectedDayFormattedAlt = DateFormat('yyyy-MM-dd').format(_selectedDay!);
     final futures = <Future>[];
     
-    for (var camera in _selectedCameras) {
-      // Kamera device'ını bul
+    for (var camera in camerasToLoad) {
       final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
       
-      print('[MultiRecordings] Camera: ${camera.name} (MAC: ${camera.mac}, Index: ${camera.index})');
+      print('[MultiRecordings] Camera: ${camera.name} (MAC: ${camera.mac})');
       print('[MultiRecordings] Camera currentDevices: ${camera.currentDevices.keys.join(", ")}');
       
-      final device = cameraDevicesProvider.getDeviceForCamera(camera);
-      
-      if (device != null) {
-        print('[MultiRecordings] Found device for ${camera.name}: ${device.macAddress} (IP: ${device.ipv4})');
+      // If camera is on multiple devices, load recordings from ALL devices
+      if (camera.currentDevices.length > 1) {
+        print('[MultiRecordings] Camera ${camera.name} is on ${camera.currentDevices.length} devices, loading from all');
         
-        // Kayıt URL'i oluştur
-        final recordingsUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/';
-        print('[MultiRecordings] Generated URL: $recordingsUrl');
+        // Initialize multi-device maps for this camera
+        _cameraDeviceRecordings[camera] = {};
+        _cameraDeviceErrors[camera] = {};
+        _cameraDeviceDateFormats[camera] = {};
         
-        // Kamera için kayıtları yükle
-        final future = _loadRecordingsForCamera(camera, recordingsUrl, selectedDayFormatted, selectedDayFormattedAlt);
-        futures.add(future);
+        for (var deviceMac in camera.currentDevices.keys) {
+          CameraDevice? device;
+          try {
+            device = cameraDevicesProvider.devices.values.firstWhere(
+              (d) => d.macAddress == deviceMac || d.macKey == deviceMac,
+            );
+            // Device found - load recordings
+            final recordingsUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/';
+            print('[MultiRecordings] Loading from device ${device.deviceName ?? deviceMac} (IP: ${device.ipv4})');
+            final future = _loadRecordingsForCameraDevice(camera, deviceMac, recordingsUrl, selectedDayFormatted, selectedDayFormattedAlt);
+            futures.add(future);
+          } catch (e) {
+            // Try to get device info from currentDevices
+            final deviceInfo = camera.currentDevices[deviceMac];
+            if (deviceInfo != null && deviceInfo.deviceIp.isNotEmpty) {
+              // Create a temporary recording URL using the IP from currentDevices
+              final recordingsUrl = 'http://${deviceInfo.deviceIp}:8080/Rec/${camera.name}/';
+              print('[MultiRecordings] Loading from device $deviceMac (IP: ${deviceInfo.deviceIp})');
+              final future = _loadRecordingsForCameraDevice(camera, deviceMac, recordingsUrl, selectedDayFormatted, selectedDayFormattedAlt);
+              futures.add(future);
+            }
+          }
+        }
       } else {
-        print('[MultiRecordings] ERROR: No device found for camera ${camera.name}');
+        // Single device - use existing logic
+        CameraDevice? device;
+        final selectedDeviceMac = _cameraSelectedDevice[camera];
+        
+        if (selectedDeviceMac != null && camera.currentDevices.containsKey(selectedDeviceMac)) {
+          try {
+            device = cameraDevicesProvider.devices.values.firstWhere(
+              (d) => d.macAddress == selectedDeviceMac || d.macKey == selectedDeviceMac,
+            );
+          } catch (e) {
+            device = cameraDevicesProvider.getDeviceForCamera(camera);
+          }
+        } else {
+          device = cameraDevicesProvider.getDeviceForCamera(camera);
+        }
+        
+        if (device != null) {
+          final recordingsUrl = 'http://${device.ipv4}:8080/Rec/${camera.name}/';
+          print('[MultiRecordings] Single device - Loading from ${device.ipv4}');
+          final future = _loadRecordingsForCamera(camera, recordingsUrl, selectedDayFormatted, selectedDayFormattedAlt);
+          futures.add(future);
+        } else {
+          print('[MultiRecordings] ERROR: No device found for camera ${camera.name}');
+        }
       }
     }
     
@@ -561,6 +813,88 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
         setState(() {
           _cameraErrors[camera] = 'Error loading recordings: $e';
           _cameraRecordings[camera] = [];
+        });
+      }
+    }
+  }
+  
+  // Load recordings for a specific camera+device combination (for multi-device cameras)
+  Future<void> _loadRecordingsForCameraDevice(Camera camera, String deviceMac, String recordingsUrl, String formattedDate, String formattedDateAlt) async {
+    try {
+      print('[MultiRecordings] Loading recordings for camera: ${camera.name} from device: $deviceMac');
+      print('[MultiRecordings] Recordings URL: $recordingsUrl');
+      
+      final response = await http.get(Uri.parse(recordingsUrl));
+      print('[MultiRecordings] Response status for $deviceMac: ${response.statusCode}');
+      
+      if (response.statusCode == 200) {
+        final html = response.body;
+        
+        final dateRegExp = RegExp(r'<a href="([^"]+)/">');
+        final dateMatches = dateRegExp.allMatches(html);
+        final dates = dateMatches.map((m) => m.group(1)!).toList();
+        
+        String? foundDate;
+        if (dates.contains(formattedDate)) {
+          foundDate = formattedDate;
+          _cameraDeviceDateFormats[camera] ??= {};
+          _cameraDeviceDateFormats[camera]![deviceMac] = formattedDate;
+        } else if (dates.contains(formattedDateAlt)) {
+          foundDate = formattedDateAlt;
+          _cameraDeviceDateFormats[camera] ??= {};
+          _cameraDeviceDateFormats[camera]![deviceMac] = formattedDateAlt;
+        }
+        
+        if (foundDate != null) {
+          final dateUrl = '$recordingsUrl$foundDate/';
+          final dateResponse = await http.get(Uri.parse(dateUrl));
+          
+          if (dateResponse.statusCode == 200) {
+            final html = utf8.decode(dateResponse.bodyBytes);
+            
+            final mkvRegExp = RegExp(r'<a href="([^"]+\.mkv)"');
+            final mkvMatches = mkvRegExp.allMatches(html);
+            final mkvRecordings = mkvMatches.map((m) => m.group(1)!).toList();
+            
+            final m3u8RegExp = RegExp(r'<a href="([^"]+\.m3u8)"');
+            final m3u8Matches = m3u8RegExp.allMatches(html);
+            final m3u8Recordings = m3u8Matches.map((m) => m.group(1)!).toList();
+            
+            final mp4RegExp = RegExp(r'<a href="([^"]+\.mp4)"');
+            final mp4Matches = mp4RegExp.allMatches(html);
+            final mp4Recordings = mp4Matches.map((m) => m.group(1)!).toList();
+            
+            final allRecordings = [...mkvRecordings, ...m3u8Recordings, ...mp4Recordings];
+            
+            print('[MultiRecordings] Found ${allRecordings.length} recordings for ${camera.name} from device $deviceMac');
+            
+            if (mounted) {
+              setState(() {
+                _cameraDeviceRecordings[camera] ??= {};
+                _cameraDeviceRecordings[camera]![deviceMac] = allRecordings;
+              });
+            }
+          }
+        } else {
+          print('[MultiRecordings] No recordings for $formattedDate from device $deviceMac');
+          if (mounted) {
+            setState(() {
+              _cameraDeviceRecordings[camera] ??= {};
+              _cameraDeviceRecordings[camera]![deviceMac] = [];
+            });
+          }
+        }
+      } else {
+        throw Exception('Failed to load: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('[MultiRecordings] Error loading from $deviceMac: $e');
+      if (mounted) {
+        setState(() {
+          _cameraDeviceErrors[camera] ??= {};
+          _cameraDeviceErrors[camera]![deviceMac] = 'Error: $e';
+          _cameraDeviceRecordings[camera] ??= {};
+          _cameraDeviceRecordings[camera]![deviceMac] = [];
         });
       }
     }
@@ -1313,7 +1647,28 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
 
     // Toplu kayıt gruplarını hesapla
     final groups = _groupRecordingsByTime();
-    final totalTabs = _cameraRecordings.length + (groups.isNotEmpty ? 1 : 0);
+    
+    // Calculate total tabs: 
+    // - 1 for group watch (if groups exist)
+    // - 1 tab per camera for single-device cameras
+    // - N tabs per camera for multi-device cameras (one per device)
+    int totalTabs = groups.isNotEmpty ? 1 : 0;
+    
+    // Count tabs for each selected camera
+    for (var camera in _selectedCameras) {
+      // Check if this is a multi-device camera
+      if (camera.currentDevices.length > 1) {
+        // Multi-device camera: one tab per device (use currentDevices count, not loaded recordings)
+        totalTabs += camera.currentDevices.length;
+      } else {
+        // Single-device camera: one tab
+        totalTabs += 1;
+      }
+    }
+    
+    print('[MultiRecordings] Total tabs calculated: $totalTabs (groups: ${groups.isNotEmpty ? 1 : 0}, cameras: ${_selectedCameras.length})');
+    print('[MultiRecordings] _cameraRecordings keys: ${_cameraRecordings.keys.map((c) => c.name).join(", ")}');
+    print('[MultiRecordings] _cameraDeviceRecordings keys: ${_cameraDeviceRecordings.keys.map((c) => "${c.name}(${_cameraDeviceRecordings[c]?.length ?? 0} devices)").join(", ")}');
     
     return DefaultTabController(
       length: totalTabs,
@@ -1350,33 +1705,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                     ],
                   ),
                 ),
-              // Her kamera için tab
-              ..._cameraRecordings.keys.map((camera) {
-                final recordings = _cameraRecordings[camera] ?? [];
-                return Tab(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(camera.name),
-                      const SizedBox(width: 4),
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: AppTheme.primaryBlue,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          recordings.length.toString(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
+              // Tabs for each camera (and each device for multi-device cameras)
+              ..._buildCameraTabs(),
             ],
           ),
           
@@ -1387,15 +1717,456 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                 // Toplu İzle içeriği - EN BAŞTA
                 if (groups.isNotEmpty)
                   _buildGroupRecordingsList(groups),
-                // Her kamera için içerik
-                ..._cameraRecordings.entries.map((entry) {
-                  return _buildCameraRecordingsList(entry.key, entry.value);
-                }),
+                // Content for each camera/device
+                ..._buildCameraTabContents(),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+  
+  // Build tabs for cameras (with separate tabs for each device on multi-device cameras)
+  List<Widget> _buildCameraTabs() {
+    final tabs = <Widget>[];
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    
+    for (var camera in _selectedCameras) {
+      // Check if camera is on multiple devices
+      if (camera.currentDevices.length > 1) {
+        // Multi-device camera: create a tab for each device
+        final deviceRecordings = _cameraDeviceRecordings[camera] ?? {};
+        
+        for (var deviceMac in camera.currentDevices.keys) {
+          final recordings = deviceRecordings[deviceMac] ?? [];
+          
+          // Get device name
+          CameraDevice? device;
+          try {
+            device = cameraDevicesProvider.devices.values.firstWhere(
+              (d) => d.macAddress == deviceMac || d.macKey == deviceMac,
+            );
+          } catch (e) {
+            device = null;
+          }
+          final deviceName = device?.deviceName ?? deviceMac.substring(deviceMac.length > 8 ? deviceMac.length - 8 : 0).toUpperCase();
+          
+          tabs.add(
+            Tab(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        camera.name,
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.computer, size: 10, color: Colors.orange.shade300),
+                          const SizedBox(width: 2),
+                          Text(
+                            deviceName,
+                            style: TextStyle(fontSize: 9, color: Colors.orange.shade300),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 4),
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.orange,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      recordings.length.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+      } else {
+        // Single-device camera: use normal recordings
+        final recordings = _cameraRecordings[camera] ?? [];
+        tabs.add(
+          Tab(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(camera.name),
+                const SizedBox(width: 4),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: AppTheme.primaryBlue,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    recordings.length.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+    }
+    
+    return tabs;
+  }
+  
+  // Build tab contents for cameras
+  List<Widget> _buildCameraTabContents() {
+    final contents = <Widget>[];
+    
+    for (var camera in _selectedCameras) {
+      // Check if camera is on multiple devices
+      if (camera.currentDevices.length > 1) {
+        // Multi-device camera: create content for each device
+        final deviceRecordings = _cameraDeviceRecordings[camera] ?? {};
+        
+        for (var deviceMac in camera.currentDevices.keys) {
+          final recordings = deviceRecordings[deviceMac] ?? [];
+          contents.add(_buildCameraDeviceRecordingsList(camera, deviceMac, recordings));
+        }
+      } else {
+        // Single-device camera
+        final recordings = _cameraRecordings[camera] ?? [];
+        contents.add(_buildCameraRecordingsList(camera, recordings));
+      }
+    }
+    
+    return contents;
+  }
+  
+  // Build a single recording tile (reusable for both single and multi-device cameras)
+  Widget _buildRecordingTile(Camera camera, String recording, {String? deviceMac, String? deviceIp}) {
+    final recordingName = recording.split('/').last;
+    final timestamp = _parseTimestampFromFilename(recordingName);
+    
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    
+    // Determine which device to use
+    String? resolvedDeviceIp = deviceIp;
+    if (resolvedDeviceIp == null || resolvedDeviceIp.isEmpty) {
+      final device = cameraDevicesProvider.getDeviceForCamera(camera);
+      resolvedDeviceIp = device?.ipv4 ?? '';
+    }
+    
+    // Build recording URL
+    String recordingUrl = '';
+    if (resolvedDeviceIp.isNotEmpty && _selectedDay != null) {
+      String? dateFormat;
+      if (deviceMac != null) {
+        dateFormat = _cameraDeviceDateFormats[camera]?[deviceMac];
+      } else {
+        dateFormat = _cameraDateFormats[camera];
+      }
+      final formattedDate = dateFormat ?? DateFormat('yyyy_MM_dd').format(_selectedDay!);
+      recordingUrl = 'http://$resolvedDeviceIp:8080/Rec/${camera.name}/$formattedDate/$recording';
+    }
+    
+    final isSelected = _isMultiSelectionMode 
+        ? _selectedForDownload.contains(recordingUrl)
+        : _activeCamera == camera && _activeRecording == recording;
+    
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      color: isSelected ? AppTheme.primaryBlue.withOpacity(0.2) : null,
+      child: ListTile(
+        leading: Icon(
+          isSelected && _isMultiSelectionMode ? Icons.check_circle : 
+          recordingName.toLowerCase().endsWith('.m3u8') ? Icons.playlist_play : Icons.videocam,
+          color: isSelected ? AppTheme.primaryBlue : null,
+        ),
+        title: Row(
+          children: [
+            Expanded(child: Text(recordingName)),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: recordingName.toLowerCase().endsWith('.m3u8') 
+                    ? Colors.orange.withOpacity(0.2)
+                    : Colors.blue.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                recordingName.toLowerCase().endsWith('.m3u8') ? 'M3U8' : 
+                recordingName.toLowerCase().endsWith('.mp4') ? 'MP4' : 'MKV',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: recordingName.toLowerCase().endsWith('.m3u8') 
+                      ? Colors.orange
+                      : Colors.blue,
+                ),
+              ),
+            ),
+          ],
+        ),
+        subtitle: timestamp != null
+          ? Text(DateFormat('HH:mm:ss').format(timestamp))
+          : null,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.play_arrow),
+              onPressed: _isMultiSelectionMode ? null : () => _selectRecordingWithDevice(camera, recording, deviceMac, resolvedDeviceIp!),
+            ),
+            IconButton(
+              icon: const Icon(Icons.download),
+              onPressed: () => _downloadSingleRecording(camera, recording, recordingUrl),
+            ),
+          ],
+        ),
+        onTap: () => _selectRecordingWithDevice(camera, recording, deviceMac, resolvedDeviceIp!),
+      ),
+    );
+  }
+  
+  // Select recording from a specific device
+  void _selectRecordingWithDevice(Camera camera, String recording, String? deviceMac, String deviceIp) {
+    if (_isMultiSelectionMode) {
+      // Multi-selection mode - handle checkbox
+      String recordingUrl = '';
+      if (deviceIp.isNotEmpty && _selectedDay != null) {
+        String? dateFormat;
+        if (deviceMac != null) {
+          dateFormat = _cameraDeviceDateFormats[camera]?[deviceMac];
+        } else {
+          dateFormat = _cameraDateFormats[camera];
+        }
+        final formattedDate = dateFormat ?? DateFormat('yyyy_MM_dd').format(_selectedDay!);
+        recordingUrl = 'http://$deviceIp:8080/Rec/${camera.name}/$formattedDate/$recording';
+      }
+      
+      setState(() {
+        if (_selectedForDownload.contains(recordingUrl)) {
+          _selectedForDownload.remove(recordingUrl);
+        } else {
+          _selectedForDownload.add(recordingUrl);
+        }
+      });
+    } else {
+      // Normal mode - open video player
+      _openVideoPlayerPopupWithDevice(camera, recording, deviceMac, deviceIp);
+    }
+  }
+  
+  // Open video player for a specific device
+  void _openVideoPlayerPopupWithDevice(Camera camera, String recording, String? deviceMac, String deviceIp) {
+    print('[MultiRecordings] Opening video player for ${camera.name} from device $deviceMac ($deviceIp)');
+    
+    setState(() {
+      _activeCamera = camera;
+      _activeRecording = recording;
+      _activeDeviceMac = deviceMac;
+    });
+    
+    String recordingUrl = '';
+    if (deviceIp.isNotEmpty && _selectedDay != null) {
+      String? dateFormat;
+      if (deviceMac != null) {
+        dateFormat = _cameraDeviceDateFormats[camera]?[deviceMac];
+      } else {
+        dateFormat = _cameraDateFormats[camera];
+      }
+      final formattedDate = dateFormat ?? DateFormat('yyyy_MM_dd').format(_selectedDay!);
+      recordingUrl = 'http://$deviceIp:8080/Rec/${camera.name}/$formattedDate/$recording';
+    }
+    
+    print('[MultiRecordings] Recording URL: $recordingUrl');
+    
+    if (recordingUrl.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not determine device IP'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+    
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(16),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.9,
+                maxHeight: MediaQuery.of(context).size.height * 0.8,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[900],
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.videocam, color: Colors.white),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${camera.name} - $recording',
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (deviceMac != null)
+                                Text(
+                                  'Device: $deviceIp',
+                                  style: TextStyle(color: Colors.orange.shade300, fontSize: 11),
+                                ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Video player
+                  Expanded(
+                    child: _VideoPlayerPopup(
+                      recordingUrl: recordingUrl,
+                      camera: camera,
+                      recording: recording,
+                      seekTime: _pendingSeekTime,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    ).then((_) {
+      // Clear pending seek time after dialog closes
+      _pendingSeekTime = null;
+    });
+  }
+  
+  // Build recordings list for a specific camera+device combination
+  Widget _buildCameraDeviceRecordingsList(Camera camera, String deviceMac, List<String> recordings) {
+    final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    final deviceErrors = _cameraDeviceErrors[camera];
+    final deviceError = deviceErrors?[deviceMac];
+    
+    // Get device info
+    CameraDevice? device;
+    try {
+      device = cameraDevicesProvider.devices.values.firstWhere(
+        (d) => d.macAddress == deviceMac || d.macKey == deviceMac,
+      );
+    } catch (e) {
+      device = null;
+    }
+    final deviceName = device?.deviceName ?? deviceMac.toUpperCase();
+    final deviceIp = device?.ipv4 ?? camera.currentDevices[deviceMac]?.deviceIp ?? '';
+    
+    if (deviceError != null && deviceError.isNotEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 64, color: Colors.red.withOpacity(0.7)),
+            const SizedBox(height: 16),
+            Text('Error loading from $deviceName', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Text(deviceError, style: TextStyle(color: Colors.red.shade300), textAlign: TextAlign.center),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    if (recordings.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.videocam_off, size: 64, color: Colors.grey.withOpacity(0.5)),
+            const SizedBox(height: 16),
+            Text('No recordings on $deviceName', style: const TextStyle(fontSize: 16)),
+            Text('IP: $deviceIp', style: TextStyle(fontSize: 12, color: Colors.grey)),
+          ],
+        ),
+      );
+    }
+    
+    // Device info header
+    return Column(
+      children: [
+        // Device info banner
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          color: Colors.orange.withOpacity(0.1),
+          child: Row(
+            children: [
+              Icon(Icons.computer, size: 16, color: Colors.orange),
+              const SizedBox(width: 8),
+              Text(
+                'Device: $deviceName',
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange),
+              ),
+              const Spacer(),
+              Text(
+                'IP: $deviceIp',
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              ),
+            ],
+          ),
+        ),
+        // Recordings list
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(8.0),
+            itemCount: recordings.length,
+            itemBuilder: (context, index) {
+              final recording = recordings[index];
+              return _buildRecordingTile(camera, recording, deviceMac: deviceMac, deviceIp: deviceIp);
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -1737,7 +2508,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                           _selectedDay = selectedDay;
                           _focusedDay = focusedDay;
                         });
-                        _updateRecordingsForSelectedDay();
+                        _reloadAllRecordings(); // Date changed - reload all
                       },
                       onPageChanged: (focusedDay) {
                         _focusedDay = focusedDay;
@@ -1901,31 +2672,59 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                     children: [
                       ...camerasInGroup.map((camera) {
                         final isSelected = _selectedCameras.contains(camera);
+                        final hasMultipleDevices = camera.currentDevices.length > 1;
+                        final selectedDeviceMac = _cameraSelectedDevice[camera];
+                        
                         return CheckboxListTile(
                           dense: true,
                           contentPadding: const EdgeInsets.only(left: 50, right: 16),
-                          title: Text(
-                            camera.name,
-                            style: const TextStyle(fontSize: 14),
+                          title: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  camera.name,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                              if (hasMultipleDevices)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.orange.withOpacity(0.5)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.devices, size: 12, color: Colors.orange),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${camera.currentDevices.length}',
+                                        style: const TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
                           ),
-                          subtitle: Text(
-                            'IP: ${camera.ip}',
-                            style: const TextStyle(fontSize: 12),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'IP: ${camera.ip}',
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              if (isSelected && selectedDeviceMac != null)
+                                Text(
+                                  'Cihaz: ${selectedDeviceMac.toUpperCase().substring(selectedDeviceMac.length > 8 ? selectedDeviceMac.length - 8 : 0)}',
+                                  style: TextStyle(fontSize: 10, color: Colors.blue[700]),
+                                ),
+                            ],
                           ),
                           value: isSelected,
                           onChanged: (bool? value) {
-                            setState(() {
-                              if (value == true) {
-                                if (!_selectedCameras.contains(camera)) {
-                                  _selectedCameras.add(camera);
-                                }
-                              } else {
-                                _selectedCameras.remove(camera);
-                                _cameraRecordings.remove(camera);
-                                _cameraErrors.remove(camera);
-                              }
-                            });
-                            _updateRecordingsForSelectedDay();
+                            _selectCamera(camera, value ?? false);
                           },
                         );
                       }).toList(),
@@ -1952,31 +2751,59 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen> with Sing
                     children: [
                       ...ungroupedCameras.map((camera) {
                         final isSelected = _selectedCameras.contains(camera);
+                        final hasMultipleDevices = camera.currentDevices.length > 1;
+                        final selectedDeviceMac = _cameraSelectedDevice[camera];
+                        
                         return CheckboxListTile(
                           dense: true,
                           contentPadding: const EdgeInsets.only(left: 50, right: 16),
-                          title: Text(
-                            camera.name,
-                            style: const TextStyle(fontSize: 14),
+                          title: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  camera.name,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                              if (hasMultipleDevices)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.orange.withOpacity(0.5)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.devices, size: 12, color: Colors.orange),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${camera.currentDevices.length}',
+                                        style: const TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
                           ),
-                          subtitle: Text(
-                            'IP: ${camera.ip}',
-                            style: const TextStyle(fontSize: 12),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'IP: ${camera.ip}',
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              if (isSelected && selectedDeviceMac != null)
+                                Text(
+                                  'Cihaz: ${selectedDeviceMac.toUpperCase().substring(selectedDeviceMac.length > 8 ? selectedDeviceMac.length - 8 : 0)}',
+                                  style: TextStyle(fontSize: 10, color: Colors.blue[700]),
+                                ),
+                            ],
                           ),
                           value: isSelected,
                           onChanged: (bool? value) {
-                            setState(() {
-                              if (value == true) {
-                                if (!_selectedCameras.contains(camera)) {
-                                  _selectedCameras.add(camera);
-                                }
-                              } else {
-                                _selectedCameras.remove(camera);
-                                _cameraRecordings.remove(camera);
-                                _cameraErrors.remove(camera);
-                              }
-                            });
-                            _updateRecordingsForSelectedDay();
+                            _selectCamera(camera, value ?? false);
                           },
                         );
                       }).toList(),

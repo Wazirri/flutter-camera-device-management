@@ -1366,6 +1366,18 @@ class Camera {
     return DeviceStatus.online;
   }
   
+  // Override equality based on MAC address for proper Map/Set usage
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! Camera) return false;
+    // Use MAC address as unique identifier
+    return mac == other.mac;
+  }
+
+  @override
+  int get hashCode => mac.hashCode;
+  
   @override
   String toString() {
     return 'Camera{name: $name, ip: $ip, connected: $connected, recording: $recording}';
