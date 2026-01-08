@@ -784,9 +784,18 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
                 .map((m) => '${m.group(1)}/')
                 .toList();
 
+            // Filter out m3u8 files that have a corresponding time folder
+            final timeFolderNames = timeFolderRecordings.map((f) => f.substring(0, f.length - 1)).toSet();
+            final filteredM3u8Recordings = m3u8Recordings.where((m3u8) {
+              final nameWithoutExt = m3u8.endsWith('.m3u8') 
+                  ? m3u8.substring(0, m3u8.length - 5) 
+                  : m3u8;
+              return !timeFolderNames.contains(nameWithoutExt);
+            }).toList();
+
             final newRecordings = [
               ...mkvRecordings,
-              ...m3u8Recordings,
+              ...filteredM3u8Recordings,
               ...mp4Recordings,
               ...tsRecordings,
               ...timeFolderRecordings,
@@ -864,9 +873,18 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
                 .map((m) => '${m.group(1)}/')
                 .toList();
 
+            // Filter out m3u8 files that have a corresponding time folder
+            final timeFolderNames = timeFolderRecordings.map((f) => f.substring(0, f.length - 1)).toSet();
+            final filteredM3u8Recordings = m3u8Recordings.where((m3u8) {
+              final nameWithoutExt = m3u8.endsWith('.m3u8') 
+                  ? m3u8.substring(0, m3u8.length - 5) 
+                  : m3u8;
+              return !timeFolderNames.contains(nameWithoutExt);
+            }).toList();
+
             final newRecordings = [
               ...mkvRecordings,
-              ...m3u8Recordings,
+              ...filteredM3u8Recordings,
               ...mp4Recordings,
               ...tsRecordings,
               ...timeFolderRecordings,
@@ -1124,17 +1142,27 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
             final timeFolderMatches = timeFolderRegExp.allMatches(html);
             final timeFolderRecordings = timeFolderMatches.map((m) => '${m.group(1)}/').toList();
 
-            // Tüm kayıtları birleştir
+            // Filter out m3u8 files that have a corresponding time folder
+            // e.g., if "00-01-07/" exists, remove "00-01-07.m3u8" from the list
+            final timeFolderNames = timeFolderRecordings.map((f) => f.substring(0, f.length - 1)).toSet();
+            final filteredM3u8Recordings = m3u8Recordings.where((m3u8) {
+              final nameWithoutExt = m3u8.endsWith('.m3u8') 
+                  ? m3u8.substring(0, m3u8.length - 5) 
+                  : m3u8;
+              return !timeFolderNames.contains(nameWithoutExt);
+            }).toList();
+
+            // Tüm kayıtları birleştir (prefer time folders over m3u8 files)
             final allRecordings = [
               ...mkvRecordings,
-              ...m3u8Recordings,
+              ...filteredM3u8Recordings,
               ...mp4Recordings,
               ...tsRecordings,
               ...timeFolderRecordings,
             ];
 
             print(
-                '[MultiRecordings] Found ${mkvRecordings.length} MKV, ${m3u8Recordings.length} M3U8, ${mp4Recordings.length} MP4, ${tsRecordings.length} TS, ${timeFolderRecordings.length} time folders for ${camera.name}');
+                '[MultiRecordings] Found ${mkvRecordings.length} MKV, ${m3u8Recordings.length} M3U8 (${filteredM3u8Recordings.length} after filtering), ${mp4Recordings.length} MP4, ${tsRecordings.length} TS, ${timeFolderRecordings.length} time folders for ${camera.name}');
             print('[MultiRecordings] Total recordings: ${allRecordings.length}');
 
             if (mounted) {
@@ -1236,9 +1264,18 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
             final timeFolderMatches = timeFolderRegExp.allMatches(html);
             final timeFolderRecordings = timeFolderMatches.map((m) => '${m.group(1)}/').toList();
 
+            // Filter out m3u8 files that have a corresponding time folder
+            final timeFolderNames = timeFolderRecordings.map((f) => f.substring(0, f.length - 1)).toSet();
+            final filteredM3u8Recordings = m3u8Recordings.where((m3u8) {
+              final nameWithoutExt = m3u8.endsWith('.m3u8') 
+                  ? m3u8.substring(0, m3u8.length - 5) 
+                  : m3u8;
+              return !timeFolderNames.contains(nameWithoutExt);
+            }).toList();
+
             final allRecordings = [
               ...mkvRecordings,
-              ...m3u8Recordings,
+              ...filteredM3u8Recordings,
               ...mp4Recordings,
               ...tsRecordings,
               ...timeFolderRecordings,
@@ -1313,8 +1350,12 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
 
     for (final recording in recordings) {
       // Extract time from recording filename using our parsing function
+      // Handle time folder format (e.g., "00-01-07/") - remove trailing slash first
+      String cleanRecording = recording.endsWith('/') 
+          ? recording.substring(0, recording.length - 1) 
+          : recording;
       final recordingName =
-          recording.contains('/') ? recording.split('/').last : recording;
+          cleanRecording.contains('/') ? cleanRecording.split('/').last : cleanRecording;
       final timestamp = _parseTimestampFromFilename(recordingName);
 
       if (timestamp != null) {
@@ -1383,8 +1424,15 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
           // Include date folder in the download URL
           final dateStr =
               DateFormat('yyyy-MM-dd').format(_selectedDay ?? DateTime.now());
+          
+          // If recording is a time folder (ends with /), convert to corresponding m3u8 file
+          String finalRecording = recording;
+          if (recording.endsWith('/')) {
+            finalRecording = '${recording.substring(0, recording.length - 1)}.m3u8';
+          }
+          
           final completeUrl =
-              'http://${device.ipv4}:8080/Rec/${camera.name}/$dateStr/$recording';
+              'http://${device.ipv4}:8080/Rec/${camera.name}/$dateStr/$finalRecording';
           print('[Select] Generated URL: $completeUrl');
 
           if (_selectedForDownload.contains(completeUrl)) {
@@ -1422,9 +1470,15 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
       }
       dateFormat ??= _cameraDateFormats[camera];
 
+      // If recording is a time folder (ends with /), convert to corresponding m3u8 file
+      String finalRecording = recording;
+      if (recording.endsWith('/')) {
+        finalRecording = '${recording.substring(0, recording.length - 1)}.m3u8';
+      }
+
       final recordingUrl = dateFormat != null
-          ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$dateFormat/$recording'
-          : 'http://${device.ipv4}:8080/Rec/${camera.name}/${DateFormat('yyyy-MM-dd').format(_selectedDay!)}/$recording';
+          ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$dateFormat/$finalRecording'
+          : 'http://${device.ipv4}:8080/Rec/${camera.name}/${DateFormat('yyyy-MM-dd').format(_selectedDay!)}/$finalRecording';
 
       print('[MultiRecordings] Using recording URL: $recordingUrl');
 
@@ -1454,7 +1508,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '${camera.name} - ${recording.split('/').last}',
+                            '${camera.name} - ${recording.endsWith('/') ? recording.substring(0, recording.length - 1) : recording}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -1739,8 +1793,12 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
           '[MultiRecordings] Camera ${camera.name} has ${recordings.length} recordings');
 
       for (final recording in recordings) {
+        // Handle time folder format (e.g., "00-01-07/") - remove trailing slash first
+        String cleanRecording = recording.endsWith('/') 
+            ? recording.substring(0, recording.length - 1) 
+            : recording;
         final recordingName =
-            recording.contains('/') ? recording.split('/').last : recording;
+            cleanRecording.contains('/') ? cleanRecording.split('/').last : cleanRecording;
         final timestamp = _parseTimestampFromFilename(recordingName);
 
         if (timestamp != null) {
@@ -1762,8 +1820,12 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
             '[MultiRecordings] Camera ${camera.name} from device $deviceMac has ${recordings.length} recordings');
 
         for (final recording in recordings) {
+          // Handle time folder format (e.g., "00-01-07/") - remove trailing slash first
+          String cleanRecording = recording.endsWith('/') 
+              ? recording.substring(0, recording.length - 1) 
+              : recording;
           final recordingName =
-              recording.contains('/') ? recording.split('/').last : recording;
+              cleanRecording.contains('/') ? cleanRecording.split('/').last : cleanRecording;
           final timestamp = _parseTimestampFromFilename(recordingName);
 
           if (timestamp != null) {
@@ -1804,56 +1866,104 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
           '[MultiRecordings]   ${rec.camera.name}: ${rec.recording} ($fileType) -> ${rec.timestamp}');
     }
 
-    // ±5dk toleransla grupla
+    // ±5dk toleransla grupla - İKİ GEÇİŞLİ ALGORİTMA
+    // 1. Geçiş: Grupları oluştur
+    // 2. Geçiş: Kayıtları optimize et (daha yakın gruba taşı)
     final List<List<RecordingTime>> groups = [];
     const Duration tolerance = Duration(minutes: 5);
 
     print(
-        '[MultiRecordings] Starting grouping with ${tolerance.inMinutes}min tolerance...');
+        '[MultiRecordings] Starting TWO-PASS grouping with ${tolerance.inMinutes}min tolerance...');
 
+    // === PASS 1: Initial grouping ===
+    print('[MultiRecordings] === PASS 1: Initial grouping ===');
     for (final recording in allRecordings) {
-      bool addedToGroup = false;
+      int bestGroupIndex = -1;
+      Duration bestTimeDiff = const Duration(days: 999);
 
-      // Mevcut gruplardan birine eklenebilir mi kontrol et
       for (int i = 0; i < groups.length; i++) {
         final group = groups[i];
         if (group.isNotEmpty) {
-          final groupTime = group.first.timestamp;
-          final timeDiff = recording.timestamp.difference(groupTime).abs();
+          final hasThisCamera = group.any((r) => r.camera == recording.camera);
+          if (hasThisCamera) continue;
 
-          if (timeDiff <= tolerance) {
-            // Bu gruba ekle, ama aynı kameradan kayıt yoksa
-            final hasThisCamera =
-                group.any((r) => r.camera == recording.camera);
-            if (!hasThisCamera) {
-              print(
-                  '[MultiRecordings] Adding ${recording.camera.name}:${recording.recording} to group $i (time diff: ${timeDiff.inMinutes}min)');
-              group.add(recording);
-              addedToGroup = true;
-              break;
-            } else {
-              print(
-                  '[MultiRecordings] Skipping ${recording.camera.name}:${recording.recording} - camera already in group $i');
-            }
-          } else {
-            print(
-                '[MultiRecordings] Time diff too large for ${recording.camera.name}:${recording.recording} vs group $i: ${timeDiff.inMinutes}min > ${tolerance.inMinutes}min');
+          // Use group's CENTER time (average) instead of first timestamp
+          final groupCenterTime = _calculateGroupCenterTime(group);
+          final timeDiff = recording.timestamp.difference(groupCenterTime).abs();
+
+          if (timeDiff <= tolerance && timeDiff < bestTimeDiff) {
+            bestGroupIndex = i;
+            bestTimeDiff = timeDiff;
           }
         }
       }
 
-      // Hiçbir gruba eklenemedi, yeni grup oluştur
-      if (!addedToGroup) {
+      if (bestGroupIndex >= 0) {
         print(
-            '[MultiRecordings] Creating new group for ${recording.camera.name}:${recording.recording}');
+            '[MultiRecordings] Pass1: Adding ${recording.camera.name}:${recording.recording} to group $bestGroupIndex (diff: ${bestTimeDiff.inSeconds}sec)');
+        groups[bestGroupIndex].add(recording);
+      } else {
+        print(
+            '[MultiRecordings] Pass1: Creating new group for ${recording.camera.name}:${recording.recording}');
         groups.add([recording]);
       }
     }
 
-    print('[MultiRecordings] Created ${groups.length} groups:');
+    // === PASS 2: Optimize - Move recordings to closer groups if possible ===
+    print('[MultiRecordings] === PASS 2: Optimizing groups ===');
+    bool changed = true;
+    int iterations = 0;
+    const maxIterations = 10; // Prevent infinite loops
+    
+    while (changed && iterations < maxIterations) {
+      changed = false;
+      iterations++;
+      
+      for (int groupIdx = 0; groupIdx < groups.length; groupIdx++) {
+        final group = groups[groupIdx];
+        final recordingsToMove = <RecordingTime>[];
+        
+        for (final recording in group) {
+          final currentGroupCenter = _calculateGroupCenterTime(group);
+          final currentDiff = recording.timestamp.difference(currentGroupCenter).abs();
+          
+          // Check if this recording would be closer to another group
+          for (int otherIdx = 0; otherIdx < groups.length; otherIdx++) {
+            if (otherIdx == groupIdx) continue;
+            
+            final otherGroup = groups[otherIdx];
+            // Check if this camera is already in the other group
+            if (otherGroup.any((r) => r.camera == recording.camera)) continue;
+            
+            final otherGroupCenter = _calculateGroupCenterTime(otherGroup);
+            final otherDiff = recording.timestamp.difference(otherGroupCenter).abs();
+            
+            // Move if other group is significantly closer (at least 30 seconds closer)
+            if (otherDiff < currentDiff && (currentDiff - otherDiff).inSeconds >= 30 && otherDiff <= tolerance) {
+              print('[MultiRecordings] Pass2: Moving ${recording.camera.name}:${recording.recording} from group $groupIdx to group $otherIdx (${currentDiff.inSeconds}s -> ${otherDiff.inSeconds}s)');
+              recordingsToMove.add(recording);
+              otherGroup.add(recording);
+              changed = true;
+              break;
+            }
+          }
+        }
+        
+        // Remove moved recordings from current group
+        for (final rec in recordingsToMove) {
+          group.remove(rec);
+        }
+      }
+    }
+    
+    // Remove empty groups
+    groups.removeWhere((group) => group.isEmpty);
+
+    print('[MultiRecordings] Created ${groups.length} groups after optimization:');
     for (int i = 0; i < groups.length; i++) {
       final group = groups[i];
-      print('[MultiRecordings] Group $i (${group.length} cameras):');
+      final centerTime = _calculateGroupCenterTime(group);
+      print('[MultiRecordings] Group $i (${group.length} cameras, center: ${centerTime.hour}:${centerTime.minute}:${centerTime.second}):');
       for (final rec in group) {
         final fileType = rec.recording.toLowerCase().contains('.mkv')
             ? 'MKV'
@@ -1871,15 +1981,53 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
     return result;
   }
 
+  /// Calculate the center (average) time of a group
+  DateTime _calculateGroupCenterTime(List<RecordingTime> group) {
+    if (group.isEmpty) return DateTime.now();
+    if (group.length == 1) return group.first.timestamp;
+    
+    // Calculate average timestamp
+    int totalMilliseconds = 0;
+    for (final rec in group) {
+      totalMilliseconds += rec.timestamp.millisecondsSinceEpoch;
+    }
+    return DateTime.fromMillisecondsSinceEpoch(totalMilliseconds ~/ group.length);
+  }
+
   void _openMultiWatchScreen(List<RecordingTime> recordingGroup) {
     final Map<Camera, String> cameraRecordings = {};
     final Map<Camera, String> cameraDeviceIps = {};
     final Map<Camera, String> dateFormats = {};
+    final Map<Camera, Duration> cameraStartOffsets = {};
     final cameraDevicesProvider =
         Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
 
+    // Find the earliest recording timestamp as reference point
+    DateTime? earliestTimestamp;
     for (final recording in recordingGroup) {
-      cameraRecordings[recording.camera] = recording.recording;
+      if (earliestTimestamp == null || recording.timestamp.isBefore(earliestTimestamp)) {
+        earliestTimestamp = recording.timestamp;
+      }
+    }
+    
+    print('[MultiRecordings] Earliest timestamp: $earliestTimestamp');
+
+    for (final recording in recordingGroup) {
+      // If recording is a time folder (ends with /), convert to corresponding m3u8 file
+      String finalRecording = recording.recording;
+      if (recording.recording.endsWith('/')) {
+        finalRecording = '${recording.recording.substring(0, recording.recording.length - 1)}.m3u8';
+      }
+      cameraRecordings[recording.camera] = finalRecording;
+      
+      // Calculate offset relative to earliest recording
+      if (earliestTimestamp != null) {
+        final offset = recording.timestamp.difference(earliestTimestamp);
+        if (offset != Duration.zero) {
+          cameraStartOffsets[recording.camera] = offset;
+          print('[MultiRecordings] ${recording.camera.name} offset: ${offset.inSeconds}s (started at ${recording.timestamp})');
+        }
+      }
 
       // Get device IP for this camera (especially important for multi-device cameras)
       if (recording.deviceMac != null) {
@@ -1940,6 +2088,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
         '[MultiRecordings] Device IPs: ${cameraDeviceIps.entries.map((e) => "${e.key.name}: ${e.value}").join(", ")}');
     print(
         '[MultiRecordings] Date formats: ${dateFormats.entries.map((e) => "${e.key.name}: ${e.value}").join(", ")}');
+    print(
+        '[MultiRecordings] Start offsets: ${cameraStartOffsets.entries.map((e) => "${e.key.name}: ${e.value.inSeconds}s").join(", ")}');
 
     // Multi Watch sayfasını aç
     Navigator.push(
@@ -1950,6 +2100,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
           selectedDate: _selectedDay!,
           cameraDateFormats: dateFormats,
           cameraDeviceIps: cameraDeviceIps,
+          cameraStartOffsets: cameraStartOffsets,
         ),
       ),
     );
@@ -2407,7 +2558,13 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
   // Build a single recording tile (reusable for both single and multi-device cameras)
   Widget _buildRecordingTile(Camera camera, String recording,
       {String? deviceMac, String? deviceIp}) {
-    final recordingName = recording.split('/').last;
+    // Handle time folder format (e.g., "00-01-07/") - remove trailing slash first
+    String cleanRecording = recording.endsWith('/') 
+        ? recording.substring(0, recording.length - 1) 
+        : recording;
+    final recordingName = cleanRecording.split('/').last.isEmpty 
+        ? cleanRecording 
+        : cleanRecording.split('/').last;
     final timestamp = _parseTimestampFromFilename(recordingName);
 
     final cameraDevicesProvider =
@@ -2438,8 +2595,15 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
       }
       final formattedDate =
           dateFormat ?? DateFormat('yyyy-MM-dd').format(_selectedDay!);
+      
+      // If recording is a time folder (ends with /), convert to corresponding m3u8 file
+      String finalRecording = recording;
+      if (recording.endsWith('/')) {
+        finalRecording = '${recording.substring(0, recording.length - 1)}.m3u8';
+      }
+      
       recordingUrl =
-          'http://$resolvedDeviceIp:8080/Rec/${camera.name}/$formattedDate/$recording';
+          'http://$resolvedDeviceIp:8080/Rec/${camera.name}/$formattedDate/$finalRecording';
     }
 
     final isSelected = _isMultiSelectionMode
@@ -2466,21 +2630,35 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
               decoration: BoxDecoration(
                 color: recordingName.toLowerCase().endsWith('.m3u8')
                     ? Colors.orange.withOpacity(0.2)
-                    : Colors.blue.withOpacity(0.2),
+                    : recordingName.endsWith('/')
+                        ? Colors.green.withOpacity(0.2)
+                        : recordingName.toLowerCase().endsWith('.ts')
+                            ? Colors.purple.withOpacity(0.2)
+                            : Colors.blue.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
                 recordingName.toLowerCase().endsWith('.m3u8')
                     ? 'M3U8'
-                    : recordingName.toLowerCase().endsWith('.mp4')
-                        ? 'MP4'
-                        : 'MKV',
+                    : recordingName.endsWith('/')
+                        ? 'HLS'
+                        : recordingName.toLowerCase().endsWith('.mp4')
+                            ? 'MP4'
+                            : recordingName.toLowerCase().endsWith('.ts')
+                                ? 'TS'
+                                : recordingName.toLowerCase().endsWith('.mkv')
+                                    ? 'MKV'
+                                    : 'VIDEO',
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   color: recordingName.toLowerCase().endsWith('.m3u8')
                       ? Colors.orange
-                      : Colors.blue,
+                      : recordingName.endsWith('/')
+                          ? Colors.green
+                          : recordingName.toLowerCase().endsWith('.ts')
+                              ? Colors.purple
+                              : Colors.blue,
                 ),
               ),
             ),
@@ -2534,8 +2712,15 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
         }
         final formattedDate =
             dateFormat ?? DateFormat('yyyy-MM-dd').format(_selectedDay!);
+        
+        // If recording is a time folder (ends with /), convert to corresponding m3u8 file
+        String finalRecording = recording;
+        if (recording.endsWith('/')) {
+          finalRecording = '${recording.substring(0, recording.length - 1)}.m3u8';
+        }
+        
         recordingUrl =
-            'http://$deviceIp:8080/Rec/${camera.name}/$formattedDate/$recording';
+            'http://$deviceIp:8080/Rec/${camera.name}/$formattedDate/$finalRecording';
       }
 
       setState(() {
@@ -2589,8 +2774,17 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
       // Default to yyyy-MM-dd (with dashes) as that's more common in this system
       final formattedDate =
           dateFormat ?? DateFormat('yyyy-MM-dd').format(_selectedDay!);
+      
+      // If recording is a time folder (ends with /), convert to corresponding m3u8 file
+      String finalRecording = recording;
+      if (recording.endsWith('/')) {
+        // e.g. "00-01-07/" -> "00-01-07.m3u8"
+        finalRecording = '${recording.substring(0, recording.length - 1)}.m3u8';
+        print('[MultiRecordings] Converted time folder $recording to m3u8: $finalRecording');
+      }
+      
       recordingUrl =
-          'http://$deviceIp:8080/Rec/${camera.name}/$formattedDate/$recording';
+          'http://$deviceIp:8080/Rec/${camera.name}/$formattedDate/$finalRecording';
       print('[MultiRecordings] Final dateFormat used: $formattedDate');
     }
 
@@ -2848,7 +3042,13 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
       itemCount: recordings.length,
       itemBuilder: (context, index) {
         final recording = recordings[index];
-        final recordingName = recording.split('/').last;
+        // Handle time folder format (e.g., "00-01-07/") - remove trailing slash first
+        String cleanRecording = recording.endsWith('/') 
+            ? recording.substring(0, recording.length - 1) 
+            : recording;
+        final recordingName = cleanRecording.split('/').last.isEmpty 
+            ? cleanRecording 
+            : cleanRecording.split('/').last;
         final timestamp = _parseTimestampFromFilename(recordingName);
 
         final cameraDevicesProvider =
@@ -2868,9 +3068,15 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
           }
           dateFormat ??= _cameraDateFormats[camera];
 
+          // If recording is a time folder (ends with /), convert to corresponding m3u8 file
+          String finalRecording = recording;
+          if (recording.endsWith('/')) {
+            finalRecording = '${recording.substring(0, recording.length - 1)}.m3u8';
+          }
+
           recordingUrl = dateFormat != null
-              ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$dateFormat/$recording'
-              : 'http://${device.ipv4}:8080/Rec/${camera.name}/${DateFormat('yyyy-MM-dd').format(_selectedDay!)}/$recording';
+              ? 'http://${device.ipv4}:8080/Rec/${camera.name}/$dateFormat/$finalRecording'
+              : 'http://${device.ipv4}:8080/Rec/${camera.name}/${DateFormat('yyyy-MM-dd').format(_selectedDay!)}/$finalRecording';
         }
 
         final isSelected = _isMultiSelectionMode
@@ -2898,19 +3104,35 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
                   decoration: BoxDecoration(
                     color: recordingName.toLowerCase().endsWith('.m3u8')
                         ? Colors.orange.withOpacity(0.2)
-                        : Colors.blue.withOpacity(0.2),
+                        : recordingName.endsWith('/')
+                            ? Colors.green.withOpacity(0.2)
+                            : recordingName.toLowerCase().endsWith('.ts')
+                                ? Colors.purple.withOpacity(0.2)
+                                : Colors.blue.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     recordingName.toLowerCase().endsWith('.m3u8')
                         ? 'M3U8'
-                        : 'MKV',
+                        : recordingName.endsWith('/')
+                            ? 'HLS'
+                            : recordingName.toLowerCase().endsWith('.mp4')
+                                ? 'MP4'
+                                : recordingName.toLowerCase().endsWith('.ts')
+                                    ? 'TS'
+                                    : recordingName.toLowerCase().endsWith('.mkv')
+                                        ? 'MKV'
+                                        : 'HLS',
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       color: recordingName.toLowerCase().endsWith('.m3u8')
                           ? Colors.orange
-                          : Colors.blue,
+                          : recordingName.endsWith('/')
+                              ? Colors.green
+                              : recordingName.toLowerCase().endsWith('.ts')
+                                  ? Colors.purple
+                                  : Colors.blue,
                     ),
                   ),
                 ),
@@ -3005,7 +3227,13 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
     }
     print('[SingleDownload] Download directory: ${downloadDir.path}');
 
-    final fileName = recording.split('/').last;
+    // Handle time folder format (e.g., "00-01-07/") - remove trailing slash first
+    String cleanRecording = recording.endsWith('/') 
+        ? recording.substring(0, recording.length - 1) 
+        : recording;
+    final fileName = cleanRecording.split('/').last.isEmpty 
+        ? cleanRecording 
+        : cleanRecording.split('/').last;
     final filePath = '${downloadDir.path}/$fileName';
     print('[SingleDownload] File name: $fileName');
     print('[SingleDownload] File path: $filePath');
@@ -3742,6 +3970,7 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
   String _errorMessage = '';
   bool _isLiveStream = false; // Track if this is a live/EVENT HLS stream
   Duration _playlistDuration = Duration.zero; // Calculated from playlist
+  Duration _lastNSegmentsDuration = Duration.zero; // Duration of last N segments for live offset
   Timer? _playlistRefreshTimer; // Timer to refresh playlist duration
 
   @override
@@ -3787,7 +4016,7 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
       if (mounted) {
         setState(() {
           _hasError = true;
-          _errorMessage = "Error playing video: ${error.toString()}";
+          _errorMessage = "Error playing video: ${error.toString()}\n\nURL: ${widget.recordingUrl}";
         });
       }
     });
@@ -3827,14 +4056,18 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
 
         // Calculate total duration from EXTINF tags
         final duration = _calculatePlaylistDuration(content);
+        
+        // Calculate last 5 segments duration for live stream offset (more buffer for stability)
+        final lastNDuration = _calculateLastNSegmentsDuration(content, 5);
 
         if (mounted) {
           setState(() {
             _isLiveStream = isLive;
             _playlistDuration = duration;
+            _lastNSegmentsDuration = lastNDuration;
           });
           print(
-              '[VideoPlayerPopup] Playlist duration: $duration (${duration.inSeconds}s), isLive: $isLive');
+              '[VideoPlayerPopup] Playlist duration: $duration (${duration.inSeconds}s), isLive: $isLive, last5Segments: $lastNDuration');
 
           if (isLive) {
             print(
@@ -3864,6 +4097,29 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
     return Duration(milliseconds: (totalSeconds * 1000).round());
   }
 
+  /// Calculate duration of the last N segments in the playlist
+  Duration _calculateLastNSegmentsDuration(String playlistContent, int n) {
+    final List<double> segmentDurations = [];
+    final lines = playlistContent.split('\n');
+    for (final line in lines) {
+      if (line.startsWith('#EXTINF:')) {
+        final match = RegExp(r'#EXTINF:([0-9.]+)').firstMatch(line);
+        if (match != null) {
+          segmentDurations.add(double.tryParse(match.group(1) ?? '0') ?? 0);
+        }
+      }
+    }
+    
+    // Get last N segments
+    final lastN = segmentDurations.length >= n 
+        ? segmentDurations.sublist(segmentDurations.length - n) 
+        : segmentDurations;
+    
+    final totalSeconds = lastN.fold<double>(0, (sum, d) => sum + d);
+    print('[VideoPlayerPopup] Last $n segments duration: ${totalSeconds}s (${segmentDurations.length} total segments)');
+    return Duration(milliseconds: (totalSeconds * 1000).round());
+  }
+
   void _startPlaylistRefresh() {
     // Refresh playlist every 10 seconds to update duration
     _playlistRefreshTimer =
@@ -3871,11 +4127,14 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
       try {
         final response = await http.get(Uri.parse(widget.recordingUrl));
         if (response.statusCode == 200 && mounted) {
-          final duration = _calculatePlaylistDuration(response.body);
+          final content = response.body;
+          final duration = _calculatePlaylistDuration(content);
+          final lastNDuration = _calculateLastNSegmentsDuration(content, 5);
           setState(() {
             _playlistDuration = duration;
+            _lastNSegmentsDuration = lastNDuration;
           });
-          print('[VideoPlayerPopup] Updated playlist duration: $duration');
+          print('[VideoPlayerPopup] Updated playlist duration: $duration, last5Segments: $lastNDuration');
         }
       } catch (e) {
         print('[VideoPlayerPopup] Error refreshing playlist: $e');
@@ -3920,17 +4179,22 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
               }
             });
           }
-          // For live streams without specific seek time, seek to live edge (end)
+          // For live streams without specific seek time, seek to position before last 5 segments
           else if (_isLiveStream && !initialSeekDone && _playlistDuration.inSeconds > 0) {
             initialSeekDone = true;
-            // Seek to near the end of playlist (live edge)
-            final liveEdge = Duration(seconds: _playlistDuration.inSeconds - 3);
-            print('[VideoPlayerPopup] Live stream detected, seeking to live edge: $liveEdge');
+            // Seek to before the last 5 segments (live edge - lastNSegmentsDuration)
+            // This ensures we're not trying to play segments that aren't fully written yet
+            final offsetSeconds = _lastNSegmentsDuration.inSeconds > 0 
+                ? _lastNSegmentsDuration.inSeconds 
+                : 30; // Default to ~30 seconds (5 segments * 6 sec each)
+            final safePosition = Duration(
+                seconds: (_playlistDuration.inSeconds - offsetSeconds).clamp(0, _playlistDuration.inSeconds));
+            print('[VideoPlayerPopup] Live stream detected, seeking to safe position: $safePosition (${offsetSeconds}s before live edge)');
             
             Future.delayed(const Duration(milliseconds: 500), () {
               if (mounted) {
-                _popupPlayer.seek(liveEdge);
-                print('[VideoPlayerPopup] Seeked to live edge: $liveEdge');
+                _popupPlayer.seek(safePosition);
+                print('[VideoPlayerPopup] Seeked to safe position: $safePosition');
               }
             });
           }
@@ -3940,7 +4204,7 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
       print('[VideoPlayerPopup] Error in _loadVideo: $e');
       setState(() {
         _hasError = true;
-        _errorMessage = 'Error loading recording: $e';
+        _errorMessage = 'Error loading recording: $e\n\nURL: ${widget.recordingUrl}';
       });
     }
   }

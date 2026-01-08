@@ -15,6 +15,7 @@ class MultiWatchScreen extends StatefulWidget {
   final DateTime selectedDate;
   final Map<Camera, String>? cameraDateFormats; // Date format per camera
   final Map<Camera, String>? cameraDeviceIps; // Device IP per camera (for multi-device cameras)
+  final Map<Camera, Duration>? cameraStartOffsets; // Start offset per camera for sync (relative to earliest recording)
 
   const MultiWatchScreen({
     Key? key,
@@ -22,6 +23,7 @@ class MultiWatchScreen extends StatefulWidget {
     required this.selectedDate,
     this.cameraDateFormats,
     this.cameraDeviceIps,
+    this.cameraStartOffsets,
   }) : super(key: key);
 
   @override
@@ -36,6 +38,7 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   final Map<Camera, String> _errorMessages = {};
   final Map<Camera, bool> _isPlaying = {};
   final Map<Camera, String> _recordingUrls = {}; // Store URLs for live check
+  Map<Camera, Duration> _cameraOffsets = {}; // Start offset per camera for synchronized playback
   
   // Synchronized playback control
   bool _isSyncPlaying = false;
@@ -43,6 +46,7 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   Duration _syncDuration = Duration.zero;
   Duration _lastKnownDuration = Duration.zero; // Track duration changes for live streams
   Duration _playlistTotalDuration = Duration.zero; // Actual playlist duration from parsing
+  Duration _lastNSegmentsDuration = Duration.zero; // Duration of last N segments for safe live position
   Player? _masterPlayer; // Reference player for sync
   bool _isSeeking = false;
   
@@ -56,6 +60,14 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialize offsets from widget parameter
+    _cameraOffsets = widget.cameraStartOffsets ?? {};
+    if (_cameraOffsets.isNotEmpty) {
+      print('[MultiWatch] Camera offsets initialized:');
+      for (final entry in _cameraOffsets.entries) {
+        print('  ${entry.key.name}: ${entry.value.inSeconds}s offset');
+      }
+    }
     _initializePlayers();
   }
   
@@ -289,23 +301,34 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
         final content = response.body;
         final isLive = !content.contains('#EXT-X-ENDLIST');
         
-        // Parse total duration from playlist
-        double totalSeconds = 0;
+        // Parse all segment durations from playlist
+        final List<double> segmentDurations = [];
         final extinfRegex = RegExp(r'#EXTINF:(\d+\.?\d*)');
         final matches = extinfRegex.allMatches(content);
         for (final match in matches) {
           final durationStr = match.group(1);
           if (durationStr != null) {
-            totalSeconds += double.tryParse(durationStr) ?? 0;
+            segmentDurations.add(double.tryParse(durationStr) ?? 0);
           }
         }
         
+        // Calculate total duration
+        final totalSeconds = segmentDurations.fold<double>(0, (sum, d) => sum + d);
         final playlistDuration = Duration(seconds: totalSeconds.toInt());
-        print('[MultiWatch] Playlist analysis: isLive=$isLive, duration=${playlistDuration.inSeconds}s, segments=${matches.length}');
+        
+        // Calculate last 10 segments duration for live offset
+        final last10 = segmentDurations.length >= 10 
+            ? segmentDurations.sublist(segmentDurations.length - 10) 
+            : segmentDurations;
+        final last10Seconds = last10.fold<double>(0, (sum, d) => sum + d);
+        final last10Duration = Duration(seconds: last10Seconds.toInt());
+        
+        print('[MultiWatch] Playlist analysis: isLive=$isLive, duration=${playlistDuration.inSeconds}s, segments=${matches.length}, last10Segments=${last10Duration.inSeconds}s');
         
         if (mounted) {
           setState(() {
             _playlistTotalDuration = playlistDuration;
+            _lastNSegmentsDuration = last10Duration;
             // Use playlist duration as sync duration if it's larger
             if (playlistDuration > _syncDuration) {
               _syncDuration = playlistDuration;
@@ -337,8 +360,11 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
       if (mounted && _isAtLiveEdge && !_isSeeking && _syncDuration.inSeconds > 0) {
         // If we're supposed to be at live edge but fell behind due to buffering, catch up
         final behindSeconds = _syncDuration.inSeconds - _syncPosition.inSeconds;
-        if (behindSeconds > 15) {
-          print('[MultiWatch] At live edge but fell behind by $behindSeconds seconds, catching up...');
+        // Use dynamic offset based on last 10 segments, or default to 60s
+        final safeOffset = _lastNSegmentsDuration.inSeconds > 0 ? _lastNSegmentsDuration.inSeconds : 60;
+        // Only catch up if we're significantly behind the safe position (more than safeOffset + 25s)
+        if (behindSeconds > safeOffset + 25) {
+          print('[MultiWatch] At live edge but fell behind by $behindSeconds seconds (safe offset: ${safeOffset}s), catching up...');
           _seekToLiveEdge();
         }
       }
@@ -369,22 +395,32 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
               return;
             }
             
-            // Parse new duration
-            double totalSeconds = 0;
+            // Parse all segment durations
+            final List<double> segmentDurations = [];
             final extinfRegex = RegExp(r'#EXTINF:(\d+\.?\d*)');
             final matches = extinfRegex.allMatches(content);
             for (final match in matches) {
               final durationStr = match.group(1);
               if (durationStr != null) {
-                totalSeconds += double.tryParse(durationStr) ?? 0;
+                segmentDurations.add(double.tryParse(durationStr) ?? 0);
               }
             }
             
+            final totalSeconds = segmentDurations.fold<double>(0, (sum, d) => sum + d);
             final newDuration = Duration(seconds: totalSeconds.toInt());
+            
+            // Calculate last 10 segments duration
+            final last10 = segmentDurations.length >= 10 
+                ? segmentDurations.sublist(segmentDurations.length - 10) 
+                : segmentDurations;
+            final last10Seconds = last10.fold<double>(0, (sum, d) => sum + d);
+            final last10Duration = Duration(seconds: last10Seconds.toInt());
+            
             if (newDuration > _playlistTotalDuration) {
-              print('[MultiWatch] Playlist duration grew: ${_playlistTotalDuration.inSeconds}s -> ${newDuration.inSeconds}s');
+              print('[MultiWatch] Playlist duration grew: ${_playlistTotalDuration.inSeconds}s -> ${newDuration.inSeconds}s, last10Segments: ${last10Duration.inSeconds}s');
               setState(() {
                 _playlistTotalDuration = newDuration;
+                _lastNSegmentsDuration = last10Duration;
                 if (newDuration > _syncDuration) {
                   _syncDuration = newDuration;
                 }
@@ -410,9 +446,14 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   
   void _seekToLiveEdge() {
     if (_syncDuration.inSeconds > 0) {
-      // Seek to 2 seconds before the end to be at live edge
-      final livePosition = Duration(seconds: _syncDuration.inSeconds - 2);
-      print('[MultiWatch] Seeking to live edge: $livePosition');
+      // Seek to before the last 10 segments for stable playback
+      // Use calculated segment duration or default to 60 seconds (10 segments * 6 sec each)
+      final offsetSeconds = _lastNSegmentsDuration.inSeconds > 0 
+          ? _lastNSegmentsDuration.inSeconds 
+          : 60;
+      final livePosition = Duration(
+          seconds: (_syncDuration.inSeconds - offsetSeconds).clamp(0, _syncDuration.inSeconds));
+      print('[MultiWatch] Seeking to safe live position: $livePosition (${offsetSeconds}s before live edge)');
       _seekAll(livePosition);
       setState(() {
         _isAtLiveEdge = true;
@@ -438,7 +479,7 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
     }
   }
   
-  // Seek all players to a specific position
+  // Seek all players to a specific position (with per-camera offset compensation)
   void _seekAll(Duration position, {bool isUserSeek = false}) {
     print('[MultiWatch] _seekAll called: position=$position, isUserSeek=$isUserSeek, duration=$_syncDuration');
     _isSeeking = true;
@@ -458,8 +499,26 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
       }
     }
     
-    for (final player in _players.values) {
-      player.seek(position);
+    // Apply per-camera offset compensation for synchronized playback
+    for (final entry in _players.entries) {
+      final camera = entry.key;
+      final player = entry.value;
+      
+      // Get offset for this camera (default 0 if not specified)
+      final offset = _cameraOffsets[camera] ?? Duration.zero;
+      
+      // Calculate adjusted position: later recordings need to seek earlier
+      // If camera started 20s later than reference, seek 20s earlier in that recording
+      final adjustedPosition = position - offset;
+      
+      // Clamp to valid range (don't seek before 0)
+      final clampedPosition = adjustedPosition < Duration.zero ? Duration.zero : adjustedPosition;
+      
+      if (offset != Duration.zero) {
+        print('[MultiWatch] ${camera.name}: position=$position, offset=${offset.inSeconds}s, adjusted=${clampedPosition.inSeconds}s');
+      }
+      
+      player.seek(clampedPosition);
     }
     setState(() {
       _syncPosition = position;
