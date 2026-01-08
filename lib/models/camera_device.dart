@@ -965,6 +965,15 @@ class Camera {
   // Distribute active flag - indicates if the camera is being distributed
   bool distribute;
 
+  // Distribute count - how many devices this camera should be distributed to
+  int distributeCount;
+
+  // ONVIF connection status
+  bool onvifConnected;
+
+  // Last ONVIF seen timestamp
+  String lastOnvifSeen;
+
   // Current device assignments from cameras_mac.json - Map<DeviceMac, CameraCurrentDevice>
   // A camera can be on multiple devices at the same time
   Map<String, CameraCurrentDevice> currentDevices;
@@ -1029,6 +1038,9 @@ class Camera {
     this.parentDeviceMacKey,
     this.isPlaceholder = false,
     this.distribute = false,
+    this.distributeCount = 1,
+    this.onvifConnected = false,
+    this.lastOnvifSeen = '',
     CameraCurrentDevice? currentDevice,
     Map<String, CameraCurrentDevice>? currentDevices,
     List<CameraHistoryDevice>? deviceHistory,
@@ -1092,6 +1104,9 @@ class Camera {
     String? parentDeviceMacKey, // Added parentDeviceMacKey to copyWith
     bool? isPlaceholder,
     bool? distribute,
+    int? distributeCount,
+    bool? onvifConnected,
+    String? lastOnvifSeen,
     Map<String, CameraCurrentDevice>? currentDevices,
     List<CameraHistoryDevice>? deviceHistory,
   }) {
@@ -1143,6 +1158,9 @@ class Camera {
           this.parentDeviceMacKey, // Updated parentDeviceMacKey
       isPlaceholder: isPlaceholder ?? this.isPlaceholder,
       distribute: distribute ?? this.distribute,
+      distributeCount: distributeCount ?? this.distributeCount,
+      onvifConnected: onvifConnected ?? this.onvifConnected,
+      lastOnvifSeen: lastOnvifSeen ?? this.lastOnvifSeen,
       currentDevices: currentDevices ??
           Map<String, CameraCurrentDevice>.from(this.currentDevices),
       deviceHistory:

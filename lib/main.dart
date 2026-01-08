@@ -26,6 +26,7 @@ import 'screens/multi_recordings_screen.dart';  // New multi-recordings screen
 import 'screens/multi_camera_view_screen.dart';  // Multi camera view screen
 import 'screens/camera_layout_assignment_screen.dart';  // Camera layout assignment screen
 import 'screens/activities_screen.dart';  // New activities screen
+import 'screens/live_recording_screen.dart';  // Live recording screen
 import 'theme/app_theme.dart';
 import 'utils/responsive_helper.dart';
 import 'utils/page_transitions.dart';

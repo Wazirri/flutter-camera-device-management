@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
 import '../providers/camera_devices_provider.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
@@ -33,13 +35,23 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   final Map<Camera, bool> _hasError = {};
   final Map<Camera, String> _errorMessages = {};
   final Map<Camera, bool> _isPlaying = {};
+  final Map<Camera, String> _recordingUrls = {}; // Store URLs for live check
   
   // Synchronized playback control
   bool _isSyncPlaying = false;
   Duration _syncPosition = Duration.zero;
   Duration _syncDuration = Duration.zero;
+  Duration _lastKnownDuration = Duration.zero; // Track duration changes for live streams
+  Duration _playlistTotalDuration = Duration.zero; // Actual playlist duration from parsing
   Player? _masterPlayer; // Reference player for sync
   bool _isSeeking = false;
+  
+  // Live recording support
+  bool _isLiveRecording = false; // Whether any recording is still ongoing
+  bool _isAtLiveEdge = true; // Whether we're at the live edge
+  bool _initialSeekDone = false; // Prevent multiple initial seeks
+  Timer? _liveCheckTimer;
+  Timer? _playlistRefreshTimer;
   
   @override
   void initState() {
@@ -54,8 +66,34 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
       final camera = entry.key;
       final recording = entry.value;
       
-      // Player ve controller oluştur
-      final player = Player();
+      // Player ve controller oluştur - with HLS-friendly configuration
+      final player = Player(
+        configuration: PlayerConfiguration(
+          // Larger buffer for HLS playlist
+          bufferSize: 500 * 1024 * 1024, // 500MB buffer for live streams
+        ),
+      );
+      
+      // Set MPV options for HLS EVENT stream support
+      if (player.platform is NativePlayer) {
+        final nativePlayer = player.platform as NativePlayer;
+        // Large demuxer buffer for full HLS playlist caching
+        nativePlayer.setProperty('demuxer-max-bytes', '500MiB');
+        nativePlayer.setProperty('demuxer-max-back-bytes', '400MiB');
+        // Cache settings for seeking
+        nativePlayer.setProperty('cache', 'yes');
+        nativePlayer.setProperty('cache-secs', '7200'); // 2 hour cache
+        nativePlayer.setProperty('demuxer-seekable-cache', 'yes');
+        // HLS specific options
+        nativePlayer.setProperty('hls-bitrate', 'max');
+        // Force stream to be seekable even without ENDLIST
+        nativePlayer.setProperty('force-seekable', 'yes');
+        // Start from the beginning of playlist, not live edge
+        nativePlayer.setProperty('demuxer-lavf-o', 'live_start_index=0');
+        // Prefetch the entire playlist
+        nativePlayer.setProperty('prefetch-playlist', 'yes');
+      }
+      
       final controller = VideoController(player);
       
       _players[camera] = player;
@@ -81,9 +119,26 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
         
         player.stream.duration.listen((duration) {
           if (mounted && duration != Duration.zero) {
+            // Use the larger of player duration or playlist parsed duration
+            final effectiveDuration = duration > _playlistTotalDuration ? duration : _playlistTotalDuration;
+            
+            print('[MultiWatch] Duration update - player: ${duration.inSeconds}s, playlist: ${_playlistTotalDuration.inSeconds}s, using: ${effectiveDuration.inSeconds}s');
+            
             setState(() {
-              _syncDuration = duration;
+              _syncDuration = effectiveDuration;
             });
+            
+            // For live recordings, seek to live edge ONCE when duration is first received
+            if (_isLiveRecording && !_initialSeekDone && effectiveDuration.inSeconds > 0) {
+              print('[MultiWatch] Duration received: $effectiveDuration, doing initial seek to live edge');
+              _initialSeekDone = true;
+              _lastKnownDuration = effectiveDuration;
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (mounted) {
+                  _seekToLiveEdge();
+                }
+              });
+            }
           }
         });
         
@@ -127,7 +182,7 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
     }
   }
   
-  void _loadRecording(Camera camera, String recording) {
+  Future<void> _loadRecording(Camera camera, String recording) async {
     final cameraDevicesProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
     
     // First check if we have a specific device IP for this camera
@@ -161,6 +216,9 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
       
       final recordingUrl = 'http://$deviceIp:8080/Rec/${camera.name}/$selectedDayFormatted/$recording';
       
+      // Store URL for live checking
+      _recordingUrls[camera] = recordingUrl;
+      
       print('[MultiWatch] Loading recording for ${camera.name}: $recordingUrl (format: ${cameraDateFormat ?? 'default'}, ip: $deviceIp)');
       
       setState(() {
@@ -171,7 +229,13 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
       final player = _players[camera];
       if (player != null) {
         try {
-          player.open(Media(recordingUrl), play: true); // Otomatik başlatma
+          // First parse the playlist to get actual duration BEFORE opening player
+          await _checkIfLiveRecording(recordingUrl);
+          
+          print('[MultiWatch] After playlist check - playlistTotalDuration: ${_playlistTotalDuration.inSeconds}s, isLive: $_isLiveRecording');
+          
+          // Open the media
+          player.open(Media(recordingUrl), play: true);
         } catch (e) {
           print('[MultiWatch] Error loading recording for ${camera.name}: $e');
           setState(() {
@@ -185,6 +249,173 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
       setState(() {
         _hasError[camera] = true;
         _errorMessages[camera] = 'Device not found for camera';
+      });
+    }
+  }
+  
+  /// Parse m3u8 playlist and calculate total duration from EXTINF tags
+  Future<Duration> _parsePlaylistDuration(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final content = response.body;
+        double totalSeconds = 0;
+        
+        // Parse all #EXTINF:<duration> lines
+        final extinfRegex = RegExp(r'#EXTINF:(\d+\.?\d*)');
+        final matches = extinfRegex.allMatches(content);
+        
+        for (final match in matches) {
+          final durationStr = match.group(1);
+          if (durationStr != null) {
+            totalSeconds += double.tryParse(durationStr) ?? 0;
+          }
+        }
+        
+        print('[MultiWatch] Parsed playlist duration: ${totalSeconds.toInt()} seconds (${matches.length} segments)');
+        return Duration(seconds: totalSeconds.toInt());
+      }
+    } catch (e) {
+      print('[MultiWatch] Error parsing playlist: $e');
+    }
+    return Duration.zero;
+  }
+  
+  /// Check if any m3u8 is a live/event stream (no #EXT-X-ENDLIST) and parse duration
+  Future<void> _checkIfLiveRecording(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final content = response.body;
+        final isLive = !content.contains('#EXT-X-ENDLIST');
+        
+        // Parse total duration from playlist
+        double totalSeconds = 0;
+        final extinfRegex = RegExp(r'#EXTINF:(\d+\.?\d*)');
+        final matches = extinfRegex.allMatches(content);
+        for (final match in matches) {
+          final durationStr = match.group(1);
+          if (durationStr != null) {
+            totalSeconds += double.tryParse(durationStr) ?? 0;
+          }
+        }
+        
+        final playlistDuration = Duration(seconds: totalSeconds.toInt());
+        print('[MultiWatch] Playlist analysis: isLive=$isLive, duration=${playlistDuration.inSeconds}s, segments=${matches.length}');
+        
+        if (mounted) {
+          setState(() {
+            _playlistTotalDuration = playlistDuration;
+            // Use playlist duration as sync duration if it's larger
+            if (playlistDuration > _syncDuration) {
+              _syncDuration = playlistDuration;
+            }
+          });
+        }
+        
+        if (isLive) {
+          print('[MultiWatch] Detected live recording: $url');
+          if (mounted && !_isLiveRecording) {
+            setState(() {
+              _isLiveRecording = true;
+            });
+            _startLiveRecordingTimers();
+          }
+        }
+      }
+    } catch (e) {
+      print('[MultiWatch] Error checking playlist: $e');
+    }
+  }
+  
+  void _startLiveRecordingTimers() {
+    // Check every 5 seconds if we should seek to live edge (only if user wants to stay at live)
+    _liveCheckTimer?.cancel();
+    _liveCheckTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      // ONLY catch up if user explicitly wants to be at live edge
+      // Do NOT auto-seek if user has manually seeked away
+      if (mounted && _isAtLiveEdge && !_isSeeking && _syncDuration.inSeconds > 0) {
+        // If we're supposed to be at live edge but fell behind due to buffering, catch up
+        final behindSeconds = _syncDuration.inSeconds - _syncPosition.inSeconds;
+        if (behindSeconds > 15) {
+          print('[MultiWatch] At live edge but fell behind by $behindSeconds seconds, catching up...');
+          _seekToLiveEdge();
+        }
+      }
+    });
+    
+    // Periodically refresh playlist to get updated duration for live recordings
+    _playlistRefreshTimer?.cancel();
+    _playlistRefreshTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      if (!mounted || !_isLiveRecording) {
+        timer.cancel();
+        return;
+      }
+      
+      // Re-parse playlist to get new duration
+      for (final url in _recordingUrls.values) {
+        try {
+          final response = await http.get(Uri.parse(url));
+          if (response.statusCode == 200) {
+            final content = response.body;
+            
+            // Check if recording ended
+            if (content.contains('#EXT-X-ENDLIST')) {
+              print('[MultiWatch] Recording ended (ENDLIST found)');
+              setState(() {
+                _isLiveRecording = false;
+              });
+              timer.cancel();
+              return;
+            }
+            
+            // Parse new duration
+            double totalSeconds = 0;
+            final extinfRegex = RegExp(r'#EXTINF:(\d+\.?\d*)');
+            final matches = extinfRegex.allMatches(content);
+            for (final match in matches) {
+              final durationStr = match.group(1);
+              if (durationStr != null) {
+                totalSeconds += double.tryParse(durationStr) ?? 0;
+              }
+            }
+            
+            final newDuration = Duration(seconds: totalSeconds.toInt());
+            if (newDuration > _playlistTotalDuration) {
+              print('[MultiWatch] Playlist duration grew: ${_playlistTotalDuration.inSeconds}s -> ${newDuration.inSeconds}s');
+              setState(() {
+                _playlistTotalDuration = newDuration;
+                if (newDuration > _syncDuration) {
+                  _syncDuration = newDuration;
+                }
+              });
+              
+              // If at live edge, seek to new position
+              if (_isAtLiveEdge && !_isSeeking) {
+                Future.delayed(const Duration(milliseconds: 200), () {
+                  if (mounted && _isAtLiveEdge) {
+                    _seekToLiveEdge();
+                  }
+                });
+              }
+            }
+          }
+        } catch (e) {
+          print('[MultiWatch] Error refreshing playlist: $e');
+        }
+        break; // Only check first URL
+      }
+    });
+  }
+  
+  void _seekToLiveEdge() {
+    if (_syncDuration.inSeconds > 0) {
+      // Seek to 2 seconds before the end to be at live edge
+      final livePosition = Duration(seconds: _syncDuration.inSeconds - 2);
+      print('[MultiWatch] Seeking to live edge: $livePosition');
+      _seekAll(livePosition);
+      setState(() {
+        _isAtLiveEdge = true;
       });
     }
   }
@@ -208,8 +439,25 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   }
   
   // Seek all players to a specific position
-  void _seekAll(Duration position) {
+  void _seekAll(Duration position, {bool isUserSeek = false}) {
+    print('[MultiWatch] _seekAll called: position=$position, isUserSeek=$isUserSeek, duration=$_syncDuration');
     _isSeeking = true;
+    
+    // If user manually seeks backward in live mode, mark as not at live edge
+    if (isUserSeek && _isLiveRecording) {
+      final behindSeconds = _syncDuration.inSeconds - position.inSeconds;
+      if (behindSeconds > 5) {
+        print('[MultiWatch] User seeked away from live edge by $behindSeconds seconds');
+        setState(() {
+          _isAtLiveEdge = false;
+        });
+      } else {
+        setState(() {
+          _isAtLiveEdge = true;
+        });
+      }
+    }
+    
     for (final player in _players.values) {
       player.seek(position);
     }
@@ -228,7 +476,9 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
     final clampedPosition = newPosition < Duration.zero 
         ? Duration.zero 
         : (newPosition > _syncDuration ? _syncDuration : newPosition);
-    _seekAll(clampedPosition);
+    
+    print('[MultiWatch] _skipAll: $seconds seconds, new position: $clampedPosition');
+    _seekAll(clampedPosition, isUserSeek: true);
   }
   
   // Toggle play/pause for all players
@@ -255,6 +505,8 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   
   @override
   void dispose() {
+    _liveCheckTimer?.cancel();
+    _playlistRefreshTimer?.cancel();
     // Tüm player'ları temizle
     for (final player in _players.values) {
       player.dispose();
@@ -268,13 +520,63 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: Text('Toplu İzleme - ${DateFormat('dd/MM/yyyy').format(widget.selectedDate)}'),
+        title: Row(
+          children: [
+            Flexible(
+              child: Text(
+                'Toplu İzleme - ${DateFormat('dd/MM/yyyy').format(widget.selectedDate)}',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (_isLiveRecording) ...[
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _isAtLiveEdge ? Colors.red : Colors.orange,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.fiber_manual_record,
+                      size: 10,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _isAtLiveEdge ? 'CANLI' : 'GECİKMELİ',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
         automaticallyImplyLeading: true, // Sadece geri butonu göster
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
+          // Go to live edge button (only show when not at live edge in live mode)
+          if (_isLiveRecording && !_isAtLiveEdge)
+            TextButton.icon(
+              onPressed: () {
+                _seekToLiveEdge();
+              },
+              icon: const Icon(Icons.skip_next, color: Colors.red),
+              label: const Text(
+                'CANLIYA DÖN',
+                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.play_arrow),
             tooltip: 'Tümünü Oynat',
@@ -315,6 +617,9 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
         ? _syncPosition.inMilliseconds / _syncDuration.inMilliseconds
         : 0.0;
     
+    // For live recordings, use red colors when at live edge
+    final activeColor = (_isLiveRecording && _isAtLiveEdge) ? Colors.red : AppTheme.primaryOrange;
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -350,10 +655,10 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
                 Expanded(
                   child: SliderTheme(
                     data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: AppTheme.primaryOrange,
+                      activeTrackColor: activeColor,
                       inactiveTrackColor: Colors.grey[600],
-                      thumbColor: AppTheme.primaryOrange,
-                      overlayColor: AppTheme.primaryOrange.withOpacity(0.2),
+                      thumbColor: activeColor,
+                      overlayColor: activeColor.withOpacity(0.2),
                       trackHeight: 4,
                       thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
                     ),
@@ -363,20 +668,22 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
                         final newPosition = Duration(
                           milliseconds: (value * _syncDuration.inMilliseconds).round(),
                         );
-                        _seekAll(newPosition);
+                        print('[MultiWatch] Slider seek to: $newPosition');
+                        _seekAll(newPosition, isUserSeek: true);
                       },
                     ),
                   ),
                 ),
                 
                 const SizedBox(width: 8),
-                // Total duration
+                // Total duration or LIVE indicator
                 Text(
-                  _formatDuration(_syncDuration),
-                  style: const TextStyle(
-                    color: Colors.white,
+                  (_isLiveRecording && _isAtLiveEdge) ? 'CANLI' : _formatDuration(_syncDuration),
+                  style: TextStyle(
+                    color: (_isLiveRecording && _isAtLiveEdge) ? Colors.red : Colors.white,
                     fontSize: 12,
                     fontFamily: 'monospace',
+                    fontWeight: (_isLiveRecording && _isAtLiveEdge) ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
               ],
@@ -407,7 +714,7 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
                 // Play/Pause button
                 Container(
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryOrange,
+                    color: (_isLiveRecording && _isAtLiveEdge) ? Colors.red : AppTheme.primaryOrange,
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
@@ -430,12 +737,19 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
                   onPressed: () => _skipAll(10),
                 ),
                 
-                // Skip forward 30s
-                IconButton(
-                  icon: const Icon(Icons.forward_30, color: Colors.white, size: 28),
-                  tooltip: '30 saniye ileri',
-                  onPressed: () => _skipAll(30),
-                ),
+                // Skip forward 30s / Go to live button
+                if (_isLiveRecording && !_isAtLiveEdge)
+                  IconButton(
+                    icon: const Icon(Icons.skip_next, color: Colors.red, size: 28),
+                    tooltip: 'Canlıya Dön',
+                    onPressed: _seekToLiveEdge,
+                  )
+                else
+                  IconButton(
+                    icon: const Icon(Icons.forward_30, color: Colors.white, size: 28),
+                    tooltip: '30 saniye ileri',
+                    onPressed: () => _skipAll(30),
+                  ),
               ],
             ),
           ],
@@ -739,6 +1053,8 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
                   child: VideoControls(
                     player: player,
                     showFullScreenButton: false,
+                    isLiveStream: _isLiveRecording,
+                    playlistDuration: _playlistTotalDuration,
                   ),
                 ),
               ],

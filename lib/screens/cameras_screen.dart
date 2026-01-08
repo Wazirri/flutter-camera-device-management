@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/camera_device.dart';
 import '../widgets/camera_grid_item.dart';
+import '../widgets/camera_snapshot_widget.dart';
 import '../providers/camera_devices_provider.dart';
 import '../providers/websocket_provider.dart';
 import '../providers/user_group_provider.dart';
@@ -718,18 +719,15 @@ class _CamerasScreenState extends State<CamerasScreen>
                                               color: Colors.grey,
                                             )
                                           : camera.mainSnapShot.isNotEmpty
-                                              ? Image.network(
-                                                  camera.mainSnapShot,
+                                              ? CameraSnapshotWidget(
+                                                  snapshotUrl: camera.mainSnapShot,
+                                                  cameraId: camera.mac,
+                                                  width: double.infinity,
+                                                  height: double.infinity,
                                                   fit: BoxFit.cover,
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return const Icon(
-                                                      Icons
-                                                          .broken_image_outlined,
-                                                      size: 36.0,
-                                                      color: Colors.white54,
-                                                    );
-                                                  },
+                                                  showRefreshButton: false,
+                                                  username: camera.username,
+                                                  password: camera.password,
                                                 )
                                               : const Icon(
                                                   Icons.videocam_off,
@@ -1284,19 +1282,15 @@ class CameraSearchDelegate extends SearchDelegate<Camera> {
               borderRadius: BorderRadius.circular(4),
             ),
             child: camera.mainSnapShot.isNotEmpty
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: Image.network(
-                      camera.mainSnapShot,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(
-                          Icons.broken_image_outlined,
-                          size: 24.0,
-                          color: Colors.white54,
-                        );
-                      },
-                    ),
+                ? CameraSnapshotWidget(
+                    snapshotUrl: camera.mainSnapShot,
+                    cameraId: camera.mac,
+                    width: 48,
+                    height: 48,
+                    fit: BoxFit.cover,
+                    showRefreshButton: false,
+                    username: camera.username,
+                    password: camera.password,
                   )
                 : const Icon(
                     Icons.videocam_off,

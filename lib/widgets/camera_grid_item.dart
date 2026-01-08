@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
 import '../providers/camera_devices_provider.dart';
 import '../providers/websocket_provider.dart';
+import 'camera_snapshot_widget.dart';
 
 class CameraGridItem extends StatelessWidget {
   final Camera camera;
@@ -81,18 +82,15 @@ class CameraGridItem extends StatelessWidget {
                         camera.isPlaceholder ? Colors.grey[800] : Colors.black,
                     child: _hasMacAddress(camera)
                         ? camera.mainSnapShot.isNotEmpty
-                            ? Image.network(
-                                camera.mainSnapShot,
+                            ? CameraSnapshotWidget(
+                                snapshotUrl: camera.mainSnapShot,
+                                cameraId: camera.mac,
+                                username: camera.username,
+                                password: camera.password,
+                                width: double.infinity,
+                                height: double.infinity,
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Center(
-                                    child: Icon(
-                                      Icons.broken_image_outlined,
-                                      size: 48.0,
-                                      color: Colors.white54,
-                                    ),
-                                  );
-                                },
+                                showRefreshButton: false,
                               )
                             : const Center(
                                 child: Icon(

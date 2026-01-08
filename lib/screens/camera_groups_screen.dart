@@ -7,6 +7,7 @@ import '../providers/camera_devices_provider.dart';
 import '../providers/user_group_provider.dart';
 import '../providers/websocket_provider.dart';
 import '../theme/app_theme.dart';
+import '../widgets/camera_snapshot_widget.dart';
 import 'live_view_screen.dart';
 import 'multi_recordings_screen.dart';
 
@@ -367,16 +368,15 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
                                             color: Colors.grey,
                                           )
                                         : camera.mainSnapShot.isNotEmpty
-                                            ? Image.network(
-                                                camera.mainSnapShot,
+                                            ? CameraSnapshotWidget(
+                                                snapshotUrl: camera.mainSnapShot,
+                                                cameraId: camera.mac,
+                                                width: double.infinity,
+                                                height: double.infinity,
                                                 fit: BoxFit.cover,
-                                                errorBuilder: (context, error, stackTrace) {
-                                                  return const Icon(
-                                                    Icons.broken_image_outlined,
-                                                    size: 36.0,
-                                                    color: Colors.white54,
-                                                  );
-                                                },
+                                                showRefreshButton: false,
+                                                username: camera.username,
+                                                password: camera.password,
                                               )
                                             : const Icon(
                                                 Icons.videocam_off,

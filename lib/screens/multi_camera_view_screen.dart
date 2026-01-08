@@ -788,6 +788,7 @@ class _CameraGridViewState extends State<CameraGridView> {
   final Map<int, VideoController> _controllers = {};
   final Map<int, bool> _loadingStates = {};
   final Map<int, bool> _errorStates = {};
+  final Map<int, String> _errorMessages = {}; // Error messages per position
   
   @override
   void initState() {
@@ -809,12 +810,14 @@ class _CameraGridViewState extends State<CameraGridView> {
   void _initializePlayers() {
     // Create players for each camera location
     for (final location in widget.layout.cameraLoc) {
-      // Initialize loading and error states
+      // Initialize loading, error states and messages
       _loadingStates[location.cameraCode] = false;
       _errorStates[location.cameraCode] = false;
+      _errorMessages[location.cameraCode] = '';
       
       // Create a player for this location
       final player = Player();
+      
       _players[location.cameraCode] = player;
       _controllers[location.cameraCode] = VideoController(player);
       
@@ -831,6 +834,7 @@ class _CameraGridViewState extends State<CameraGridView> {
         if (mounted) {
           setState(() {
             _errorStates[location.cameraCode] = true;
+            _errorMessages[location.cameraCode] = 'Stream hatası: $error';
             _loadingStates[location.cameraCode] = false;
           });
           print('Player error at position ${location.cameraCode}: $error');
@@ -871,6 +875,7 @@ class _CameraGridViewState extends State<CameraGridView> {
     
     setState(() {
       _errorStates[positionCode] = false;
+      _errorMessages[positionCode] = '';
       _loadingStates[positionCode] = true;
     });
     
@@ -878,6 +883,7 @@ class _CameraGridViewState extends State<CameraGridView> {
     
     // Check if camera has RTSP URL
     if (camera.rtspUri.isNotEmpty) {
+      print('[MultiCameraView] Position $positionCode: Loading RTSP stream: ${camera.rtspUri}');
       try {
         // Only open if player is not already playing this stream
         if (player.state.playlist.medias.isEmpty || 
@@ -887,20 +893,24 @@ class _CameraGridViewState extends State<CameraGridView> {
           player.stop();
           // Open new stream
           player.open(Media(camera.rtspUri));
+          print('[MultiCameraView] Position $positionCode: Stream opened successfully');
         }
       } catch (e) {
-        print('Error opening stream for camera ${camera.name} at position $positionCode: $e');
+        print('[MultiCameraView] Position $positionCode: Error opening stream for camera ${camera.name}: $e');
         if (mounted) {
           setState(() {
             _errorStates[positionCode] = true;
+            _errorMessages[positionCode] = 'Bağlantı hatası: $e';
             _loadingStates[positionCode] = false;
           });
         }
       }
     } else {
       // No valid stream URL
+      print('[MultiCameraView] Position $positionCode: No RTSP URL for camera ${camera.name}');
       setState(() {
         _errorStates[positionCode] = true;
+        _errorMessages[positionCode] = 'RTSP URL bulunamadı';
         _loadingStates[positionCode] = false;
       });
     }
@@ -982,12 +992,13 @@ class _CameraGridViewState extends State<CameraGridView> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Video player
+        // Video player - no controls for live RTSP stream
         ClipRect(
           child: RepaintBoundary(
             child: Video(
               controller: _controllers[positionCode]!,
               fit: BoxFit.cover,
+              controls: null, // No controls for live RTSP
             ),
           ),
         ),
@@ -998,19 +1009,27 @@ class _CameraGridViewState extends State<CameraGridView> {
             child: CircularProgressIndicator(),
           ),
         
-        // Error indicator
+        // Error indicator with message
         if (_errorStates[positionCode] == true)
-          const Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.error_outline, color: Colors.red, size: 32),
-                SizedBox(height: 8),
-                Text(
-                  'Stream Error',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ],
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.videocam_off, color: Colors.red, size: 32),
+                  const SizedBox(height: 8),
+                  Text(
+                    _errorMessages[positionCode]?.isNotEmpty == true 
+                        ? _errorMessages[positionCode]! 
+                        : 'Stream Hatası',
+                    style: const TextStyle(color: Colors.red, fontSize: 11),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
           ),
         
@@ -1038,22 +1057,49 @@ class _CameraGridViewState extends State<CameraGridView> {
         Positioned(
           bottom: 4,
           right: 4,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: camera.recording
-                  ? Colors.red.withOpacity(0.7)
-                  : Colors.green.withOpacity(0.7),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              camera.recording ? 'REC' : 'LIVE',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (camera.recording)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  margin: const EdgeInsets.only(right: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.fiber_manual_record, color: Colors.white, size: 8),
+                      SizedBox(width: 2),
+                      Text(
+                        'REC',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'LIVE',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ],

@@ -27,6 +27,7 @@ dependencies:
   media_kit_libs_windows_video: ^1.0.9       # Windows package
   path_provider: ^2.1.5
   permission_handler: ^11.3.1
+  http_auth: ^1.0.4  # For HTTP Digest Authentication
   # Video player with FVP support from pub.dev
   video_player: ^2.6.1
   fvp: ^0.32.1

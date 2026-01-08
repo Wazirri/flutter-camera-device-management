@@ -102,12 +102,19 @@ class _VideoControlsState extends State<VideoControls> {
 
   @override
   Widget build(BuildContext context) {
-    // For live streams, use player's actual duration (what's seekable)
-    // For VOD, use playlist duration if available
-    final effectiveDuration = _duration;
+    // For live streams with playlist duration, use the larger of:
+    // - Player's duration (what's currently loaded/seekable)
+    // - Playlist duration (total content available)
+    Duration effectiveDuration;
+    if (widget.isLiveStream && widget.playlistDuration != null && widget.playlistDuration! > Duration.zero) {
+      // Use playlist duration if it's larger than what player reports
+      effectiveDuration = widget.playlistDuration! > _duration ? widget.playlistDuration! : _duration;
+      print('[VideoControls] Live stream - player: ${_duration.inSeconds}s, playlist: ${widget.playlistDuration!.inSeconds}s, using: ${effectiveDuration.inSeconds}s');
+    } else {
+      effectiveDuration = _duration;
+    }
 
-    // For live streams, just use player's position directly
-    // The offset calculation was causing seek issues
+    // Position is always what the player reports
     Duration effectivePosition = _position;
     Duration positionOffset = Duration.zero;
 

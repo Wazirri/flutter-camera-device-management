@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
@@ -120,6 +121,10 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                         name: 'Recording',
                         value: camera.recording ? 'Yes' : 'No'),
                     DetailItem(name: 'Last Seen', value: camera.lastSeenAt),
+                    DetailItem(
+                        name: 'ONVIF Status',
+                        value: camera.onvifConnected ? 'Bağlı' : 'Bağlı Değil'),
+                    DetailItem(name: 'Last ONVIF Seen', value: camera.lastOnvifSeen),
                   ],
                 ),
                 _buildDetailGroup(
@@ -449,6 +454,25 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                           ),
                         ),
                       ),
+                      // Copy button
+                      if (detail.value.isNotEmpty && detail.value != '-')
+                        IconButton(
+                          icon: const Icon(Icons.copy, size: 18),
+                          color: Colors.grey,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          tooltip: 'Kopyala',
+                          onPressed: () {
+                            Clipboard.setData(ClipboardData(text: detail.value));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${detail.name} kopyalandı'),
+                                duration: const Duration(seconds: 1),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          },
+                        ),
                     ],
                   ),
                 );

@@ -53,8 +53,14 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
             onPressed: () {
               final provider = Provider.of<MultiCameraViewProvider>(context, listen: false);
               
-              // Apply changes to the provider
+              // First, set the active page to the selected page
+              provider.setActivePage(_selectedPageIndex);
+              
+              // Then apply the layout change to that page
               provider.setActivePageLayout(_selectedLayoutCode);
+              
+              // Save assignments to persistent storage
+              provider.saveCurrentStateAsDefault();
               
               // Return to previous screen
               Navigator.pop(context);

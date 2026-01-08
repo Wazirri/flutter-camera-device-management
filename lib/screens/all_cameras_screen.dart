@@ -1,274 +1,13 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import '../models/camera_device.dart';
 import '../providers/camera_devices_provider.dart';
 import '../providers/websocket_provider.dart';
 import '../providers/user_group_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/camera_details_bottom_sheet.dart';
+import '../widgets/camera_snapshot_widget.dart';
 import 'live_view_screen.dart';
-
-// Snapshot cache manager for efficient memory usage
-class SnapshotCacheManager {
-  static final SnapshotCacheManager _instance =
-      SnapshotCacheManager._internal();
-  factory SnapshotCacheManager() => _instance;
-  SnapshotCacheManager._internal();
-
-  // Cache with max size limit
-  final Map<String, Uint8List> _cache = {};
-  final Map<String, DateTime> _cacheTimestamps = {};
-  static const int maxCacheSize = 100; // Keep max 100 snapshots in memory
-  static const Duration cacheExpiry = Duration(minutes: 5);
-
-  Uint8List? get(String url) {
-    final timestamp = _cacheTimestamps[url];
-    if (timestamp != null &&
-        DateTime.now().difference(timestamp) > cacheExpiry) {
-      _cache.remove(url);
-      _cacheTimestamps.remove(url);
-      return null;
-    }
-    return _cache[url];
-  }
-
-  void set(String url, Uint8List data) {
-    // Remove oldest entries if cache is full
-    if (_cache.length >= maxCacheSize) {
-      final oldestUrl = _cacheTimestamps.entries
-          .reduce((a, b) => a.value.isBefore(b.value) ? a : b)
-          .key;
-      _cache.remove(oldestUrl);
-      _cacheTimestamps.remove(oldestUrl);
-    }
-    _cache[url] = data;
-    _cacheTimestamps[url] = DateTime.now();
-  }
-
-  void clear() {
-    _cache.clear();
-    _cacheTimestamps.clear();
-  }
-}
-
-// Async snapshot loader widget
-class CameraSnapshotWidget extends StatefulWidget {
-  final String snapshotUrl;
-  final double width;
-  final double height;
-  final BoxFit fit;
-  final String cameraId;
-  final bool showRefreshButton;
-  final String? username;
-  final String? password;
-
-  const CameraSnapshotWidget({
-    Key? key,
-    required this.snapshotUrl,
-    required this.cameraId,
-    this.width = double.infinity,
-    this.height = 120,
-    this.fit = BoxFit.cover,
-    this.showRefreshButton = true,
-    this.username,
-    this.password,
-  }) : super(key: key);
-
-  @override
-  State<CameraSnapshotWidget> createState() => _CameraSnapshotWidgetState();
-}
-
-class _CameraSnapshotWidgetState extends State<CameraSnapshotWidget> {
-  Uint8List? _imageData;
-  bool _isLoading = true;
-  bool _hasError = false;
-  static final _cacheManager = SnapshotCacheManager();
-
-  // Throttle concurrent requests
-  static int _activeRequests = 0;
-  static const int _maxConcurrentRequests = 10;
-  static final List<VoidCallback> _pendingRequests = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSnapshot();
-  }
-
-  @override
-  void didUpdateWidget(CameraSnapshotWidget oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.snapshotUrl != widget.snapshotUrl) {
-      _loadSnapshot();
-    }
-  }
-
-  Future<void> _loadSnapshot() async {
-    if (widget.snapshotUrl.isEmpty) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _hasError = true;
-        });
-      }
-      return;
-    }
-
-    // Check cache first
-    final cached = _cacheManager.get(widget.snapshotUrl);
-    if (cached != null) {
-      if (mounted) {
-        setState(() {
-          _imageData = cached;
-          _isLoading = false;
-          _hasError = false;
-        });
-      }
-      return;
-    }
-
-    // Throttle requests
-    if (_activeRequests >= _maxConcurrentRequests) {
-      _pendingRequests.add(_loadSnapshot);
-      return;
-    }
-
-    _activeRequests++;
-
-    try {
-      // Prepare headers with Basic Auth if credentials provided
-      final headers = <String, String>{};
-      if (widget.username != null && widget.username!.isNotEmpty) {
-        final credentials = base64Encode(
-            utf8.encode('${widget.username}:${widget.password ?? ""}'));
-        headers['Authorization'] = 'Basic $credentials';
-      }
-
-      final response = await http
-          .get(
-            Uri.parse(widget.snapshotUrl),
-            headers: headers.isNotEmpty ? headers : null,
-          )
-          .timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200 && mounted) {
-        final data = response.bodyBytes;
-        _cacheManager.set(widget.snapshotUrl, data);
-        setState(() {
-          _imageData = data;
-          _isLoading = false;
-          _hasError = false;
-        });
-      } else if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _hasError = true;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _hasError = true;
-        });
-      }
-    } finally {
-      _activeRequests--;
-      // Process pending requests
-      if (_pendingRequests.isNotEmpty) {
-        final next = _pendingRequests.removeAt(0);
-        Future.microtask(next);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: widget.width,
-        height: widget.height,
-        decoration: BoxDecoration(
-          color: Colors.grey.shade900,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: _buildContent(),
-      ),
-    );
-  }
-
-  Widget _buildContent() {
-    if (_isLoading) {
-      return Center(
-        child: SizedBox(
-          width: widget.height < 60 ? 16 : 24,
-          height: widget.height < 60 ? 16 : 24,
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              AppTheme.primaryOrange.withOpacity(0.7),
-            ),
-          ),
-        ),
-      );
-    }
-
-    if (_hasError || _imageData == null) {
-      return Center(
-        child: Icon(
-          Icons.videocam_off,
-          size: widget.height < 60 ? 20 : 32,
-          color: Colors.grey.shade600,
-        ),
-      );
-    }
-
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Image.memory(
-          _imageData!,
-          fit: widget.fit,
-          gaplessPlayback: true,
-        ),
-        // Refresh button overlay (only if enabled)
-        if (widget.showRefreshButton)
-          Positioned(
-            right: 4,
-            top: 4,
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  _isLoading = true;
-                  _hasError = false;
-                });
-                _cacheManager._cache.remove(widget.snapshotUrl);
-                _cacheManager._cacheTimestamps.remove(widget.snapshotUrl);
-                _loadSnapshot();
-              },
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.black54,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Icon(
-                  Icons.refresh,
-                  size: 16,
-                  color: Colors.white70,
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
 
 class AllCamerasScreen extends StatefulWidget {
   const AllCamerasScreen({Key? key}) : super(key: key);
@@ -1435,6 +1174,16 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                     ),
                   ),
 
+                  // ONVIF Status
+                  Expanded(
+                    child: _buildDetailItem(
+                      icon: camera.onvifConnected ? Icons.link : Icons.link_off,
+                      label: 'ONVIF',
+                      value: camera.onvifConnected ? 'Bağlı' : 'Bağlı Değil',
+                      valueColor: camera.onvifConnected ? Colors.green : Colors.grey,
+                    ),
+                  ),
+
                   // Port
                   Expanded(
                     child: _buildDetailItem(
@@ -1445,6 +1194,22 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                   ),
                 ],
               ),
+
+              // Last ONVIF Seen Row
+              if (camera.lastOnvifSeen.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildDetailItem(
+                        icon: Icons.schedule,
+                        label: 'Son ONVIF',
+                        value: camera.lastOnvifSeen,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
 
               const SizedBox(height: 16),
 
@@ -1520,6 +1285,107 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                     },
                   ),
                   const SizedBox(width: 8),
+                  // Distribute count control
+                  Consumer2<CameraDevicesProviderOptimized,
+                      WebSocketProviderOptimized>(
+                    builder:
+                        (context, cameraProvider, websocketProvider, child) {
+                      // Check for parameter_set result
+                      final paramResult = websocketProvider.consumeLastParameterSetResult();
+                      if (paramResult != null && context.mounted) {
+                        // Show snackbar asynchronously
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (context.mounted) {
+                            final isSuccess = paramResult['success'] == true;
+                            final message = paramResult['message'] ?? '';
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(message),
+                                backgroundColor: isSuccess ? Colors.green : Colors.red,
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        });
+                      }
+                      
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade800,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade600),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'Cihaz:',
+                              style: TextStyle(fontSize: 11, color: Colors.grey),
+                            ),
+                            const SizedBox(width: 4),
+                            InkWell(
+                              onTap: camera.distributeCount > 1 ? () async {
+                                final newCount = camera.distributeCount - 1;
+                                final success = await websocketProvider
+                                    .setCameraDistributeCount(camera.mac, newCount);
+                                if (success) {
+                                  final updatedCamera = camera.copyWith(distributeCount: newCount);
+                                  cameraProvider.updateCamera(updatedCamera);
+                                }
+                              } : null,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: camera.distributeCount > 1 
+                                      ? Colors.blue.shade700 
+                                      : Colors.grey.shade700,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Icon(
+                                  Icons.remove, 
+                                  size: 14, 
+                                  color: camera.distributeCount > 1 
+                                      ? Colors.white 
+                                      : Colors.grey,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${camera.distributeCount}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            InkWell(
+                              onTap: () async {
+                                final newCount = camera.distributeCount + 1;
+                                final success = await websocketProvider
+                                    .setCameraDistributeCount(camera.mac, newCount);
+                                if (success) {
+                                  final updatedCamera = camera.copyWith(distributeCount: newCount);
+                                  cameraProvider.updateCamera(updatedCamera);
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade700,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Icon(Icons.add, size: 14, color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const Spacer(),
                   Expanded(
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.play_circle_outline, size: 18),
@@ -1907,6 +1773,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
     required String value,
     String? badge,
     Color? badgeColor,
+    Color? valueColor,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1930,10 +1797,10 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
             Flexible(
               child: Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                  color: valueColor ?? Colors.white,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),

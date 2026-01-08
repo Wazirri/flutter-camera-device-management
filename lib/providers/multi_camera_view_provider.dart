@@ -56,6 +56,9 @@ class MultiCameraViewProvider with ChangeNotifier {
     // Load saved presets from shared preferences
     _loadSavedPresets();
     
+    // Load saved state (page layouts and camera assignments)
+    _loadSavedState();
+    
     // Auto-load configuration if available
     _autoLoadConfigurationOnStart();
   }
@@ -131,6 +134,75 @@ class MultiCameraViewProvider with ChangeNotifier {
       print('Saved ${_savedPresets.length} presets to shared preferences');
     } catch (e) {
       print('Error saving presets to shared preferences: $e');
+    }
+  }
+  
+  // Save current state (page layouts and camera assignments) to persistent storage
+  Future<void> saveCurrentStateAsDefault() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Save page layouts
+      await prefs.setString('_pageLayouts', jsonEncode(_pageLayouts));
+      
+      // Save camera assignments - convert Map<int, Map<int, int>> to JSON-serializable format
+      final Map<String, Map<String, int>> serializableAssignments = {};
+      _cameraAssignments.forEach((pageIndex, assignments) {
+        final Map<String, int> stringKeyAssignments = {};
+        assignments.forEach((position, cameraIndex) {
+          stringKeyAssignments[position.toString()] = cameraIndex;
+        });
+        serializableAssignments[pageIndex.toString()] = stringKeyAssignments;
+      });
+      await prefs.setString('_cameraAssignments', jsonEncode(serializableAssignments));
+      
+      // Save active page index
+      await prefs.setInt('_activePageIndex', _activePageIndex);
+      
+      print('Saved current state: ${_pageLayouts.length} pages, ${_cameraAssignments.length} assignment maps');
+    } catch (e) {
+      print('Error saving current state: $e');
+    }
+  }
+  
+  // Load saved state from persistent storage
+  Future<void> _loadSavedState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Load page layouts
+      final String? pageLayoutsJson = prefs.getString('_pageLayouts');
+      if (pageLayoutsJson != null) {
+        final List<dynamic> decoded = jsonDecode(pageLayoutsJson);
+        _pageLayouts = decoded.map((e) => e as int).toList();
+        print('Loaded ${_pageLayouts.length} page layouts');
+      }
+      
+      // Load camera assignments
+      final String? assignmentsJson = prefs.getString('_cameraAssignments');
+      if (assignmentsJson != null) {
+        final Map<String, dynamic> decoded = jsonDecode(assignmentsJson);
+        _cameraAssignments.clear();
+        decoded.forEach((pageKey, assignments) {
+          final int pageIndex = int.parse(pageKey);
+          final Map<int, int> intKeyAssignments = {};
+          (assignments as Map<String, dynamic>).forEach((posKey, cameraIndex) {
+            intKeyAssignments[int.parse(posKey)] = cameraIndex as int;
+          });
+          _cameraAssignments[pageIndex] = intKeyAssignments;
+        });
+        print('Loaded ${_cameraAssignments.length} assignment maps');
+      }
+      
+      // Load active page index
+      final int? savedPageIndex = prefs.getInt('_activePageIndex');
+      if (savedPageIndex != null && savedPageIndex < _pageLayouts.length) {
+        _activePageIndex = savedPageIndex;
+      }
+      
+      notifyListeners();
+    } catch (e) {
+      print('Error loading saved state: $e');
     }
   }
 

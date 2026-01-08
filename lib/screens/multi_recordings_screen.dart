@@ -766,6 +766,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
             final mkvRegExp = RegExp(r'<a href="([^"]+\.mkv)"');
             final m3u8RegExp = RegExp(r'<a href="([^"]+\.m3u8)"');
             final mp4RegExp = RegExp(r'<a href="([^"]+\.mp4)"');
+            final tsRegExp = RegExp(r'<a href="([^"]+\.ts)"');
+            final timeFolderRegExp = RegExp(r'<a href="(\d{2}-\d{2}-\d{2})/"');
 
             final mkvRecordings =
                 mkvRegExp.allMatches(dateHtml).map((m) => m.group(1)!).toList();
@@ -775,11 +777,19 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
                 .toList();
             final mp4Recordings =
                 mp4RegExp.allMatches(dateHtml).map((m) => m.group(1)!).toList();
+            final tsRecordings =
+                tsRegExp.allMatches(dateHtml).map((m) => m.group(1)!).toList();
+            final timeFolderRecordings = timeFolderRegExp
+                .allMatches(dateHtml)
+                .map((m) => '${m.group(1)}/')
+                .toList();
 
             final newRecordings = [
               ...mkvRecordings,
               ...m3u8Recordings,
-              ...mp4Recordings
+              ...mp4Recordings,
+              ...tsRecordings,
+              ...timeFolderRecordings,
             ];
             final existingRecordings =
                 _cameraDeviceRecordings[camera]?[deviceMac] ?? [];
@@ -836,6 +846,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
             final mkvRegExp = RegExp(r'<a href="([^"]+\.mkv)"');
             final m3u8RegExp = RegExp(r'<a href="([^"]+\.m3u8)"');
             final mp4RegExp = RegExp(r'<a href="([^"]+\.mp4)"');
+            final tsRegExp = RegExp(r'<a href="([^"]+\.ts)"');
+            final timeFolderRegExp = RegExp(r'<a href="(\d{2}-\d{2}-\d{2})/"');
 
             final mkvRecordings =
                 mkvRegExp.allMatches(dateHtml).map((m) => m.group(1)!).toList();
@@ -845,11 +857,19 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
                 .toList();
             final mp4Recordings =
                 mp4RegExp.allMatches(dateHtml).map((m) => m.group(1)!).toList();
+            final tsRecordings =
+                tsRegExp.allMatches(dateHtml).map((m) => m.group(1)!).toList();
+            final timeFolderRecordings = timeFolderRegExp
+                .allMatches(dateHtml)
+                .map((m) => '${m.group(1)}/')
+                .toList();
 
             final newRecordings = [
               ...mkvRecordings,
               ...m3u8Recordings,
-              ...mp4Recordings
+              ...mp4Recordings,
+              ...tsRecordings,
+              ...timeFolderRecordings,
             ];
             final existingRecordings = _cameraRecordings[camera] ?? [];
 
@@ -1093,17 +1113,29 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
             final mp4RegExp = RegExp(r'<a href="([^"]+\.mp4)"');
             final mp4Matches = mp4RegExp.allMatches(html);
             final mp4Recordings = mp4Matches.map((m) => m.group(1)!).toList();
+            
+            // TS dosyalarını bul
+            final tsRegExp = RegExp(r'<a href="([^"]+\.ts)"');
+            final tsMatches = tsRegExp.allMatches(html);
+            final tsRecordings = tsMatches.map((m) => m.group(1)!).toList();
+            
+            // Zaman klasörlerini bul (format: HH-MM-SS/) - bu da kayıt olarak sayılır
+            final timeFolderRegExp = RegExp(r'<a href="(\d{2}-\d{2}-\d{2})/"');
+            final timeFolderMatches = timeFolderRegExp.allMatches(html);
+            final timeFolderRecordings = timeFolderMatches.map((m) => '${m.group(1)}/').toList();
 
             // Tüm kayıtları birleştir
             final allRecordings = [
               ...mkvRecordings,
               ...m3u8Recordings,
-              ...mp4Recordings
+              ...mp4Recordings,
+              ...tsRecordings,
+              ...timeFolderRecordings,
             ];
 
             print(
-                '[MultiRecordings] Found ${mkvRecordings.length} MKV, ${m3u8Recordings.length} M3U8, and ${mp4Recordings.length} MP4 recordings for ${camera.name}');
-            print('[MultiRecordings] Total recordings: $allRecordings');
+                '[MultiRecordings] Found ${mkvRecordings.length} MKV, ${m3u8Recordings.length} M3U8, ${mp4Recordings.length} MP4, ${tsRecordings.length} TS, ${timeFolderRecordings.length} time folders for ${camera.name}');
+            print('[MultiRecordings] Total recordings: ${allRecordings.length}');
 
             if (mounted) {
               setState(() {
@@ -1193,11 +1225,23 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
             final mp4RegExp = RegExp(r'<a href="([^"]+\.mp4)"');
             final mp4Matches = mp4RegExp.allMatches(html);
             final mp4Recordings = mp4Matches.map((m) => m.group(1)!).toList();
+            
+            // TS dosyalarını bul
+            final tsRegExp = RegExp(r'<a href="([^"]+\.ts)"');
+            final tsMatches = tsRegExp.allMatches(html);
+            final tsRecordings = tsMatches.map((m) => m.group(1)!).toList();
+            
+            // Zaman klasörlerini bul (format: HH-MM-SS/) - bu da kayıt olarak sayılır
+            final timeFolderRegExp = RegExp(r'<a href="(\d{2}-\d{2}-\d{2})/"');
+            final timeFolderMatches = timeFolderRegExp.allMatches(html);
+            final timeFolderRecordings = timeFolderMatches.map((m) => '${m.group(1)}/').toList();
 
             final allRecordings = [
               ...mkvRecordings,
               ...m3u8Recordings,
-              ...mp4Recordings
+              ...mp4Recordings,
+              ...tsRecordings,
+              ...timeFolderRecordings,
             ];
 
             print(
@@ -3719,18 +3763,21 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
     // This allows proper handling of growing playlists without #EXT-X-ENDLIST
     if (_popupPlayer.platform is NativePlayer) {
       final nativePlayer = _popupPlayer.platform as NativePlayer;
-      // Force demuxer to not cache playlist (reload for new segments)
-      nativePlayer.setProperty('demuxer-max-bytes', '150MiB');
-      nativePlayer.setProperty('demuxer-max-back-bytes', '100MiB');
+      // Large demuxer buffer for full HLS playlist caching
+      nativePlayer.setProperty('demuxer-max-bytes', '500MiB');
+      nativePlayer.setProperty('demuxer-max-back-bytes', '400MiB'); // Allow seeking back
       // Cache settings for seeking
       nativePlayer.setProperty('cache', 'yes');
-      nativePlayer.setProperty('cache-secs', '3600'); // 1 hour cache
+      nativePlayer.setProperty('cache-secs', '7200'); // 2 hour cache
+      nativePlayer.setProperty('demuxer-seekable-cache', 'yes'); // Enable seeking in cached content
       // HLS specific options
       nativePlayer.setProperty('hls-bitrate', 'max');
-      // Force stream to be seekable
+      // Force stream to be seekable even without ENDLIST
       nativePlayer.setProperty('force-seekable', 'yes');
-      // Reload playlist more frequently for EVENT streams
-      nativePlayer.setProperty('demuxer-lavf-o', 'live_start_index=-1');
+      // Start from the beginning of playlist, not live edge
+      nativePlayer.setProperty('demuxer-lavf-o', 'live_start_index=0');
+      // Prefetch the entire playlist
+      nativePlayer.setProperty('prefetch-playlist', 'yes');
     }
 
     _popupController = VideoController(_popupPlayer);
@@ -3754,11 +3801,15 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
       }
     });
 
-    // Load and play the video
-    _loadVideo();
+    // First check if this is a live HLS stream, then load video
+    _initializePlayer();
+  }
 
-    // Check if this is a live HLS stream (no ENDLIST)
-    _checkIfLiveStream();
+  Future<void> _initializePlayer() async {
+    // First check if this is a live stream (sets _isLiveStream and _playlistDuration)
+    await _checkIfLiveStream();
+    // Then load the video (will use _isLiveStream and _playlistDuration for seek)
+    _loadVideo();
   }
 
   Future<void> _checkIfLiveStream() async {
@@ -3847,14 +3898,17 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
         print('[VideoPlayerPopup] Player log: $log');
       });
 
-      // If we have a seek time, wait for the video to be ready and then seek
-      if (widget.seekTime != null && widget.seekTime! > 0) {
-        print('[VideoPlayerPopup] Will seek to ${widget.seekTime} seconds');
+      // Track if we've done initial seek
+      bool initialSeekDone = false;
 
-        // Listen for when the video is ready to seek
-        _popupPlayer.stream.duration.listen((duration) {
-          if (duration != Duration.zero && mounted) {
-            // Video is ready, now we can seek
+      // Listen for duration changes
+      _popupPlayer.stream.duration.listen((duration) {
+        if (duration != Duration.zero && mounted) {
+          print('[VideoPlayerPopup] Duration received: $duration (${duration.inSeconds}s)');
+          
+          // If we have a specific seek time, use that
+          if (widget.seekTime != null && widget.seekTime! > 0 && !initialSeekDone) {
+            initialSeekDone = true;
             final seekDuration = Duration(seconds: widget.seekTime!);
             print('[VideoPlayerPopup] Video ready, seeking to: $seekDuration');
 
@@ -3866,8 +3920,22 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
               }
             });
           }
-        });
-      }
+          // For live streams without specific seek time, seek to live edge (end)
+          else if (_isLiveStream && !initialSeekDone && _playlistDuration.inSeconds > 0) {
+            initialSeekDone = true;
+            // Seek to near the end of playlist (live edge)
+            final liveEdge = Duration(seconds: _playlistDuration.inSeconds - 3);
+            print('[VideoPlayerPopup] Live stream detected, seeking to live edge: $liveEdge');
+            
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (mounted) {
+                _popupPlayer.seek(liveEdge);
+                print('[VideoPlayerPopup] Seeked to live edge: $liveEdge');
+              }
+            });
+          }
+        }
+      });
     } catch (e) {
       print('[VideoPlayerPopup] Error in _loadVideo: $e');
       setState(() {
