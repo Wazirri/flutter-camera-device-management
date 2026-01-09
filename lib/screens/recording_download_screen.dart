@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +38,16 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
   ConversionsResponse? _conversionsData;
   bool _isLoadingConversions = false;
   
+  // Pending conversion tracking
+  bool _isPendingConversion = false;
+  String _pendingConversionCamera = '';
+  String _pendingConversionStartTime = ''; // To match the correct conversion request
+  String _pendingConversionEndTime = '';   // To match the correct conversion request
+  String _pendingConversionStatus = '';
+  Timer? _conversionPollingTimer;
+  int _pollingAttempts = 0;
+  static const int _maxPollingAttempts = 30; // 30 * 10s = 5 minutes max
+  
   // Available formats
   final List<String> _formats = ['mp4', 'avi', 'mkv', 'mov'];
   
@@ -47,6 +58,122 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadConversions();
     });
+  }
+  
+  @override
+  void dispose() {
+    _conversionPollingTimer?.cancel();
+    super.dispose();
+  }
+  
+  // Start polling for conversion completion
+  void _startConversionPolling(String cameraName, String targetSlaveMac, String startTime, String endTime) {
+    // Cancel any existing timer
+    _conversionPollingTimer?.cancel();
+    _pollingAttempts = 0;
+    
+    setState(() {
+      _isPendingConversion = true;
+      _pendingConversionCamera = cameraName;
+      _pendingConversionStartTime = startTime;
+      _pendingConversionEndTime = endTime;
+      _pendingConversionStatus = 'Converting... (checking every 10 seconds)';
+    });
+    
+    print('[Conversions] Starting polling for $cameraName on device $targetSlaveMac (start: $startTime, end: $endTime)');
+    
+    // Poll every 10 seconds
+    _conversionPollingTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      _pollingAttempts++;
+      print('[Conversions] Polling attempt $_pollingAttempts/$_maxPollingAttempts for $cameraName');
+      
+      setState(() {
+        _pendingConversionStatus = 'Converting... (attempt $_pollingAttempts/$_maxPollingAttempts)';
+      });
+      
+      // Check if max attempts reached
+      if (_pollingAttempts >= _maxPollingAttempts) {
+        timer.cancel();
+        setState(() {
+          _isPendingConversion = false;
+          _pendingConversionStatus = '';
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Conversion timeout. Please check manually.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+        return;
+      }
+      
+      // Reload conversions to check status
+      await _loadConversions();
+      
+      // Check if the file is ready (file_path is not empty)
+      // We need to match by camera name AND start/end time to find the correct conversion
+      if (_conversionsData != null) {
+        for (final entry in _conversionsData!.data.entries) {
+          final deviceMac = entry.key;
+          final conversions = entry.value;
+          if (conversions != null && deviceMac == targetSlaveMac) {
+            for (final conversion in conversions) {
+              if (conversion.cameraName == cameraName) {
+                // Check if start/end times match (normalize the format for comparison)
+                // Server returns format like: 2026-01-09T01:15:00+03:00
+                // We sent format like: 2026-01-09_01-15-00
+                final serverStartNormalized = _normalizeTimeForComparison(conversion.startTime);
+                final serverEndNormalized = _normalizeTimeForComparison(conversion.endTime);
+                final requestStartNormalized = _normalizeTimeForComparison(startTime);
+                final requestEndNormalized = _normalizeTimeForComparison(endTime);
+                
+                print('[Conversions] Checking conversion: server($serverStartNormalized-$serverEndNormalized) vs request($requestStartNormalized-$requestEndNormalized)');
+                
+                if (serverStartNormalized == requestStartNormalized && serverEndNormalized == requestEndNormalized) {
+                  if (conversion.filePath.isNotEmpty) {
+                    // File is ready!
+                    timer.cancel();
+                    setState(() {
+                      _isPendingConversion = false;
+                      _pendingConversionStatus = '';
+                    });
+                    print('[Conversions] File ready for $cameraName: ${conversion.filePath}');
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('✅ Conversion complete for $cameraName! File is ready for download.'),
+                          backgroundColor: Colors.green,
+                          duration: const Duration(seconds: 5),
+                        ),
+                      );
+                    }
+                    // Refresh the list to show updated file path
+                    _loadConversions();
+                    return;
+                  } else {
+                    print('[Conversions] File not ready yet for $cameraName (file_path is empty)');
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  // Normalize time format for comparison (extract just the datetime part)
+  String _normalizeTimeForComparison(String time) {
+    // Handle server format: 2026-01-09T01:15:00+03:00 -> 2026-01-09_01-15-00
+    // Handle request format: 2026-01-09_01-15-00 -> 2026-01-09_01-15-00
+    String normalized = time
+        .replaceAll('T', '_')
+        .replaceAll(':', '-')
+        .split('+').first  // Remove timezone
+        .split('.').first; // Remove milliseconds if any
+    return normalized;
   }
   
   Future<void> _loadConversions() async {
@@ -128,6 +255,61 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Pending Conversion Indicator
+                  if (_isPendingConversion)
+                    Card(
+                      color: Colors.blue.shade50,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 3),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '⏳ Conversion in Progress',
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '$_pendingConversionCamera ($_pendingConversionStartTime → $_pendingConversionEndTime)',
+                                    style: Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                  Text(
+                                    _pendingConversionStatus,
+                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.cancel, color: Colors.red),
+                              onPressed: () {
+                                _conversionPollingTimer?.cancel();
+                                setState(() {
+                                  _isPendingConversion = false;
+                                  _pendingConversionStatus = '';
+                                });
+                              },
+                              tooltip: 'Cancel waiting',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  if (_isPendingConversion) const SizedBox(height: 12),
+                  
                   // Header
                   Card(
                     child: Padding(
@@ -491,12 +673,18 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
       );
       
       if (success) {
+        final cameraName = selectedCamera.name.isNotEmpty ? selectedCamera.name : selectedCamera.mac;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Conversion request sent successfully'),
+          SnackBar(
+            content: Text('Conversion request sent for $cameraName. Waiting for file to be ready...'),
             backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
           ),
         );
+        
+        // Start polling for conversion completion (pass start/end time for correct matching)
+        _startConversionPolling(cameraName, _selectedTargetSlaveMac!, startFormatted, endFormatted);
+        
         // Refresh conversions list
         _loadConversions();
       } else {

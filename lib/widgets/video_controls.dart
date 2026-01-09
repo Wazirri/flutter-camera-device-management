@@ -33,6 +33,14 @@ class _VideoControlsState extends State<VideoControls> {
   Duration _duration = Duration.zero;
   double _volume = 100;
   late final _subscription;
+  
+  // Slider dragging state to prevent seek while dragging
+  bool _isDragging = false;
+  double _dragValue = 0;
+  
+  // Throttle position updates to reduce setState calls during live playback
+  DateTime _lastPositionUpdate = DateTime.now();
+  static const _positionUpdateInterval = Duration(milliseconds: 500); // Update max 2 times per second
 
   @override
   void initState() {
@@ -41,36 +49,41 @@ class _VideoControlsState extends State<VideoControls> {
     // Initial values
     _updatePlaybackState();
 
-    // Set up listener for changes
+    // Set up listener for changes - only update if state actually changed
     _subscription = widget.player.stream.playing.listen((playing) {
-      if (mounted) {
+      if (mounted && playing != _playing) {
         setState(() {
           _playing = playing;
         });
       }
     });
 
-    // Listen to position changes
+    // Listen to position changes - throttled to reduce setState calls
     widget.player.stream.position.listen((position) {
-      if (mounted) {
-        setState(() {
-          _position = position;
-        });
+      if (mounted && !_isDragging) {
+        final now = DateTime.now();
+        // Only update if enough time has passed since last update
+        if (now.difference(_lastPositionUpdate) >= _positionUpdateInterval) {
+          _lastPositionUpdate = now;
+          setState(() {
+            _position = position;
+          });
+        }
       }
     });
 
-    // Listen to duration changes
+    // Listen to duration changes - only update if actually changed
     widget.player.stream.duration.listen((duration) {
-      if (mounted) {
+      if (mounted && duration != _duration) {
         setState(() {
           _duration = duration;
         });
       }
     });
 
-    // Listen to volume changes
+    // Listen to volume changes - only update if actually changed
     widget.player.stream.volume.listen((volume) {
-      if (mounted) {
+      if (mounted && volume != _volume) {
         setState(() {
           _volume = volume;
         });
@@ -109,13 +122,15 @@ class _VideoControlsState extends State<VideoControls> {
     if (widget.isLiveStream && widget.playlistDuration != null && widget.playlistDuration! > Duration.zero) {
       // Use playlist duration if it's larger than what player reports
       effectiveDuration = widget.playlistDuration! > _duration ? widget.playlistDuration! : _duration;
-      print('[VideoControls] Live stream - player: ${_duration.inSeconds}s, playlist: ${widget.playlistDuration!.inSeconds}s, using: ${effectiveDuration.inSeconds}s');
+      // Debug log removed for performance - was causing slowdown in live mode
     } else {
       effectiveDuration = _duration;
     }
 
-    // Position is always what the player reports
-    Duration effectivePosition = _position;
+    // Position is always what the player reports (unless dragging)
+    Duration effectivePosition = _isDragging 
+        ? Duration(milliseconds: _dragValue.toInt()) 
+        : _position;
     Duration positionOffset = Duration.zero;
 
     // Only show offset info for display purposes, not for seeking
@@ -164,10 +179,25 @@ class _VideoControlsState extends State<VideoControls> {
                           ),
                       min: 0,
                       max: effectiveDuration.inMilliseconds.toDouble().max(1),
+                      onChangeStart: (value) {
+                        // Start dragging - pause position updates
+                        setState(() {
+                          _isDragging = true;
+                          _dragValue = value;
+                        });
+                      },
                       onChanged: (value) {
-                        // Direct seek - player handles what's seekable
-                        widget.player
-                            .seek(Duration(milliseconds: value.toInt()));
+                        // Only update drag value, don't seek yet
+                        setState(() {
+                          _dragValue = value;
+                        });
+                      },
+                      onChangeEnd: (value) {
+                        // Dragging ended - now seek to final position
+                        setState(() {
+                          _isDragging = false;
+                        });
+                        widget.player.seek(Duration(milliseconds: value.toInt()));
                       },
                       activeColor: AppTheme.primaryOrange,
                       inactiveColor: Colors.grey.shade600,

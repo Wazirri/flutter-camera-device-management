@@ -50,6 +50,17 @@ class WebSocketProviderOptimized with ChangeNotifier {
   // Get last conversions response
   Map<String, dynamic>? get lastConversionsResponse => _lastConversionsResponse;
   
+  // Store last convert_rec response
+  Map<String, dynamic>? _lastConvertRecResponse;
+  
+  // Get last convert_rec response
+  Map<String, dynamic>? get lastConvertRecResponse => _lastConvertRecResponse;
+  
+  // Clear last convert_rec response
+  void clearLastConvertRecResponse() {
+    _lastConvertRecResponse = null;
+  }
+  
   // Store last parameter_set result for UI notification
   Map<String, dynamic>? _lastParameterSetResult;
   
@@ -334,6 +345,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
     _errorMessage = '';
     _lastMessage = null;
     _lastConversionsResponse = null;
+    _lastConvertRecResponse = null;
     
     // Clear message log
     _messageLog.clear();
@@ -709,6 +721,21 @@ class WebSocketProviderOptimized with ChangeNotifier {
           _lastConversionsResponse = jsonData;
           print('[${DateTime.now().toString().split('.').first}] Received conversions response');
           print('[Conversions] Data: ${jsonData['data']}');
+          _batchNotifyListeners();
+          break;
+
+        case 'convert_rec':
+          // Store convert_rec response for polling
+          _lastMessage = jsonData;
+          _lastConvertRecResponse = jsonData;
+          final result = jsonData['result'];
+          final msg = jsonData['message'] ?? '';
+          final filePath = jsonData['file_path'] ?? '';
+          final status = jsonData['status'] ?? '';
+          print('[${DateTime.now().toString().split('.').first}] Received convert_rec response: result=$result, status=$status, message=$msg');
+          if (filePath.isNotEmpty) {
+            print('[ConvertRec] File path: $filePath');
+          }
           _batchNotifyListeners();
           break;
 

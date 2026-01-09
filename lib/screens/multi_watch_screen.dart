@@ -57,6 +57,14 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   Timer? _liveCheckTimer;
   Timer? _playlistRefreshTimer;
   
+  // Slider dragging state - prevent seek while dragging
+  bool _isSliderDragging = false;
+  double _sliderDragValue = 0.0;
+  
+  // Position update throttling - reduce setState calls
+  DateTime _lastPositionUpdate = DateTime.now();
+  static const _positionUpdateInterval = Duration(milliseconds: 500); // Max 2 updates per second
+  
   @override
   void initState() {
     super.initState();
@@ -100,10 +108,16 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
         nativePlayer.setProperty('hls-bitrate', 'max');
         // Force stream to be seekable even without ENDLIST
         nativePlayer.setProperty('force-seekable', 'yes');
-        // Start from the beginning of playlist, not live edge
+        // Start from the BEGINNING of playlist (index 0)
+        // This ensures position values are accurate from the start of recording
+        // We will seek to live edge after player is ready if this is a live recording
         nativePlayer.setProperty('demuxer-lavf-o', 'live_start_index=0');
         // Prefetch the entire playlist
         nativePlayer.setProperty('prefetch-playlist', 'yes');
+        // CRITICAL: Prevent auto-seeking to live edge when playlist updates
+        nativePlayer.setProperty('stream-lavf-o', 'reconnect_streamed=0');
+        // Disable live sync - don't try to catch up to live edge
+        nativePlayer.setProperty('untimed', 'yes');
       }
       
       final controller = VideoController(player);
@@ -120,12 +134,21 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
         _masterPlayer = player;
         isFirst = false;
         
-        // Listen to master player for sync position/duration
+        // Listen to master player for sync position/duration - THROTTLED
         player.stream.position.listen((position) {
-          if (mounted && !_isSeeking) {
-            setState(() {
-              _syncPosition = position;
-            });
+          // Don't update position while user is dragging slider or seeking
+          if (mounted && !_isSeeking && !_isSliderDragging) {
+            final now = DateTime.now();
+            // Only update if enough time has passed (throttle to reduce setState calls)
+            if (now.difference(_lastPositionUpdate) >= _positionUpdateInterval) {
+              _lastPositionUpdate = now;
+              // Only update if position actually changed significantly (more than 200ms)
+              if ((position - _syncPosition).abs() > const Duration(milliseconds: 200)) {
+                setState(() {
+                  _syncPosition = position;
+                });
+              }
+            }
           }
         });
         
@@ -140,12 +163,14 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
               _syncDuration = effectiveDuration;
             });
             
-            // For live recordings, seek to live edge ONCE when duration is first received
+            // For live recordings, seek to near-live position after player is ready
+            // Player started from beginning (live_start_index=0) for accurate position tracking
             if (_isLiveRecording && !_initialSeekDone && effectiveDuration.inSeconds > 0) {
-              print('[MultiWatch] Duration received: $effectiveDuration, doing initial seek to live edge');
+              print('[MultiWatch] Duration received: $effectiveDuration, seeking to live edge');
               _initialSeekDone = true;
               _lastKnownDuration = effectiveDuration;
-              Future.delayed(const Duration(milliseconds: 500), () {
+              // Seek to live edge after a brief delay for stability
+              Future.delayed(const Duration(milliseconds: 300), () {
                 if (mounted) {
                   _seekToLiveEdge();
                 }
@@ -352,23 +377,9 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   }
   
   void _startLiveRecordingTimers() {
-    // Check every 5 seconds if we should seek to live edge (only if user wants to stay at live)
+    // Live check timer removed - we don't want auto-seeking during playback
+    // User can manually use "Canlıya Dön" button if they want to go to live edge
     _liveCheckTimer?.cancel();
-    _liveCheckTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      // ONLY catch up if user explicitly wants to be at live edge
-      // Do NOT auto-seek if user has manually seeked away
-      if (mounted && _isAtLiveEdge && !_isSeeking && _syncDuration.inSeconds > 0) {
-        // If we're supposed to be at live edge but fell behind due to buffering, catch up
-        final behindSeconds = _syncDuration.inSeconds - _syncPosition.inSeconds;
-        // Use dynamic offset based on last 10 segments, or default to 60s
-        final safeOffset = _lastNSegmentsDuration.inSeconds > 0 ? _lastNSegmentsDuration.inSeconds : 60;
-        // Only catch up if we're significantly behind the safe position (more than safeOffset + 25s)
-        if (behindSeconds > safeOffset + 25) {
-          print('[MultiWatch] At live edge but fell behind by $behindSeconds seconds (safe offset: ${safeOffset}s), catching up...');
-          _seekToLiveEdge();
-        }
-      }
-    });
     
     // Periodically refresh playlist to get updated duration for live recordings
     _playlistRefreshTimer?.cancel();
@@ -426,14 +437,8 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
                 }
               });
               
-              // If at live edge, seek to new position
-              if (_isAtLiveEdge && !_isSeeking) {
-                Future.delayed(const Duration(milliseconds: 200), () {
-                  if (mounted && _isAtLiveEdge) {
-                    _seekToLiveEdge();
-                  }
-                });
-              }
+              // DO NOT auto-seek when playlist updates - let playback continue naturally
+              // User can manually seek to live edge if they want
             }
           }
         } catch (e) {
@@ -672,8 +677,13 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   
   // Build the synchronized control bar
   Widget _buildSyncControlBar() {
+    // Use drag value while dragging, otherwise use actual position
+    final displayPosition = _isSliderDragging 
+        ? Duration(milliseconds: (_sliderDragValue * _syncDuration.inMilliseconds).round())
+        : _syncPosition;
+    
     final progress = _syncDuration.inMilliseconds > 0
-        ? _syncPosition.inMilliseconds / _syncDuration.inMilliseconds
+        ? (_isSliderDragging ? _sliderDragValue : _syncPosition.inMilliseconds / _syncDuration.inMilliseconds)
         : 0.0;
     
     // For live recordings, use red colors when at live edge
@@ -701,7 +711,7 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
               children: [
                 // Current position
                 Text(
-                  _formatDuration(_syncPosition),
+                  _formatDuration(displayPosition),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
@@ -723,7 +733,24 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
                     ),
                     child: Slider(
                       value: progress.clamp(0.0, 1.0),
+                      onChangeStart: (value) {
+                        // Start dragging - pause position updates from player
+                        setState(() {
+                          _isSliderDragging = true;
+                          _sliderDragValue = value;
+                        });
+                      },
                       onChanged: (value) {
+                        // Only update visual position while dragging, don't seek yet
+                        setState(() {
+                          _sliderDragValue = value;
+                        });
+                      },
+                      onChangeEnd: (value) {
+                        // Dragging ended - now seek to final position
+                        setState(() {
+                          _isSliderDragging = false;
+                        });
                         final newPosition = Duration(
                           milliseconds: (value * _syncDuration.inMilliseconds).round(),
                         );

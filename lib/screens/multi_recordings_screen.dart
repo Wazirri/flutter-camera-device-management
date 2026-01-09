@@ -3972,6 +3972,7 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
   Duration _playlistDuration = Duration.zero; // Calculated from playlist
   Duration _lastNSegmentsDuration = Duration.zero; // Duration of last N segments for live offset
   Timer? _playlistRefreshTimer; // Timer to refresh playlist duration
+  bool _initialSeekDone = false; // Track if initial seek has been performed - prevents repeated seeks
 
   @override
   void initState() {
@@ -4003,10 +4004,17 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
       nativePlayer.setProperty('hls-bitrate', 'max');
       // Force stream to be seekable even without ENDLIST
       nativePlayer.setProperty('force-seekable', 'yes');
-      // Start from the beginning of playlist, not live edge
+      // Start from the BEGINNING of playlist (index 0)
+      // This ensures position values are accurate from the start of recording
+      // We will seek to live edge after player is ready if this is a live stream
       nativePlayer.setProperty('demuxer-lavf-o', 'live_start_index=0');
       // Prefetch the entire playlist
       nativePlayer.setProperty('prefetch-playlist', 'yes');
+      // CRITICAL: Prevent auto-seeking to live edge when playlist updates
+      // Keep playing from current position, don't jump to new segments
+      nativePlayer.setProperty('stream-lavf-o', 'reconnect_streamed=0');
+      // Disable live sync - don't try to catch up to live edge
+      nativePlayer.setProperty('untimed', 'yes');
     }
 
     _popupController = VideoController(_popupPlayer);
@@ -4021,9 +4029,9 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
       }
     });
 
-    // Setup buffering listener
+    // Setup buffering listener - only update if state changed
     _popupPlayer.stream.buffering.listen((buffering) {
-      if (mounted) {
+      if (mounted && buffering != _isBuffering) {
         setState(() {
           _isBuffering = buffering;
         });
@@ -4044,6 +4052,14 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
   Future<void> _checkIfLiveStream() async {
     // Only check for m3u8 files
     if (!widget.recordingUrl.endsWith('.m3u8')) {
+      return;
+    }
+
+    // If URL contains /recordings/ or /recording/, this is definitely NOT a live stream
+    // These are completed recordings, not live EVENT streams
+    if (widget.recordingUrl.contains('/recordings/') || 
+        widget.recordingUrl.contains('/recording/')) {
+      print('[VideoPlayerPopup] URL contains /recordings/ - treating as completed recording, not live');
       return;
     }
 
@@ -4116,7 +4132,7 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
         : segmentDurations;
     
     final totalSeconds = lastN.fold<double>(0, (sum, d) => sum + d);
-    print('[VideoPlayerPopup] Last $n segments duration: ${totalSeconds}s (${segmentDurations.length} total segments)');
+    // Debug logging removed for performance
     return Duration(milliseconds: (totalSeconds * 1000).round());
   }
 
@@ -4130,13 +4146,20 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
           final content = response.body;
           final duration = _calculatePlaylistDuration(content);
           final lastNDuration = _calculateLastNSegmentsDuration(content, 5);
-          setState(() {
-            _playlistDuration = duration;
-            _lastNSegmentsDuration = lastNDuration;
-          });
-          print('[VideoPlayerPopup] Updated playlist duration: $duration, last5Segments: $lastNDuration');
+          
+          // Only update state if values actually changed (avoid unnecessary rebuilds)
+          final durationChanged = (duration.inSeconds - _playlistDuration.inSeconds).abs() > 1;
+          final lastNChanged = (lastNDuration.inSeconds - _lastNSegmentsDuration.inSeconds).abs() > 1;
+          
+          if (durationChanged || lastNChanged) {
+            setState(() {
+              _playlistDuration = duration;
+              _lastNSegmentsDuration = lastNDuration;
+            });
+          }
         }
       } catch (e) {
+        // Error logging kept for debugging issues
         print('[VideoPlayerPopup] Error refreshing playlist: $e');
       }
     });
@@ -4147,57 +4170,30 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
     try {
       _popupPlayer.open(Media(widget.recordingUrl), play: true);
 
-      // Listen for player state changes
-      _popupPlayer.stream.playing.listen((playing) {
-        print('[VideoPlayerPopup] Playing state changed: $playing');
-      });
+      // Listen for player state changes (no logging to avoid performance issues)
+      // _popupPlayer.stream.playing.listen is handled by VideoControls widget
 
-      // Listen for log messages
-      _popupPlayer.stream.log.listen((log) {
-        print('[VideoPlayerPopup] Player log: $log');
-      });
-
-      // Track if we've done initial seek
-      bool initialSeekDone = false;
-
-      // Listen for duration changes
+      // Listen for duration changes - only do initial seek once, no delay
       _popupPlayer.stream.duration.listen((duration) {
-        if (duration != Duration.zero && mounted) {
-          print('[VideoPlayerPopup] Duration received: $duration (${duration.inSeconds}s)');
+        if (duration != Duration.zero && mounted && !_initialSeekDone) {
+          _initialSeekDone = true;
           
-          // If we have a specific seek time, use that
-          if (widget.seekTime != null && widget.seekTime! > 0 && !initialSeekDone) {
-            initialSeekDone = true;
+          if (widget.seekTime != null && widget.seekTime! > 0) {
+            // Explicit seek time provided - seek to that position
             final seekDuration = Duration(seconds: widget.seekTime!);
-            print('[VideoPlayerPopup] Video ready, seeking to: $seekDuration');
-
-            // Delay the seek slightly to ensure video is fully loaded
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (mounted) {
-                _popupPlayer.seek(seekDuration);
-                print('[VideoPlayerPopup] Seek completed to: $seekDuration');
-              }
-            });
-          }
-          // For live streams without specific seek time, seek to position before last 5 segments
-          else if (_isLiveStream && !initialSeekDone && _playlistDuration.inSeconds > 0) {
-            initialSeekDone = true;
-            // Seek to before the last 5 segments (live edge - lastNSegmentsDuration)
-            // This ensures we're not trying to play segments that aren't fully written yet
+            _popupPlayer.seek(seekDuration);
+          } else if (_isLiveStream && _playlistDuration.inSeconds > 0) {
+            // Live stream without explicit seekTime - seek to near-live position
+            // Use last 5 segments duration for safe offset, or default to 30s
             final offsetSeconds = _lastNSegmentsDuration.inSeconds > 0 
                 ? _lastNSegmentsDuration.inSeconds 
-                : 30; // Default to ~30 seconds (5 segments * 6 sec each)
-            final safePosition = Duration(
+                : 30;
+            final livePosition = Duration(
                 seconds: (_playlistDuration.inSeconds - offsetSeconds).clamp(0, _playlistDuration.inSeconds));
-            print('[VideoPlayerPopup] Live stream detected, seeking to safe position: $safePosition (${offsetSeconds}s before live edge)');
-            
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (mounted) {
-                _popupPlayer.seek(safePosition);
-                print('[VideoPlayerPopup] Seeked to safe position: $safePosition');
-              }
-            });
+            print('[VideoPlayerPopup] Live stream - seeking to near-live: $livePosition (${offsetSeconds}s before end)');
+            _popupPlayer.seek(livePosition);
           }
+          // Non-live stream and no seekTime: start from beginning
         }
       });
     } catch (e) {
@@ -4268,11 +4264,13 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
 
     return Stack(
       children: [
-        // Video widget without built-in controls
-        Video(
-          controller: _popupController,
-          fit: BoxFit.contain,
-          controls: null, // Disable built-in controls
+        // Video widget without built-in controls - wrapped in RepaintBoundary to prevent rebuilds
+        RepaintBoundary(
+          child: Video(
+            controller: _popupController,
+            fit: BoxFit.contain,
+            controls: null, // Disable built-in controls
+          ),
         ),
 
         // Loading indicator
