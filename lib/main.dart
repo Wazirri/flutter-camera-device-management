@@ -37,6 +37,7 @@ import 'providers/camera_devices_provider.dart'; // Using optimized camera devic
 import 'providers/multi_view_layout_provider.dart';
 import 'providers/multi_camera_view_provider.dart'; // Multi camera view provider
 import 'providers/user_group_provider.dart'; // User group provider
+import 'providers/conversion_tracking_provider.dart'; // Conversion tracking provider
 
 Future<void> main() async {
   // This captures errors that happen during initialization
@@ -81,10 +82,15 @@ Future<void> main() async {
     final multiViewLayoutProvider = MultiViewLayoutProvider();
     final multiCameraViewProvider = MultiCameraViewProvider();
     final userGroupProvider = UserGroupProvider();
+    final conversionTrackingProvider = ConversionTrackingProvider();
+    
+    // Initialize conversion tracking with websocket provider
+    conversionTrackingProvider.initialize(webSocketProvider);
     
     // Connect the providers
     webSocketProvider.setCameraDevicesProvider(cameraDevicesProvider);
     webSocketProvider.setUserGroupProvider(userGroupProvider);
+    webSocketProvider.setConversionTrackingProvider(conversionTrackingProvider);
     cameraDevicesProvider.setWebSocketProvider(webSocketProvider);
     cameraDevicesProvider.setUserGroupProvider(userGroupProvider);
     
@@ -97,6 +103,7 @@ Future<void> main() async {
           ChangeNotifierProvider<MultiViewLayoutProvider>.value(value: multiViewLayoutProvider),
           ChangeNotifierProvider<MultiCameraViewProvider>.value(value: multiCameraViewProvider),
           ChangeNotifierProvider<UserGroupProvider>.value(value: userGroupProvider),
+          ChangeNotifierProvider<ConversionTrackingProvider>.value(value: conversionTrackingProvider),
         ],
         child: const MyApp(),
       ),
@@ -342,6 +349,122 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
     super.initState();
     // Register observer for app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
+    
+    // Setup global conversion complete callback
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setupConversionCallbacks();
+    });
+  }
+  
+  void _setupConversionCallbacks() {
+    final trackingProvider = Provider.of<ConversionTrackingProvider>(context, listen: false);
+    final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
+    
+    // Set callback for WebSocket result messages
+    webSocketProvider.onResultMessage = (command, result, message) {
+      if (mounted && message.isNotEmpty) {
+        final isSuccess = result == 1;
+        final icon = isSuccess ? Icons.check_circle : Icons.error_outline;
+        final color = isSuccess ? Colors.green.shade600 : Colors.red.shade600;
+        final emoji = isSuccess ? '✅' : '❌';
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(icon, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$emoji $command',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
+                      Text(
+                        message,
+                        style: const TextStyle(fontSize: 13),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: color,
+            duration: Duration(seconds: isSuccess ? 3 : 5),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    };
+    
+    // Set callback for when conversion completes
+    trackingProvider.onConversionComplete = (conversion) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '✅ Dönüştürme Tamamlandı!',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${conversion.cameraName} (${conversion.startTime} - ${conversion.endTime})',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.green.shade600,
+            duration: const Duration(seconds: 6),
+            behavior: SnackBarBehavior.floating,
+            action: SnackBarAction(
+              label: 'İndir',
+              textColor: Colors.white,
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/recording-download');
+              },
+            ),
+          ),
+        );
+      }
+    };
+    
+    // Set callback for conversion errors
+    trackingProvider.onConversionError = (conversion, error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text('❌ ${conversion.cameraName}: $error'),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.red.shade600,
+            duration: const Duration(seconds: 5),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    };
   }
 
   @override
@@ -423,7 +546,14 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
                 // Use ClipRRect to avoid rendering issues with video players
                 child: Material(
                   color: AppTheme.darkBackground,
-                  child: widget.child,
+                  child: Column(
+                    children: [
+                      // Global conversion tracking banner
+                      _buildConversionBanner(context),
+                      // Main content
+                      Expanded(child: widget.child),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -437,7 +567,14 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
         body: SafeArea(
           child: Material(
             color: AppTheme.darkBackground,
-            child: widget.child,
+            child: Column(
+              children: [
+                // Global conversion tracking banner
+                _buildConversionBanner(context),
+                // Main content
+                Expanded(child: widget.child),
+              ],
+            ),
           ),
         ),
         bottomNavigationBar: MobileBottomNavigationBar(
@@ -448,5 +585,67 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
         ),
       );
     }
+  }
+
+  Widget _buildConversionBanner(BuildContext context) {
+    return Consumer<ConversionTrackingProvider>(
+      builder: (context, trackingProvider, child) {
+        final pendingConversions = trackingProvider.pendingConversions.where((c) => !c.isComplete).toList();
+        
+        if (pendingConversions.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        
+        return Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.orange.shade700, Colors.orange.shade500],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  '🔄 ${pendingConversions.length} dönüştürme devam ediyor: ${pendingConversions.map((c) => c.cameraName).join(", ")}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              InkWell(
+                onTap: () => Navigator.pushReplacementNamed(context, '/recording-download'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'Detay',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

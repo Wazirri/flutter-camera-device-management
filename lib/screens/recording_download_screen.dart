@@ -9,6 +9,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import '../providers/websocket_provider.dart';
 import '../providers/camera_devices_provider.dart';
+import '../providers/conversion_tracking_provider.dart';
 import '../utils/responsive_helper.dart';
 import '../models/camera_device.dart';
 import '../models/conversion_item.dart';
@@ -38,16 +39,6 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
   ConversionsResponse? _conversionsData;
   bool _isLoadingConversions = false;
   
-  // Pending conversion tracking
-  bool _isPendingConversion = false;
-  String _pendingConversionCamera = '';
-  String _pendingConversionStartTime = ''; // To match the correct conversion request
-  String _pendingConversionEndTime = '';   // To match the correct conversion request
-  String _pendingConversionStatus = '';
-  Timer? _conversionPollingTimer;
-  int _pollingAttempts = 0;
-  static const int _maxPollingAttempts = 30; // 30 * 10s = 5 minutes max
-  
   // Available formats
   final List<String> _formats = ['mp4', 'avi', 'mkv', 'mov'];
   
@@ -62,118 +53,7 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
   
   @override
   void dispose() {
-    _conversionPollingTimer?.cancel();
     super.dispose();
-  }
-  
-  // Start polling for conversion completion
-  void _startConversionPolling(String cameraName, String targetSlaveMac, String startTime, String endTime) {
-    // Cancel any existing timer
-    _conversionPollingTimer?.cancel();
-    _pollingAttempts = 0;
-    
-    setState(() {
-      _isPendingConversion = true;
-      _pendingConversionCamera = cameraName;
-      _pendingConversionStartTime = startTime;
-      _pendingConversionEndTime = endTime;
-      _pendingConversionStatus = 'Converting... (checking every 10 seconds)';
-    });
-    
-    print('[Conversions] Starting polling for $cameraName on device $targetSlaveMac (start: $startTime, end: $endTime)');
-    
-    // Poll every 10 seconds
-    _conversionPollingTimer = Timer.periodic(const Duration(seconds: 10), (timer) async {
-      _pollingAttempts++;
-      print('[Conversions] Polling attempt $_pollingAttempts/$_maxPollingAttempts for $cameraName');
-      
-      setState(() {
-        _pendingConversionStatus = 'Converting... (attempt $_pollingAttempts/$_maxPollingAttempts)';
-      });
-      
-      // Check if max attempts reached
-      if (_pollingAttempts >= _maxPollingAttempts) {
-        timer.cancel();
-        setState(() {
-          _isPendingConversion = false;
-          _pendingConversionStatus = '';
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Conversion timeout. Please check manually.'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
-        return;
-      }
-      
-      // Reload conversions to check status
-      await _loadConversions();
-      
-      // Check if the file is ready (file_path is not empty)
-      // We need to match by camera name AND start/end time to find the correct conversion
-      if (_conversionsData != null) {
-        for (final entry in _conversionsData!.data.entries) {
-          final deviceMac = entry.key;
-          final conversions = entry.value;
-          if (conversions != null && deviceMac == targetSlaveMac) {
-            for (final conversion in conversions) {
-              if (conversion.cameraName == cameraName) {
-                // Check if start/end times match (normalize the format for comparison)
-                // Server returns format like: 2026-01-09T01:15:00+03:00
-                // We sent format like: 2026-01-09_01-15-00
-                final serverStartNormalized = _normalizeTimeForComparison(conversion.startTime);
-                final serverEndNormalized = _normalizeTimeForComparison(conversion.endTime);
-                final requestStartNormalized = _normalizeTimeForComparison(startTime);
-                final requestEndNormalized = _normalizeTimeForComparison(endTime);
-                
-                print('[Conversions] Checking conversion: server($serverStartNormalized-$serverEndNormalized) vs request($requestStartNormalized-$requestEndNormalized)');
-                
-                if (serverStartNormalized == requestStartNormalized && serverEndNormalized == requestEndNormalized) {
-                  if (conversion.filePath.isNotEmpty) {
-                    // File is ready!
-                    timer.cancel();
-                    setState(() {
-                      _isPendingConversion = false;
-                      _pendingConversionStatus = '';
-                    });
-                    print('[Conversions] File ready for $cameraName: ${conversion.filePath}');
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('✅ Conversion complete for $cameraName! File is ready for download.'),
-                          backgroundColor: Colors.green,
-                          duration: const Duration(seconds: 5),
-                        ),
-                      );
-                    }
-                    // Refresh the list to show updated file path
-                    _loadConversions();
-                    return;
-                  } else {
-                    print('[Conversions] File not ready yet for $cameraName (file_path is empty)');
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-  
-  // Normalize time format for comparison (extract just the datetime part)
-  String _normalizeTimeForComparison(String time) {
-    // Handle server format: 2026-01-09T01:15:00+03:00 -> 2026-01-09_01-15-00
-    // Handle request format: 2026-01-09_01-15-00 -> 2026-01-09_01-15-00
-    String normalized = time
-        .replaceAll('T', '_')
-        .replaceAll(':', '-')
-        .split('+').first  // Remove timezone
-        .split('.').first; // Remove milliseconds if any
-    return normalized;
   }
   
   Future<void> _loadConversions() async {
@@ -191,8 +71,8 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
       if (success) {
         print('[Conversions] Conversions request sent successfully');
         
-        // Wait a bit for response and check
-        await Future.delayed(const Duration(milliseconds: 500));
+        // Wait a bit for response and check - reduced delay
+        await Future.delayed(const Duration(milliseconds: 200));
         
         // Check if we got a response using dedicated conversions response
         final conversionsMessage = webSocketProvider.lastConversionsResponse;
@@ -232,8 +112,8 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
         title: const Text('Recording Download'),
         automaticallyImplyLeading: false, // Geri tuşunu kaldır
       ),
-      body: Consumer2<CameraDevicesProviderOptimized, WebSocketProviderOptimized>(
-        builder: (context, cameraProvider, webSocketProvider, child) {
+      body: Consumer3<CameraDevicesProviderOptimized, WebSocketProviderOptimized, ConversionTrackingProvider>(
+        builder: (context, cameraProvider, webSocketProvider, trackingProvider, child) {
           // Only include cameras with MAC address and remove duplicates
           final allCamerasWithMac = cameraProvider.allCameras
               .where((camera) => camera.mac.isNotEmpty)
@@ -247,6 +127,7 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
             }
           }
           final cameras = uniqueCamerasByMac.values.toList();
+          final pendingConversions = trackingProvider.pendingConversions.where((c) => !c.isComplete).toList();
           
           return SingleChildScrollView(
             padding: EdgeInsets.all(isDesktop ? 24.0 : 16.0),
@@ -255,60 +136,100 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Pending Conversion Indicator
-                  if (_isPendingConversion)
+                  // Pending Conversions Indicator (from global provider)
+                  if (pendingConversions.isNotEmpty)
                     Card(
-                      color: Colors.blue.shade50,
-                      child: Padding(
+                      color: Colors.orange.shade100,
+                      elevation: 4,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.orange.shade400, width: 2),
+                        ),
                         padding: const EdgeInsets.all(16.0),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(strokeWidth: 3),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.shade600,
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: const Center(
+                                    child: SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  '🔄 ${pendingConversions.length} Dönüştürme Devam Ediyor',
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange.shade800,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                            const SizedBox(height: 12),
+                            ...pendingConversions.map((conversion) => Padding(
+                              padding: const EdgeInsets.only(bottom: 8.0),
+                              child: Row(
                                 children: [
-                                  Text(
-                                    '⏳ Conversion in Progress',
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
+                                  Icon(Icons.videocam, size: 18, color: Colors.orange.shade700),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          conversion.cameraName,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.orange.shade900,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${conversion.startTime} → ${conversion.endTime}',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.orange.shade700,
+                                          ),
+                                        ),
+                                        Text(
+                                          conversion.status,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '$_pendingConversionCamera ($_pendingConversionStartTime → $_pendingConversionEndTime)',
-                                    style: Theme.of(context).textTheme.bodyMedium,
-                                  ),
-                                  Text(
-                                    _pendingConversionStatus,
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Colors.grey[600],
-                                    ),
+                                  IconButton(
+                                    icon: Icon(Icons.cancel, color: Colors.red.shade400, size: 20),
+                                    onPressed: () => trackingProvider.stopTracking(conversion),
+                                    tooltip: 'Takibi Durdur',
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
                                   ),
                                 ],
                               ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.cancel, color: Colors.red),
-                              onPressed: () {
-                                _conversionPollingTimer?.cancel();
-                                setState(() {
-                                  _isPendingConversion = false;
-                                  _pendingConversionStatus = '';
-                                });
-                              },
-                              tooltip: 'Cancel waiting',
-                            ),
+                            )),
                           ],
                         ),
                       ),
                     ),
-                  if (_isPendingConversion) const SizedBox(height: 12),
+                  if (pendingConversions.isNotEmpty) const SizedBox(height: 16),
                   
                   // Header
                   Card(
@@ -527,7 +448,7 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
                   ),
                   
                   // Conversions Section
-                  _buildConversionsSection(),
+                  _buildConversionsSection(trackingProvider),
                 ],
               ),
             ),
@@ -676,14 +597,21 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
         final cameraName = selectedCamera.name.isNotEmpty ? selectedCamera.name : selectedCamera.mac;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Conversion request sent for $cameraName. Waiting for file to be ready...'),
+            content: Text('$cameraName için dönüştürme isteği gönderildi...'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 3),
           ),
         );
         
-        // Start polling for conversion completion (pass start/end time for correct matching)
-        _startConversionPolling(cameraName, _selectedTargetSlaveMac!, startFormatted, endFormatted);
+        // Start tracking with global provider (continues across page changes)
+        final trackingProvider = Provider.of<ConversionTrackingProvider>(context, listen: false);
+        trackingProvider.startTracking(
+          cameraName: cameraName,
+          targetSlaveMac: _selectedTargetSlaveMac!,
+          startTime: startFormatted,
+          endTime: endFormatted,
+          format: _selectedFormat,
+        );
         
         // Refresh conversions list
         _loadConversions();
@@ -711,20 +639,16 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
 
   // Build grouped camera dropdown with camera groups only
   Widget _buildGroupedCameraDropdown(List<Camera> cameras, CameraDevicesProviderOptimized cameraProvider) {
-    // Group cameras by camera groups only
-    final Map<String, List<Camera>> camerasByGroup = {};
-    
     // Get camera groups
     final cameraGroups = cameraProvider.cameraGroupsList;
-    print('[RecordingDownload] Camera groups count: ${cameraGroups.length}');
-    print('[RecordingDownload] Total cameras: ${cameras.length}');
     
-    // Group cameras by camera groups first
+    // Group cameras by camera groups
+    final Map<String, List<Camera>> camerasByGroup = {};
     Set<String> groupedCameraIds = {};
+    
     if (cameraGroups.isNotEmpty) {
       for (final group in cameraGroups) {
         final camerasInGroup = cameraProvider.getCamerasInGroup(group.name);
-        print('[RecordingDownload] Group "${group.name}" has ${camerasInGroup.length} cameras');
         if (camerasInGroup.isNotEmpty) {
           camerasByGroup[group.name] = camerasInGroup;
           for (final camera in camerasInGroup) {
@@ -734,138 +658,241 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
       }
     }
     
-    // Find ungrouped cameras (not assigned to any group)
+    // Find ungrouped cameras
     final ungroupedCameras = cameras.where((camera) => !groupedCameraIds.contains(camera.id)).toList();
     
-    // Build dropdown items
-    List<DropdownMenuItem<String>> items = [];
+    // Build list of all cameras with their group info for display
+    // Using a custom widget instead of DropdownButtonFormField to allow duplicates
+    final List<_CameraMenuItem> menuItems = [];
     
     // Add camera groups
     camerasByGroup.forEach((groupName, camerasInGroup) {
       // Add group header
-      items.add(DropdownMenuItem<String>(
-        value: null,
-        enabled: false,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            children: [
-              const Icon(Icons.group_work, size: 16, color: Colors.blue),
-              const SizedBox(width: 8),
-              Text(
-                groupName,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ));
+      menuItems.add(_CameraMenuItem(isHeader: true, groupName: groupName));
       
       // Add cameras in this group
       for (var camera in camerasInGroup) {
-        items.add(DropdownMenuItem<String>(
-          value: camera.name.isNotEmpty ? camera.name : camera.mac,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 24),
-            child: Text(
-              camera.name.isNotEmpty 
-                ? '${camera.name} (${camera.mac})'
-                : camera.mac,
-            ),
-          ),
+        menuItems.add(_CameraMenuItem(
+          camera: camera,
+          groupName: groupName,
         ));
       }
     });
     
-    // Add ungrouped cameras if any exist
+    // Add ungrouped cameras
     if (ungroupedCameras.isNotEmpty) {
-      // Add ungrouped cameras header
-      items.add(DropdownMenuItem<String>(
-        value: null,
-        enabled: false,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: const Row(
-            children: [
-              Icon(Icons.videocam_off_outlined, size: 16, color: Colors.grey),
-              SizedBox(width: 8),
-              Text(
-                'Ungrouped Cameras',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ));
+      menuItems.add(_CameraMenuItem(isHeader: true, groupName: 'Grupsuz', isUngrouped: true));
       
-      // Add ungrouped cameras
       for (var camera in ungroupedCameras) {
-        items.add(DropdownMenuItem<String>(
-          value: camera.name.isNotEmpty ? camera.name : camera.mac,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 24),
-            child: Text(
-              camera.name.isNotEmpty 
-                ? '${camera.name} (${camera.mac})'
-                : camera.mac,
-            ),
-          ),
-        ));
+        menuItems.add(_CameraMenuItem(camera: camera, groupName: 'Grupsuz'));
       }
     }
     
-    return DropdownButtonFormField<String>(
-      value: _selectedCameraName,
-      decoration: const InputDecoration(
-        labelText: 'Select Camera',
-        border: OutlineInputBorder(),
-        prefixIcon: Icon(Icons.videocam),
-        helperText: 'Cameras grouped by Groups and Devices',
+    return InkWell(
+      onTap: () => _showCameraSelectionDialog(menuItems, cameras, cameraProvider),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: 'Kamera Seçin',
+          border: const OutlineInputBorder(),
+          prefixIcon: const Icon(Icons.videocam),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          errorText: _selectedCameraName == null && _formKey.currentState?.validate() == false 
+              ? 'Lütfen bir kamera seçin' : null,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                _selectedCameraName ?? 'Kamera seçin...',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: _selectedCameraName != null ? null : Colors.grey[600],
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const Icon(Icons.arrow_drop_down),
+          ],
+        ),
       ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select a camera';
-        }
-        return null;
-      },
-      items: items,
-      onChanged: (value) {
-        if (value != null) {
-          setState(() {
-            _selectedCameraName = value;
-            
-            // Auto-select the target device for the selected camera
-            // Find the camera by name or MAC
-            Camera? selectedCamera;
-            try {
-              selectedCamera = cameras.firstWhere(
-                (camera) => (camera.name.isNotEmpty ? camera.name : camera.mac) == value,
-              );
-            } catch (e) {
-              // Camera not found
-              selectedCamera = null;
-            }
-            
-            // Find the device that contains this camera
-            if (selectedCamera != null) {
-              final deviceForCamera = cameraProvider.findDeviceForCamera(selectedCamera);
-              if (deviceForCamera != null) {
-                _selectedTargetSlaveMac = deviceForCamera.macKey;
-              }
-            }
-          });
-        }
-      },
     );
   }
   
-  Widget _buildConversionsSection() {
+  void _showCameraSelectionDialog(List<_CameraMenuItem> menuItems, List<Camera> cameras, CameraDevicesProviderOptimized cameraProvider) {
+    String searchQuery = '';
+    
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          // Filter items based on search query
+          final filteredItems = searchQuery.isEmpty
+              ? menuItems
+              : menuItems.where((item) {
+                  if (item.isHeader) {
+                    // Keep header if any camera in that group matches
+                    final groupName = item.groupName ?? '';
+                    return menuItems.any((m) =>
+                        !m.isHeader &&
+                        m.groupName == groupName &&
+                        (m.camera!.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                         m.camera!.mac.toLowerCase().contains(searchQuery.toLowerCase())));
+                  }
+                  final camera = item.camera!;
+                  final cameraName = camera.name.isNotEmpty ? camera.name : camera.mac;
+                  return cameraName.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                         camera.mac.toLowerCase().contains(searchQuery.toLowerCase());
+                }).toList();
+          
+          return AlertDialog(
+            title: const Text('Kamera Seçin'),
+            contentPadding: EdgeInsets.zero,
+            content: SizedBox(
+              width: 350,
+              height: 450,
+              child: Column(
+                children: [
+                  // Search bar
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: TextField(
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: 'Kamera ara...',
+                        prefixIcon: const Icon(Icons.search, size: 20),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        isDense: true,
+                        suffixIcon: searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, size: 18),
+                                onPressed: () {
+                                  setDialogState(() {
+                                    searchQuery = '';
+                                  });
+                                },
+                              )
+                            : null,
+                      ),
+                      onChanged: (value) {
+                        setDialogState(() {
+                          searchQuery = value;
+                        });
+                      },
+                    ),
+                  ),
+                  // Camera list
+                  Expanded(
+                    child: filteredItems.isEmpty
+                        ? Center(
+                            child: Text(
+                              'Sonuç bulunamadı',
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: filteredItems.length,
+                            itemBuilder: (context, index) {
+                              final item = filteredItems[index];
+              
+              if (item.isHeader) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  color: item.isUngrouped ? Colors.grey[100] : Colors.blue[50],
+                  child: Row(
+                    children: [
+                      Icon(
+                        item.isUngrouped ? Icons.videocam_off : Icons.folder,
+                        size: 18,
+                        color: item.isUngrouped ? Colors.grey[600] : Colors.blue,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        item.groupName ?? '',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: item.isUngrouped ? Colors.grey[700] : Colors.blue[700],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              
+              final camera = item.camera!;
+              final cameraName = camera.name.isNotEmpty ? camera.name : camera.mac;
+              final isSelected = _selectedCameraName == cameraName;
+              
+              return ListTile(
+                dense: true,
+                selected: isSelected,
+                selectedTileColor: Colors.blue[100],
+                contentPadding: const EdgeInsets.only(left: 40, right: 16),
+                leading: Icon(
+                  Icons.videocam,
+                  size: 20,
+                  color: isSelected ? Colors.blue : Colors.grey,
+                ),
+                title: Text(
+                  cameraName,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+                subtitle: Text(
+                  camera.mac,
+                  style: const TextStyle(fontSize: 11),
+                ),
+                onTap: () {
+                  setState(() {
+                    _selectedCameraName = cameraName;
+                    
+                    // Find the device for this camera
+                    Camera? selectedCamera;
+                    try {
+                      selectedCamera = cameras.firstWhere(
+                        (c) => (c.name.isNotEmpty ? c.name : c.mac) == cameraName,
+                      );
+                    } catch (e) {
+                      selectedCamera = null;
+                    }
+                    
+                    if (selectedCamera != null) {
+                      final deviceForCamera = cameraProvider.findDeviceForCamera(selectedCamera);
+                      if (deviceForCamera != null) {
+                        _selectedTargetSlaveMac = deviceForCamera.macKey;
+                      }
+                    }
+                  });
+                  Navigator.of(context).pop();
+                },
+              );
+            },
+          ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('İptal'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+  
+  Widget _buildConversionsSection(ConversionTrackingProvider trackingProvider) {
+    // Use trackingProvider.conversionsData which is updated by polling
+    final conversionsData = trackingProvider.conversionsData ?? _conversionsData;
+    
     return Card(
       margin: const EdgeInsets.only(top: 24),
       child: Padding(
@@ -880,10 +907,26 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
                   'Active Conversions',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: _loadConversions,
-                  tooltip: 'Refresh',
+                Row(
+                  children: [
+                    if (trackingProvider.hasPendingConversions)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: () {
+                        _loadConversions();
+                        trackingProvider.refreshConversions();
+                      },
+                      tooltip: 'Refresh',
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -897,7 +940,7 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
                   child: CircularProgressIndicator(),
                 ),
               )
-            else if (_conversionsData == null || _conversionsData!.data.isEmpty)
+            else if (conversionsData == null || conversionsData.data.isEmpty)
               Center(
                 child: Padding(
                   padding: const EdgeInsets.all(32.0),
@@ -914,81 +957,123 @@ class _RecordingDownloadScreenState extends State<RecordingDownloadScreen> {
                 ),
               )
             else
-              ..._buildConversionsList(),
+              ..._buildConversionsList(conversionsData),
           ],
         ),
       ),
     );
   }
   
-  List<Widget> _buildConversionsList() {
+  List<Widget> _buildConversionsList(ConversionsResponse conversionsData) {
     final widgets = <Widget>[];
     final cameraProvider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
     
-    _conversionsData!.data.forEach((macAddress, conversions) {
+    // Group conversions by camera name instead of device MAC
+    final Map<String, List<MapEntry<String, ConversionItem>>> conversionsByCamera = {};
+    
+    conversionsData.data.forEach((macAddress, conversions) {
       if (conversions != null && conversions.isNotEmpty) {
-        // Find device by MAC address
-        final device = cameraProvider.devices.values.firstWhere(
-          (d) => d.macAddress == macAddress,
-          orElse: () => cameraProvider.devices.values.first,
-        );
-        
-        widgets.add(
-          ExpansionTile(
-            title: Text('Device: $macAddress'),
-            subtitle: Text('${conversions.length} conversion(s)'),
-            initiallyExpanded: true,
-            children: conversions.map((conversion) {
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.blue[100],
-                    child: const Icon(Icons.video_file, color: Colors.blue),
-                  ),
-                  title: Text(conversion.cameraName),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 4),
-                      Text('Format: ${conversion.format.toUpperCase()}'),
-                      Text('Start: ${_formatTime(conversion.startTime)}'),
-                      Text('End: ${_formatTime(conversion.endTime)}'),
-                      Text(
-                        'File: ${conversion.filePath.split('/').last}',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.play_circle_outline),
-                        tooltip: 'İzle',
-                        onPressed: () => _playConversion(conversion, device.ipv4),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.download),
-                        tooltip: 'İndir',
-                        onPressed: () => _downloadConversion(conversion, device.ipv4),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        );
+        for (final conversion in conversions) {
+          final cameraName = conversion.cameraName;
+          if (!conversionsByCamera.containsKey(cameraName)) {
+            conversionsByCamera[cameraName] = [];
+          }
+          conversionsByCamera[cameraName]!.add(MapEntry(macAddress, conversion));
+        }
       }
     });
+    
+    // Sort camera names
+    final sortedCameraNames = conversionsByCamera.keys.toList()..sort();
+    
+    // Build widgets for each camera
+    for (final cameraName in sortedCameraNames) {
+      final cameraConversions = conversionsByCamera[cameraName]!;
+      
+      widgets.add(
+        ExpansionTile(
+          leading: const CircleAvatar(
+            backgroundColor: Colors.blue,
+            child: Icon(Icons.videocam, color: Colors.white, size: 20),
+          ),
+          title: Text(cameraName, style: const TextStyle(fontWeight: FontWeight.bold)),
+          subtitle: Text('${cameraConversions.length} kayıt'),
+          initiallyExpanded: true,
+          children: cameraConversions.map((entry) {
+            final macAddress = entry.key;
+            final conversion = entry.value;
+            
+            // Find device by MAC address for IP
+            final device = cameraProvider.devices.values.firstWhere(
+              (d) => d.macAddress == macAddress,
+              orElse: () => cameraProvider.devices.values.first,
+            );
+            
+            return Card(
+              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.green[100],
+                  child: const Icon(Icons.video_file, color: Colors.green),
+                ),
+                title: Text(
+                  conversion.filePath.split('/').last,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.schedule, size: 14, color: Colors.grey[600]),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${_formatTime(conversion.startTime)} - ${_formatTime(conversion.endTime).split(' ').last}',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.video_settings, size: 14, color: Colors.grey[600]),
+                        const SizedBox(width: 4),
+                        Text(
+                          conversion.format.toUpperCase(),
+                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.play_circle_outline, color: Colors.blue),
+                      tooltip: 'İzle',
+                      onPressed: () => _playConversion(conversion, device.ipv4),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.download, color: Colors.green),
+                      tooltip: 'İndir',
+                      onPressed: () => _downloadConversion(conversion, device.ipv4),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      );
+    }
     
     return widgets;
   }
   
   String _formatTime(String isoTime) {
     try {
-      final dateTime = DateTime.parse(isoTime);
+      final dateTime = DateTime.parse(isoTime).toLocal();
       return DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
     } catch (e) {
       return isoTime;
@@ -1169,4 +1254,19 @@ class _ConversionVideoPlayerState extends State<_ConversionVideoPlayer> {
       controls: MaterialVideoControls,
     );
   }
+}
+
+// Helper class for camera menu items
+class _CameraMenuItem {
+  final bool isHeader;
+  final bool isUngrouped;
+  final String? groupName;
+  final Camera? camera;
+
+  _CameraMenuItem({
+    this.isHeader = false,
+    this.isUngrouped = false,
+    this.groupName,
+    this.camera,
+  });
 }

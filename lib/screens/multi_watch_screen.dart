@@ -163,18 +163,10 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
               _syncDuration = effectiveDuration;
             });
             
-            // For live recordings, seek to near-live position after player is ready
-            // Player started from beginning (live_start_index=0) for accurate position tracking
-            if (_isLiveRecording && !_initialSeekDone && effectiveDuration.inSeconds > 0) {
-              print('[MultiWatch] Duration received: $effectiveDuration, seeking to live edge');
-              _initialSeekDone = true;
+            // Initial seek is now handled in _loadRecording after player.open
+            // Just update last known duration for reference
+            if (_isLiveRecording && effectiveDuration > _lastKnownDuration) {
               _lastKnownDuration = effectiveDuration;
-              // Seek to live edge after a brief delay for stability
-              Future.delayed(const Duration(milliseconds: 300), () {
-                if (mounted) {
-                  _seekToLiveEdge();
-                }
-              });
             }
           }
         });
@@ -273,6 +265,19 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
           
           // Open the media
           player.open(Media(recordingUrl), play: true);
+          
+          // For live recordings, seek to near-live position after player starts
+          // This is done here instead of duration listener to ensure proper timing
+          if (_isLiveRecording && !_initialSeekDone && _playlistTotalDuration.inSeconds > 0) {
+            _initialSeekDone = true;
+            // Wait for player to be ready then seek to live edge
+            Future.delayed(const Duration(milliseconds: 800), () {
+              if (mounted && _isLiveRecording) {
+                print('[MultiWatch] Initial seek to live edge for live recording');
+                _seekToLiveEdge();
+              }
+            });
+          }
         } catch (e) {
           print('[MultiWatch] Error loading recording for ${camera.name}: $e');
           setState(() {

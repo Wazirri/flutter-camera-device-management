@@ -4173,29 +4173,35 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
       // Listen for player state changes (no logging to avoid performance issues)
       // _popupPlayer.stream.playing.listen is handled by VideoControls widget
 
-      // Listen for duration changes - only do initial seek once, no delay
-      _popupPlayer.stream.duration.listen((duration) {
-        if (duration != Duration.zero && mounted && !_initialSeekDone) {
-          _initialSeekDone = true;
-          
-          if (widget.seekTime != null && widget.seekTime! > 0) {
-            // Explicit seek time provided - seek to that position
-            final seekDuration = Duration(seconds: widget.seekTime!);
-            _popupPlayer.seek(seekDuration);
-          } else if (_isLiveStream && _playlistDuration.inSeconds > 0) {
-            // Live stream without explicit seekTime - seek to near-live position
+      // For live streams, seek to near-live position after player starts
+      // This is done here after player.open for proper timing
+      if (_isLiveStream && !_initialSeekDone && _playlistDuration.inSeconds > 0) {
+        _initialSeekDone = true;
+        // Wait for player to be ready then seek to live edge
+        Future.delayed(const Duration(milliseconds: 800), () {
+          if (mounted && _isLiveStream) {
             // Use last 5 segments duration for safe offset, or default to 30s
             final offsetSeconds = _lastNSegmentsDuration.inSeconds > 0 
                 ? _lastNSegmentsDuration.inSeconds 
                 : 30;
             final livePosition = Duration(
                 seconds: (_playlistDuration.inSeconds - offsetSeconds).clamp(0, _playlistDuration.inSeconds));
-            print('[VideoPlayerPopup] Live stream - seeking to near-live: $livePosition (${offsetSeconds}s before end)');
+            print('[VideoPlayerPopup] Initial seek to near-live: $livePosition (${offsetSeconds}s before end)');
             _popupPlayer.seek(livePosition);
           }
-          // Non-live stream and no seekTime: start from beginning
-        }
-      });
+        });
+      } else if (widget.seekTime != null && widget.seekTime! > 0) {
+        // Explicit seek time provided - seek after a brief delay
+        _initialSeekDone = true;
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            final seekDuration = Duration(seconds: widget.seekTime!);
+            _popupPlayer.seek(seekDuration);
+          }
+        });
+      }
+      // Non-live stream and no seekTime: start from beginning (no seek needed)
+      
     } catch (e) {
       print('[VideoPlayerPopup] Error in _loadVideo: $e');
       setState(() {

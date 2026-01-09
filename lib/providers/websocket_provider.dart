@@ -8,6 +8,7 @@ import 'package:movita_ecs/models/system_info.dart';
 import 'package:movita_ecs/models/permissions.dart';
 import 'camera_devices_provider.dart';
 import 'user_group_provider.dart';
+import 'conversion_tracking_provider.dart';
 
 class WebSocketProviderOptimized with ChangeNotifier {
   WebSocket? _socket;
@@ -74,6 +75,10 @@ class WebSocketProviderOptimized with ChangeNotifier {
   // Get last parameter_set result without clearing
   Map<String, dynamic>? get lastParameterSetResult => _lastParameterSetResult;
   
+  // Global result message callback for notifications
+  // Parameters: command, result (0=error, 1=success), message
+  void Function(String command, int result, String message)? onResultMessage;
+  
   // Connection settings
   String _serverIp = '85.104.114.145';
   int _serverPort = 1200;
@@ -102,6 +107,14 @@ class WebSocketProviderOptimized with ChangeNotifier {
   // Set the user group provider
   void setUserGroupProvider(UserGroupProvider provider) {
     _userGroupProvider = provider;
+  }
+
+  // Reference to ConversionTrackingProvider
+  ConversionTrackingProvider? _conversionTrackingProvider;
+
+  // Set the conversion tracking provider
+  void setConversionTrackingProvider(ConversionTrackingProvider provider) {
+    _conversionTrackingProvider = provider;
   }
 
   // Detect platform and use local server if desktop
@@ -516,6 +529,13 @@ class WebSocketProviderOptimized with ChangeNotifier {
     return sendCommand(command);
   }
   
+  // Change camera name
+  Future<bool> changeCameraName(String cameraMac, String newName) async {
+    final command = 'CHANGE_CAM_NAME $cameraMac $newName';
+    print('WebSocketProvider: Sending change camera name command: $command');
+    return await sendCommand(command);
+  }
+  
   // Toggle camera distribute (SETINT command)
   Future<bool> toggleCameraDistribute(String cameraMac, bool distribute) async {
     final value = distribute ? 1 : 0;
@@ -582,6 +602,20 @@ class WebSocketProviderOptimized with ChangeNotifier {
       final message = jsonData['msg'] ?? '';
       
       print('processJsonMessage: command=$command, msg=$message');
+      
+      // Global result notification - if result field exists, notify listeners
+      if (jsonData.containsKey('result') && command != null) {
+        final result = jsonData['result'];
+        final msg = jsonData['msg'] ?? jsonData['message'] ?? '';
+        // Convert result to int (could be int or string)
+        final resultInt = result is int ? result : int.tryParse(result.toString()) ?? -1;
+        // Skip certain commands that have their own handling (like heartbeat, login, etc.)
+        final skipCommands = ['login', 'changedone', 'system_info', 'user_groups', 'conversions'];
+        if (!skipCommands.contains(command) && onResultMessage != null) {
+          print('[ResultNotification] Command: $command, Result: $resultInt, Message: $msg');
+          onResultMessage!(command.toString(), resultInt, msg.toString());
+        }
+      }
       
       // Handle "Oturum açılmamış!" message - send login credentials (trim to handle spaces)
       if (message.trim() == "Oturum açılmamış!" && _lastUsername != null && _lastPassword != null) {
@@ -729,13 +763,40 @@ class WebSocketProviderOptimized with ChangeNotifier {
           _lastMessage = jsonData;
           _lastConvertRecResponse = jsonData;
           final result = jsonData['result'];
-          final msg = jsonData['message'] ?? '';
+          final msg = jsonData['msg'] ?? jsonData['message'] ?? '';
           final filePath = jsonData['file_path'] ?? '';
           final status = jsonData['status'] ?? '';
           print('[${DateTime.now().toString().split('.').first}] Received convert_rec response: result=$result, status=$status, message=$msg');
           if (filePath.isNotEmpty) {
             print('[ConvertRec] File path: $filePath');
           }
+          
+          // If result is 0 (error), notify ConversionTrackingProvider immediately
+          if (result == 0 && _conversionTrackingProvider != null) {
+            // Extract camera name from error message (format: "KAMERA104 kamerası convert işlemi başarısız...")
+            String cameraName = '';
+            final msgStr = msg.toString();
+            if (msgStr.contains(' kamerası')) {
+              cameraName = msgStr.split(' kamerası').first.trim();
+            } else if (msgStr.contains('KAMERA')) {
+              // Try to extract KAMERA<number> pattern
+              final match = RegExp(r'KAMERA\d+').firstMatch(msgStr);
+              if (match != null) {
+                cameraName = match.group(0)!;
+              }
+            }
+            
+            if (cameraName.isNotEmpty) {
+              print('[ConvertRec] ❌ Error for camera: $cameraName - $msg');
+              _conversionTrackingProvider!.markAsError(
+                cameraName: cameraName,
+                errorMessage: msg.toString(),
+              );
+            } else {
+              print('[ConvertRec] ❌ Error but could not extract camera name: $msg');
+            }
+          }
+          
           _batchNotifyListeners();
           break;
 

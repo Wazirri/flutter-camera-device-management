@@ -932,7 +932,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
         ),
       ),
       child: InkWell(
-        onTap: () => _showCameraDetails(camera),
+        onTap: () => _openLiveView(camera),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -948,9 +948,9 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                             camera.subSnapShot.isNotEmpty)
                         ? () => _showFullSnapshot(
                               context,
-                              camera.subSnapShot.isNotEmpty
-                                  ? camera.subSnapShot
-                                  : camera.mainSnapShot,
+                              camera.mainSnapShot.isNotEmpty
+                                  ? camera.mainSnapShot
+                                  : camera.subSnapShot,
                               camera.displayName,
                               camera.username,
                               camera.password,
@@ -971,23 +971,33 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(6),
-                        child: (camera.mainSnapShot.isNotEmpty ||
-                                camera.subSnapShot.isNotEmpty)
+                        child: camera.mainSnapShot.isNotEmpty
                             ? CameraSnapshotWidget(
-                                snapshotUrl: camera.subSnapShot.isNotEmpty
-                                    ? camera.subSnapShot
-                                    : camera.mainSnapShot,
+                                snapshotUrl: camera.mainSnapShot,
                                 cameraId: camera.mac,
+                                width: 48,
                                 height: 48,
+                                fit: BoxFit.cover,
                                 showRefreshButton: false,
                                 username: camera.username,
                                 password: camera.password,
                               )
-                            : Icon(
-                                isOnline ? Icons.videocam : Icons.videocam_off,
-                                color: isOnline ? Colors.green : Colors.grey,
-                                size: 24,
-                              ),
+                            : camera.subSnapShot.isNotEmpty
+                                ? CameraSnapshotWidget(
+                                    snapshotUrl: camera.subSnapShot,
+                                    cameraId: camera.mac,
+                                    width: 48,
+                                    height: 48,
+                                    fit: BoxFit.cover,
+                                    showRefreshButton: false,
+                                    username: camera.username,
+                                    password: camera.password,
+                                  )
+                                : Icon(
+                                    isOnline ? Icons.videocam : Icons.videocam_off,
+                                    color: isOnline ? Colors.green : Colors.grey,
+                                    size: 24,
+                                  ),
                       ),
                     ),
                   ),
@@ -998,13 +1008,31 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          camera.displayName,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                camera.displayName,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            // Edit camera name button
+                            GestureDetector(
+                              onTap: () => _showRenameCameraDialog(camera),
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: Icon(
+                                  Icons.edit,
+                                  size: 16,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -2304,6 +2332,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                   cameraId: snapshotUrl,
                   height: MediaQuery.of(context).size.height * 0.5,
                   width: MediaQuery.of(context).size.width - 32,
+                  fit: BoxFit.contain,
                   showRefreshButton: true,
                   username: username,
                   password: password,
@@ -2348,5 +2377,103 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
         builder: (context) => LiveViewScreen(camera: camera),
       ),
     );
+  }
+
+  void _showRenameCameraDialog(Camera camera) {
+    final TextEditingController nameController = TextEditingController(text: camera.displayName);
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.darkSurface,
+        title: const Row(
+          children: [
+            Icon(Icons.edit, color: AppTheme.primaryBlue),
+            SizedBox(width: 8),
+            Text('Kamera Adını Değiştir', style: TextStyle(color: Colors.white)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'MAC: ${camera.mac}',
+              style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: nameController,
+              autofocus: true,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                labelText: 'Yeni Kamera Adı',
+                labelStyle: TextStyle(color: Colors.grey.shade400),
+                filled: true,
+                fillColor: AppTheme.darkBackground,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppTheme.primaryBlue),
+                ),
+              ),
+              onSubmitted: (_) => _submitRename(camera, nameController.text),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('İptal'),
+          ),
+          ElevatedButton(
+            onPressed: () => _submitRename(camera, nameController.text),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryBlue,
+            ),
+            child: const Text('Kaydet'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _submitRename(Camera camera, String newName) async {
+    final trimmedName = newName.trim();
+    if (trimmedName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Kamera adı boş olamaz'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
+    if (trimmedName == camera.displayName) {
+      Navigator.pop(context);
+      return;
+    }
+    
+    Navigator.pop(context);
+    
+    final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
+    final success = await webSocketProvider.changeCameraName(camera.mac, trimmedName);
+    
+    if (success) {
+      print('[AllCameras] Camera rename command sent: ${camera.mac} -> $trimmedName');
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Kamera adı değiştirme komutu gönderilemedi'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

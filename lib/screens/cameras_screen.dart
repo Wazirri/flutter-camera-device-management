@@ -65,8 +65,8 @@ class _CamerasScreenState extends State<CamerasScreen>
       selectedCamera = camera;
     });
 
-    // Kamera detaylarını BottomSheet olarak göster
-    _showCameraDetails(camera);
+    // Doğrudan canlı izlemeye git
+    _openLiveView(camera);
   }
 
   void _showCameraDetails(Camera camera) {

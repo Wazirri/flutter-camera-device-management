@@ -5,6 +5,7 @@ import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../providers/websocket_provider.dart';
 import '../providers/camera_devices_provider.dart';
+import '../screens/live_view_screen.dart';
 
 class CameraDetailsBottomSheet extends StatelessWidget {
   final Camera camera;
@@ -270,7 +271,13 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                   ),
                   onPressed: () {
                     Navigator.pop(context);
-                    // Live view sayfasına git (mevcut implemenatasyonunuza göre düzenleyin)
+                    // Navigate to LiveViewScreen with the camera
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LiveViewScreen(camera: camera),
+                      ),
+                    );
                   },
                 ),
               ),
