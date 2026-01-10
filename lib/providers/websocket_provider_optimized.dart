@@ -8,7 +8,6 @@ import 'package:movita_ecs/models/system_info.dart';
 import 'package:movita_ecs/models/permissions.dart';
 import 'camera_devices_provider.dart';
 import 'user_group_provider.dart';
-import 'conversion_tracking_provider.dart';
 
 class WebSocketProviderOptimized with ChangeNotifier {
   WebSocket? _socket;
@@ -51,34 +50,6 @@ class WebSocketProviderOptimized with ChangeNotifier {
   // Get last conversions response
   Map<String, dynamic>? get lastConversionsResponse => _lastConversionsResponse;
   
-  // Store last convert_rec response
-  Map<String, dynamic>? _lastConvertRecResponse;
-  
-  // Get last convert_rec response
-  Map<String, dynamic>? get lastConvertRecResponse => _lastConvertRecResponse;
-  
-  // Clear last convert_rec response
-  void clearLastConvertRecResponse() {
-    _lastConvertRecResponse = null;
-  }
-  
-  // Store last parameter_set result for UI notification
-  Map<String, dynamic>? _lastParameterSetResult;
-  
-  // Get last parameter_set result and clear it (one-time read)
-  Map<String, dynamic>? consumeLastParameterSetResult() {
-    final result = _lastParameterSetResult;
-    _lastParameterSetResult = null;
-    return result;
-  }
-  
-  // Get last parameter_set result without clearing
-  Map<String, dynamic>? get lastParameterSetResult => _lastParameterSetResult;
-  
-  // Global result message callback for notifications
-  // Parameters: command, result (0=error, 1=success), message
-  void Function(String command, int result, String message)? onResultMessage;
-  
   // Connection settings
   String _serverIp = '85.104.114.145';
   int _serverPort = 1200;
@@ -86,7 +57,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
   // Notification batching
   bool _needsNotification = false;
   Timer? _notificationDebounceTimer;
-  final int _notificationBatchWindow = 500; // milliseconds - increased for better batching with many cameras
+  final int _notificationBatchWindow = 200; // milliseconds
 
   // Constructor - load saved settings but don't auto-connect
   WebSocketProviderOptimized() {
@@ -107,14 +78,6 @@ class WebSocketProviderOptimized with ChangeNotifier {
   // Set the user group provider
   void setUserGroupProvider(UserGroupProvider provider) {
     _userGroupProvider = provider;
-  }
-
-  // Reference to ConversionTrackingProvider
-  ConversionTrackingProvider? _conversionTrackingProvider;
-
-  // Set the conversion tracking provider
-  void setConversionTrackingProvider(ConversionTrackingProvider provider) {
-    _conversionTrackingProvider = provider;
   }
 
   // Detect platform and use local server if desktop
@@ -153,16 +116,13 @@ class WebSocketProviderOptimized with ChangeNotifier {
 
   // Add message to log
   void _logMessage(String message) {
-    final now = DateTime.now();
-    final timestamp = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} '
-        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:'
-        '${now.second.toString().padLeft(2, '0')}.${now.millisecond.toString().padLeft(3, '0')}';
+    final timestamp = DateTime.now().toString().split('.').first;
     final logEntry = '[$timestamp] $message';
     
     _messageLog.add(logEntry);
     
     // Keep log size manageable (max 100000 messages)
-    if (_messageLog.length > 10000000) {
+    if (_messageLog.length > 100000) {
       _messageLog.removeAt(0);
     }
     
@@ -358,7 +318,6 @@ class WebSocketProviderOptimized with ChangeNotifier {
     _errorMessage = '';
     _lastMessage = null;
     _lastConversionsResponse = null;
-    _lastConvertRecResponse = null;
     
     // Clear message log
     _messageLog.clear();
@@ -392,13 +351,6 @@ class WebSocketProviderOptimized with ChangeNotifier {
       print('[${DateTime.now().toString().split('.').first}] $_errorMessage');
       _logMessage('ERROR: $_errorMessage');
       _batchNotifyListeners();
-      
-      // Try to reconnect if we have credentials
-      if (_lastUsername != null && _lastPassword != null) {
-        print('[${DateTime.now().toString().split('.').first}] Connection lost detected during sendCommand, scheduling reconnect...');
-        _logMessage('INFO: Bağlantı koptu, yeniden bağlanılıyor...');
-        _scheduleReconnect();
-      }
       return false;
     }
     
@@ -411,14 +363,6 @@ class WebSocketProviderOptimized with ChangeNotifier {
       _errorMessage = 'Error sending command: $e';
       print('[${DateTime.now().toString().split('.').first}] $_errorMessage');
       _logMessage('ERROR: $_errorMessage');
-      
-      // Connection might be broken, schedule reconnect
-      if (_lastUsername != null && _lastPassword != null) {
-        print('[${DateTime.now().toString().split('.').first}] Send error, scheduling reconnect...');
-        _logMessage('INFO: Gönderim hatası, yeniden bağlanılıyor...');
-        _handleDisconnect();
-      }
-      
       _batchNotifyListeners();
       return false;
     }
@@ -529,25 +473,30 @@ class WebSocketProviderOptimized with ChangeNotifier {
     return sendCommand(command);
   }
   
+  // Change WiFi settings
+  Future<bool> changeWifiSettings(String newName, String newPassword) {
+    final command = 'DO SCRIPT "wifichange" "$newName" "$newPassword"';
+    return sendCommand(command);
+  }
+  
   // Change camera name
   Future<bool> changeCameraName(String cameraMac, String newName) async {
-    final command = 'CHANGE_CAM_NAME $cameraMac $newName';
-    print('WebSocketProvider: Sending change camera name command: $command');
+    final command = 'SET all_cameras.$cameraMac.name "$newName"';
+    print('WebSocketProvider: Sending camera name change command: $command');
     return await sendCommand(command);
   }
   
-  // Toggle camera distribute (SETINT command)
-  Future<bool> toggleCameraDistribute(String cameraMac, bool distribute) async {
-    final value = distribute ? 1 : 0;
+  // Toggle camera distribute
+  Future<bool> toggleCameraDistribute(String cameraMac, int value) async {
     final command = 'SETINT all_cameras.$cameraMac.distribute $value';
-    print('WebSocketProvider: Sending toggle camera distribute command: $command');
+    print('WebSocketProvider: Sending toggle distribute command: $command');
     return await sendCommand(command);
   }
   
-  // Set camera distribute count (SETINT command)
+  // Set camera distribute count
   Future<bool> setCameraDistributeCount(String cameraMac, int count) async {
     final command = 'SETINT all_cameras.$cameraMac.distribute_count $count';
-    print('WebSocketProvider: Sending set camera distribute_count command: $command');
+    print('WebSocketProvider: Sending set distribute count command: $command');
     return await sendCommand(command);
   }
   
@@ -567,12 +516,6 @@ class WebSocketProviderOptimized with ChangeNotifier {
     final command = '$deviceMac SHMC configuration.service.recorder.on $value';
     print('WebSocketProvider: Sending Recorder service command: $command');
     return await sendCommand(command);
-  }
-  
-  // Change WiFi settings
-  Future<bool> changeWifiSettings(String newName, String newPassword) {
-    final command = 'DO SCRIPT "wifichange" "$newName" "$newPassword"';
-    return sendCommand(command);
   }
 
   // Handle incoming WebSocket messages
@@ -620,20 +563,6 @@ class WebSocketProviderOptimized with ChangeNotifier {
       final message = jsonData['msg'] ?? '';
       
       print('processJsonMessage: command=$command, msg=$message');
-      
-      // Global result notification - if result field exists, notify listeners
-      if (jsonData.containsKey('result') && command != null) {
-        final result = jsonData['result'];
-        final msg = jsonData['msg'] ?? jsonData['message'] ?? '';
-        // Convert result to int (could be int or string)
-        final resultInt = result is int ? result : int.tryParse(result.toString()) ?? -1;
-        // Skip certain commands that have their own handling (like heartbeat, login, etc.)
-        final skipCommands = ['login', 'changedone', 'system_info', 'user_groups', 'conversions'];
-        if (!skipCommands.contains(command) && onResultMessage != null) {
-          print('[ResultNotification] Command: $command, Result: $resultInt, Message: $msg');
-          onResultMessage!(command.toString(), resultInt, msg.toString());
-        }
-      }
       
       // Handle "Oturum açılmamış!" message - send login credentials (trim to handle spaces)
       if (message.trim() == "Oturum açılmamış!" && _lastUsername != null && _lastPassword != null) {
@@ -773,48 +702,6 @@ class WebSocketProviderOptimized with ChangeNotifier {
           _lastConversionsResponse = jsonData;
           print('[${DateTime.now().toString().split('.').first}] Received conversions response');
           print('[Conversions] Data: ${jsonData['data']}');
-          _batchNotifyListeners();
-          break;
-
-        case 'convert_rec':
-          // Store convert_rec response for polling
-          _lastMessage = jsonData;
-          _lastConvertRecResponse = jsonData;
-          final result = jsonData['result'];
-          final msg = jsonData['msg'] ?? jsonData['message'] ?? '';
-          final filePath = jsonData['file_path'] ?? '';
-          final status = jsonData['status'] ?? '';
-          print('[${DateTime.now().toString().split('.').first}] Received convert_rec response: result=$result, status=$status, message=$msg');
-          if (filePath.isNotEmpty) {
-            print('[ConvertRec] File path: $filePath');
-          }
-          
-          // If result is 0 (error), notify ConversionTrackingProvider immediately
-          if (result == 0 && _conversionTrackingProvider != null) {
-            // Extract camera name from error message (format: "KAMERA104 kamerası convert işlemi başarısız...")
-            String cameraName = '';
-            final msgStr = msg.toString();
-            if (msgStr.contains(' kamerası')) {
-              cameraName = msgStr.split(' kamerası').first.trim();
-            } else if (msgStr.contains('KAMERA')) {
-              // Try to extract KAMERA<number> pattern
-              final match = RegExp(r'KAMERA\d+').firstMatch(msgStr);
-              if (match != null) {
-                cameraName = match.group(0)!;
-              }
-            }
-            
-            if (cameraName.isNotEmpty) {
-              print('[ConvertRec] ❌ Error for camera: $cameraName - $msg');
-              _conversionTrackingProvider!.markAsError(
-                cameraName: cameraName,
-                errorMessage: msg.toString(),
-              );
-            } else {
-              print('[ConvertRec] ❌ Error but could not extract camera name: $msg');
-            }
-          }
-          
           _batchNotifyListeners();
           break;
 
@@ -977,33 +864,6 @@ class WebSocketProviderOptimized with ChangeNotifier {
           _batchNotifyListeners();
           break;
 
-        case 'parameter_set':
-          // Handle SETINT command response
-          final result = jsonData['result'] as int?;
-          final msg = jsonData['msg'] ?? '';
-          final key = jsonData['key'] ?? '';
-          final value = jsonData['value'];
-          
-          print('⚙️ WebSocket: parameter_set response: result=$result, msg=$msg, key=$key, value=$value');
-          
-          // Store the last parameter set result for UI notification
-          _lastParameterSetResult = {
-            'success': result == 1,
-            'message': msg,
-            'key': key,
-            'value': value,
-          };
-          
-          // Log to WebSocket log
-          if (result == 1) {
-            _logMessage('INFO: ✅ $msg');
-          } else {
-            _logMessage('ERROR: ❌ $msg');
-          }
-          
-          _batchNotifyListeners();
-          break;
-
         default:
           // Handle any command with result/msg pattern (generic command response handler)
           // Format: {"c":"command_name", "result":1, "msg":"..."}
@@ -1051,62 +911,30 @@ class WebSocketProviderOptimized with ChangeNotifier {
   void _handleDisconnect() {
     print('WebSocket disconnected');
     print('[${DateTime.now().toString().split('.').first}] WebSocket disconnected');
-    _logMessage('INFO: WebSocket bağlantısı koptu');
-    
-    // Keep login state - we'll try to reconnect with same credentials
-    final wasLoggedIn = _isLoggedIn;
-    final hasCredentials = _lastUsername != null && _lastPassword != null;
-    
-    print('[${DateTime.now().toString().split('.').first}] Disconnect state: wasLoggedIn=$wasLoggedIn, hasCredentials=$hasCredentials');
-    
     _isConnected = false;
     _isWaitingForChangedone = false;
-    _socket = null;
     _batchNotifyListeners();
 
-    // Try to reconnect if we have credentials (either was logged in or have saved credentials)
-    if (hasCredentials) {
-      print('[${DateTime.now().toString().split('.').first}] Connection lost, scheduling reconnect...');
-      _logMessage('INFO: Bağlantı koptu, 3 saniye sonra yeniden bağlanılacak...');
-      _scheduleReconnect();
-    } else {
-      print('[${DateTime.now().toString().split('.').first}] No credentials saved, not scheduling reconnect');
-      _logMessage('INFO: Kayıtlı kimlik bilgisi yok, yeniden bağlanma planlanmıyor');
-    }
+    // Try to reconnect (login state korunur)
+    _scheduleReconnect();
   }
 
   // Handle WebSocket errors
   void _handleError(dynamic error) {
     print('WebSocket error: $error');
     print('[${DateTime.now().toString().split('.').first}] WebSocket error: $error');
-    _logMessage('ERROR: WebSocket hatası: $error');
     _errorMessage = error.toString();
-    
-    // Keep login state - we'll try to reconnect with same credentials
-    final wasLoggedIn = _isLoggedIn;
-    final hasCredentials = _lastUsername != null && _lastPassword != null;
-    
-    print('[${DateTime.now().toString().split('.').first}] Error state: wasLoggedIn=$wasLoggedIn, hasCredentials=$hasCredentials');
-    
     _isConnected = false;
     _isConnecting = false;
     _isWaitingForChangedone = false;
-    _socket = null;
     
     // Start connection error handling and auto-reconnect
     _handleConnectionError();
     
     _batchNotifyListeners();
 
-    // Try to reconnect if we have credentials
-    if (hasCredentials) {
-      print('[${DateTime.now().toString().split('.').first}] Connection error, scheduling reconnect...');
-      _logMessage('INFO: Bağlantı hatası, 3 saniye sonra yeniden bağlanılacak...');
-      _scheduleReconnect();
-    } else {
-      print('[${DateTime.now().toString().split('.').first}] No credentials saved, not scheduling reconnect');
-      _logMessage('INFO: Kayıtlı kimlik bilgisi yok, yeniden bağlanma planlanmıyor');
-    }
+    // Try to reconnect (login state korunur)
+    _scheduleReconnect();
   }
 
   // Start heartbeat timer
@@ -1136,44 +964,22 @@ class WebSocketProviderOptimized with ChangeNotifier {
 
   // Schedule reconnection attempt
   void _scheduleReconnect() {
-    // Don't reconnect if we don't have credentials
-    if (_lastUsername == null || _lastPassword == null) {
-      print('[${DateTime.now().toString().split('.').first}] Reconnect suppressed: no saved credentials.');
-      _logMessage('INFO: Yeniden bağlanma iptal edildi: kayıtlı kimlik bilgisi yok');
+    // Don't auto-reconnect unless user is logged in
+    if (!_isLoggedIn) {
+      print('Reconnect suppressed: user not logged in.');
       return;
     }
-    
-    // Don't schedule multiple reconnect attempts
-    if (_reconnectTimer != null && _reconnectTimer!.isActive) {
-      print('[${DateTime.now().toString().split('.').first}] Reconnect already scheduled, skipping...');
-      return;
-    }
-    
     _stopReconnectTimer(); // Stop existing timer if any
 
-    print('[${DateTime.now().toString().split('.').first}] Scheduling reconnect in 3 seconds...');
-    _logMessage('INFO: 3 saniye sonra yeniden bağlanılacak...');
-    
-    _reconnectTimer = Timer(const Duration(seconds: 3), () async {
-      print('Attempting to reconnect...');
-      print('[${DateTime.now().toString().split('.').first}] Attempting to reconnect to $_serverIp:$_serverPort');
-      _logMessage('INFO: Yeniden bağlanılıyor: $_serverIp:$_serverPort');
-      
-      final success = await connect(_serverIp, _serverPort,
-          username: _lastUsername!, password: _lastPassword!, rememberMe: _rememberMe);
-      
-      if (!success) {
-        print('[${DateTime.now().toString().split('.').first}] Reconnect failed, will retry in 5 seconds...');
-        _logMessage('ERROR: Yeniden bağlanma başarısız, 5 saniye sonra tekrar denenecek...');
-        // Schedule another reconnect attempt with longer delay
-        _reconnectTimer = Timer(const Duration(seconds: 5), () {
-          _scheduleReconnect();
-        });
-      } else {
-        print('[${DateTime.now().toString().split('.').first}] Reconnect successful!');
-        _logMessage('INFO: Yeniden bağlantı başarılı!');
-      }
-    });
+    // Try to reconnect if we were previously connected and have credentials
+    if (_lastUsername != null && _lastPassword != null) {
+      _reconnectTimer = Timer(const Duration(seconds: 5), () {
+        print('Attempting to reconnect...');
+        print('[${DateTime.now().toString().split('.').first}] Attempting to reconnect...');
+        connect(_serverIp, _serverPort,
+            username: _lastUsername!, password: _lastPassword!, rememberMe: _rememberMe);
+      });
+    }
   }
 
   // Stop reconnect timer

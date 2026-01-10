@@ -36,17 +36,7 @@ class _CamerasScreenState extends State<CamerasScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    // Check if there's a selected device and auto-filter cameras for that device
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider =
-          Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
-      final selectedDevice = provider.selectedDevice;
-      if (selectedDevice != null) {
-        setState(() {
-          selectedMacAddress = selectedDevice.macKey;
-        });
-      }
-    });
+    // selectedMacAddress stays null so "All Devices" is selected by default
   }
 
   @override
@@ -197,12 +187,12 @@ class _CamerasScreenState extends State<CamerasScreen>
           controller: _tabController,
           tabs: const [
             Tab(
-              icon: Icon(Icons.devices),
-              text: 'By Device',
-            ),
-            Tab(
               icon: Icon(Icons.group_work),
               text: 'By Group',
+            ),
+            Tab(
+              icon: Icon(Icons.devices),
+              text: 'By Device',
             ),
           ],
         ),
@@ -229,8 +219,8 @@ class _CamerasScreenState extends State<CamerasScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildDeviceGroupedView(),
           _buildCameraGroupedView(),
+          _buildDeviceGroupedView(),
         ],
       ),
     );
@@ -508,10 +498,10 @@ class _CamerasScreenState extends State<CamerasScreen>
 
           if (deviceName == null) {
             print(
-                'DEBUG: Camera ${camera.name} (${camera.id}) has no device assignment - adding to Ungrouped');
+                'DEBUG: Camera ${camera.name} (${camera.id}) has no device assignment - adding to Unassigned');
           }
 
-          final groupName = deviceName ?? 'Ungrouped Cameras';
+          final groupName = deviceName ?? 'Unassigned';
           camerasGroupedByDevice.putIfAbsent(groupName, () => []).add(camera);
         }
 
@@ -684,8 +674,14 @@ class _CamerasScreenState extends State<CamerasScreen>
 
   Widget _buildGroupedCameraContent(
       Map<String, List<Camera>> groupedCameras, Widget? filterChips, Widget? searchBar) {
+    // Sort group names, but keep 'Ungrouped Cameras' and 'Unassigned' at the end
     final sortedGroupNames = groupedCameras.keys.toList()
-      ..sort((a, b) => a.compareTo(b));
+      ..sort((a, b) {
+        // 'Ungrouped Cameras' and 'Unassigned' should be at the end
+        if (a == 'Ungrouped Cameras' || a == 'Unassigned') return 1;
+        if (b == 'Ungrouped Cameras' || b == 'Unassigned') return -1;
+        return a.compareTo(b);
+      });
     
     // İlk yüklemede tüm grupları genişlet
     if (_expandedGroups.isEmpty && sortedGroupNames.isNotEmpty) {

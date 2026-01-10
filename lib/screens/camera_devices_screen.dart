@@ -49,6 +49,9 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
                   provider.setSelectedDevice(device.macKey);
                   _showDeviceDetails(context, device);
                 },
+                onToggleSmartPlayer: (ctx, dev) => _toggleSmartPlayerService(dev, provider),
+                onToggleRecorder: (ctx, dev) => _toggleRecorderService(dev, provider),
+                onShowNetworkSettings: _showNetworkSettings,
               );
             },
           );
@@ -81,18 +84,170 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
       },
     );
   }
+  
+  void _toggleSmartPlayerService(CameraDevice device, CameraDevicesProviderOptimized cameraDevicesProvider) async {
+    print('[Toggle] _toggleSmartPlayerService called for device: ${device.macAddress}');
+    
+    final newValue = !device.smartPlayerServiceOn;
+    print('[Toggle] Current smartPlayerServiceOn: ${device.smartPlayerServiceOn}, newValue: $newValue');
+    
+    // WebSocket komutu gönder ve UI'ı güncelle
+    final success = await cameraDevicesProvider.setSmartPlayerService(device.macAddress, newValue);
+    
+    print('[Toggle] Command sent, success: $success');
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(success 
+              ? 'Player servisi ${newValue ? "başlatıldı" : "durduruldu"}'
+              : 'Komut gönderilemedi'),
+          backgroundColor: success ? (newValue ? Colors.green : Colors.red) : Colors.grey,
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+  
+  void _toggleRecorderService(CameraDevice device, CameraDevicesProviderOptimized cameraDevicesProvider) async {
+    print('[Toggle] _toggleRecorderService called for device: ${device.macAddress}');
+    
+    final newValue = !device.recorderServiceOn;
+    print('[Toggle] Current recorderServiceOn: ${device.recorderServiceOn}, newValue: $newValue');
+    
+    // Recorder kapatılırken onay iste
+    if (!newValue) {
+      bool clearCameras = false;
+      
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => StatefulBuilder(
+          builder: (context, setDialogState) => AlertDialog(
+            backgroundColor: AppTheme.darkSurface,
+            title: Row(
+              children: [
+                const Icon(Icons.warning_amber, color: Colors.orange, size: 28),
+                const SizedBox(width: 8),
+                const Text(
+                  'Recorder Durdur',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${device.deviceName ?? device.macAddress} cihazında Recorder servisini durdurmak istiyor musunuz?\n\nDikkat: Bu işlem cihazın kayıt yapmasını durduracak!',
+                  style: TextStyle(color: Colors.grey.shade300),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: clearCameras,
+                        onChanged: (value) {
+                          setDialogState(() {
+                            clearCameras = value ?? false;
+                          });
+                        },
+                        activeColor: Colors.red,
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Cihazdaki tüm kameraları da sil',
+                          style: TextStyle(
+                            color: Colors.red.shade300,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('İptal'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                ),
+                onPressed: () {
+                  Navigator.pop(dialogContext, true);
+                },
+                child: const Text('Durdur'),
+              ),
+            ],
+          ),
+        ),
+      );
+      
+      if (confirmed != true) {
+        print('[Toggle] User cancelled recorder stop');
+        return;
+      }
+      
+      // Eğer kameraları silme seçeneği seçildiyse CLEARCAMS komutunu gönder
+      if (clearCameras) {
+        print('[Toggle] User requested to clear cameras');
+        await cameraDevicesProvider.clearDeviceCameras(device.macAddress);
+      }
+    }
+    
+    // WebSocket komutu gönder ve UI'ı güncelle
+    final success = await cameraDevicesProvider.setRecorderService(device.macAddress, newValue);
+    
+    print('[Toggle] Command sent, success: $success');
+    
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(success 
+              ? 'Recorder servisi ${newValue ? "başlatıldı" : "durduruldu"}'
+              : 'Komut gönderilemedi'),
+          backgroundColor: success ? (newValue ? Colors.orange : Colors.red) : Colors.grey,
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+  
+  void _showNetworkSettings(BuildContext context, CameraDevice device) {
+    showDialog(
+      context: context,
+      builder: (context) => _NetworkSettingsDialog(device: device),
+    );
+  }
 }
 
 class DeviceCard extends StatelessWidget {
   final CameraDevice device;
   final VoidCallback onTap;
   final bool isSelected;
+  final Function(BuildContext, CameraDevice) onToggleSmartPlayer;
+  final Function(BuildContext, CameraDevice) onToggleRecorder;
+  final Function(BuildContext, CameraDevice) onShowNetworkSettings;
 
   const DeviceCard({
     Key? key,
     required this.device,
     required this.onTap,
     this.isSelected = false,
+    required this.onToggleSmartPlayer,
+    required this.onToggleRecorder,
+    required this.onShowNetworkSettings,
   }) : super(key: key);
 
   @override
@@ -104,6 +259,14 @@ class DeviceCard extends StatelessWidget {
     print('DeviceCard build: ${device.macAddress}, connected: ${device.connected}, online: ${device.online}, firstTime: ${device.firstTime}, status from getter: $currentStatus'); // MODIFIED
     
     final isMaster = device.isMaster == true;
+    
+    // Seçili offline cihaz için gri, online için altın sarısı/primary renk kullan
+    final selectedBorderColor = device.connected 
+        ? AppTheme.primaryColor.withOpacity(0.8)
+        : Colors.grey.shade500;
+    final selectedBackgroundColor = device.connected
+        ? AppTheme.primaryColor.withOpacity(0.1)
+        : Colors.grey.withOpacity(0.1);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -114,7 +277,7 @@ class DeviceCard extends StatelessWidget {
           color: isMaster 
               ? Colors.amber
               : (isSelected 
-                  ? AppTheme.primaryColor.withOpacity(0.8)
+                  ? selectedBorderColor
                   : (device.connected 
                       ? AppTheme.primaryColor
                       : Theme.of(context).dividerColor)),
@@ -124,7 +287,7 @@ class DeviceCard extends StatelessWidget {
       color: isMaster 
           ? Colors.amber.withOpacity(0.1)
           : (isSelected 
-              ? AppTheme.primaryColor.withOpacity(0.1)
+              ? selectedBackgroundColor
               : null),
       child: InkWell(
         onTap: onTap,
@@ -348,6 +511,113 @@ class DeviceCard extends StatelessWidget {
               ),
               // END ADDED
               const SizedBox(height: 8),
+              // Service control toggles (Smart Player and Recorder)
+              Row(
+                children: [
+                  // Smart Player Service toggle
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => onToggleSmartPlayer(context, device),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: device.smartPlayerServiceOn 
+                              ? Colors.green.withOpacity(0.15)
+                              : Colors.red.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: device.smartPlayerServiceOn ? Colors.green : Colors.red,
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.play_circle_outline,
+                                  size: 16,
+                                  color: device.smartPlayerServiceOn ? Colors.green : Colors.red,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Player',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: device.smartPlayerServiceOn ? Colors.green : Colors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Switch(
+                              value: device.smartPlayerServiceOn,
+                              onChanged: (value) => onToggleSmartPlayer(context, device),
+                              activeColor: Colors.green,
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Recorder Service toggle
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => onToggleRecorder(context, device),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: device.recorderServiceOn 
+                              ? Colors.orange.withOpacity(0.15)
+                              : Colors.red.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: device.recorderServiceOn ? Colors.orange : Colors.red,
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  device.recorderServiceOn ? Icons.fiber_manual_record : Icons.stop,
+                                  size: 16,
+                                  color: device.recorderServiceOn ? Colors.orange : Colors.red,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Recorder',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: device.recorderServiceOn ? Colors.orange : Colors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Switch(
+                              value: device.recorderServiceOn,
+                              onChanged: (value) => onToggleRecorder(context, device),
+                              activeColor: Colors.orange,
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
               Text(
                 'Last seen: ${device.lastSeenAt}',
                 style: TextStyle(
@@ -360,7 +630,7 @@ class DeviceCard extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: ElevatedButton.icon(
-                  onPressed: () => _showNetworkSettings(context, device),
+                  onPressed: () => onShowNetworkSettings(context, device),
                   icon: const Icon(Icons.settings, size: 18),
                   label: const Text('Network Settings'),
                   style: ElevatedButton.styleFrom(
@@ -374,13 +644,6 @@ class DeviceCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-  
-  void _showNetworkSettings(BuildContext context, CameraDevice device) {
-    showDialog(
-      context: context,
-      builder: (context) => _NetworkSettingsDialog(device: device),
     );
   }
 }

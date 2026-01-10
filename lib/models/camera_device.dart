@@ -240,6 +240,10 @@ class CameraDevice {
   int totalConnections;
   int totalSessions;
 
+  // Service status fields (from configuration.service.*)
+  bool smartPlayerServiceOn; // configuration.service.smart_player.on - default true (1)
+  bool recorderServiceOn; // configuration.service.recorder.on - default true (1)
+
   List<Camera> cameras;
 
   CameraDevice({
@@ -343,6 +347,8 @@ class CameraDevice {
     this.networkInfo,
     this.totalConnections = 0,
     this.totalSessions = 0,
+    this.smartPlayerServiceOn = true, // Default: service is ON
+    this.recorderServiceOn = true, // Default: service is ON
     List<Camera>? cameras,
   }) : cameras = cameras ?? [];
 
@@ -449,6 +455,8 @@ class CameraDevice {
     String? networkInfo,
     int? totalConnections,
     int? totalSessions,
+    bool? smartPlayerServiceOn,
+    bool? recorderServiceOn,
   }) {
     return CameraDevice(
       macAddress: macAddress ?? this.macAddress,
@@ -558,6 +566,8 @@ class CameraDevice {
       networkInfo: networkInfo ?? this.networkInfo,
       totalConnections: totalConnections ?? this.totalConnections,
       totalSessions: totalSessions ?? this.totalSessions,
+      smartPlayerServiceOn: smartPlayerServiceOn ?? this.smartPlayerServiceOn,
+      recorderServiceOn: recorderServiceOn ?? this.recorderServiceOn,
     );
   }
 

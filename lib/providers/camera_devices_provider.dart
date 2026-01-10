@@ -2337,6 +2337,24 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         _batchNotifyListeners();
       }
     }
+    
+    // Process service.smart_player.on and service.recorder.on for this device
+    // Path format: configuration.service.smart_player.on or configuration.service.recorder.on
+    if (fullPath.contains('service.smart_player.on') || 
+        (subPath.length >= 3 && subPath[0] == 'service' && subPath[1] == 'smart_player' && subPath[2] == 'on')) {
+      final isOn = value == 1 || value == true || value.toString() == '1';
+      device.smartPlayerServiceOn = isOn;
+      print('CDP_OPT: ⚙️ Smart Player Service for ${device.macAddress}: ${isOn ? "ON" : "OFF"}');
+      _batchNotifyListeners();
+    }
+    
+    if (fullPath.contains('service.recorder.on') || 
+        (subPath.length >= 3 && subPath[0] == 'service' && subPath[1] == 'recorder' && subPath[2] == 'on')) {
+      final isOn = value == 1 || value == true || value.toString() == '1';
+      device.recorderServiceOn = isOn;
+      print('CDP_OPT: ⚙️ Recorder Service for ${device.macAddress}: ${isOn ? "ON" : "OFF"}');
+      _batchNotifyListeners();
+    }
   }
 
   // Process camera group definition
@@ -2497,6 +2515,13 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     }
     print('CDP_OPT: ======================');
   }
+  
+  // Public method to trigger UI update
+  void triggerUpdate() {
+    _cachedFlatCameraList = null;
+    _cachedDevicesList = null;
+    notifyListeners();
+  }
 
   // Batch notifications to reduce UI rebuilds
   void _batchNotifyListeners() {
@@ -2621,6 +2646,84 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       dhcp: dhcp,
       mac: mac,
     );
+  }
+  
+  /// Toggle Smart Player service on a device
+  /// Format: <MAC> SHMC configuration.service.smart_player.on <0|1>
+  Future<bool> setSmartPlayerService(String deviceMac, bool enabled) async {
+    if (_webSocketProvider == null) {
+      print('❌ CDP: WebSocketProvider not set');
+      return false;
+    }
+    
+    final value = enabled ? 1 : 0;
+    final command = '$deviceMac SHMC configuration.service.smart_player.on $value';
+    print('CDP: 🎬 Sending Smart Player service command: $command');
+    
+    final success = await _webSocketProvider!.sendCommand(command);
+    
+    if (success) {
+      // Update device state
+      final device = _devices[deviceMac];
+      if (device != null) {
+        device.smartPlayerServiceOn = enabled;
+        triggerUpdate();
+      }
+    }
+    
+    return success;
+  }
+  
+  /// Toggle Recorder service on a device
+  /// Format: <MAC> SHMC configuration.service.recorder.on <0|1>
+  Future<bool> setRecorderService(String deviceMac, bool enabled) async {
+    if (_webSocketProvider == null) {
+      print('❌ CDP: WebSocketProvider not set');
+      return false;
+    }
+    
+    final value = enabled ? 1 : 0;
+    final command = '$deviceMac SHMC configuration.service.recorder.on $value';
+    print('CDP: 🔴 Sending Recorder service command: $command');
+    
+    final success = await _webSocketProvider!.sendCommand(command);
+    
+    if (success) {
+      // Update device state
+      final device = _devices[deviceMac];
+      if (device != null) {
+        device.recorderServiceOn = enabled;
+        triggerUpdate();
+      }
+    }
+    
+    return success;
+  }
+  
+  /// Clear all cameras from a device
+  /// Format: <MAC> CLEARCAMS
+  Future<bool> clearDeviceCameras(String deviceMac) async {
+    if (_webSocketProvider == null) {
+      print('❌ CDP: WebSocketProvider not set');
+      return false;
+    }
+    
+    final command = '$deviceMac CLEARCAMS';
+    print('CDP: 🗑️ Sending CLEARCAMS command: $command');
+    
+    final success = await _webSocketProvider!.sendCommand(command);
+    
+    if (success) {
+      // Clear cameras from local device state
+      final device = _devices[deviceMac];
+      if (device != null) {
+        device.cameras.clear();
+        triggerUpdate();
+        print('CDP: ✅ Cameras cleared for device $deviceMac');
+      }
+    }
+    
+    return success;
   }
 
   @override
