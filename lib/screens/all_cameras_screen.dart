@@ -1010,6 +1010,18 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                       children: [
                         Row(
                           children: [
+                            // Edit camera name button - sol tarafta
+                            GestureDetector(
+                              onTap: () => _showRenameCameraDialog(camera),
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 6),
+                                child: Icon(
+                                  Icons.edit,
+                                  size: 14,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                            ),
                             Expanded(
                               child: Text(
                                 camera.displayName,
@@ -1017,18 +1029,6 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            // Edit camera name button
-                            GestureDetector(
-                              onTap: () => _showRenameCameraDialog(camera),
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 4),
-                                child: Icon(
-                                  Icons.edit,
-                                  size: 16,
-                                  color: Colors.grey.shade500,
                                 ),
                               ),
                             ),

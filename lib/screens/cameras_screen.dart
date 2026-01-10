@@ -27,6 +27,10 @@ class _CamerasScreenState extends State<CamerasScreen>
   bool isGridView = false; // Default to list view
   String? selectedMacAddress;
   late TabController _tabController;
+  final TextEditingController _searchController = TextEditingController();
+  
+  // Grup genişletme durumları - varsayılan olarak tümü açık
+  final Set<String> _expandedGroups = {};
 
   @override
   void initState() {
@@ -48,6 +52,7 @@ class _CamerasScreenState extends State<CamerasScreen>
   @override
   void dispose() {
     _tabController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -118,6 +123,48 @@ class _CamerasScreenState extends State<CamerasScreen>
     });
   }
 
+  bool _matchesSearch(Camera camera, String query) {
+    if (query.isEmpty) return true;
+    final lowercaseQuery = query.toLowerCase();
+    return camera.name.toLowerCase().contains(lowercaseQuery) ||
+        camera.displayName.toLowerCase().contains(lowercaseQuery) ||
+        camera.ip.toLowerCase().contains(lowercaseQuery) ||
+        camera.mac.toLowerCase().contains(lowercaseQuery);
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: 'Kamera ara...',
+          hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+          prefixIcon: Icon(Icons.search, color: Colors.grey.shade500, size: 20),
+          suffixIcon: searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: Icon(Icons.clear, color: Colors.grey.shade500, size: 18),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() => searchQuery = '');
+                  },
+                )
+              : null,
+          filled: true,
+          fillColor: AppTheme.darkSurface,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          isDense: true,
+        ),
+        style: const TextStyle(color: Colors.white, fontSize: 14),
+        onChanged: (value) => setState(() => searchQuery = value),
+      ),
+    );
+  }
+
   void _toggleActiveFilter() {
     setState(() {
       showOnlyActive = !showOnlyActive;
@@ -160,23 +207,6 @@ class _CamerasScreenState extends State<CamerasScreen>
           ],
         ),
         actions: [
-          // Search button
-          IconButton(
-            icon: const Icon(Icons.search),
-            tooltip: 'Search Cameras',
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: CameraSearchDelegate(
-                  onCameraSelected: (camera) {
-                    _selectCamera(camera);
-                    // Optionally navigate to camera details
-                  },
-                ),
-              );
-            },
-          ),
-
           // Filter toggle
           IconButton(
             icon: Icon(
@@ -239,54 +269,64 @@ class _CamerasScreenState extends State<CamerasScreen>
 
         // Get filtered cameras based on authorization
         final allCameras = provider.getAuthorizedCameras(authorizedMacs);
+        
+        // Apply search filter
+        final filteredBySearch = searchQuery.isEmpty
+            ? allCameras
+            : allCameras.where((camera) => _matchesSearch(camera, searchQuery)).toList();
+        
         print(
             '[CameraScreen] 📊 Total cameras available: ${provider.cameras.length}');
         print(
-            '[CameraScreen] ✅ Filtered cameras to show: ${allCameras.length}');
+            '[CameraScreen] ✅ Filtered cameras to show: ${filteredBySearch.length}');
 
+        // Build search bar widget
+        final searchBar = _buildSearchBar();
         // If loading, show a spinner
         if (provider.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
+          return Column(
+            children: [
+              searchBar,
+              const Expanded(child: Center(child: CircularProgressIndicator())),
+            ],
           );
         }
 
         // If there are no cameras, show empty state
-        if (allCameras.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.videocam_off_outlined,
-                  size: 64.0,
-                  color: Colors.grey,
-                ),
-                const SizedBox(height: 16.0),
-                const Text(
-                  'No cameras found',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
+        if (filteredBySearch.isEmpty) {
+          return Column(
+            children: [
+              searchBar,
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.videocam_off_outlined,
+                        size: 64.0,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 16.0),
+                      Text(
+                        searchQuery.isNotEmpty ? 'Sonuç bulunamadı' : 'No cameras found',
+                        style: const TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (searchQuery.isNotEmpty) ...[
+                        const SizedBox(height: 8.0),
+                        Text(
+                          '"$searchQuery" için eşleşme yok',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8.0),
-                Text(
-                  'Connect to your network to discover cameras',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 24.0),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Refresh'),
-                  onPressed: () {
-                    // provider.refreshCameras(); // Method removed, WebSocket handles updates
-                  },
-                ),
-              ],
-            ),
+              ),
+            ],
           );
         }
 
@@ -294,7 +334,7 @@ class _CamerasScreenState extends State<CamerasScreen>
         // This includes cameras from cameras_mac even if device is offline
         // A camera can be on MULTIPLE devices (currentDevices Map), so we add it to each device group
         final groupedCamerasByMac = <String, List<Camera>>{};
-        for (var camera in allCameras) {
+        for (var camera in filteredBySearch) {
           // Skip device MAC addresses (m_*) and cameras without MAC
           if (camera.mac.isEmpty || camera.mac.startsWith('m_')) continue;
 
@@ -474,7 +514,7 @@ class _CamerasScreenState extends State<CamerasScreen>
         }
 
         return _buildGroupedCameraContent(
-            camerasGroupedByDevice, macAddressFilters);
+            camerasGroupedByDevice, macAddressFilters, searchBar);
       },
     );
   }
@@ -516,54 +556,65 @@ class _CamerasScreenState extends State<CamerasScreen>
         // Get filtered cameras based on authorization
         final allAuthorizedCameras =
             provider.getAuthorizedCameras(authorizedMacs);
+        
+        // Apply search filter
+        final filteredBySearch = searchQuery.isEmpty
+            ? allAuthorizedCameras
+            : allAuthorizedCameras.where((camera) => _matchesSearch(camera, searchQuery)).toList();
+        
         print(
             '[CameraScreen-Grouped] 📊 Total cameras available: ${provider.cameras.length}');
         print(
-            '[CameraScreen-Grouped] ✅ Filtered cameras to show: ${allAuthorizedCameras.length}');
+            '[CameraScreen-Grouped] ✅ Filtered cameras to show: ${filteredBySearch.length}');
+
+        // Build search bar widget
+        final searchBar = _buildSearchBar();
 
         // If loading, show a spinner
         if (provider.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
+          return Column(
+            children: [
+              searchBar,
+              const Expanded(child: Center(child: CircularProgressIndicator())),
+            ],
           );
         }
 
         // If there are no authorized cameras, show empty state
-        if (allAuthorizedCameras.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.videocam_off_outlined,
-                  size: 64.0,
-                  color: Colors.grey,
-                ),
-                const SizedBox(height: 16.0),
-                const Text(
-                  'No cameras found',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
+        if (filteredBySearch.isEmpty) {
+          return Column(
+            children: [
+              searchBar,
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.videocam_off_outlined,
+                        size: 64.0,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 16.0),
+                      Text(
+                        searchQuery.isNotEmpty ? 'Sonuç bulunamadı' : 'No cameras found',
+                        style: const TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (searchQuery.isNotEmpty) ...[
+                        const SizedBox(height: 8.0),
+                        Text(
+                          '"$searchQuery" için eşleşme yok',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8.0),
-                Text(
-                  'Connect to your network to discover cameras',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 24.0),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Refresh'),
-                  onPressed: () {
-                    // provider.refreshCameras(); // Method removed, WebSocket handles updates
-                  },
-                ),
-              ],
-            ),
+              ),
+            ],
           );
         }
 
@@ -575,8 +626,8 @@ class _CamerasScreenState extends State<CamerasScreen>
 
         // Use authorized cameras and apply active filter
         List<Camera> filteredAuthorizedCameras = showOnlyActive
-            ? allAuthorizedCameras.where((camera) => camera.connected).toList()
-            : allAuthorizedCameras;
+            ? filteredBySearch.where((camera) => camera.connected).toList()
+            : filteredBySearch;
 
         // Track which cameras are assigned to groups
         Set<String> assignedCameraIds = {};
@@ -593,8 +644,9 @@ class _CamerasScreenState extends State<CamerasScreen>
             // Filter by authorization and active status
             List<Camera> filteredCameras = camerasInGroup
                 .where((camera) =>
-                    allAuthorizedCameras.any((ac) => ac.mac == camera.mac))
+                    filteredBySearch.any((ac) => ac.mac == camera.mac))
                 .toList();
+
 
             if (showOnlyActive) {
               filteredCameras =
@@ -623,483 +675,308 @@ class _CamerasScreenState extends State<CamerasScreen>
         // Remove empty groups
         camerasGroupedByName.removeWhere((key, value) => value.isEmpty);
 
-        return _buildGroupedCameraContent(camerasGroupedByName, null);
+        return _buildGroupedCameraContent(camerasGroupedByName, null, searchBar);
       },
     );
   }
 
   Widget _buildGroupedCameraContent(
-      Map<String, List<Camera>> groupedCameras, Widget? filterChips) {
+      Map<String, List<Camera>> groupedCameras, Widget? filterChips, Widget? searchBar) {
     final sortedGroupNames = groupedCameras.keys.toList()
       ..sort((a, b) => a.compareTo(b));
+    
+    // İlk yüklemede tüm grupları genişlet
+    if (_expandedGroups.isEmpty && sortedGroupNames.isNotEmpty) {
+      _expandedGroups.addAll(sortedGroupNames);
+    }
 
     final cameraContent = Expanded(
-      child: CustomScrollView(
-        slivers: sortedGroupNames.expand<Widget>((groupName) {
+      child: ListView.builder(
+        itemCount: sortedGroupNames.length,
+        itemBuilder: (context, groupIndex) {
+          final groupName = sortedGroupNames[groupIndex];
           final camerasInGroup = groupedCameras[groupName]!;
           if (camerasInGroup.isEmpty) {
-            return <Widget>[];
+            return const SizedBox.shrink();
           }
-
-          final List<Widget> groupWidgets = [];
-
-          groupWidgets.add(
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-                child: Text(
-                  groupName,
-                  style: const TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+          
+          final isExpanded = _expandedGroups.contains(groupName);
+          
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            color: AppTheme.darkSurface,
+            child: Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                key: PageStorageKey<String>(groupName),
+                initiallyExpanded: isExpanded,
+                onExpansionChanged: (expanded) {
+                  setState(() {
+                    if (expanded) {
+                      _expandedGroups.add(groupName);
+                    } else {
+                      _expandedGroups.remove(groupName);
+                    }
+                  });
+                },
+                tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                title: Row(
+                  children: [
+                    Icon(
+                      Icons.folder,
+                      color: AppTheme.primaryOrange,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        groupName,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryOrange.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${camerasInGroup.length}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryOrange,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                children: [
+                  if (isGridView)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.75,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
+                        ),
+                        itemCount: camerasInGroup.length,
+                        itemBuilder: (context, index) {
+                          final camera = camerasInGroup[index];
+                          return CameraGridItem(
+                            camera: camera,
+                            index: index,
+                            isSelected: selectedCamera?.id == camera.id,
+                            onTap: () => _selectCamera(camera),
+                            onLiveView: () => _openLiveView(camera),
+                            onPlayback: () => _openRecordView(camera),
+                          );
+                        },
+                      ),
+                    )
+                  else
+                    ...camerasInGroup.map((camera) => _buildCameraListItem(camera)),
+                ],
               ),
             ),
           );
-
-          if (isGridView) {
-            groupWidgets.add(
-              SliverPadding(
-                padding: const EdgeInsets.all(16.0),
-                sliver: SliverGrid.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio:
-                        0.75, // Daha uzun kartlar için (toggle görünsün)
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                  ),
-                  itemCount: camerasInGroup.length,
-                  itemBuilder: (context, index) {
-                    final camera = camerasInGroup[index];
-                    return CameraGridItem(
-                      camera: camera,
-                      index: index,
-                      isSelected: selectedCamera?.id == camera.id,
-                      onTap: () => _selectCamera(camera),
-                      onLiveView: () => _openLiveView(camera),
-                      onPlayback: () => _openRecordView(camera),
-                    );
-                  },
-                ),
-              ),
-            );
-          } else {
-            groupWidgets.add(
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final camera = camerasInGroup[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 4.0),
-                      child: Card(
-                        margin: const EdgeInsets.only(bottom: 8.0),
-                        elevation: 2,
-                        clipBehavior: Clip.antiAlias,
-                        child: InkWell(
-                          onTap: () => _selectCamera(camera),
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: 120,
-                                height: 80,
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    Container(
-                                      color: !_hasMacAddress(camera)
-                                          ? Colors.grey[800]
-                                          : Colors.black,
-                                      child: !_hasMacAddress(camera)
-                                          ? const Icon(
-                                              Icons.videocam_off_outlined,
-                                              size: 36.0,
-                                              color: Colors.grey,
-                                            )
-                                          : camera.mainSnapShot.isNotEmpty
-                                              ? CameraSnapshotWidget(
-                                                  snapshotUrl: camera.mainSnapShot,
-                                                  cameraId: camera.mac,
-                                                  width: double.infinity,
-                                                  height: double.infinity,
-                                                  fit: BoxFit.cover,
-                                                  showRefreshButton: false,
-                                                  username: camera.username,
-                                                  password: camera.password,
-                                                )
-                                              : const Icon(
-                                                  Icons.videocam_off,
-                                                  size: 36.0,
-                                                  color: Colors.white54,
-                                                ),
-                                    ),
-                                    if (camera.connected)
-                                      Positioned(
-                                        top: 4,
-                                        left: 4,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6.0,
-                                            vertical: 2.0,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(0.6),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: const Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                Icons.fiber_manual_record,
-                                                color: Colors.red,
-                                                size: 10,
-                                              ),
-                                              SizedBox(width: 2),
-                                              Text(
-                                                'LIVE',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              camera.displayName,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16.0,
-                                                color: !_hasMacAddress(camera)
-                                                    ? Colors.grey
-                                                    : null,
-                                              ),
-                                            ),
-                                          ),
-                                          if (!_hasMacAddress(camera))
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: Colors.orange
-                                                    .withOpacity(0.2),
-                                                borderRadius:
-                                                    BorderRadius.circular(4),
-                                                border: Border.all(
-                                                    color: Colors.orange,
-                                                    width: 1),
-                                              ),
-                                              child: const Text(
-                                                'NO MAC',
-                                                style: TextStyle(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.orange,
-                                                ),
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            camera.connected
-                                                ? Icons.link
-                                                : Icons.link_off,
-                                            size: 14.0,
-                                            color: camera.connected
-                                                ? Colors.green
-                                                : Colors.red,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            camera.connected
-                                                ? 'Connected'
-                                                : 'Disconnected',
-                                            style: TextStyle(
-                                              fontSize: 12.0,
-                                              color: camera.connected
-                                                  ? Colors.green
-                                                  : Colors.red,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      // IP Address
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.language,
-                                            size: 12.0,
-                                            color: Colors.grey[600],
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            camera.ip,
-                                            style: TextStyle(
-                                              fontSize: 12.0,
-                                              color: Colors.grey[600],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
-                                      // Current device assignment(s) with count
-                                      if (camera.currentDevices.isNotEmpty) ...[
-                                        // Device count badge
-                                        Row(
-                                          children: [
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 6,
-                                                      vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: camera.currentDevices
-                                                            .length >
-                                                        1
-                                                    ? Colors.orange
-                                                        .withOpacity(0.2)
-                                                    : Colors.blue
-                                                        .withOpacity(0.2),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                border: Border.all(
-                                                  color: camera.currentDevices
-                                                              .length >
-                                                          1
-                                                      ? Colors.orange
-                                                          .withOpacity(0.5)
-                                                      : Colors.blue
-                                                          .withOpacity(0.5),
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Icon(
-                                                    camera.currentDevices
-                                                                .length >
-                                                            1
-                                                        ? Icons.devices
-                                                        : Icons.device_hub,
-                                                    size: 12.0,
-                                                    color: camera.currentDevices
-                                                                .length >
-                                                            1
-                                                        ? Colors.orange
-                                                        : Colors.blue,
-                                                  ),
-                                                  const SizedBox(width: 4),
-                                                  Text(
-                                                    camera.currentDevices
-                                                                .length >
-                                                            1
-                                                        ? '${camera.currentDevices.length} cihazda'
-                                                        : '1 cihazda',
-                                                    style: TextStyle(
-                                                      fontSize: 10.0,
-                                                      color:
-                                                          camera.currentDevices
-                                                                      .length >
-                                                                  1
-                                                              ? Colors.orange
-                                                              : Colors.blue,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        // Device names list
-                                        ...camera.currentDevices.keys
-                                            .map((deviceMac) => Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          bottom: 2),
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.arrow_right,
-                                                        size: 14.0,
-                                                        color: Colors.blue
-                                                            .withOpacity(0.7),
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                          _getDeviceName(
-                                                              context,
-                                                              deviceMac),
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 11.0,
-                                                            color: Colors.blue,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ))
-                                            .toList(),
-                                      ],
-                                      if (camera.currentDevices.isNotEmpty)
-                                        const SizedBox(height: 4),
-                                      // Resolution and additional info row
-                                      Row(
-                                        children: [
-                                          // Resolution
-                                          if (camera.recordWidth > 0 &&
-                                              camera.recordHeight > 0) ...[
-                                            Icon(
-                                              Icons.high_quality,
-                                              size: 12.0,
-                                              color: Colors.orange,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              '${camera.recordWidth}x${camera.recordHeight}',
-                                              style: const TextStyle(
-                                                fontSize: 11.0,
-                                                color: Colors.orange,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                          ],
-                                          // History count - filter out empty entries
-                                          if (camera.deviceHistory.any((h) =>
-                                              h.deviceMac.isNotEmpty)) ...[
-                                            Icon(
-                                              Icons.history,
-                                              size: 12.0,
-                                              color: Colors.purple,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              '${camera.deviceHistory.where((h) => h.deviceMac.isNotEmpty).length}',
-                                              style: const TextStyle(
-                                                fontSize: 11.0,
-                                                color: Colors.purple,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                          ],
-                                          // Recording status
-                                          if (camera.recording) ...[
-                                            Icon(
-                                              Icons.fiber_manual_record,
-                                              size: 12.0,
-                                              color: Colors.red,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              'REC',
-                                              style: const TextStyle(
-                                                fontSize: 11.0,
-                                                color: Colors.red,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                          ],
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.videocam,
-                                      color: !_hasMacAddress(camera)
-                                          ? Colors.grey
-                                          : null,
-                                    ),
-                                    onPressed: !_hasMacAddress(camera)
-                                        ? null
-                                        : () => _openLiveView(camera),
-                                    tooltip: !_hasMacAddress(camera)
-                                        ? 'No MAC Address'
-                                        : 'Live View',
-                                  ),
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.video_library,
-                                      color: !_hasMacAddress(camera)
-                                          ? Colors.grey
-                                          : null,
-                                    ),
-                                    onPressed: !_hasMacAddress(camera)
-                                        ? null
-                                        : () => _openRecordView(camera),
-                                    tooltip: !_hasMacAddress(camera)
-                                        ? 'No MAC Address'
-                                        : 'Recordings',
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  childCount: camerasInGroup.length,
-                ),
-              ),
-            );
-
-            groupWidgets.add(
-              const SliverToBoxAdapter(
-                child: Divider(height: 1, indent: 16, endIndent: 16),
-              ),
-            );
-          }
-
-          return groupWidgets;
-        }).toList(),
+        },
       ),
     );
 
     return Column(
       children: [
+        if (searchBar != null) searchBar,
         if (filterChips != null) filterChips,
         cameraContent,
       ],
+    );
+  }
+
+  // Build individual camera list item for expansion tile
+  Widget _buildCameraListItem(Camera camera) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Card(
+        margin: EdgeInsets.zero,
+        elevation: 1,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => _selectCamera(camera),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 100,
+                height: 70,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Container(
+                      color: !_hasMacAddress(camera)
+                          ? Colors.grey[800]
+                          : Colors.black,
+                      child: !_hasMacAddress(camera)
+                          ? const Icon(
+                              Icons.videocam_off_outlined,
+                              size: 32.0,
+                              color: Colors.grey,
+                            )
+                          : camera.mainSnapShot.isNotEmpty
+                              ? CameraSnapshotWidget(
+                                  snapshotUrl: camera.mainSnapShot,
+                                  cameraId: camera.mac,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                  showRefreshButton: false,
+                                  username: camera.username,
+                                  password: camera.password,
+                                )
+                              : const Icon(
+                                  Icons.videocam_off,
+                                  size: 32.0,
+                                  color: Colors.white54,
+                                ),
+                    ),
+                    if (camera.connected)
+                      Positioned(
+                        top: 2,
+                        left: 2,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4.0,
+                            vertical: 1.0,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.fiber_manual_record,
+                                color: Colors.red,
+                                size: 8,
+                              ),
+                              SizedBox(width: 2),
+                              Text(
+                                'LIVE',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          // Edit camera name button - sol tarafta
+                          if (_hasMacAddress(camera))
+                            GestureDetector(
+                              onTap: () => _showRenameCameraDialog(camera),
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 6),
+                                child: Icon(
+                                  Icons.edit,
+                                  size: 14,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                            ),
+                          Expanded(
+                            child: Text(
+                              camera.displayName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14.0,
+                                color: !_hasMacAddress(camera) ? Colors.grey : null,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Icon(
+                            camera.connected ? Icons.link : Icons.link_off,
+                            size: 12.0,
+                            color: camera.connected ? Colors.green : Colors.red,
+                          ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              camera.ip.isNotEmpty ? camera.ip : camera.mac,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11.0,
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.videocam,
+                      size: 20,
+                      color: !_hasMacAddress(camera) ? Colors.grey : AppTheme.primaryOrange,
+                    ),
+                    onPressed: !_hasMacAddress(camera) ? null : () => _openLiveView(camera),
+                    tooltip: 'Live View',
+                    padding: const EdgeInsets.all(8),
+                    constraints: const BoxConstraints(),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.video_library,
+                      size: 20,
+                      color: !_hasMacAddress(camera) ? Colors.grey : Colors.blue,
+                    ),
+                    onPressed: !_hasMacAddress(camera) ? null : () => _openRecordView(camera),
+                    tooltip: 'Recordings',
+                    padding: const EdgeInsets.all(8),
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -1311,5 +1188,109 @@ class CameraSearchDelegate extends SearchDelegate<Camera> {
         );
       },
     );
+  }
+}
+
+// Extension to add rename functionality to _CamerasScreenState
+extension _CamerasScreenRename on _CamerasScreenState {
+  void _showRenameCameraDialog(Camera camera) {
+    final TextEditingController nameController = TextEditingController(text: camera.displayName);
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppTheme.darkSurface,
+        title: const Row(
+          children: [
+            Icon(Icons.edit, color: AppTheme.primaryBlue),
+            SizedBox(width: 8),
+            Text('Kamera Adını Değiştir', style: TextStyle(color: Colors.white)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'MAC: ${camera.mac}',
+              style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: nameController,
+              autofocus: true,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                labelText: 'Yeni Kamera Adı',
+                labelStyle: TextStyle(color: Colors.grey.shade400),
+                filled: true,
+                fillColor: AppTheme.darkBackground,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppTheme.primaryBlue),
+                ),
+              ),
+              onSubmitted: (_) {
+                Navigator.pop(dialogContext);
+                _submitRename(camera, nameController.text);
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('İptal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _submitRename(camera, nameController.text);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryBlue,
+            ),
+            child: const Text('Kaydet'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _submitRename(Camera camera, String newName) async {
+    final trimmedName = newName.trim();
+    if (trimmedName.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Kamera adı boş olamaz'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
+    if (trimmedName == camera.displayName) {
+      return;
+    }
+    
+    final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
+    final success = await webSocketProvider.changeCameraName(camera.mac, trimmedName);
+    
+    if (success) {
+      print('[CamerasScreen] Camera rename command sent: ${camera.mac} -> $trimmedName');
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Kamera adı değiştirme komutu gönderilemedi'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }

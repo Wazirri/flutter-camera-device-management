@@ -806,11 +806,23 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   // Update history device assignment for camera
   Future<void> _updateHistoryDeviceAssignment(
       Camera camera, String timestamp, String property, dynamic value) async {
-    int timestampInt = int.tryParse(timestamp) ?? 0;
+    // Timestamp format can be either:
+    // - Single timestamp: "1767886903" 
+    // - Combined startDate_endDate: "1767886903_1767886935"
+    int startDateInt = 0;
+    int endDateInt = 0;
+    
+    if (timestamp.contains('_')) {
+      final parts = timestamp.split('_');
+      startDateInt = int.tryParse(parts[0]) ?? 0;
+      endDateInt = parts.length > 1 ? (int.tryParse(parts[1]) ?? 0) : 0;
+    } else {
+      startDateInt = int.tryParse(timestamp) ?? 0;
+    }
 
-    // Find existing history entry or create new one
+    // Find existing history entry by startDate or create new one
     CameraHistoryDevice? historyEntry = camera.deviceHistory
-        .where((h) => h.startDate == timestampInt)
+        .where((h) => h.startDate == startDateInt)
         .firstOrNull;
 
     if (historyEntry == null) {
@@ -819,10 +831,15 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         deviceIp: '',
         cameraIp: '',
         name: '',
-        startDate: timestampInt,
-        endDate: 0,
+        startDate: startDateInt,
+        endDate: endDateInt,
       );
       camera.deviceHistory.add(historyEntry);
+    } else if (endDateInt > 0 && historyEntry.endDate == 0) {
+      // Update endDate if we have it from timestamp and entry doesn't have it yet
+      int index = camera.deviceHistory.indexOf(historyEntry);
+      camera.deviceHistory[index] = historyEntry.copyWith(endDate: endDateInt);
+      historyEntry = camera.deviceHistory[index];
     }
 
     // Update the history entry based on property
