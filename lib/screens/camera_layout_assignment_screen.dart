@@ -50,8 +50,13 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
           TextButton.icon(
             icon: const Icon(Icons.save, color: Colors.white),
             label: const Text('Save', style: TextStyle(color: Colors.white)),
-            onPressed: () {
+            onPressed: () async {
               final provider = Provider.of<MultiCameraViewProvider>(context, listen: false);
+              
+              print('[CameraLayoutAssignment] Save pressed');
+              print('[CameraLayoutAssignment] _selectedPageIndex: $_selectedPageIndex');
+              print('[CameraLayoutAssignment] _selectedLayoutCode: $_selectedLayoutCode');
+              print('[CameraLayoutAssignment] Current provider assignments: ${provider.cameraAssignments(_selectedPageIndex)}');
               
               // First, set the active page to the selected page
               provider.setActivePage(_selectedPageIndex);
@@ -59,14 +64,18 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
               // Then apply the layout change to that page
               provider.setActivePageLayout(_selectedLayoutCode);
               
-              // Save assignments to persistent storage
-              provider.saveCurrentStateAsDefault();
+              // Save assignments to persistent storage - await to ensure it completes
+              await provider.saveCurrentStateAsDefault();
+              
+              print('[CameraLayoutAssignment] Save completed');
               
               // Return to previous screen
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Layout assignments saved')),
-              );
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Layout assignments saved')),
+                );
+              }
             },
           ),
         ],
@@ -279,13 +288,27 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
                   ),
                 ],
               ),
-              // Add count indicator to show how many pages are available
-              Text(
-                '$pageCount pages available',
-                style: TextStyle(
-                  fontSize: 12, 
-                  color: Colors.grey.shade400,
-                ),
+              Row(
+                children: [
+                  // Delete page button
+                  if (pageCount > 1)
+                    IconButton(
+                      icon: Icon(Icons.delete_outline, color: Colors.red.shade400, size: 20),
+                      tooltip: 'Seçili Sayfayı Sil',
+                      onPressed: () => _showDeletePageDialog(selectedIndex, pageCount),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  const SizedBox(width: 12),
+                  // Add count indicator to show how many pages are available
+                  Text(
+                    '$pageCount sayfa',
+                    style: TextStyle(
+                      fontSize: 12, 
+                      color: Colors.grey.shade400,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -302,88 +325,91 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
                 
                 return Padding(
                   padding: const EdgeInsets.only(right: 12),
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        _selectedPageIndex = index;
-                        
-                        // Update the selected layout when changing pages
-                        if (index < provider.pageLayouts.length) {
-                          _selectedLayoutCode = provider.pageLayouts[index];
-                        }
-                      });
-                    },
-                    borderRadius: BorderRadius.circular(24),
-                    child: Container(
-                      width: 52,
-                      height: 52,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isSelected
-                            ? AppTheme.primaryColor
-                            : Colors.grey.shade800,
-                        // Add subtle shadow for selected page
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: AppTheme.primaryColor.withOpacity(0.3),
-                                  spreadRadius: 1,
-                                  blurRadius: 3,
-                                  offset: const Offset(0, 1),
-                                )
-                              ]
-                            : null,
-                      ),
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // Page number
-                          Text(
-                            '${index + 1}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: isSelected
-                                  ? Colors.white
-                                  : Colors.grey,
-                            ),
-                          ),
+                  child: GestureDetector(
+                    onLongPress: pageCount > 1 ? () => _showDeletePageDialog(index, pageCount) : null,
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _selectedPageIndex = index;
                           
-                          // Layout code indicator (small badge)
-                          if (layoutCode != null)
-                            Positioned(
-                              right: 4,
-                              bottom: 4,
-                              child: Container(
-                                width: 18,
-                                height: 18,
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? Colors.white 
-                                      : AppTheme.primaryColor,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
+                          // Update the selected layout when changing pages
+                          if (index < provider.pageLayouts.length) {
+                            _selectedLayoutCode = provider.pageLayouts[index];
+                          }
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(24),
+                      child: Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isSelected
+                              ? AppTheme.primaryColor
+                              : Colors.grey.shade800,
+                          // Add subtle shadow for selected page
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: AppTheme.primaryColor.withOpacity(0.3),
+                                    spreadRadius: 1,
+                                    blurRadius: 3,
+                                    offset: const Offset(0, 1),
+                                  )
+                                ]
+                              : null,
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            // Page number
+                            Text(
+                              '${index + 1}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.grey,
+                              ),
+                            ),
+                            
+                            // Layout code indicator (small badge)
+                            if (layoutCode != null)
+                              Positioned(
+                                right: 4,
+                                bottom: 4,
+                                child: Container(
+                                  width: 18,
+                                  height: 18,
+                                  decoration: BoxDecoration(
                                     color: isSelected
-                                        ? AppTheme.primaryColor
-                                        : Colors.white,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    '$layoutCode',
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
+                                        ? Colors.white 
+                                        : AppTheme.primaryColor,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
                                       color: isSelected
                                           ? AppTheme.primaryColor
                                           : Colors.white,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '$layoutCode',
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                        color: isSelected
+                                            ? AppTheme.primaryColor
+                                            : Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -1376,6 +1402,63 @@ class _CameraLayoutAssignmentScreenState extends State<CameraLayoutAssignmentScr
           },
         );
       },
+    );
+  }
+  
+  void _showDeletePageDialog(int pageIndex, int pageCount) {
+    if (pageCount <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('En az bir sayfa olmalı')),
+      );
+      return;
+    }
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppTheme.darkSurface,
+        title: Row(
+          children: [
+            Icon(Icons.delete_outline, color: Colors.red.shade400),
+            const SizedBox(width: 8),
+            Text('Sayfa ${pageIndex + 1} Silinsin mi?', style: const TextStyle(color: Colors.white)),
+          ],
+        ),
+        content: Text(
+          'Bu sayfa ve içindeki tüm kamera atamaları silinecek. Bu işlem geri alınamaz.',
+          style: TextStyle(color: Colors.grey.shade300),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('İptal'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              
+              final provider = Provider.of<MultiCameraViewProvider>(context, listen: false);
+              provider.removePageAt(pageIndex);
+              
+              // Seçili sayfayı güncelle
+              setState(() {
+                if (_selectedPageIndex >= provider.pageLayouts.length) {
+                  _selectedPageIndex = provider.pageLayouts.length - 1;
+                }
+                if (_selectedPageIndex >= 0 && _selectedPageIndex < provider.pageLayouts.length) {
+                  _selectedLayoutCode = provider.pageLayouts[_selectedPageIndex];
+                }
+              });
+              
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Sayfa ${pageIndex + 1} silindi')),
+              );
+            },
+            child: const Text('Sil'),
+          ),
+        ],
+      ),
     );
   }
 }

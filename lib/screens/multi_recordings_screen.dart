@@ -465,53 +465,28 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
         }
         _pendingCameraSelection = null; // Clear after use
       }
-      // Eğer hiç kamera seçilmemişse, ilk kamerayı seç
-      else if (_selectedCameras.isEmpty && _availableCameras.isNotEmpty) {
-        // Use _selectCamera to handle multi-device selection
-        _selectCameraWithDeviceChoice(_availableCameras.first);
-        print(
-            '[MultiRecordings] Auto-selected first camera: ${_availableCameras.first.name}');
-      } else if (_availableCameras.isEmpty) {
+      // Sayfa açıldığında otomatik kamera seçimi yapma - kullanıcı kendisi seçsin
+      else if (_availableCameras.isEmpty) {
         print('[MultiRecordings] No cameras available!');
+      } else {
+        print('[MultiRecordings] ${_availableCameras.length} cameras available - waiting for user selection');
       }
     });
   }
 
-  // Select camera and show device dialog if needed, then update recordings
+  // Select camera and load recordings from all devices automatically
   Future<void> _selectCameraWithDeviceChoice(Camera camera) async {
-    if (camera.currentDevices.length > 1) {
-      // Show device selection dialog
-      final selectedDevice = await _showDeviceSelectionDialog(camera);
-      if (selectedDevice != null) {
-        _cameraSelectedDevice[camera] = selectedDevice;
-        setState(() {
-          _selectedCameras = [camera];
-          _activeCamera = camera;
-        });
-        _updateRecordingsForSelectedDay();
-      } else {
-        // User cancelled, still add camera with first device
-        _cameraSelectedDevice[camera] = camera.currentDevices.keys.first;
-        setState(() {
-          _selectedCameras = [camera];
-          _activeCamera = camera;
-        });
-        _updateRecordingsForSelectedDay();
-      }
-    } else if (camera.currentDevices.isNotEmpty) {
+    // Auto-select first device as default for playback
+    if (camera.currentDevices.isNotEmpty) {
       _cameraSelectedDevice[camera] = camera.currentDevices.keys.first;
-      setState(() {
-        _selectedCameras = [camera];
-        _activeCamera = camera;
-      });
-      _updateRecordingsForSelectedDay();
-    } else {
-      setState(() {
-        _selectedCameras = [camera];
-        _activeCamera = camera;
-      });
-      _updateRecordingsForSelectedDay();
+      print('[MultiRecordings] Camera ${camera.name} selected - loading from ${camera.currentDevices.length} device(s)');
     }
+    
+    setState(() {
+      _selectedCameras = [camera];
+      _activeCamera = camera;
+    });
+    _updateRecordingsForSelectedDay();
   }
 
   // Show device selection dialog for cameras on multiple devices
@@ -608,19 +583,14 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
     );
   }
 
-  // Handle camera selection with device choice
+  // Handle camera selection - automatically load recordings from all devices
   Future<void> _selectCamera(Camera camera, bool select) async {
     if (select) {
-      // Check if camera is on multiple devices
-      if (camera.currentDevices.length > 1) {
-        final selectedDevice = await _showDeviceSelectionDialog(camera);
-        if (selectedDevice == null) {
-          return; // User cancelled
-        }
-        _cameraSelectedDevice[camera] = selectedDevice;
-      } else if (camera.currentDevices.isNotEmpty) {
-        // Single device, auto-select it
+      // Auto-select all devices for this camera (no dialog needed)
+      if (camera.currentDevices.isNotEmpty) {
+        // Use first device as default selected device for playback
         _cameraSelectedDevice[camera] = camera.currentDevices.keys.first;
+        print('[MultiRecordings] Camera ${camera.name} has ${camera.currentDevices.length} devices - will load from all');
       }
 
       if (!_selectedCameras.contains(camera)) {

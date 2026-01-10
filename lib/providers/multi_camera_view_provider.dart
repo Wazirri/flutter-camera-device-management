@@ -139,6 +139,10 @@ class MultiCameraViewProvider with ChangeNotifier {
   
   // Save current state (page layouts and camera assignments) to persistent storage
   Future<void> saveCurrentStateAsDefault() async {
+    print('[MultiCameraViewProvider] saveCurrentStateAsDefault called');
+    print('[MultiCameraViewProvider] _pageLayouts: $_pageLayouts');
+    print('[MultiCameraViewProvider] _cameraAssignments: $_cameraAssignments');
+    print('[MultiCameraViewProvider] _activePageIndex: $_activePageIndex');
     try {
       final prefs = await SharedPreferences.getInstance();
       
@@ -242,7 +246,9 @@ class MultiCameraViewProvider with ChangeNotifier {
   
   // Belirli bir sayfa için kamera atamalarını direkt olarak ayarla
   void setCameraAssignments(int pageIndex, Map<int, int> assignments) {
+    print('[MultiCameraViewProvider] setCameraAssignments called: pageIndex=$pageIndex, assignments=$assignments');
     _cameraAssignments[pageIndex] = assignments;
+    print('[MultiCameraViewProvider] _cameraAssignments now: $_cameraAssignments');
     notifyListeners();
   }
 
@@ -467,19 +473,27 @@ class MultiCameraViewProvider with ChangeNotifier {
   
   // Sayfayı sil (aktif sayfa)
   void removePage() {
+    removePageAt(_activePageIndex);
+  }
+  
+  // Belirli bir sayfayı sil
+  void removePageAt(int pageIndex) {
     if (_pageLayouts.length <= 1) return; // En az bir sayfa kalmalı
+    if (pageIndex < 0 || pageIndex >= _pageLayouts.length) return;
     
-    _pageLayouts.removeAt(_activePageIndex);
-    _cameraAssignments.remove(_activePageIndex);
+    print('[MultiCameraViewProvider] removePageAt called: pageIndex=$pageIndex');
+    
+    _pageLayouts.removeAt(pageIndex);
+    _cameraAssignments.remove(pageIndex);
     
     // Kalan sayfalardaki atama indekslerini güncelle
     final Map<int, Map<int, int>> updatedAssignments = {};
     
-    _cameraAssignments.forEach((pageIndex, assignments) {
-      if (pageIndex > _activePageIndex) {
-        updatedAssignments[pageIndex - 1] = assignments;
-      } else if (pageIndex < _activePageIndex) {
-        updatedAssignments[pageIndex] = assignments;
+    _cameraAssignments.forEach((pIndex, assignments) {
+      if (pIndex > pageIndex) {
+        updatedAssignments[pIndex - 1] = assignments;
+      } else if (pIndex < pageIndex) {
+        updatedAssignments[pIndex] = assignments;
       }
     });
     
@@ -489,6 +503,8 @@ class MultiCameraViewProvider with ChangeNotifier {
     if (_activePageIndex >= _pageLayouts.length) {
       _activePageIndex = _pageLayouts.length - 1;
     }
+    
+    print('[MultiCameraViewProvider] Page removed. Remaining pages: ${_pageLayouts.length}');
     
     notifyListeners();
   }

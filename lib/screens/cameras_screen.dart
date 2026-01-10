@@ -438,13 +438,15 @@ class _CamerasScreenState extends State<CamerasScreen>
 
         if (selectedMacAddress != null) {
           // Filter by selected MAC address - only show cameras with MAC
+          // Also apply search filter
           baseFilteredCameras = (groupedCamerasByMac[selectedMacAddress] ?? [])
               .where((camera) => camera.mac.isNotEmpty)
+              .where((camera) => _matchesSearch(camera, searchQuery))
               .toList();
         } else {
-          // Show ALL cameras from cameras_mac (source of truth)
+          // Show ALL cameras from search-filtered list
           // This includes cameras even if their device is offline
-          baseFilteredCameras = provider.cameras
+          baseFilteredCameras = filteredBySearch
               .where((camera) =>
                   camera.mac.isNotEmpty && !camera.mac.startsWith('m_'))
               .toList();
@@ -939,6 +941,34 @@ class _CamerasScreenState extends State<CamerasScreen>
                               ),
                             ),
                           ),
+                          // Recording status badge
+                          if (camera.recording)
+                            Container(
+                              margin: const EdgeInsets.only(left: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: Colors.red, width: 0.5),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.fiber_manual_record, size: 6, color: Colors.red),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    camera.currentDevices.length > 1
+                                        ? 'REC ${camera.recordingCount}/${camera.currentDevices.length}'
+                                        : 'REC',
+                                    style: const TextStyle(
+                                      fontSize: 8,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                         ],
                       ),
                     ],

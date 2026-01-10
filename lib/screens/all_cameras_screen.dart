@@ -1077,15 +1077,17 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                             color: Colors.orange,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.fiber_manual_record,
+                              const Icon(Icons.fiber_manual_record,
                                   color: Colors.white, size: 10),
-                              SizedBox(width: 4),
+                              const SizedBox(width: 4),
                               Text(
-                                'Recording',
-                                style: TextStyle(
+                                camera.currentDevices.length > 1
+                                    ? 'Recording (${camera.recordingCount}/${camera.currentDevices.length})'
+                                    : 'Recording',
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
@@ -1481,6 +1483,9 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
             ...camera.currentDevices.entries.map((entry) {
               final deviceMac = entry.key;
               final deviceInfo = entry.value;
+              // Check if this device is recording this camera
+              final isDeviceRecording = camera.recordingDevices[deviceMac] ?? false;
+              
               return Padding(
                 padding: EdgeInsets.only(
                   bottom: camera.currentDevices.entries.last.key != deviceMac
@@ -1489,6 +1494,27 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                 ),
                 child: Row(
                   children: [
+                    // Recording indicator for this device
+                    Container(
+                      width: 24,
+                      height: 24,
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isDeviceRecording 
+                            ? Colors.red.withOpacity(0.2)
+                            : Colors.grey.withOpacity(0.2),
+                        border: Border.all(
+                          color: isDeviceRecording ? Colors.red : Colors.grey,
+                          width: 1,
+                        ),
+                      ),
+                      child: Icon(
+                        isDeviceRecording ? Icons.fiber_manual_record : Icons.stop,
+                        size: 12,
+                        color: isDeviceRecording ? Colors.red : Colors.grey,
+                      ),
+                    ),
                     // Device MAC
                     Expanded(
                       child: Column(
@@ -1541,27 +1567,34 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                         ],
                       ),
                     ),
-                    // Assigned date
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    // Recording status badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isDeviceRecording 
+                            ? Colors.red.withOpacity(0.2)
+                            : Colors.grey.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                          color: isDeviceRecording ? Colors.red : Colors.grey.shade600,
+                          width: 0.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
+                          Icon(
+                            isDeviceRecording ? Icons.fiber_manual_record : Icons.stop,
+                            size: 8,
+                            color: isDeviceRecording ? Colors.red : Colors.grey,
+                          ),
+                          const SizedBox(width: 4),
                           Text(
-                            'Assigned',
+                            isDeviceRecording ? 'REC' : 'OFF',
                             style: TextStyle(
                               fontSize: 9,
-                              color: Colors.grey.shade500,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            deviceInfo.startDate > 0
-                                ? _formatTimestamp(deviceInfo.startDate)
-                                : '-',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.bold,
+                              color: isDeviceRecording ? Colors.red : Colors.grey,
                             ),
                           ),
                         ],
