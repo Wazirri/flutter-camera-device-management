@@ -59,7 +59,7 @@ class _DesktopSideMenuState extends State<DesktopSideMenu> with SingleTickerProv
       'route': '/activities',
     },
     {
-      'title': 'Cameras',
+      'title': 'Active Cameras',
       'icon': Icons.camera,
       'route': '/cameras',
     },

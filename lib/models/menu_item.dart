@@ -51,7 +51,7 @@ class MenuItems {
         isSelected: currentRoute == '/recording-download',
       ),
       CustomMenuItem(
-        title: 'Cameras',
+        title: 'Active Cameras',
         icon: Icons.camera_alt_rounded,
         route: '/cameras',
         isSelected: currentRoute == '/cameras',

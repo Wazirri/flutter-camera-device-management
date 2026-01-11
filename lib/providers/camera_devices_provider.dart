@@ -2549,12 +2549,16 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     // The UI uses _macDefinedCameras for display, so we must sync device-specific data there
     final macDefinedCamera = _macDefinedCameras[deviceCamera.mac];
     if (macDefinedCamera != null) {
-      // Sync all device-specific Maps and tracker Sets
-      macDefinedCamera.connectedDevices[device.macKey] = deviceCamera.connectedDevices[device.macKey] ?? false;
-      macDefinedCamera.camReportsConnectedDevices.add(device.macKey);
+      // Sync only if deviceCamera has data for this device
+      if (deviceCamera.connectedDevices.containsKey(device.macKey)) {
+        macDefinedCamera.connectedDevices[device.macKey] = deviceCamera.connectedDevices[device.macKey]!;
+        macDefinedCamera.camReportsConnectedDevices.add(device.macKey);
+      }
       
-      macDefinedCamera.recordingDevices[device.macKey] = deviceCamera.recordingDevices[device.macKey] ?? false;
-      macDefinedCamera.camReportsRecordingDevices.add(device.macKey);
+      if (deviceCamera.recordingDevices.containsKey(device.macKey)) {
+        macDefinedCamera.recordingDevices[device.macKey] = deviceCamera.recordingDevices[device.macKey]!;
+        macDefinedCamera.camReportsRecordingDevices.add(device.macKey);
+      }
       
       if (deviceCamera.recordPathDevices.containsKey(device.macKey)) {
         macDefinedCamera.recordPathDevices[device.macKey] = deviceCamera.recordPathDevices[device.macKey]!;

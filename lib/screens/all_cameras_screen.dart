@@ -946,13 +946,41 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
   }
 
   Widget _buildCameraCard(Camera camera) {
-    final isOnline = camera.connected;
     final isRecording = camera.recording;
     final resolution = camera.recordWidth > 0 && camera.recordHeight > 0
         ? '${camera.recordWidth}x${camera.recordHeight}'
         : 'Unknown';
     final resolutionLabel =
         _getResolutionLabel(camera.recordWidth, camera.recordHeight);
+    
+    // Calculate connected count from camReports data
+    int connectedCount = 0;
+    int totalDevicesWithConnectedInfo = 0;
+    for (final entry in camera.connectedDevices.entries) {
+      if (camera.camReportsConnectedDevices.contains(entry.key)) {
+        totalDevicesWithConnectedInfo++;
+        if (entry.value) connectedCount++;
+      }
+    }
+    final hasDeviceConnectedInfo = totalDevicesWithConnectedInfo > 0;
+    final isOnline = hasDeviceConnectedInfo ? connectedCount > 0 : camera.connected;
+    final onlineLabel = hasDeviceConnectedInfo 
+        ? '$connectedCount/$totalDevicesWithConnectedInfo'
+        : (isOnline ? 'Online' : 'Offline');
+    
+    // Calculate recording count from camReports data
+    int recordingCountFromReports = 0;
+    int totalDevicesWithRecordingInfo = 0;
+    for (final entry in camera.recordingDevices.entries) {
+      if (camera.camReportsRecordingDevices.contains(entry.key)) {
+        totalDevicesWithRecordingInfo++;
+        if (entry.value) recordingCountFromReports++;
+      }
+    }
+    final hasDeviceRecordingInfo = totalDevicesWithRecordingInfo > 0;
+    final recordingLabel = hasDeviceRecordingInfo 
+        ? '$recordingCountFromReports/$totalDevicesWithRecordingInfo'
+        : 'Recording';
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -1085,7 +1113,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      // Online/Offline badge
+                      // Online/Offline badge with device count
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
@@ -1093,13 +1121,24 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                           color: isOnline ? Colors.green : Colors.red,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          isOnline ? 'Online' : 'Offline',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isOnline ? Icons.link : Icons.link_off,
+                              color: Colors.white,
+                              size: 12,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              onlineLabel,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       // Recording badge (if recording)
@@ -1119,8 +1158,8 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                                   color: Colors.white, size: 10),
                               const SizedBox(width: 4),
                               Text(
-                                camera.currentDevices.length > 1
-                                    ? 'Recording (${camera.recordingCount}/${camera.currentDevices.length})'
+                                hasDeviceRecordingInfo
+                                    ? 'REC $recordingLabel'
                                     : 'Recording',
                                 style: const TextStyle(
                                   color: Colors.white,

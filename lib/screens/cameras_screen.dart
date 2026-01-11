@@ -25,6 +25,7 @@ class _CamerasScreenState extends State<CamerasScreen>
   String searchQuery = '';
   bool showOnlyActive = false;
   bool isGridView = false; // Default to list view
+  bool _showDetailedView = false; // Detaylı gösterim modu
   String? selectedMacAddress;
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
@@ -183,7 +184,7 @@ class _CamerasScreenState extends State<CamerasScreen>
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Cameras'),
+        title: const Text('Active Cameras'),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -198,6 +199,19 @@ class _CamerasScreenState extends State<CamerasScreen>
           ],
         ),
         actions: [
+          // Detailed view toggle
+          IconButton(
+            icon: Icon(
+              _showDetailedView ? Icons.view_agenda : Icons.view_agenda_outlined,
+              color: _showDetailedView ? AppTheme.primaryOrange : null,
+            ),
+            tooltip: _showDetailedView ? 'Simple View' : 'Detailed View',
+            onPressed: () {
+              setState(() {
+                _showDetailedView = !_showDetailedView;
+              });
+            },
+          ),
           // Filter toggle
           IconButton(
             icon: Icon(
@@ -807,14 +821,11 @@ class _CamerasScreenState extends State<CamerasScreen>
     int totalDevicesWithRecordingInfo = 0;
     
     for (final camera in allCameras) {
-      // Connected - count based on camReportsConnectedDevices tracker
-      if (camera.camReportsConnectedDevices.isNotEmpty) {
-        totalDevicesWithConnectedInfo += camera.camReportsConnectedDevices.length;
-        // Count how many devices report this camera as connected
-        for (final deviceMac in camera.camReportsConnectedDevices) {
-          if (camera.isConnectedOnDevice(deviceMac)) {
-            totalConnectedOnDevices++;
-          }
+      // Connected - count based on connectedDevices entries that have camReports data
+      for (final entry in camera.connectedDevices.entries) {
+        if (camera.camReportsConnectedDevices.contains(entry.key)) {
+          totalDevicesWithConnectedInfo++;
+          if (entry.value) totalConnectedOnDevices++;
         }
       }
       
@@ -823,20 +834,19 @@ class _CamerasScreenState extends State<CamerasScreen>
         totalDevicesWithDisconnectedInfo += camera.camReportsDisconnectedDevices.length;
         // Count how many devices report this camera as disconnected
         for (final deviceMac in camera.camReportsDisconnectedDevices) {
-          if (camera.getDisconnectedOnDevice(deviceMac) == true) {
+          final disconnectedValue = camera.getDisconnectedOnDevice(deviceMac);
+          // disconnected is a timestamp string, not empty means disconnected
+          if (disconnectedValue.isNotEmpty && disconnectedValue != '-') {
             totalDisconnectedOnDevices++;
           }
         }
       }
       
-      // Recording - count based on camReportsRecordingDevices tracker
-      if (camera.camReportsRecordingDevices.isNotEmpty) {
-        totalDevicesWithRecordingInfo += camera.camReportsRecordingDevices.length;
-        // Count how many devices report this camera as recording
-        for (final deviceMac in camera.camReportsRecordingDevices) {
-          if (camera.isRecordingOnDevice(deviceMac)) {
-            totalRecordingOnDevices++;
-          }
+      // Recording - count based on recordingDevices entries that have camReports data
+      for (final entry in camera.recordingDevices.entries) {
+        if (camera.camReportsRecordingDevices.contains(entry.key)) {
+          totalDevicesWithRecordingInfo++;
+          if (entry.value) totalRecordingOnDevices++;
         }
       }
     }
@@ -932,6 +942,14 @@ class _CamerasScreenState extends State<CamerasScreen>
 
   // Build individual camera list item for expansion tile
   Widget _buildCameraListItem(Camera camera) {
+    if (_showDetailedView) {
+      return _buildDetailedCameraListItem(camera);
+    }
+    return _buildSimpleCameraListItem(camera);
+  }
+
+  // Simple camera list item (original)
+  Widget _buildSimpleCameraListItem(Camera camera) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       child: Card(
@@ -1051,12 +1069,57 @@ class _CamerasScreenState extends State<CamerasScreen>
                       const SizedBox(height: 2),
                       Row(
                         children: [
-                          Icon(
-                            camera.connected ? Icons.link : Icons.link_off,
-                            size: 12.0,
-                            color: camera.connected ? Colors.green : Colors.red,
-                          ),
-                          const SizedBox(width: 4),
+                          // Connected status badge with device count
+                          () {
+                            // Calculate connected count from camReports data
+                            int connectedCount = 0;
+                            int totalDevicesWithInfo = 0;
+                            for (final entry in camera.connectedDevices.entries) {
+                              if (camera.camReportsConnectedDevices.contains(entry.key)) {
+                                totalDevicesWithInfo++;
+                                if (entry.value) connectedCount++;
+                              }
+                            }
+                            final hasDeviceInfo = totalDevicesWithInfo > 0;
+                            final isConnected = hasDeviceInfo ? connectedCount > 0 : camera.connected;
+                            final label = hasDeviceInfo 
+                                ? '$connectedCount/$totalDevicesWithInfo'
+                                : (isConnected ? '1' : '0');
+                            
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: isConnected 
+                                    ? Colors.green.withOpacity(0.2)
+                                    : Colors.red.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: isConnected ? Colors.green : Colors.red, 
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isConnected ? Icons.link : Icons.link_off,
+                                    size: 10,
+                                    color: isConnected ? Colors.green : Colors.red,
+                                  ),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    label,
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: isConnected ? Colors.green : Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }(),
+                          const SizedBox(width: 6),
                           Expanded(
                             child: Text(
                               camera.ip.isNotEmpty ? camera.ip : camera.mac,
@@ -1131,6 +1194,451 @@ class _CamerasScreenState extends State<CamerasScreen>
               ),
               const SizedBox(width: 8),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Detailed camera list item with extra information
+  Widget _buildDetailedCameraListItem(Camera camera) {
+    // Calculate connected count from camReports data
+    int connectedCount = 0;
+    int totalDevicesWithConnectedInfo = 0;
+    for (final entry in camera.connectedDevices.entries) {
+      if (camera.camReportsConnectedDevices.contains(entry.key)) {
+        totalDevicesWithConnectedInfo++;
+        if (entry.value) connectedCount++;
+      }
+    }
+    final hasDeviceConnectedInfo = totalDevicesWithConnectedInfo > 0;
+    final isOnline = hasDeviceConnectedInfo ? connectedCount > 0 : camera.connected;
+    final onlineLabel = hasDeviceConnectedInfo 
+        ? '$connectedCount/$totalDevicesWithConnectedInfo'
+        : (isOnline ? 'Online' : 'Offline');
+
+    // Calculate recording count
+    int recordingCount = 0;
+    int totalDevicesWithRecordingInfo = 0;
+    for (final entry in camera.recordingDevices.entries) {
+      if (camera.camReportsRecordingDevices.contains(entry.key)) {
+        totalDevicesWithRecordingInfo++;
+        if (entry.value) recordingCount++;
+      }
+    }
+    final hasDeviceRecordingInfo = totalDevicesWithRecordingInfo > 0;
+    final isRecording = hasDeviceRecordingInfo ? recordingCount > 0 : camera.recording;
+    final recordingLabel = hasDeviceRecordingInfo 
+        ? '$recordingCount/$totalDevicesWithRecordingInfo'
+        : 'REC';
+
+    final resolution = camera.recordWidth > 0 && camera.recordHeight > 0
+        ? '${camera.recordWidth}x${camera.recordHeight}'
+        : '-';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Card(
+        margin: EdgeInsets.zero,
+        elevation: 2,
+        color: AppTheme.darkSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: isOnline
+                ? Colors.green.withOpacity(0.3)
+                : Colors.red.withOpacity(0.3),
+            width: 1,
+          ),
+        ),
+        child: InkWell(
+          onTap: () => _selectCamera(camera),
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Row 1: Thumbnail, Name, Status badges
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Thumbnail
+                    Container(
+                      width: 80,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: isOnline
+                              ? Colors.green.withOpacity(0.5)
+                              : Colors.red.withOpacity(0.5),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: !_hasMacAddress(camera)
+                            ? const Icon(Icons.videocam_off_outlined, size: 24, color: Colors.grey)
+                            : camera.mainSnapShot.isNotEmpty
+                                ? CameraSnapshotWidget(
+                                    snapshotUrl: camera.mainSnapShot,
+                                    cameraId: camera.mac,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.cover,
+                                    showRefreshButton: false,
+                                    username: camera.username,
+                                    password: camera.password,
+                                  )
+                                : Icon(
+                                    isOnline ? Icons.videocam : Icons.videocam_off,
+                                    color: isOnline ? Colors.green : Colors.grey,
+                                    size: 24,
+                                  ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Name and IP
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            camera.displayName,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: !_hasMacAddress(camera) ? Colors.grey : Colors.white,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            camera.ip.isNotEmpty ? camera.ip : camera.mac,
+                            style: TextStyle(fontSize: 12, color: Colors.grey.shade400),
+                          ),
+                          const SizedBox(height: 4),
+                          // Resolution and codec
+                          Row(
+                            children: [
+                              if (resolution != '-') ...[
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    resolution,
+                                    style: const TextStyle(fontSize: 9, color: Colors.blue),
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                              ],
+                              if (camera.recordCodec.isNotEmpty) ...[
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: Colors.purple.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    camera.recordCodec.toUpperCase(),
+                                    style: const TextStyle(fontSize: 9, color: Colors.purple),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Status badges column
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        // Online/Offline badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: isOnline ? Colors.green : Colors.red,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                isOnline ? Icons.link : Icons.link_off,
+                                color: Colors.white,
+                                size: 10,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                onlineLabel,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Recording badge
+                        if (isRecording) ...[
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: Colors.orange,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.fiber_manual_record, color: Colors.white, size: 8),
+                                const SizedBox(width: 3),
+                                Text(
+                                  hasDeviceRecordingInfo ? 'REC $recordingLabel' : 'REC',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                        // Distributing badge
+                        if (camera.distribute) ...[
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: Colors.purple,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.share, color: Colors.white, size: 8),
+                                SizedBox(width: 3),
+                                Text(
+                                  'Distributing',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+                // Row 2: Device assignments (if any)
+                if (camera.currentDevices.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.devices, size: 12, color: Colors.blue),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Assigned to ${camera.currentDevices.length} device(s)',
+                              style: const TextStyle(fontSize: 10, color: Colors.blue),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: camera.currentDevices.entries.take(3).map((entry) {
+                            final deviceMac = entry.key;
+                            final isConnectedOnDevice = camera.isConnectedOnDevice(deviceMac);
+                            final isRecordingOnDevice = camera.isRecordingOnDevice(deviceMac);
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: isConnectedOnDevice 
+                                    ? Colors.green.withOpacity(0.2)
+                                    : Colors.red.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: isConnectedOnDevice ? Colors.green : Colors.red,
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isConnectedOnDevice ? Icons.check_circle : Icons.cancel,
+                                    size: 10,
+                                    color: isConnectedOnDevice ? Colors.green : Colors.red,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    deviceMac.length > 12 
+                                        ? '${deviceMac.substring(0, 12)}...'
+                                        : deviceMac,
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      color: Colors.grey.shade300,
+                                    ),
+                                  ),
+                                  if (isRecordingOnDevice) ...[
+                                    const SizedBox(width: 4),
+                                    const Icon(Icons.fiber_manual_record, size: 8, color: Colors.orange),
+                                  ],
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        if (camera.currentDevices.length > 3)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              '+${camera.currentDevices.length - 3} more devices',
+                              style: TextStyle(fontSize: 9, color: Colors.grey.shade500),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+                
+                // Row 3: Details grid (Resolution, Codec, Brand)
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    // Resolution
+                    Expanded(
+                      child: _buildDetailItem(
+                        icon: Icons.aspect_ratio,
+                        label: 'Resolution',
+                        value: resolution,
+                        badge: _getResolutionLabel(camera.recordWidth, camera.recordHeight),
+                        badgeColor: _getResolutionColor(_getResolutionLabel(camera.recordWidth, camera.recordHeight)),
+                      ),
+                    ),
+                    // Codec
+                    Expanded(
+                      child: _buildDetailItem(
+                        icon: Icons.video_settings,
+                        label: 'Codec',
+                        value: camera.recordCodec.isNotEmpty ? camera.recordCodec : '-',
+                      ),
+                    ),
+                    // Brand
+                    Expanded(
+                      child: _buildDetailItem(
+                        icon: Icons.business,
+                        label: 'Brand',
+                        value: camera.brand.isNotEmpty ? camera.brand : camera.manufacturer,
+                      ),
+                    ),
+                  ],
+                ),
+                
+                // Row 4: MAC and Last Seen
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    // MAC
+                    Expanded(
+                      flex: 2,
+                      child: _buildDetailItem(
+                        icon: Icons.router,
+                        label: 'MAC',
+                        value: camera.mac.isNotEmpty ? camera.mac.toUpperCase() : '-',
+                      ),
+                    ),
+                    // Last Seen
+                    Expanded(
+                      child: _buildDetailItem(
+                        icon: Icons.access_time,
+                        label: 'Last Seen',
+                        value: camera.lastSeenAt.isNotEmpty ? _formatLastSeen(camera.lastSeenAt) : '-',
+                      ),
+                    ),
+                    // ONVIF Status
+                    Expanded(
+                      child: _buildDetailItem(
+                        icon: camera.onvifConnected ? Icons.link : Icons.link_off,
+                        label: 'ONVIF',
+                        value: camera.onvifConnected ? 'Connected' : 'Disconnected',
+                        valueColor: camera.onvifConnected ? Colors.green : Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Row 5: Action buttons
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton.icon(
+                      icon: Icon(
+                        Icons.videocam,
+                        size: 16,
+                        color: !_hasMacAddress(camera) ? Colors.grey : AppTheme.primaryOrange,
+                      ),
+                      label: Text(
+                        'Live',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: !_hasMacAddress(camera) ? Colors.grey : AppTheme.primaryOrange,
+                        ),
+                      ),
+                      onPressed: !_hasMacAddress(camera) ? null : () => _openLiveView(camera),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        minimumSize: Size.zero,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton.icon(
+                      icon: Icon(
+                        Icons.video_library,
+                        size: 16,
+                        color: !_hasMacAddress(camera) ? Colors.grey : Colors.blue,
+                      ),
+                      label: Text(
+                        'Recordings',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: !_hasMacAddress(camera) ? Colors.grey : Colors.blue,
+                        ),
+                      ),
+                      onPressed: !_hasMacAddress(camera) ? null : () => _openRecordView(camera),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        minimumSize: Size.zero,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1448,6 +1956,122 @@ extension _CamerasScreenRename on _CamerasScreenState {
           ),
         );
       }
+    }
+  }
+
+  // Helper method to build detail item (like all_cameras_screen)
+  Widget _buildDetailItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    String? badge,
+    Color? badgeColor,
+    Color? valueColor,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 12, color: Colors.grey.shade500),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: Colors.grey.shade500,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                value.isNotEmpty ? value : '-',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: valueColor ?? Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (badge != null) ...[
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                decoration: BoxDecoration(
+                  color: (badgeColor ?? Colors.blue).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  badge,
+                  style: TextStyle(
+                    fontSize: 8,
+                    color: badgeColor ?? Colors.blue,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+
+  // Format last seen timestamp
+  String _formatLastSeen(String lastSeenAt) {
+    if (lastSeenAt.isEmpty) return '-';
+    try {
+      final dateTime = DateTime.parse(lastSeenAt);
+      final now = DateTime.now();
+      final difference = now.difference(dateTime);
+      
+      if (difference.inMinutes < 1) {
+        return 'Just now';
+      } else if (difference.inHours < 1) {
+        return '${difference.inMinutes}m ago';
+      } else if (difference.inDays < 1) {
+        return '${difference.inHours}h ago';
+      } else if (difference.inDays < 7) {
+        return '${difference.inDays}d ago';
+      } else {
+        return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+      }
+    } catch (e) {
+      return lastSeenAt;
+    }
+  }
+
+  // Get resolution label
+  String _getResolutionLabel(int width, int height) {
+    if (width >= 3840) return '4K';
+    if (width >= 2560) return '2K';
+    if (width >= 1920) return 'FHD';
+    if (width >= 1280) return 'HD';
+    if (width >= 640) return 'SD';
+    return '';
+  }
+
+  // Get resolution color
+  Color _getResolutionColor(String label) {
+    switch (label) {
+      case '4K':
+        return Colors.purple;
+      case '2K':
+        return Colors.blue;
+      case 'FHD':
+        return Colors.green;
+      case 'HD':
+        return Colors.orange;
+      case 'SD':
+        return Colors.grey;
+      default:
+        return Colors.grey;
     }
   }
 }
