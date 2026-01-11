@@ -943,11 +943,103 @@ class Camera {
   // A camera can record on multiple devices simultaneously
   final Map<String, bool> recordingDevices;
 
+  // Connected per device - key: deviceMac, value: isConnected
+  // A camera can be connected on multiple devices simultaneously
+  final Map<String, bool> connectedDevices;
+
+  // RecordPath per device - key: deviceMac, value: recordPath
+  // A camera can have different record paths on different devices
+  final Map<String, String> recordPathDevices;
+
+  // Disconnected timestamp per device - key: deviceMac, value: disconnected timestamp
+  final Map<String, String> disconnectedDevices;
+
+  // LastSeenAt per device - key: deviceMac, value: lastSeenAt timestamp
+  final Map<String, String> lastSeenAtDevices;
+
+  // LastRestartTime per device - key: deviceMac, value: lastRestartTime timestamp
+  final Map<String, String> lastRestartTimeDevices;
+
+  // Reported per device - key: deviceMac, value: reported timestamp
+  final Map<String, String> reportedDevices;
+
+  // Set of device MACs that have received camreports recording info
+  // Only show recording status for a device if camreports data was received
+  final Set<String> camReportsRecordingDevices;
+
+  // Set of device MACs that have received camreports connected info
+  final Set<String> camReportsConnectedDevices;
+
+  // Set of device MACs that have received camreports recordPath info
+  final Set<String> camReportsRecordPathDevices;
+
+  // Set of device MACs that have received camreports disconnected info
+  final Set<String> camReportsDisconnectedDevices;
+
+  // Set of device MACs that have received camreports lastSeenAt info
+  final Set<String> camReportsLastSeenAtDevices;
+
+  // Set of device MACs that have received camreports lastRestartTime info
+  final Set<String> camReportsLastRestartTimeDevices;
+
+  // Set of device MACs that have received camreports reported info
+  final Set<String> camReportsReportedDevices;
+
   // Computed property - true if recording on any device
   bool get recording => recordingDevices.values.any((r) => r);
 
   // How many devices are recording this camera
   int get recordingCount => recordingDevices.values.where((r) => r).length;
+
+  // Check if recording info was received from camreports for a specific device
+  bool hasCamReportsRecordingInfo(String deviceMac) => camReportsRecordingDevices.contains(deviceMac);
+
+  // Check if connected info was received from camreports for a specific device
+  bool hasCamReportsConnectedInfo(String deviceMac) => camReportsConnectedDevices.contains(deviceMac);
+
+  // Check if recordPath info was received from camreports for a specific device
+  bool hasCamReportsRecordPathInfo(String deviceMac) => camReportsRecordPathDevices.contains(deviceMac);
+
+  // Check if camera is connected on a specific device (only if camreports data exists)
+  bool isConnectedOnDevice(String deviceMac) {
+    if (!camReportsConnectedDevices.contains(deviceMac)) return connected; // fallback to general
+    return connectedDevices[deviceMac] ?? false;
+  }
+
+  // Get record path on a specific device (only if camreports data exists)
+  String getRecordPathOnDevice(String deviceMac) {
+    if (!camReportsRecordPathDevices.contains(deviceMac)) return recordPath; // fallback to general
+    return recordPathDevices[deviceMac] ?? '';
+  }
+
+  // Get disconnected timestamp on a specific device
+  String getDisconnectedOnDevice(String deviceMac) {
+    if (!camReportsDisconnectedDevices.contains(deviceMac)) return disconnected;
+    return disconnectedDevices[deviceMac] ?? '-';
+  }
+
+  // Get lastSeenAt on a specific device
+  String getLastSeenAtOnDevice(String deviceMac) {
+    if (!camReportsLastSeenAtDevices.contains(deviceMac)) return lastSeenAt;
+    return lastSeenAtDevices[deviceMac] ?? '';
+  }
+
+  // Get lastRestartTime on a specific device
+  String getLastRestartTimeOnDevice(String deviceMac) {
+    if (!camReportsLastRestartTimeDevices.contains(deviceMac)) return lastRestartTime;
+    return lastRestartTimeDevices[deviceMac] ?? '';
+  }
+
+  // Get reported timestamp on a specific device
+  String getReportedOnDevice(String deviceMac) {
+    if (!camReportsReportedDevices.contains(deviceMac)) return reportName;
+    return reportedDevices[deviceMac] ?? '';
+  }
+  // Check if camera is recording on a specific device (only if camreports data exists)
+  bool isRecordingOnDevice(String deviceMac) {
+    if (!camReportsRecordingDevices.contains(deviceMac)) return false;
+    return recordingDevices[deviceMac] ?? false;
+  }
 
   // Display name - uses MAC address if name is empty
   String get displayName => name.isNotEmpty ? name : mac;
@@ -1036,6 +1128,18 @@ class Camera {
     this.disconnected = '-',
     this.lastSeenAt = '',
     Map<String, bool>? recordingDevices,
+    Map<String, bool>? connectedDevices,
+    Map<String, String>? recordPathDevices,
+    Map<String, String>? disconnectedDevices,
+    Map<String, String>? lastSeenAtDevices,
+    Map<String, String>? lastRestartTimeDevices,
+    Map<String, String>? reportedDevices,
+    Set<String>? camReportsConnectedDevices,
+    Set<String>? camReportsRecordPathDevices,
+    Set<String>? camReportsDisconnectedDevices,
+    Set<String>? camReportsLastSeenAtDevices,
+    Set<String>? camReportsLastRestartTimeDevices,
+    Set<String>? camReportsReportedDevices,
     this.soundRec = false,
     this.xAddr = '',
     this.mac = '',
@@ -1054,9 +1158,23 @@ class Camera {
     CameraCurrentDevice? currentDevice,
     Map<String, CameraCurrentDevice>? currentDevices,
     List<CameraHistoryDevice>? deviceHistory,
+    Set<String>? camReportsRecordingDevices,
   })  : groups = groups ?? [],
         deviceHistory = deviceHistory ?? [],
         recordingDevices = recordingDevices ?? {},
+        connectedDevices = connectedDevices ?? {},
+        recordPathDevices = recordPathDevices ?? {},
+        disconnectedDevices = disconnectedDevices ?? {},
+        lastSeenAtDevices = lastSeenAtDevices ?? {},
+        lastRestartTimeDevices = lastRestartTimeDevices ?? {},
+        reportedDevices = reportedDevices ?? {},
+        camReportsRecordingDevices = camReportsRecordingDevices ?? {},
+        camReportsConnectedDevices = camReportsConnectedDevices ?? {},
+        camReportsRecordPathDevices = camReportsRecordPathDevices ?? {},
+        camReportsDisconnectedDevices = camReportsDisconnectedDevices ?? {},
+        camReportsLastSeenAtDevices = camReportsLastSeenAtDevices ?? {},
+        camReportsLastRestartTimeDevices = camReportsLastRestartTimeDevices ?? {},
+        camReportsReportedDevices = camReportsReportedDevices ?? {},
         currentDevices = currentDevices ??
             (currentDevice != null && currentDevice.deviceMac.isNotEmpty
                 ? {currentDevice.deviceMac: currentDevice}
@@ -1102,6 +1220,12 @@ class Camera {
     String? disconnected,
     String? lastSeenAt,
     Map<String, bool>? recordingDevices,
+    Map<String, bool>? connectedDevices,
+    Map<String, String>? recordPathDevices,
+    Map<String, String>? disconnectedDevices,
+    Map<String, String>? lastSeenAtDevices,
+    Map<String, String>? lastRestartTimeDevices,
+    Map<String, String>? reportedDevices,
     bool? soundRec,
     String? xAddr,
     String? mac,
@@ -1155,6 +1279,24 @@ class Camera {
       lastSeenAt: lastSeenAt ?? this.lastSeenAt,
       recordingDevices:
           recordingDevices ?? Map<String, bool>.from(this.recordingDevices),
+      connectedDevices:
+          connectedDevices ?? Map<String, bool>.from(this.connectedDevices),
+      recordPathDevices:
+          recordPathDevices ?? Map<String, String>.from(this.recordPathDevices),
+      disconnectedDevices:
+          disconnectedDevices ?? Map<String, String>.from(this.disconnectedDevices),
+      lastSeenAtDevices:
+          lastSeenAtDevices ?? Map<String, String>.from(this.lastSeenAtDevices),
+      lastRestartTimeDevices:
+          lastRestartTimeDevices ?? Map<String, String>.from(this.lastRestartTimeDevices),
+      reportedDevices:
+          reportedDevices ?? Map<String, String>.from(this.reportedDevices),
+      camReportsConnectedDevices: Set<String>.from(this.camReportsConnectedDevices),
+      camReportsRecordPathDevices: Set<String>.from(this.camReportsRecordPathDevices),
+      camReportsDisconnectedDevices: Set<String>.from(this.camReportsDisconnectedDevices),
+      camReportsLastSeenAtDevices: Set<String>.from(this.camReportsLastSeenAtDevices),
+      camReportsLastRestartTimeDevices: Set<String>.from(this.camReportsLastRestartTimeDevices),
+      camReportsReportedDevices: Set<String>.from(this.camReportsReportedDevices),
       soundRec: soundRec ?? this.soundRec,
       xAddr: xAddr ?? this.xAddr,
       mac: mac ?? this.mac,
@@ -1212,6 +1354,54 @@ class Camera {
           (json['recordingDevices'] as Map<String, dynamic>?)?.map(
                 (key, value) => MapEntry(key, value as bool),
               ) ??
+              {},
+      connectedDevices:
+          (json['connectedDevices'] as Map<String, dynamic>?)?.map(
+                (key, value) => MapEntry(key, value as bool),
+              ) ??
+              {},
+      recordPathDevices:
+          (json['recordPathDevices'] as Map<String, dynamic>?)?.map(
+                (key, value) => MapEntry(key, value as String),
+              ) ??
+              {},
+      disconnectedDevices:
+          (json['disconnectedDevices'] as Map<String, dynamic>?)?.map(
+                (key, value) => MapEntry(key, value as String),
+              ) ??
+              {},
+      lastSeenAtDevices:
+          (json['lastSeenAtDevices'] as Map<String, dynamic>?)?.map(
+                (key, value) => MapEntry(key, value as String),
+              ) ??
+              {},
+      lastRestartTimeDevices:
+          (json['lastRestartTimeDevices'] as Map<String, dynamic>?)?.map(
+                (key, value) => MapEntry(key, value as String),
+              ) ??
+              {},
+      reportedDevices:
+          (json['reportedDevices'] as Map<String, dynamic>?)?.map(
+                (key, value) => MapEntry(key, value as String),
+              ) ??
+              {},
+      camReportsConnectedDevices:
+          (json['camReportsConnectedDevices'] as List<dynamic>?)?.cast<String>().toSet() ??
+              {},
+      camReportsRecordPathDevices:
+          (json['camReportsRecordPathDevices'] as List<dynamic>?)?.cast<String>().toSet() ??
+              {},
+      camReportsDisconnectedDevices:
+          (json['camReportsDisconnectedDevices'] as List<dynamic>?)?.cast<String>().toSet() ??
+              {},
+      camReportsLastSeenAtDevices:
+          (json['camReportsLastSeenAtDevices'] as List<dynamic>?)?.cast<String>().toSet() ??
+              {},
+      camReportsLastRestartTimeDevices:
+          (json['camReportsLastRestartTimeDevices'] as List<dynamic>?)?.cast<String>().toSet() ??
+              {},
+      camReportsReportedDevices:
+          (json['camReportsReportedDevices'] as List<dynamic>?)?.cast<String>().toSet() ??
               {},
       soundRec: json['soundRec'] ?? false,
       xAddr: json['xAddr'] ?? '',
@@ -1281,6 +1471,18 @@ class Camera {
       'recording': recording,
       'recordingDevices': recordingDevices,
       'recordingCount': recordingCount,
+      'connectedDevices': connectedDevices,
+      'recordPathDevices': recordPathDevices,
+      'disconnectedDevices': disconnectedDevices,
+      'lastSeenAtDevices': lastSeenAtDevices,
+      'lastRestartTimeDevices': lastRestartTimeDevices,
+      'reportedDevices': reportedDevices,
+      'camReportsConnectedDevices': camReportsConnectedDevices.toList(),
+      'camReportsRecordPathDevices': camReportsRecordPathDevices.toList(),
+      'camReportsDisconnectedDevices': camReportsDisconnectedDevices.toList(),
+      'camReportsLastSeenAtDevices': camReportsLastSeenAtDevices.toList(),
+      'camReportsLastRestartTimeDevices': camReportsLastRestartTimeDevices.toList(),
+      'camReportsReportedDevices': camReportsReportedDevices.toList(),
       'soundRec': soundRec,
       'xAddr': xAddr,
       'mac': mac,

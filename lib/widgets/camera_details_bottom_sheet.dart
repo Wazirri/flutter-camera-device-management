@@ -6,6 +6,7 @@ import '../theme/app_theme.dart';
 import '../providers/websocket_provider.dart';
 import '../providers/camera_devices_provider.dart';
 import '../screens/live_view_screen.dart';
+import '../screens/multi_recordings_screen.dart';
 
 class CameraDetailsBottomSheet extends StatelessWidget {
   final Camera camera;
@@ -264,7 +265,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
               Expanded(
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.play_arrow),
-                  label: const Text('Live View'),
+                  label: const Text('Canlı İzle'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryBlue,
                     padding: const EdgeInsets.symmetric(vertical: 12),
@@ -275,7 +276,28 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LiveViewScreen(camera: camera),
+                        builder: (context) => LiveViewScreen(camera: camera, showBackButton: true),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.video_library),
+                  label: const Text('Kayıtlar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // Navigate to MultiRecordingsScreen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MultiRecordingsScreen(showBackButton: true),
                       ),
                     );
                   },

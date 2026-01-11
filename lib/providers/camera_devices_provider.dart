@@ -31,6 +31,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   bool _isLoading = false;
   String? _selectedGroupName;
 
+  // Buffer for camera properties that arrive before MAC
+  // Key: "deviceMac:cameraIndex", Value: Map of property -> value
+  final Map<String, Map<String, dynamic>> _pendingCameraProperties = {};
+
   // WebSocket provider reference
   WebSocketProviderOptimized? _webSocketProvider;
 
@@ -741,38 +745,15 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       case 'device_mac':
         // Device MAC is already set as the key, but update the entry if needed
         currentEntry = currentEntry.copyWith(deviceMac: value.toString());
-
-        // Link camera to device when device_mac is set
+        
+        // NOTE: Do NOT add camera to device.cameras here!
+        // device.cameras should ONLY be populated from ecs_slaves.DEVICE_MAC.cam[X].mac data
+        // This currentDevices info is just metadata about which device the camera is assigned to
+        // The actual camera listing comes from the device's own cam[] array
         String newDeviceMac = value.toString();
         if (newDeviceMac.isNotEmpty) {
-          CameraDevice? device = _devices[newDeviceMac];
-
-          if (device != null) {
-            // Check if camera is already in device's cameras list
-            bool alreadyLinked = device.cameras.any((c) => c.mac == camera.mac);
-
-            if (!alreadyLinked) {
-              // Find next available index
-              int nextIndex = device.cameras.length;
-
-              // Add camera to device with proper index
-              camera.index = nextIndex;
-              camera.parentDeviceMacKey = device.macKey;
-              device.cameras.add(camera);
-
-              print(
-                  'CDP_OPT: ✅ Linked MAC-defined camera ${camera.mac} (${camera.name}) to device ${device.macKey} at index $nextIndex');
-
-              // Invalidate caches
-              _cachedDevicesList = null;
-            } else {
-              print(
-                  'CDP_OPT: Camera ${camera.mac} already linked to device ${device.macKey}');
-            }
-          } else {
-            print(
-                'CDP_OPT: Device $newDeviceMac not found for camera ${camera.mac}, camera will appear when device comes online');
-          }
+          print(
+              'CDP_OPT: cameras_mac: Camera ${camera.mac} has current device_mac: $newDeviceMac (metadata only, not adding to device.cameras)');
         }
         break;
       case 'device_ip':
@@ -890,36 +871,97 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   }
 
   // Add or update camera in device list
+  // NOTE: Each device gets its own Camera instance (copy) to avoid shared state issues
+  // with index and parentDeviceMacKey when same camera is on multiple devices
   void _addOrUpdateCameraInDeviceList(
-      CameraDevice device, int cameraIndex, Camera cameraToAdd) {
-    cameraToAdd.index = cameraIndex; // Set the device-specific index
-    cameraToAdd.parentDeviceMacKey =
-        device.macKey; // Use the original macKey from path for the device
-
+      CameraDevice device, int cameraIndex, Camera sourceCamera) {
+    print('CDP_OPT: 📥 _addOrUpdateCameraInDeviceList called:');
+    print('CDP_OPT:    Device: ${device.macKey}');
+    print('CDP_OPT:    Camera MAC: ${sourceCamera.mac}');
+    print('CDP_OPT:    New Index: $cameraIndex');
+    print('CDP_OPT:    Current device.cameras count: ${device.cameras.length}');
+    
     // Remove any camera with the same index but different MAC (in case of MAC reassignment)
-    device.cameras
-        .removeWhere((c) => c.index == cameraIndex && c.mac != cameraToAdd.mac);
+    final removedByIndex = device.cameras.where((c) => c.index == cameraIndex && c.mac != sourceCamera.mac).toList();
+    if (removedByIndex.isNotEmpty) {
+      print('CDP_OPT:    ⚠️ Removing ${removedByIndex.length} cameras with same index but different MAC');
+    }
+    device.cameras.removeWhere((c) => c.index == cameraIndex && c.mac != sourceCamera.mac);
 
-    // Remove any camera with the same MAC but different index (in case of index reassignment)
-    device.cameras
-        .removeWhere((c) => c.mac == cameraToAdd.mac && c.index != cameraIndex);
-
-    // Add or update the camera
-    if (!device.cameras
-        .any((c) => c.mac == cameraToAdd.mac && c.index == cameraIndex)) {
-      device.cameras.add(cameraToAdd);
-      print(
-          'CDP_OPT: Added camera ${cameraToAdd.mac} (${cameraToAdd.name}) to device ${device.macKey} at index $cameraIndex');
+    // Check if camera with same MAC already exists in this device
+    final existingIndex = device.cameras.indexWhere((c) => c.mac == sourceCamera.mac);
+    
+    if (existingIndex >= 0) {
+      // Camera already exists - update its index if needed
+      final existingCamera = device.cameras[existingIndex];
+      if (existingCamera.index != cameraIndex) {
+        existingCamera.index = cameraIndex;
+        print('CDP_OPT:    ℹ️ Updated existing camera ${sourceCamera.mac} index to $cameraIndex');
+      }
+      // Sync properties from source camera
+      _syncCameraProperties(existingCamera, sourceCamera);
+    } else {
+      // Create a copy of the source camera for this device
+      final deviceCamera = sourceCamera.copyWith(
+        index: cameraIndex,
+        parentDeviceMacKey: device.macKey,
+      );
+      device.cameras.add(deviceCamera);
+      print('CDP_OPT:    ✅ Added camera copy ${sourceCamera.mac} to device at index $cameraIndex');
     }
 
     // Sort cameras by index for consistent ordering
     device.cameras.sort((a, b) => a.index.compareTo(b.index));
-
-    // Merge MAC-defined camera data with device camera data
-    _mergeMacDefinedCameraData();
-
-    // Invalidate caches
-    _cachedDevicesList = null;
+    
+    print('CDP_OPT:    Final device.cameras count: ${device.cameras.length}');
+  }
+  
+  // Sync properties from source camera to device camera
+  void _syncCameraProperties(Camera target, Camera source) {
+    if (source.name.isNotEmpty) target.name = source.name;
+    if (source.ip.isNotEmpty) target.ip = source.ip;
+    if (source.brand.isNotEmpty) target.brand = source.brand;
+    if (source.hw.isNotEmpty) target.hw = source.hw;
+    if (source.manufacturer.isNotEmpty) target.manufacturer = source.manufacturer;
+    if (source.mediaUri.isNotEmpty) target.mediaUri = source.mediaUri;
+    if (source.recordUri.isNotEmpty) target.recordUri = source.recordUri;
+    if (source.subUri.isNotEmpty) target.subUri = source.subUri;
+    if (source.mainSnapShot.isNotEmpty) target.mainSnapShot = source.mainSnapShot;
+    if (source.subSnapShot.isNotEmpty) target.subSnapShot = source.subSnapShot;
+    if (source.username.isNotEmpty) target.username = source.username;
+    if (source.password.isNotEmpty) target.password = source.password;
+    target.connected = source.connected;
+    target.recordWidth = source.recordWidth;
+    target.recordHeight = source.recordHeight;
+    target.subWidth = source.subWidth;
+    target.subHeight = source.subHeight;
+    target.recordCodec = source.recordCodec;
+    target.subCodec = source.subCodec;
+    target.soundRec = source.soundRec;
+    // Sync distribute properties from all_cameras/cameras_mac
+    target.distribute = source.distribute;
+    target.distributeCount = source.distributeCount;
+    // Merge recording devices (per-device status from camreports)
+    target.recordingDevices.addAll(source.recordingDevices);
+    target.camReportsRecordingDevices.addAll(source.camReportsRecordingDevices);
+    // Merge connected devices (per-device status from camreports)
+    target.connectedDevices.addAll(source.connectedDevices);
+    target.camReportsConnectedDevices.addAll(source.camReportsConnectedDevices);
+    // Merge recordPath devices (per-device paths from camreports)
+    target.recordPathDevices.addAll(source.recordPathDevices);
+    target.camReportsRecordPathDevices.addAll(source.camReportsRecordPathDevices);
+    // Merge disconnected devices (per-device timestamps from camreports)
+    target.disconnectedDevices.addAll(source.disconnectedDevices);
+    target.camReportsDisconnectedDevices.addAll(source.camReportsDisconnectedDevices);
+    // Merge lastSeenAt devices (per-device timestamps from camreports)
+    target.lastSeenAtDevices.addAll(source.lastSeenAtDevices);
+    target.camReportsLastSeenAtDevices.addAll(source.camReportsLastSeenAtDevices);
+    // Merge lastRestartTime devices (per-device timestamps from camreports)
+    target.lastRestartTimeDevices.addAll(source.lastRestartTimeDevices);
+    target.camReportsLastRestartTimeDevices.addAll(source.camReportsLastRestartTimeDevices);
+    // Merge reported devices (per-device timestamps from camreports)
+    target.reportedDevices.addAll(source.reportedDevices);
+    target.camReportsReportedDevices.addAll(source.camReportsReportedDevices);
   }
 
   // Merge MAC-defined camera data with device cameras based on MAC address
@@ -1002,6 +1044,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
           if (macDefinedCamera.subSnapShot.isNotEmpty) {
             deviceCamera.subSnapShot = macDefinedCamera.subSnapShot;
           }
+          
+          // Sync distribute properties from all_cameras/cameras_mac
+          deviceCamera.distribute = macDefinedCamera.distribute;
+          deviceCamera.distributeCount = macDefinedCamera.distributeCount;
 
           print(
               'CDP_OPT: Merged camera ${deviceCamera.mac}: Current devices: ${deviceCamera.currentDevices.keys.join(", ")}, History entries: ${deviceCamera.deviceHistory.length}');
@@ -1236,32 +1282,9 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       // Get or create the device
       final device = _getOrCreateDevice(canonicalDeviceMac, deviceMacPart);
 
-      // Check if this is the start of a new camera array (index 0 with a key property)
-      if (cameraIndex == 0 &&
-          (property == 'name' || property == 'mac' || property == 'brand')) {
-        print(
-            'CDP_OPT: *** RESETTING CAMERA ARRAY for device $canonicalDeviceMac ***');
-        // Clear existing cameras for this device
-        device.cameras.clear();
-
-        // Also remove these cameras from global MAC-defined cameras
-        final camerasToRemove = <String>[];
-        for (final entry in _macDefinedCameras.entries) {
-          if (entry.value.parentDeviceMacKey == canonicalDeviceMac) {
-            camerasToRemove.add(entry.key);
-          }
-        }
-
-        for (final cameraKey in camerasToRemove) {
-          _macDefinedCameras.remove(cameraKey);
-          print('CDP_OPT: Removed camera $cameraKey from global list');
-        }
-
-        // Clear caches
-        _cachedDevicesList = null;
-        _cachedFlatCameraList = null;
-        _cachedGroupsList = null;
-      }
+      // NOTE: Camera array reset is now handled in _processCameraData when cam[0].mac arrives.
+      // This function is for array-type val messages (List) which are rare.
+      // Removed the reset logic here to avoid conflicts with the new MAC-based system.
 
       // Ensure device has enough camera slots
       while (device.cameras.length <= cameraIndex) {
@@ -1290,12 +1313,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       await _updateCameraProperty(camera, property, value,
           deviceMac: canonicalDeviceMac);
 
-      // Always update camera in global list if it has MAC (even if name/other props changed)
-      if (camera.mac.isNotEmpty) {
-        _macDefinedCameras[camera.mac] = camera;
-        print(
-            'CDP_OPT: Updated camera ${camera.mac} (${camera.name}) in global list');
-      }
+      // NOTE: Do NOT add device cameras to global _macDefinedCameras!
+      // _macDefinedCameras is for cameras_mac data (cameras/all_cameras screens)
+      // device.cameras is for ecs_slaves data (camera_devices screen)
+      // These are separate data sources and should not be mixed.
 
       _batchNotifyListeners();
     } catch (e, s) {
@@ -1313,43 +1334,10 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         final newMac = value?.toString() ?? '';
         if (newMac.isEmpty) break;
         
-        // Remove old MAC from global list if it exists
-        if (camera.mac.isNotEmpty &&
-            _macDefinedCameras.containsKey(camera.mac)) {
-          _macDefinedCameras.remove(camera.mac);
-        }
-        
-        // If this MAC already exists in global list, merge properties
-        // The global camera may have IP and other properties already set
-        if (_macDefinedCameras.containsKey(newMac)) {
-          final existingCamera = _macDefinedCameras[newMac]!;
-          print('CDP_OPT: 🔄 MAC $newMac already exists in global list, merging properties');
-          
-          // Copy existing camera's properties to the device camera
-          // (but preserve parentDeviceMacKey and index from device camera)
-          camera.mac = existingCamera.mac;
-          if (existingCamera.ip.isNotEmpty) camera.ip = existingCamera.ip;
-          if (existingCamera.name.isNotEmpty) camera.name = existingCamera.name;
-          if (existingCamera.username.isNotEmpty) camera.username = existingCamera.username;
-          if (existingCamera.password.isNotEmpty) camera.password = existingCamera.password;
-          if (existingCamera.mediaUri.isNotEmpty) camera.mediaUri = existingCamera.mediaUri;
-          if (existingCamera.recordUri.isNotEmpty) camera.recordUri = existingCamera.recordUri;
-          if (existingCamera.subUri.isNotEmpty) camera.subUri = existingCamera.subUri;
-          if (existingCamera.mainSnapShot.isNotEmpty) camera.mainSnapShot = existingCamera.mainSnapShot;
-          if (existingCamera.subSnapShot.isNotEmpty) camera.subSnapShot = existingCamera.subSnapShot;
-          if (existingCamera.brand.isNotEmpty) camera.brand = existingCamera.brand;
-          if (existingCamera.manufacturer.isNotEmpty) camera.manufacturer = existingCamera.manufacturer;
-          camera.connected = existingCamera.connected;
-          camera.currentDevices.addAll(existingCamera.currentDevices);
-          camera.groups.clear();
-          camera.groups.addAll(existingCamera.groups);
-        } else {
-          camera.mac = newMac;
-        }
-        
-        // Update global list with this camera
-        _macDefinedCameras[camera.mac] = camera;
-        print('CDP_OPT: ✅ Camera MAC set: ${camera.mac} (IP: ${camera.ip})');
+        // Simply set the MAC address - no global list manipulation
+        // device.cameras is independent from _macDefinedCameras
+        camera.mac = newMac;
+        print('CDP_OPT: ✅ Camera MAC set: ${camera.mac}');
         break;
       case 'name':
         camera.name = value?.toString() ?? '';
@@ -1575,13 +1563,47 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       print(
           'CDP_OPT: *** MAC ASSIGNMENT: Device ${device.macKey} cam[$cameraIndex].mac = "$cameraMacFromMessage" ***');
       if (cameraMacFromMessage.isNotEmpty) {
-        cameraToUpdate = _getOrCreateMacDefinedCamera(cameraMacFromMessage);
-        // Link this MAC-defined camera to the parent device and its index
-        _addOrUpdateCameraInDeviceList(device, cameraIndex, cameraToUpdate);
+        // When cam[0].mac arrives, this is the start of a new camera configuration.
+        // Clear any cameras with index >= current max expected (to handle config changes)
+        if (cameraIndex == 0 && device.cameras.isNotEmpty) {
+          print('CDP_OPT: *** cam[0].mac received - NEW CONFIG starting for device ${device.macKey} ***');
+          print('CDP_OPT: *** Clearing ${device.cameras.length} existing cameras ***');
+          device.cameras.clear();
+          // Also clear pending properties for this device
+          _pendingCameraProperties.removeWhere((key, _) => key.startsWith('${device.macKey}:'));
+        }
+        
+        // Get or create the source camera in _macDefinedCameras
+        final sourceCamera = _getOrCreateMacDefinedCamera(cameraMacFromMessage);
+        // Add a copy to device's camera list
+        _addOrUpdateCameraInDeviceList(device, cameraIndex, sourceCamera);
         print(
-            'CDP_OPT: *** Successfully linked camera ${cameraToUpdate.mac} to device ${device.macKey} at index $cameraIndex ***');
+            'CDP_OPT: *** Successfully linked camera ${sourceCamera.mac} to device ${device.macKey} at index $cameraIndex ***');
         print(
             'CDP_OPT: *** Device ${device.macKey} now has ${device.cameras.length} cameras ***');
+        
+        // Apply any buffered properties that arrived before MAC
+        final bufferKey = '${device.macKey}:$cameraIndex';
+        if (_pendingCameraProperties.containsKey(bufferKey)) {
+          final bufferedProps = _pendingCameraProperties[bufferKey]!;
+          print('CDP_OPT: *** Applying ${bufferedProps.length} buffered properties for $bufferKey ***');
+          
+          // Find the device camera copy to update
+          final deviceCamera = device.cameras.firstWhere(
+            (c) => c.mac == cameraMacFromMessage,
+            orElse: () => sourceCamera,
+          );
+          
+          for (var entry in bufferedProps.entries) {
+            // Apply to both source and device copy
+            _applyCameraProperty(sourceCamera, entry.key, entry.value, device.macKey);
+            if (!identical(deviceCamera, sourceCamera)) {
+              _applyCameraProperty(deviceCamera, entry.key, entry.value, device.macKey);
+            }
+          }
+          _pendingCameraProperties.remove(bufferKey);
+        }
+        cameraToUpdate = sourceCamera; // For the final property application
       } else {
         print(
             'CDP_OPT: *** ERROR: Received empty MAC for cam[$cameraIndex] on device ${device.macAddress}. Cannot link or update. ***');
@@ -1593,99 +1615,114 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       var camsInDevice =
           device.cameras.where((cam) => cam.index == cameraIndex).toList();
       if (camsInDevice.isNotEmpty) {
-        cameraToUpdate = camsInDevice.first; // Should ideally be only one
+        cameraToUpdate = camsInDevice.first; // This is the device-specific copy
         if (camsInDevice.length > 1) {
           print(
               "CDP_OPT: WARNING - Multiple cameras found for device ${device.macKey} at index $cameraIndex. Using first: ${cameraToUpdate.mac}. All: ${camsInDevice.map((c) => c.mac).join(',')}");
         }
+        
+        // Also update the source camera in _macDefinedCameras
+        final sourceCamera = _macDefinedCameras[cameraToUpdate.mac];
+        if (sourceCamera != null && !identical(sourceCamera, cameraToUpdate)) {
+          _applyCameraProperty(sourceCamera, propertyName, value, device.macKey);
+        }
       } else {
-        // Kamera slot'u henüz oluşturulmamış
-        // MAC adresi olmadan kamera yaratmıyoruz - önce MAC gelmeli
+        // Camera not yet created - buffer this property for when MAC arrives
+        final bufferKey = '${device.macKey}:$cameraIndex';
+        _pendingCameraProperties.putIfAbsent(bufferKey, () => {});
+        _pendingCameraProperties[bufferKey]![propertyName] = value;
         print(
-            'CDP_OPT: *** No camera found at index $cameraIndex for device ${device.macKey}. Waiting for MAC assignment. Property $propertyName will be ignored for now. ***');
-        return; // MAC olmadan kamera property'leri işlenmiyor
+            'CDP_OPT: *** Buffered property $propertyName for $bufferKey (waiting for MAC) ***');
+        return;
       }
     }
 
     // Now update the identified cameraToUpdate with the property from ecs_slaves
-    // Update property values
+    _applyCameraProperty(cameraToUpdate, propertyName, value, device.macKey);
+
+    _batchNotifyListeners();
+  }
+
+  // Apply a single property to a camera object
+  void _applyCameraProperty(Camera camera, String propertyName, dynamic value, String deviceMacKey) {
     switch (propertyName.toLowerCase()) {
       case 'name':
-        cameraToUpdate.name = value.toString();
+        camera.name = value.toString();
         break;
       case 'ip':
       case 'cameraip':
-        cameraToUpdate.ip = value.toString();
+        camera.ip = value.toString();
+        print('CDP_OPT: 📍 Camera ${camera.mac} IP set to: ${camera.ip}');
         break;
       case 'connected':
-        cameraToUpdate.connected = value == 1 ||
+        camera.connected = value == 1 ||
             value == true ||
             value.toString().toLowerCase() == 'true';
         break;
       case 'brand':
-        cameraToUpdate.brand = value.toString();
+        camera.brand = value.toString();
         break;
       case 'hw':
-        cameraToUpdate.hw = value.toString();
+        camera.hw = value.toString();
         break;
       case 'manufacturer':
-        cameraToUpdate.manufacturer = value.toString();
+        camera.manufacturer = value.toString();
         break;
       case 'country':
-        cameraToUpdate.country = value.toString();
+        camera.country = value.toString();
         break;
       case 'mainsnapshot':
-        cameraToUpdate.mainSnapShot = value.toString();
+        camera.mainSnapShot = value.toString();
         break;
       case 'subsnapshot':
-        cameraToUpdate.subSnapShot = value.toString();
+        camera.subSnapShot = value.toString();
         break;
       case 'mediauri':
-        cameraToUpdate.mediaUri = value.toString();
+        camera.mediaUri = value.toString();
         break;
       case 'recorduri':
-        cameraToUpdate.recordUri = value.toString();
+        camera.recordUri = value.toString();
         break;
       case 'suburi':
-        cameraToUpdate.subUri = value.toString();
+        camera.subUri = value.toString();
         break;
       case 'remoteuri':
-        cameraToUpdate.remoteUri = value.toString();
+        camera.remoteUri = value.toString();
         break;
       case 'username':
-        cameraToUpdate.username = value.toString();
+        camera.username = value.toString();
         break;
       case 'password':
-        cameraToUpdate.password = value.toString();
+        camera.password = value.toString();
         break;
       case 'recordcodec':
-        cameraToUpdate.recordCodec = value.toString();
+        camera.recordCodec = value.toString();
         break;
       case 'recordwidth':
-        cameraToUpdate.recordWidth =
+        camera.recordWidth =
             value is int ? value : int.tryParse(value.toString()) ?? 0;
         break;
       case 'recordheight':
-        cameraToUpdate.recordHeight =
+        camera.recordHeight =
             value is int ? value : int.tryParse(value.toString()) ?? 0;
         break;
       case 'subcodec':
-        cameraToUpdate.subCodec = value.toString();
+        camera.subCodec = value.toString();
         break;
       case 'subwidth':
-        cameraToUpdate.subWidth =
+        camera.subWidth =
             value is int ? value : int.tryParse(value.toString()) ?? 0;
         break;
       case 'subheight':
-        cameraToUpdate.subHeight =
+        camera.subHeight =
             value is int ? value : int.tryParse(value.toString()) ?? 0;
         break;
       case 'camerarawip':
-        cameraToUpdate.rawIp =
+        camera.rawIp =
             value is int ? value : int.tryParse(value.toString()) ?? 0;
         break;
       case 'soundrec':
-        cameraToUpdate.soundRec =
+        camera.soundRec =
             value == true || value.toString().toLowerCase() == 'true';
         break;
       case 'record':
@@ -1693,22 +1730,21 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         final isRecording = value == 1 ||
             value == true ||
             value.toString().toLowerCase() == 'true';
-        cameraToUpdate.recordingDevices[device.macKey] = isRecording;
+        camera.recordingDevices[deviceMacKey] = isRecording;
         print(
-            'CDP_OPT: Camera ${cameraToUpdate.mac} recording on device ${device.macKey}: $isRecording (total: ${cameraToUpdate.recordingCount} devices)');
+            'CDP_OPT: Camera ${camera.mac} recording on device $deviceMacKey: $isRecording (total: ${camera.recordingCount} devices)');
         break;
       case 'recordpath':
-        cameraToUpdate.recordPath = value.toString();
+        camera.recordPath = value.toString();
         break;
       case 'xaddr':
-        cameraToUpdate.xAddr = value.toString();
+      case 'xaddrs':
+        camera.xAddr = value.toString();
         break;
       default:
         print('CDP_OPT: Unhandled ecs_slaves camera property: $propertyName');
         break;
     }
-
-    _batchNotifyListeners();
   }
 
   // Process basic device properties
@@ -2374,12 +2410,14 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   }
 
   // Process camera report
+  // NOTE: camreports data is DEVICE-SPECIFIC - each device reports its own view of the camera
+  // connected, recording, last_seen_at etc. are per-device values
   Future<void> _processCameraReport(CameraDevice device, String property,
       List<String> subPath, dynamic value) async {
     // Handle camera report updates
     // Path format: camreports.CAMERA_NAME.property (e.g., camreports.KAMERA35.connected)
     print(
-        'CDP_OPT: Camera report update for ${device.macAddress}: $property subPath=$subPath val=$value');
+        'CDP_OPT: 📊 Camera report update for device ${device.macKey}: $property subPath=$subPath val=$value');
 
     if (subPath.isEmpty) return;
 
@@ -2387,21 +2425,8 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     final reportProperty =
         subPath.length > 1 ? subPath[1] : ''; // e.g., "connected", "recording"
 
-    // Find camera by name - PRIORITIZE MAC-defined cameras as they are the source of truth
-    Camera? targetCamera;
+    // Find camera in THIS DEVICE's camera list (device-specific copy)
     Camera? deviceCamera;
-
-    // First, search in all MAC-defined cameras (primary source)
-    for (var camera in _macDefinedCameras.values) {
-      if (camera.name == cameraName) {
-        targetCamera = camera;
-        print(
-            'CDP_OPT: 🎯 Found camera $cameraName in MAC-defined cameras (MAC: ${camera.mac})');
-        break;
-      }
-    }
-
-    // Also find in device's cameras list for syncing
     for (var camera in device.cameras) {
       if (camera.name == cameraName) {
         deviceCamera = camera;
@@ -2409,76 +2434,162 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       }
     }
 
-    // If not in MAC-defined, use device camera
-    if (targetCamera == null && deviceCamera != null) {
-      targetCamera = deviceCamera;
+    if (deviceCamera == null) {
       print(
-          'CDP_OPT: Found camera $cameraName only in device ${device.macAddress} cameras list');
-    }
-
-    if (targetCamera == null) {
-      print(
-          'CDP_OPT: ⚠️ Camera not found for camreport: $cameraName in device ${device.macAddress} or global list');
+          'CDP_OPT: ⚠️ Camera $cameraName not found in device ${device.macKey} cameras list');
       return;
     }
 
-    // Update camera properties based on report
+    print('CDP_OPT: 🎯 Found camera $cameraName in device ${device.macKey} (MAC: ${deviceCamera.mac})');
+
+    // Update device-specific camera properties based on report
     switch (reportProperty) {
       case 'connected':
         final isConnected = value == 1 ||
             value == true ||
             value.toString().toLowerCase() == 'true';
-        final oldValue = targetCamera.connected;
-        targetCamera.connected = isConnected;
-        // Also sync device camera if different object
-        if (deviceCamera != null && deviceCamera != targetCamera) {
-          deviceCamera.connected = isConnected;
-        }
+        final oldValue = deviceCamera.connectedDevices[device.macKey];
+        // Connected is per-device, store with device key
+        deviceCamera.connectedDevices[device.macKey] = isConnected;
+        // Mark that we received camreports connected info for this device
+        deviceCamera.camReportsConnectedDevices.add(device.macKey);
+        // Also update the general connected property for backward compatibility
+        deviceCamera.connected = isConnected;
         print(
-            'CDP_OPT: ⚡ Updated camera ${targetCamera.name} (${targetCamera.mac}) connected: $oldValue -> $isConnected');
+            'CDP_OPT: ⚡ Device ${device.macKey} camera ${deviceCamera.name} connected: $oldValue -> $isConnected (device-specific)');
         break;
+        
       case 'recording':
         final isRecording = value == 1 ||
             value == true ||
             value.toString().toLowerCase() == 'true';
-        targetCamera.recordingDevices[device.macKey] = isRecording;
-        // Also sync device camera if different object
-        if (deviceCamera != null && deviceCamera != targetCamera) {
-          deviceCamera.recordingDevices[device.macKey] = isRecording;
-        }
+        // Recording is per-device, store with device key
+        deviceCamera.recordingDevices[device.macKey] = isRecording;
+        // Mark that we received camreports recording info for this device
+        deviceCamera.camReportsRecordingDevices.add(device.macKey);
         print(
-            'CDP_OPT: Updated camera ${targetCamera.name} recording on ${device.macKey}=$isRecording (total: ${targetCamera.recordingCount} devices)');
+            'CDP_OPT: 🔴 Device ${device.macKey} camera ${deviceCamera.name} recording: $isRecording (device-specific)');
         break;
+        
       case 'last_seen_at':
-        targetCamera.lastSeenAt = value.toString();
-        // Also sync device camera if different object
-        if (deviceCamera != null && deviceCamera != targetCamera) {
-          deviceCamera.lastSeenAt = value.toString();
-        }
+        final lastSeenAtValue = value.toString();
+        // LastSeenAt is per-device, store with device key
+        deviceCamera.lastSeenAtDevices[device.macKey] = lastSeenAtValue;
+        deviceCamera.camReportsLastSeenAtDevices.add(device.macKey);
+        // Also update the general lastSeenAt property for backward compatibility
+        deviceCamera.lastSeenAt = lastSeenAtValue;
         print(
-            'CDP_OPT: Updated camera ${targetCamera.name} lastSeenAt=${targetCamera.lastSeenAt}');
+            'CDP_OPT: 📅 Device ${device.macKey} camera ${deviceCamera.name} lastSeenAt: $lastSeenAtValue (device-specific)');
         break;
+        
+      case 'last_restart_time':
+        final lastRestartTimeValue = value.toString();
+        // LastRestartTime is per-device, store with device key
+        deviceCamera.lastRestartTimeDevices[device.macKey] = lastRestartTimeValue;
+        deviceCamera.camReportsLastRestartTimeDevices.add(device.macKey);
+        // Also update the general lastRestartTime property for backward compatibility
+        deviceCamera.lastRestartTime = lastRestartTimeValue;
+        print(
+            'CDP_OPT: 🔄 Device ${device.macKey} camera ${deviceCamera.name} lastRestartTime: $lastRestartTimeValue (device-specific)');
+        break;
+        
+      case 'reported':
+        final reportedValue = value.toString();
+        // Reported is per-device, store with device key
+        deviceCamera.reportedDevices[device.macKey] = reportedValue;
+        deviceCamera.camReportsReportedDevices.add(device.macKey);
+        // Also update the general reportName property for backward compatibility
+        deviceCamera.reportName = reportedValue;
+        print(
+            'CDP_OPT: 📋 Device ${device.macKey} camera ${deviceCamera.name} reported: $reportedValue (device-specific)');
+        break;
+        
       case 'health':
-        targetCamera.health = value.toString();
-        // Also sync device camera if different object
-        if (deviceCamera != null && deviceCamera != targetCamera) {
-          deviceCamera.health = value.toString();
-        }
+        deviceCamera.health = value.toString();
         print(
-            'CDP_OPT: Updated camera ${targetCamera.name} health=${targetCamera.health}');
+            'CDP_OPT: 💚 Device ${device.macKey} camera ${deviceCamera.name} health: ${deviceCamera.health}');
         break;
+        
       case 'report_error':
-        targetCamera.reportError = value.toString();
-        // Also sync device camera if different object
-        if (deviceCamera != null && deviceCamera != targetCamera) {
-          deviceCamera.reportError = value.toString();
-        }
+        deviceCamera.reportError = value.toString();
         print(
-            'CDP_OPT: Updated camera ${targetCamera.name} reportError=${targetCamera.reportError}');
+            'CDP_OPT: ⚠️ Device ${device.macKey} camera ${deviceCamera.name} reportError: ${deviceCamera.reportError}');
         break;
+        
+      case 'recordingpath':
+      case 'recordingPath':
+        final recordPathValue = value.toString();
+        // RecordPath is per-device, store with device key
+        deviceCamera.recordPathDevices[device.macKey] = recordPathValue;
+        // Mark that we received camreports recordPath info for this device
+        deviceCamera.camReportsRecordPathDevices.add(device.macKey);
+        // Also update the general recordPath property for backward compatibility
+        deviceCamera.recordPath = recordPathValue;
+        print(
+            'CDP_OPT: 📁 Device ${device.macKey} camera ${deviceCamera.name} recordPath: $recordPathValue (device-specific)');
+        break;
+        
+      case 'disconnected':
+        final disconnectedValue = value.toString();
+        // Disconnected timestamp is per-device, store with device key
+        deviceCamera.disconnectedDevices[device.macKey] = disconnectedValue;
+        deviceCamera.camReportsDisconnectedDevices.add(device.macKey);
+        // Also update the general disconnected property for backward compatibility
+        deviceCamera.disconnected = disconnectedValue;
+        print(
+            'CDP_OPT: 🔌 Device ${device.macKey} camera ${deviceCamera.name} disconnected: $disconnectedValue (device-specific)');
+        break;
+        
       default:
         print(
-            'CDP_OPT: Unknown camreport property: $reportProperty for camera $cameraName');
+            'CDP_OPT: ❓ Unknown camreport property: $reportProperty for camera $cameraName on device ${device.macKey}');
+    }
+
+    // CRITICAL: Sync camreports data to _macDefinedCameras so UI can see it
+    // The UI uses _macDefinedCameras for display, so we must sync device-specific data there
+    final macDefinedCamera = _macDefinedCameras[deviceCamera.mac];
+    if (macDefinedCamera != null) {
+      // Sync all device-specific Maps and tracker Sets
+      macDefinedCamera.connectedDevices[device.macKey] = deviceCamera.connectedDevices[device.macKey] ?? false;
+      macDefinedCamera.camReportsConnectedDevices.add(device.macKey);
+      
+      macDefinedCamera.recordingDevices[device.macKey] = deviceCamera.recordingDevices[device.macKey] ?? false;
+      macDefinedCamera.camReportsRecordingDevices.add(device.macKey);
+      
+      if (deviceCamera.recordPathDevices.containsKey(device.macKey)) {
+        macDefinedCamera.recordPathDevices[device.macKey] = deviceCamera.recordPathDevices[device.macKey]!;
+        macDefinedCamera.camReportsRecordPathDevices.add(device.macKey);
+      }
+      
+      if (deviceCamera.disconnectedDevices.containsKey(device.macKey)) {
+        macDefinedCamera.disconnectedDevices[device.macKey] = deviceCamera.disconnectedDevices[device.macKey]!;
+        macDefinedCamera.camReportsDisconnectedDevices.add(device.macKey);
+      }
+      
+      if (deviceCamera.lastSeenAtDevices.containsKey(device.macKey)) {
+        macDefinedCamera.lastSeenAtDevices[device.macKey] = deviceCamera.lastSeenAtDevices[device.macKey]!;
+        macDefinedCamera.camReportsLastSeenAtDevices.add(device.macKey);
+      }
+      
+      if (deviceCamera.lastRestartTimeDevices.containsKey(device.macKey)) {
+        macDefinedCamera.lastRestartTimeDevices[device.macKey] = deviceCamera.lastRestartTimeDevices[device.macKey]!;
+        macDefinedCamera.camReportsLastRestartTimeDevices.add(device.macKey);
+      }
+      
+      if (deviceCamera.reportedDevices.containsKey(device.macKey)) {
+        macDefinedCamera.reportedDevices[device.macKey] = deviceCamera.reportedDevices[device.macKey]!;
+        macDefinedCamera.camReportsReportedDevices.add(device.macKey);
+      }
+      
+      // Also sync general properties for backward compatibility
+      macDefinedCamera.connected = deviceCamera.connected;
+      macDefinedCamera.lastSeenAt = deviceCamera.lastSeenAt;
+      macDefinedCamera.disconnected = deviceCamera.disconnected;
+      macDefinedCamera.lastRestartTime = deviceCamera.lastRestartTime;
+      macDefinedCamera.recordPath = deviceCamera.recordPath;
+      macDefinedCamera.reportName = deviceCamera.reportName;
+      
+      print('CDP_OPT: 🔄 Synced camreports data to _macDefinedCameras for ${deviceCamera.mac} (device: ${device.macKey})');
     }
 
     _batchNotifyListeners();
@@ -2494,26 +2605,6 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       );
       _cachedGroupsList = null;
     }
-  }
-
-  // Print device summary for debugging
-  void _printDeviceSummary() {
-    print('CDP_OPT: === DEVICE SUMMARY ===');
-    print('CDP_OPT: Total devices: ${_devices.length}');
-    print('CDP_OPT: MAC-defined cameras: ${_macDefinedCameras.length}');
-
-    for (var entry in _devices.entries) {
-      CameraDevice device = entry.value;
-      print(
-          'CDP_OPT: Device ${device.macKey}: ${device.cameras.length} cameras');
-      for (var camera in device.cameras) {
-        String status =
-            camera.mac.startsWith(device.macKey) ? 'NO_MAC' : 'HAS_MAC';
-        print(
-            'CDP_OPT:   - Camera[${camera.index}]: ${camera.mac} (${camera.name}) [$status]');
-      }
-    }
-    print('CDP_OPT: ======================');
   }
   
   // Public method to trigger UI update
@@ -2653,6 +2744,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   Future<bool> setSmartPlayerService(String deviceMac, bool enabled) async {
     if (_webSocketProvider == null) {
       print('❌ CDP: WebSocketProvider not set');
+      _showOperationResult(false, 'WebSocket bağlantısı yok');
       return false;
     }
     
@@ -2669,6 +2761,9 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         device.smartPlayerServiceOn = enabled;
         triggerUpdate();
       }
+      _showOperationResult(true, 'Smart Player ${enabled ? "başlatıldı" : "durduruldu"}\n\nKomut: $command');
+    } else {
+      _showOperationResult(false, 'Smart Player komutu gönderilemedi');
     }
     
     return success;
@@ -2679,6 +2774,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   Future<bool> setRecorderService(String deviceMac, bool enabled) async {
     if (_webSocketProvider == null) {
       print('❌ CDP: WebSocketProvider not set');
+      _showOperationResult(false, 'WebSocket bağlantısı yok');
       return false;
     }
     
@@ -2695,6 +2791,9 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
         device.recorderServiceOn = enabled;
         triggerUpdate();
       }
+      _showOperationResult(true, 'Recorder ${enabled ? "başlatıldı" : "durduruldu"}\n\nKomut: $command');
+    } else {
+      _showOperationResult(false, 'Recorder komutu gönderilemedi');
     }
     
     return success;
@@ -2705,6 +2804,7 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   Future<bool> clearDeviceCameras(String deviceMac) async {
     if (_webSocketProvider == null) {
       print('❌ CDP: WebSocketProvider not set');
+      _showOperationResult(false, 'WebSocket bağlantısı yok');
       return false;
     }
     
@@ -2714,16 +2814,123 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     final success = await _webSocketProvider!.sendCommand(command);
     
     if (success) {
-      // Clear cameras from local device state
-      final device = _devices[deviceMac];
-      if (device != null) {
-        device.cameras.clear();
-        triggerUpdate();
-        print('CDP: ✅ Cameras cleared for device $deviceMac');
-      }
+      // Popup gösterme - sunucudan yanıt geldiğinde popup gösterilecek
+      print('CDP: ✅ CLEARCAMS komutu gönderildi, sunucu yanıtı bekleniyor...');
+    } else {
+      _showOperationResult(false, 'Kamera silme komutu gönderilemedi');
     }
     
     return success;
+  }
+  
+  /// Clear cameras locally when server confirms the operation
+  /// Called by WebSocketProvider when clearcams response is received
+  void clearDeviceCamerasLocally(String deviceMac) {
+    print('CDP: 🗑️ Clearing cameras locally for device: $deviceMac');
+    
+    final device = _devices[deviceMac];
+    if (device != null) {
+      final cameraCount = device.cameras.length;
+      
+      // Only clear device.cameras - DO NOT remove from _macDefinedCameras!
+      // _macDefinedCameras is the global camera list for all_cameras screen
+      // A camera should stay in the global list even if removed from a device
+      // because it might be on other devices or just not assigned yet
+      
+      // Clear device cameras
+      device.cameras.clear();
+      
+      // Clear caches
+      _cachedDevicesList = null;
+      _cachedFlatCameraList = null;
+      
+      print('CDP: ✅ Cameras cleared for device $deviceMac (removed $cameraCount cameras from device, global list unchanged)');
+      
+      triggerUpdate();
+    } else {
+      print('CDP: ⚠️ Device not found for clearing cameras: $deviceMac');
+    }
+  }
+  
+  /// Add a camera to a device manually
+  /// Format: ADD_CAM <CAM_MAC> <SLAVE_MAC>
+  Future<bool> addCameraToDevice(String cameraMac, String deviceMac) async {
+    if (_webSocketProvider == null) {
+      print('❌ CDP: WebSocketProvider not set');
+      _showOperationResult(false, 'WebSocket bağlantısı yok');
+      return false;
+    }
+    
+    final command = 'ADD_CAM $cameraMac $deviceMac';
+    print('CDP: 📷 Sending ADD_CAM command: $command');
+    
+    final success = await _webSocketProvider!.sendCommand(command);
+    
+    if (success) {
+      print('CDP: ✅ ADD_CAM komutu gönderildi, sunucu yanıtı bekleniyor...');
+    } else {
+      _showOperationResult(false, 'Kamera ekleme komutu gönderilemedi');
+    }
+    
+    return success;
+  }
+  
+  /// Add a camera to device locally when server confirms the operation
+  /// Called by WebSocketProvider when addcam response is received
+  void addCameraToDeviceLocally(String cameraMac, String deviceMac) {
+    print('CDP: 📷 Adding camera $cameraMac to device $deviceMac locally');
+    
+    final device = _devices[deviceMac];
+    if (device != null) {
+      // Check if camera already exists on this device
+      final existingCamera = device.cameras.firstWhereOrNull((c) => c.mac == cameraMac);
+      if (existingCamera != null) {
+        print('CDP: ⚠️ Camera $cameraMac already exists on device $deviceMac');
+        return;
+      }
+      
+      // Check if camera exists in global list
+      Camera? camera = _macDefinedCameras[cameraMac];
+      if (camera == null) {
+        // Create a new camera entry
+        camera = Camera(
+          mac: cameraMac,
+          name: 'Camera $cameraMac',
+          ip: '',
+          index: device.cameras.length,
+          parentDeviceMacKey: deviceMac,
+        );
+        _macDefinedCameras[cameraMac] = camera;
+        print('CDP: 📷 Created new camera entry for $cameraMac');
+      } else {
+        // Update existing camera's parent device
+        camera = camera.copyWith(
+          parentDeviceMacKey: deviceMac,
+          index: device.cameras.length,
+        );
+        _macDefinedCameras[cameraMac] = camera;
+      }
+      
+      // Add to device
+      device.cameras.add(camera);
+      
+      // Clear caches
+      _cachedDevicesList = null;
+      _cachedFlatCameraList = null;
+      
+      print('CDP: ✅ Camera $cameraMac added to device $deviceMac');
+      
+      triggerUpdate();
+    } else {
+      print('CDP: ⚠️ Device not found for adding camera: $deviceMac');
+    }
+  }
+  
+  /// Helper method to show operation result popup via UserGroupProvider
+  void _showOperationResult(bool success, String message) {
+    if (_userGroupProvider != null) {
+      _userGroupProvider.handleOperationResult(success: success, message: message);
+    }
   }
 
   @override

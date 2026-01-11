@@ -95,7 +95,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => LiveViewScreen(camera: camera),
+        builder: (context) => LiveViewScreen(camera: camera, showBackButton: true),
       ),
     );
   }
@@ -105,7 +105,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const MultiRecordingsScreen(),
+        builder: (context) => const MultiRecordingsScreen(showBackButton: true),
       ),
     );
   }
@@ -635,6 +635,7 @@ class _CameraGroupsScreenState extends State<CameraGroupsScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Camera Groups'),
         actions: [
           // Search field

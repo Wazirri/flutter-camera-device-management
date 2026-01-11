@@ -75,6 +75,7 @@ class _MultiCameraViewScreenState extends State<MultiCameraViewScreen> {
       appBar: AppBar(
         title: const Text('Multi Camera View'),
         backgroundColor: AppTheme.darkBackground,
+        automaticallyImplyLeading: false,
         actions: [
           // Configuration management menu
           PopupMenuButton<String>(

@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../models/camera_device.dart';
 import '../providers/camera_devices_provider.dart';
+import '../providers/user_group_provider.dart';
+import '../providers/websocket_provider.dart';
 import '../theme/app_theme.dart'; // Fixed import for AppTheme
 // Removed app_localizations import to fix build error
 
@@ -17,8 +19,59 @@ class CameraDevicesScreen extends StatefulWidget {
 class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
   @override
   Widget build(BuildContext context) {
+    return Consumer<UserGroupProvider>(
+      builder: (context, userGroupProvider, _) {
+        // Show dialog when there's an operation result
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (userGroupProvider.lastOperationMessage != null && mounted) {
+            final message = userGroupProvider.lastOperationMessage!;
+            final isSuccess = userGroupProvider.lastOperationSuccess ?? false;
+            
+            // Clear immediately to prevent showing again
+            userGroupProvider.clearOperationResult();
+            
+            // Show popup dialog
+            showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                backgroundColor: AppTheme.darkSurface,
+                title: Row(
+                  children: [
+                    Icon(
+                      isSuccess ? Icons.check_circle : Icons.error,
+                      color: isSuccess ? Colors.green : Colors.red,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      isSuccess ? 'Başarılı' : 'Hata',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
+                content: Text(
+                  message,
+                  style: const TextStyle(color: Colors.white70),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    child: const Text('Tamam'),
+                  ),
+                ],
+              ),
+            );
+          }
+        });
+        
+        return _buildMainScaffold(context);
+      },
+    );
+  }
+  
+  Widget _buildMainScaffold(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Camera Devices'),
         backgroundColor: AppTheme.darkBackground,
       ),
@@ -52,6 +105,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
                 onToggleSmartPlayer: (ctx, dev) => _toggleSmartPlayerService(dev, provider),
                 onToggleRecorder: (ctx, dev) => _toggleRecorderService(dev, provider),
                 onShowNetworkSettings: _showNetworkSettings,
+                onAddCamera: _showAddCameraDialog,
               );
             },
           );
@@ -91,22 +145,8 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
     final newValue = !device.smartPlayerServiceOn;
     print('[Toggle] Current smartPlayerServiceOn: ${device.smartPlayerServiceOn}, newValue: $newValue');
     
-    // WebSocket komutu gönder ve UI'ı güncelle
-    final success = await cameraDevicesProvider.setSmartPlayerService(device.macAddress, newValue);
-    
-    print('[Toggle] Command sent, success: $success');
-    
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(success 
-              ? 'Player servisi ${newValue ? "başlatıldı" : "durduruldu"}'
-              : 'Komut gönderilemedi'),
-          backgroundColor: success ? (newValue ? Colors.green : Colors.red) : Colors.grey,
-          duration: const Duration(seconds: 1),
-        ),
-      );
-    }
+    // WebSocket komutu gönder - popup otomatik olarak gösterilecek
+    await cameraDevicesProvider.setSmartPlayerService(device.macAddress, newValue);
   }
   
   void _toggleRecorderService(CameraDevice device, CameraDevicesProviderOptimized cameraDevicesProvider) async {
@@ -114,6 +154,80 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
     
     final newValue = !device.recorderServiceOn;
     print('[Toggle] Current recorderServiceOn: ${device.recorderServiceOn}, newValue: $newValue');
+    
+    // Recorder açılırken onay iste
+    if (newValue) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          backgroundColor: AppTheme.darkSurface,
+          title: Row(
+            children: [
+              const Icon(Icons.play_circle, color: Colors.orange, size: 28),
+              const SizedBox(width: 8),
+              const Text(
+                'Recorder Başlat',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${device.deviceName ?? device.macAddress} cihazında Recorder servisini başlatmak istiyor musunuz?',
+                style: TextStyle(color: Colors.grey.shade300),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.orange.shade300, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Bu işlem cihazın kamera dağıtımını başlatacak ve kayıt yapmaya başlayacaktır.',
+                        style: TextStyle(
+                          color: Colors.orange.shade300,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('İptal'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+              ),
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+              child: const Text('Başlat'),
+            ),
+          ],
+        ),
+      );
+      
+      if (confirmed != true) {
+        print('[Toggle] User cancelled recorder start');
+        return;
+      }
+    }
     
     // Recorder kapatılırken onay iste
     if (!newValue) {
@@ -202,33 +316,765 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
       // Eğer kameraları silme seçeneği seçildiyse CLEARCAMS komutunu gönder
       if (clearCameras) {
         print('[Toggle] User requested to clear cameras');
-        await cameraDevicesProvider.clearDeviceCameras(device.macAddress);
+        // Popup dialog göster ve CLEARCAMS komutunu gönder
+        await _showClearCamsProgressDialog(context, device, cameraDevicesProvider);
       }
     }
     
-    // WebSocket komutu gönder ve UI'ı güncelle
-    final success = await cameraDevicesProvider.setRecorderService(device.macAddress, newValue);
-    
-    print('[Toggle] Command sent, success: $success');
-    
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(success 
-              ? 'Recorder servisi ${newValue ? "başlatıldı" : "durduruldu"}'
-              : 'Komut gönderilemedi'),
-          backgroundColor: success ? (newValue ? Colors.orange : Colors.red) : Colors.grey,
-          duration: const Duration(seconds: 1),
-        ),
-      );
-    }
+    // WebSocket komutu gönder - popup otomatik olarak gösterilecek
+    await cameraDevicesProvider.setRecorderService(device.macAddress, newValue);
   }
   
+  Future<void> _showClearCamsProgressDialog(
+    BuildContext context, 
+    CameraDevice device, 
+    CameraDevicesProviderOptimized cameraDevicesProvider
+  ) async {
+    final websocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
+    final shortMac = device.macAddress.length > 8 
+        ? '...${device.macAddress.substring(device.macAddress.length - 8)}' 
+        : device.macAddress;
+    
+    bool phase1Complete = false;
+    bool phase2Complete = false;
+    
+    // Store original callback
+    final originalCallback = websocketProvider.onTwoPhaseNotification;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            // Set up callback to update dialog state
+            websocketProvider.onTwoPhaseNotification = (phase, mac, message) {
+              if (mac == device.macAddress) {
+                setDialogState(() {
+                  if (phase == 1) {
+                    phase1Complete = true;
+                  } else if (phase == 2) {
+                    phase2Complete = true;
+                  }
+                });
+              }
+              // Also call original callback for SnackBar (optional)
+              originalCallback?.call(phase, mac, message);
+            };
+            
+            return AlertDialog(
+              backgroundColor: AppTheme.darkSurface,
+              title: Row(
+                children: [
+                  const Icon(Icons.delete_sweep, color: Colors.orange, size: 28),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Kameraları Temizle',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                        Text(
+                          '[$shortMac]',
+                          style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Step 1
+                  _buildProgressStep(
+                    stepNumber: 1,
+                    title: 'Komut Gönderiliyor',
+                    subtitle: 'Mesaj başarılı şekilde iletildi',
+                    isComplete: phase1Complete,
+                    isActive: !phase1Complete,
+                  ),
+                  const SizedBox(height: 16),
+                  // Step 2
+                  _buildProgressStep(
+                    stepNumber: 2,
+                    title: 'Cihaz Onayı Bekleniyor',
+                    subtitle: 'Cihaz kameraları sildi',
+                    isComplete: phase2Complete,
+                    isActive: phase1Complete && !phase2Complete,
+                  ),
+                ],
+              ),
+              actions: [
+                if (phase2Complete)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                    ),
+                    onPressed: () {
+                      // Restore original callback
+                      websocketProvider.onTwoPhaseNotification = originalCallback;
+                      Navigator.pop(dialogContext);
+                    },
+                    child: const Text('Tamam'),
+                  )
+                else
+                  TextButton(
+                    onPressed: () {
+                      // Restore original callback
+                      websocketProvider.onTwoPhaseNotification = originalCallback;
+                      Navigator.pop(dialogContext);
+                    },
+                    child: const Text('İptal'),
+                  ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    
+    // Send the command after dialog is shown
+    await cameraDevicesProvider.clearDeviceCameras(device.macAddress);
+  }
+  
+  Widget _buildProgressStep({
+    required int stepNumber,
+    required String title,
+    required String subtitle,
+    required bool isComplete,
+    required bool isActive,
+  }) {
+    return Row(
+      children: [
+        // Step indicator
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isComplete 
+                ? Colors.green 
+                : isActive 
+                    ? Colors.orange 
+                    : Colors.grey.shade700,
+          ),
+          child: Center(
+            child: isComplete
+                ? const Icon(Icons.check, color: Colors.white, size: 18)
+                : isActive
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : Text(
+                        '$stepNumber',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        // Step content
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: isComplete || isActive ? Colors.white : Colors.grey,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+              Text(
+                isComplete ? '✅ $subtitle' : subtitle,
+                style: TextStyle(
+                  color: isComplete 
+                      ? Colors.green.shade300 
+                      : Colors.grey.shade500,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   void _showNetworkSettings(BuildContext context, CameraDevice device) {
     showDialog(
       context: context,
       builder: (context) => _NetworkSettingsDialog(device: device),
     );
+  }
+  
+  void _showAddCameraDialog(BuildContext context, CameraDevice device) {
+    final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    
+    // Get all cameras - prioritize unassigned ones
+    final allCameras = provider.cameras;
+    
+    // Separate assigned and unassigned cameras
+    final unassignedCameras = allCameras.where((c) => 
+      c.parentDeviceMacKey == null || c.parentDeviceMacKey!.isEmpty
+    ).toList();
+    final assignedCameras = allCameras.where((c) => 
+      c.parentDeviceMacKey != null && c.parentDeviceMacKey!.isNotEmpty
+    ).toList();
+    
+    // Combine: unassigned first, then assigned
+    final sortedCameras = [...unassignedCameras, ...assignedCameras];
+    
+    // Build cameras by group map
+    final Map<String, List<Camera>> camerasByGroup = {};
+    for (final camera in allCameras) {
+      if (camera.groups.isNotEmpty) {
+        for (final groupName in camera.groups) {
+          camerasByGroup.putIfAbsent(groupName, () => []);
+          camerasByGroup[groupName]!.add(camera);
+        }
+      }
+    }
+    // Add "Grupsuz" category for cameras without groups
+    final ungroupedCameras = allCameras.where((c) => c.groups.isEmpty).toList();
+    if (ungroupedCameras.isNotEmpty) {
+      camerasByGroup['📁 Grupsuz Kameralar'] = ungroupedCameras;
+    }
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) => _AddCameraSelectionDialog(
+        device: device,
+        cameras: sortedCameras,
+        unassignedCount: unassignedCameras.length,
+        camerasByGroup: camerasByGroup,
+      ),
+    );
+  }
+}
+
+/// Dialog for selecting cameras to add to a device
+class _AddCameraSelectionDialog extends StatefulWidget {
+  final CameraDevice device;
+  final List<Camera> cameras;
+  final int unassignedCount;
+  final Map<String, List<Camera>> camerasByGroup;
+  
+  const _AddCameraSelectionDialog({
+    required this.device,
+    required this.cameras,
+    required this.unassignedCount,
+    required this.camerasByGroup,
+  });
+  
+  @override
+  State<_AddCameraSelectionDialog> createState() => _AddCameraSelectionDialogState();
+}
+
+class _AddCameraSelectionDialogState extends State<_AddCameraSelectionDialog> with SingleTickerProviderStateMixin {
+  final Set<String> _selectedCameraMacs = {};
+  String _searchQuery = '';
+  bool _isProcessing = false;
+  int _processedCount = 0;
+  String _currentProcessingMac = '';
+  late TabController _tabController;
+  final Set<String> _expandedGroups = {};
+  
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+  
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+  
+  List<Camera> get _filteredCameras {
+    if (_searchQuery.isEmpty) return widget.cameras;
+    final query = _searchQuery.toLowerCase();
+    return widget.cameras.where((c) =>
+      c.name.toLowerCase().contains(query) ||
+      c.mac.toLowerCase().contains(query) ||
+      c.ip.toLowerCase().contains(query) ||
+      c.groups.any((g) => g.toLowerCase().contains(query))
+    ).toList();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: AppTheme.darkSurface,
+      title: Row(
+        children: [
+          const Icon(Icons.add_a_photo, color: Colors.green),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Kamera Ekle'),
+                Text(
+                  widget.device.deviceType.isNotEmpty 
+                    ? widget.device.deviceType 
+                    : widget.device.macAddress,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          if (_selectedCameraMacs.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                '${_selectedCameraMacs.length} seçili',
+                style: const TextStyle(fontSize: 12, color: Colors.white),
+              ),
+            ),
+        ],
+      ),
+      content: SizedBox(
+        width: double.maxFinite,
+        height: 450,
+        child: Column(
+          children: [
+            // Search bar
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Kamera veya grup ara...',
+                prefixIcon: const Icon(Icons.search, size: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                isDense: true,
+              ),
+              onChanged: (value) => setState(() => _searchQuery = value),
+            ),
+            const SizedBox(height: 8),
+            // Tab bar
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.shade800,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                indicator: BoxDecoration(
+                  color: AppTheme.primaryBlue,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.grey,
+                tabs: [
+                  Tab(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.list, size: 16),
+                        const SizedBox(width: 4),
+                        const Text('Tümü', style: TextStyle(fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                  Tab(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.folder, size: 16),
+                        const SizedBox(width: 4),
+                        Text('Gruplar (${widget.camerasByGroup.length})', style: const TextStyle(fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Tab content
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // Tab 1: All cameras list
+                  _buildAllCamerasList(),
+                  // Tab 2: Grouped cameras
+                  _buildGroupedCamerasList(),
+                ],
+              ),
+            ),
+            // Processing indicator
+            if (_isProcessing)
+              Container(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  children: [
+                    LinearProgressIndicator(
+                      value: _processedCount / _selectedCameraMacs.length,
+                      backgroundColor: Colors.grey.shade700,
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'İşleniyor: $_currentProcessingMac ($_processedCount/${_selectedCameraMacs.length})',
+                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isProcessing ? null : () => Navigator.pop(context),
+          child: const Text('İptal'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green,
+          ),
+          onPressed: _isProcessing || _selectedCameraMacs.isEmpty 
+            ? null 
+            : _addSelectedCameras,
+          child: Text(_isProcessing 
+            ? 'İşleniyor...' 
+            : 'Ekle (${_selectedCameraMacs.length})'),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildAllCamerasList() {
+    final cameras = _filteredCameras;
+    
+    if (cameras.isEmpty) {
+      return const Center(child: Text('Kamera bulunamadı'));
+    }
+    
+    return Column(
+      children: [
+        // Info text
+        if (widget.unassignedCount > 0 && _searchQuery.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(8),
+            margin: const EdgeInsets.only(bottom: 8),
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline, size: 16, color: Colors.blue),
+                const SizedBox(width: 8),
+                Text(
+                  '${widget.unassignedCount} atanmamış kamera',
+                  style: const TextStyle(fontSize: 12, color: Colors.blue),
+                ),
+              ],
+            ),
+          ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: cameras.length,
+            itemBuilder: (context, index) => _buildCameraListTile(cameras[index]),
+          ),
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildGroupedCamerasList() {
+    // Filter groups based on search
+    Map<String, List<Camera>> filteredGroups = {};
+    
+    if (_searchQuery.isEmpty) {
+      filteredGroups = widget.camerasByGroup;
+    } else {
+      final query = _searchQuery.toLowerCase();
+      for (final entry in widget.camerasByGroup.entries) {
+        // Check if group name matches
+        if (entry.key.toLowerCase().contains(query)) {
+          filteredGroups[entry.key] = entry.value;
+        } else {
+          // Check if any camera in group matches
+          final matchingCameras = entry.value.where((c) =>
+            c.name.toLowerCase().contains(query) ||
+            c.mac.toLowerCase().contains(query) ||
+            c.ip.toLowerCase().contains(query)
+          ).toList();
+          if (matchingCameras.isNotEmpty) {
+            filteredGroups[entry.key] = matchingCameras;
+          }
+        }
+      }
+    }
+    
+    if (filteredGroups.isEmpty) {
+      return const Center(child: Text('Grup bulunamadı'));
+    }
+    
+    final groupNames = filteredGroups.keys.toList()..sort();
+    
+    return ListView.builder(
+      itemCount: groupNames.length,
+      itemBuilder: (context, index) {
+        final groupName = groupNames[index];
+        final cameras = filteredGroups[groupName]!;
+        final isExpanded = _expandedGroups.contains(groupName);
+        final selectedInGroup = cameras.where((c) => _selectedCameraMacs.contains(c.mac)).length;
+        
+        return Card(
+          color: Colors.grey.shade800,
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            children: [
+              // Group header
+              ListTile(
+                dense: true,
+                leading: Icon(
+                  isExpanded ? Icons.folder_open : Icons.folder,
+                  color: Colors.amber,
+                ),
+                title: Text(
+                  groupName,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text(
+                  '${cameras.length} kamera${selectedInGroup > 0 ? ' • $selectedInGroup seçili' : ''}',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: selectedInGroup > 0 ? Colors.green : Colors.grey,
+                  ),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Select all in group button
+                    IconButton(
+                      icon: Icon(
+                        selectedInGroup == cameras.length 
+                          ? Icons.check_box 
+                          : (selectedInGroup > 0 ? Icons.indeterminate_check_box : Icons.check_box_outline_blank),
+                        size: 20,
+                        color: selectedInGroup > 0 ? Colors.green : Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          final selectableCameras = cameras.where((c) => 
+                            c.parentDeviceMacKey != widget.device.macAddress
+                          ).toList();
+                          
+                          if (selectedInGroup == selectableCameras.length) {
+                            // Deselect all
+                            for (final c in selectableCameras) {
+                              _selectedCameraMacs.remove(c.mac);
+                            }
+                          } else {
+                            // Select all
+                            for (final c in selectableCameras) {
+                              _selectedCameraMacs.add(c.mac);
+                            }
+                          }
+                        });
+                      },
+                      tooltip: 'Tümünü seç/kaldır',
+                    ),
+                    Icon(
+                      isExpanded ? Icons.expand_less : Icons.expand_more,
+                      color: Colors.grey,
+                    ),
+                  ],
+                ),
+                onTap: () {
+                  setState(() {
+                    if (isExpanded) {
+                      _expandedGroups.remove(groupName);
+                    } else {
+                      _expandedGroups.add(groupName);
+                    }
+                  });
+                },
+              ),
+              // Cameras in group
+              if (isExpanded)
+                Container(
+                  color: Colors.grey.shade900,
+                  child: Column(
+                    children: cameras.map((c) => _buildCameraListTile(c, inGroup: true)).toList(),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+  
+  Widget _buildCameraListTile(Camera camera, {bool inGroup = false}) {
+    final isSelected = _selectedCameraMacs.contains(camera.mac);
+    final isUnassigned = camera.parentDeviceMacKey == null || 
+                         camera.parentDeviceMacKey!.isEmpty;
+    final isAlreadyOnThisDevice = camera.parentDeviceMacKey == widget.device.macAddress;
+    
+    return Card(
+      color: isSelected 
+        ? Colors.green.withOpacity(0.2) 
+        : (isUnassigned ? Colors.grey.shade800 : Colors.grey.shade900),
+      margin: EdgeInsets.symmetric(vertical: 2, horizontal: inGroup ? 8 : 0),
+      child: ListTile(
+        dense: true,
+        enabled: !isAlreadyOnThisDevice,
+        leading: Checkbox(
+          value: isSelected,
+          onChanged: isAlreadyOnThisDevice ? null : (value) {
+            setState(() {
+              if (value == true) {
+                _selectedCameraMacs.add(camera.mac);
+              } else {
+                _selectedCameraMacs.remove(camera.mac);
+              }
+            });
+          },
+          activeColor: Colors.green,
+        ),
+        title: Text(
+          camera.name.isNotEmpty ? camera.name : camera.mac,
+          style: TextStyle(
+            fontSize: 13,
+            color: isAlreadyOnThisDevice ? Colors.grey : null,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'MAC: ${camera.mac}',
+              style: const TextStyle(fontSize: 11, color: Colors.grey),
+            ),
+            if (camera.ip.isNotEmpty)
+              Text(
+                'IP: ${camera.ip}',
+                style: const TextStyle(fontSize: 11, color: Colors.grey),
+              ),
+            if (!inGroup && camera.groups.isNotEmpty)
+              Wrap(
+                spacing: 4,
+                children: camera.groups.take(3).map((g) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    g,
+                    style: const TextStyle(fontSize: 9, color: Colors.amber),
+                  ),
+                )).toList(),
+              ),
+            if (isAlreadyOnThisDevice)
+              const Text(
+                'Bu cihazda zaten var',
+                style: TextStyle(fontSize: 10, color: Colors.orange),
+              )
+            else if (!isUnassigned)
+              Text(
+                'Mevcut cihaz: ${camera.parentDeviceMacKey}',
+                style: const TextStyle(fontSize: 10, color: Colors.amber),
+              ),
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              camera.connected ? Icons.wifi : Icons.wifi_off,
+              size: 16,
+              color: camera.connected ? Colors.green : Colors.red,
+            ),
+            if (isUnassigned) ...[
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'YENİ',
+                  style: TextStyle(fontSize: 8, color: Colors.white),
+                ),
+              ),
+            ],
+          ],
+        ),
+        onTap: isAlreadyOnThisDevice ? null : () {
+          setState(() {
+            if (_selectedCameraMacs.contains(camera.mac)) {
+              _selectedCameraMacs.remove(camera.mac);
+            } else {
+              _selectedCameraMacs.add(camera.mac);
+            }
+          });
+        },
+      ),
+    );
+  }
+  
+  Future<void> _addSelectedCameras() async {
+    if (_selectedCameraMacs.isEmpty) return;
+    
+    setState(() {
+      _isProcessing = true;
+      _processedCount = 0;
+    });
+    
+    final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    final cameraMacList = _selectedCameraMacs.toList();
+    
+    for (int i = 0; i < cameraMacList.length; i++) {
+      final cameraMac = cameraMacList[i];
+      
+      setState(() {
+        _currentProcessingMac = cameraMac;
+        _processedCount = i;
+      });
+      
+      // ADD_CAM komutunu gönder ve bekle
+      await provider.addCameraToDevice(cameraMac, widget.device.macAddress);
+      
+      // Her komut arasında kısa bir bekleme (sunucunun işlemesi için)
+      if (i < cameraMacList.length - 1) {
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+    }
+    
+    setState(() {
+      _processedCount = cameraMacList.length;
+      _isProcessing = false;
+    });
+    
+    // Dialog'u kapat
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 }
 
@@ -239,6 +1085,7 @@ class DeviceCard extends StatelessWidget {
   final Function(BuildContext, CameraDevice) onToggleSmartPlayer;
   final Function(BuildContext, CameraDevice) onToggleRecorder;
   final Function(BuildContext, CameraDevice) onShowNetworkSettings;
+  final Function(BuildContext, CameraDevice) onAddCamera;
 
   const DeviceCard({
     Key? key,
@@ -248,6 +1095,7 @@ class DeviceCard extends StatelessWidget {
     required this.onToggleSmartPlayer,
     required this.onToggleRecorder,
     required this.onShowNetworkSettings,
+    required this.onAddCamera,
   }) : super(key: key);
 
   @override
@@ -364,15 +1212,17 @@ class DeviceCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: device.connected
+                      color: device.status == DeviceStatus.online 
                           ? AppTheme.primaryColor
-                          : Colors.grey,
+                          : (device.status == DeviceStatus.warning ? Colors.orange : Colors.grey),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Text(
                       // Use device.status to determine online/offline text
                       device.status == DeviceStatus.online ? 'Online' : 
-                      (device.status == DeviceStatus.warning ? 'Warning' : 'Offline'),
+                      (device.status == DeviceStatus.warning 
+                          ? '${device.cameras.where((c) => !c.connected).length} Kamera Bağlı Değil' 
+                          : 'Offline'),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -399,70 +1249,40 @@ class DeviceCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              // Camera stats with online/recording badges
-              Row(
-                children: [
-                  Text(
-                    'Cameras: ${device.cameras.length}',
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                  const SizedBox(width: 12),
-                  // Online cameras badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: device.cameras.where((c) => c.connected).isNotEmpty 
-                          ? Colors.green 
-                          : Colors.grey.shade600,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.wifi, size: 12, color: Colors.white),
-                        const SizedBox(width: 3),
-                        Text(
-                          '${device.cameras.where((c) => c.connected).length}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
+              // Camera stats with text labels
+              Builder(
+                builder: (context) {
+                  final onlineCount = device.cameras.where((c) => c.connected).length;
+                  // Recording count: cameras that are recording on THIS device
+                  final recordingOnThisDevice = device.cameras.where((c) => c.isRecordingOnDevice(device.macKey)).length;
+                  
+                  return Wrap(
+                    spacing: 16,
+                    runSpacing: 4,
+                    children: [
+                      Text(
+                        'Kameralar: ${device.cameras.length}',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      Text(
+                        'Çevrimiçi: $onlineCount',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: onlineCount > 0 ? Colors.green : Colors.grey,
+                          fontWeight: FontWeight.w500,
                         ),
-                      ],
-                    ),
-                  ),
-                  // Recording cameras badge - only show if there are recording cameras
-                  if (device.cameras.where((c) => c.recording).isNotEmpty) ...[
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.fiber_manual_record,
-                            size: 12,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            '${device.cameras.where((c) => c.recording).length}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        'Kayıt: $recordingOnThisDevice',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: recordingOnThisDevice > 0 ? Colors.red : Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
-                ],
+                    ],
+                  );
+                },
               ),
               if (device.uptime.isNotEmpty) ...[
                 const SizedBox(height: 4),
@@ -626,19 +1446,34 @@ class DeviceCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              // Settings button
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton.icon(
-                  onPressed: () => onShowNetworkSettings(context, device),
-                  icon: const Icon(Icons.settings, size: 18),
-                  label: const Text('Network Settings'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryBlue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              // Action buttons row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  // Add Camera button
+                  ElevatedButton.icon(
+                    onPressed: () => onAddCamera(context, device),
+                    icon: const Icon(Icons.add_a_photo, size: 18),
+                    label: const Text('Kamera Ekle'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  // Settings button
+                  ElevatedButton.icon(
+                    onPressed: () => onShowNetworkSettings(context, device),
+                    icon: const Icon(Icons.settings, size: 18),
+                    label: const Text('Network Settings'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryBlue,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -705,15 +1540,17 @@ class DeviceDetailsSheet extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: device.connected
+                    color: device.status == DeviceStatus.online 
                         ? AppTheme.primaryColor
-                        : Colors.grey,
+                        : (device.status == DeviceStatus.warning ? Colors.orange : Colors.grey),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
                     // Use device.status to determine online/offline text
                     device.status == DeviceStatus.online ? 'Online' : 
-                    (device.status == DeviceStatus.warning ? 'Warning' : 'Offline'),
+                    (device.status == DeviceStatus.warning 
+                        ? '${device.cameras.where((c) => !c.connected).length} Kamera Bağlı Değil' 
+                        : 'Offline'),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -1065,7 +1902,8 @@ class DeviceDetailsSheet extends StatelessWidget {
   Widget _buildCamerasTab(BuildContext context) {
     // Calculate camera stats from camreports data
     final onlineCameras = device.cameras.where((c) => c.connected).length;
-    final recordingCameras = device.cameras.where((c) => c.recording).length;
+    // Recording count: cameras that are recording on THIS device specifically
+    final recordingCameras = device.cameras.where((c) => c.isRecordingOnDevice(device.macKey)).length;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1076,69 +1914,33 @@ class DeviceDetailsSheet extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Camera count with online/recording stats
-              Row(
+              Wrap(
+                spacing: 16,
+                runSpacing: 4,
                 children: [
                   Text(
-                    'Kameralar (${device.cameras.length})',
+                    'Kameralar: ${device.cameras.length}',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  // Online count badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
+                  Text(
+                    'Çevrimiçi: $onlineCameras',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                       color: onlineCameras > 0 ? Colors.green : Colors.grey,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.wifi, size: 14, color: Colors.white),
-                        const SizedBox(width: 4),
-                        Text(
-                          '$onlineCameras',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
                     ),
                   ),
-                  // Recording count badge - only show if there are recording cameras
-                  if (recordingCameras > 0) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.fiber_manual_record,
-                            size: 14,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$recordingCameras',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                  Text(
+                    'Kayıt: $recordingCameras',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: recordingCameras > 0 ? Colors.red : Colors.grey,
                     ),
-                  ],
+                  ),
                 ],
               ),
               if (device.cameras.isNotEmpty && device.connected)
@@ -1166,6 +1968,7 @@ class DeviceDetailsSheet extends StatelessWidget {
                     final camera = device.cameras[index];
                     return CameraCard(
                       camera: camera,
+                      deviceMac: device.macKey, // Pass device MAC for camReports recording check
                       onTap: () {
                         // Set the selected camera
                         Provider.of<CameraDevicesProviderOptimized>(context, listen: false)
@@ -1262,15 +2065,21 @@ class InfoRow extends StatelessWidget {
 class CameraCard extends StatelessWidget {
   final Camera camera;
   final VoidCallback onTap;
+  final String? deviceMac; // Device MAC to check camReports recording info
   
   const CameraCard({
     Key? key,
     required this.camera,
     required this.onTap,
+    this.deviceMac,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Check if we have camReports recording info for this device
+    final hasRecordingInfo = deviceMac != null && camera.hasCamReportsRecordingInfo(deviceMac!);
+    final isRecordingOnThisDevice = deviceMac != null && camera.isRecordingOnDevice(deviceMac!);
+    
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -1278,7 +2087,7 @@ class CameraCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
           color: camera.connected 
-              ? camera.recording
+              ? (hasRecordingInfo && isRecordingOnThisDevice)
                   ? Colors.red
                   : AppTheme.accentColor
               : Theme.of(context).dividerColor,
@@ -1307,8 +2116,8 @@ class CameraCard extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      // Recording indicator - show count if recording on multiple devices
-                      if (camera.recording)
+                      // Recording indicator - only show if camReports recording info exists for this device
+                      if (hasRecordingInfo && isRecordingOnThisDevice)
                         Container(
                           margin: const EdgeInsets.only(right: 8),
                           padding: const EdgeInsets.symmetric(

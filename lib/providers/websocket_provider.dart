@@ -76,8 +76,15 @@ class WebSocketProviderOptimized with ChangeNotifier {
   Map<String, dynamic>? get lastParameterSetResult => _lastParameterSetResult;
   
   // Global result message callback for notifications
-  // Parameters: command, result (0=error, 1=success), message
-  void Function(String command, int result, String message)? onResultMessage;
+  // Parameters: commandType (e.g., 'COMMAND'), result (0=error, 1=success), message, mac (device), commandText (full command sent)
+  void Function(String commandType, int result, String message, {String? mac, String? commandText})? onResultMessage;
+  
+  // Two-phase notification callback for commands like CLEARCAMS
+  // Parameters: phase (1 or 2), mac, message
+  void Function(int phase, String mac, String message)? onTwoPhaseNotification;
+  
+  // Pending CLEARCAMS commands waiting for 'deleted' confirmation
+  final Set<String> _pendingClearCams = {};
   
   // Connection settings
   String _serverIp = '85.104.114.145';
@@ -625,13 +632,28 @@ class WebSocketProviderOptimized with ChangeNotifier {
       if (jsonData.containsKey('result') && command != null) {
         final result = jsonData['result'];
         final msg = jsonData['msg'] ?? jsonData['message'] ?? '';
+        final mac = jsonData['mac']?.toString();
+        final commandText = jsonData['command']?.toString();
         // Convert result to int (could be int or string)
         final resultInt = result is int ? result : int.tryParse(result.toString()) ?? -1;
+        
+        // Handle CLEARCAMS command - mark as pending and notify phase 1
+        if (command == 'COMMAND' && commandText == 'CLEARCAMS' && resultInt == 1 && mac != null && mac.isNotEmpty) {
+          print('[CLEARCAMS] Phase 1: Command sent successfully to device $mac');
+          _pendingClearCams.add(mac);
+          // Notify phase 1: Message sent
+          if (onTwoPhaseNotification != null) {
+            onTwoPhaseNotification!(1, mac, 'Mesaj başarılı şekilde iletildi');
+          }
+          // Skip regular notification for CLEARCAMS - we handle it specially
+          return;
+        }
+        
         // Skip certain commands that have their own handling (like heartbeat, login, etc.)
         final skipCommands = ['login', 'changedone', 'system_info', 'user_groups', 'conversions'];
         if (!skipCommands.contains(command) && onResultMessage != null) {
-          print('[ResultNotification] Command: $command, Result: $resultInt, Message: $msg');
-          onResultMessage!(command.toString(), resultInt, msg.toString());
+          print('[ResultNotification] Command: $command, Result: $resultInt, Message: $msg, MAC: $mac, CommandText: $commandText');
+          onResultMessage!(command.toString(), resultInt, msg.toString(), mac: mac, commandText: commandText);
         }
       }
       
@@ -939,6 +961,44 @@ class WebSocketProviderOptimized with ChangeNotifier {
 
         case 'pong':
           // Pong response from server - heartbeat acknowledgment, no action needed
+          break;
+
+        case 'deleted':
+          // Handle deleted keys (e.g., cameras cleared from device)
+          // Format: {"c":"deleted", "keys":["ecs_slaves.36:56:F0:A5:36:30.cam"]}
+          final keys = jsonData['keys'] as List<dynamic>?;
+          if (keys != null) {
+            for (var key in keys) {
+              final keyStr = key.toString();
+              // Check if this is a camera deletion: ecs_slaves.DEVICE_MAC.cam
+              if (keyStr.startsWith('ecs_slaves.') && keyStr.endsWith('.cam')) {
+                // Extract device MAC from key
+                final parts = keyStr.split('.');
+                if (parts.length >= 2) {
+                  final deviceMac = parts[1];
+                  print('[DELETED] Device $deviceMac cameras deleted (key: $keyStr)');
+                  
+                  // Clear cameras locally
+                  _cameraDevicesProvider?.clearDeviceCamerasLocally(deviceMac);
+                  
+                  // Check if this was a pending CLEARCAMS command
+                  if (_pendingClearCams.contains(deviceMac)) {
+                    _pendingClearCams.remove(deviceMac);
+                    // Notify phase 2: Device confirmed deletion
+                    if (onTwoPhaseNotification != null) {
+                      onTwoPhaseNotification!(2, deviceMac, 'Cihaz kameraları sildi');
+                    }
+                  } else {
+                    // Not a pending CLEARCAMS, just notify normally
+                    if (onResultMessage != null) {
+                      onResultMessage!('deleted', 1, 'Cihaz $deviceMac kameraları silindi');
+                    }
+                  }
+                }
+              }
+            }
+          }
+          _batchNotifyListeners();
           break;
 
         case 'add_group_to_cam':

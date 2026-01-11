@@ -864,6 +864,79 @@ class WebSocketProviderOptimized with ChangeNotifier {
           _batchNotifyListeners();
           break;
 
+        case 'clearcams':
+          // Handle clear cameras response
+          final result = jsonData['result'] as int?;
+          final msg = jsonData['msg'] ?? '';
+          final deviceMac = jsonData['device'] ?? jsonData['mac'] ?? '';
+          
+          print('🗑️ WebSocket: clearcams response: result=$result, msg=$msg, device=$deviceMac');
+          
+          if (result == 1) {
+            // Success - clear cameras from local state
+            print('✅ Clear cameras successful: $msg');
+            
+            // Clear cameras from the device in CameraDevicesProvider
+            if (_cameraDevicesProvider != null && deviceMac.isNotEmpty) {
+              _cameraDevicesProvider!.clearDeviceCamerasLocally(deviceMac);
+            }
+            
+            if (_userGroupProvider != null) {
+              _userGroupProvider!.handleOperationResult(
+                success: true,
+                message: msg.isNotEmpty ? msg : 'Kameralar başarıyla silindi',
+              );
+            }
+          } else {
+            // Failed
+            print('❌ Clear cameras failed: $msg');
+            if (_userGroupProvider != null) {
+              _userGroupProvider!.handleOperationResult(
+                success: false,
+                message: msg.isNotEmpty ? msg : 'Kamera silme işlemi başarısız',
+              );
+            }
+          }
+          _batchNotifyListeners();
+          break;
+
+        case 'addcam':
+          // Handle add camera response
+          final result = jsonData['result'] as int?;
+          final msg = jsonData['msg'] ?? '';
+          final cameraMac = jsonData['cam'] ?? jsonData['camera'] ?? '';
+          final deviceMac = jsonData['device'] ?? jsonData['slave'] ?? jsonData['mac'] ?? '';
+          
+          print('📷 WebSocket: addcam response: result=$result, msg=$msg, camera=$cameraMac, device=$deviceMac');
+          
+          if (result == 1) {
+            // Success - add camera to local state
+            print('✅ Add camera successful: $msg');
+            
+            // Add camera to the device in CameraDevicesProvider
+            if (_cameraDevicesProvider != null && cameraMac.isNotEmpty && deviceMac.isNotEmpty) {
+              _cameraDevicesProvider!.addCameraToDeviceLocally(cameraMac, deviceMac);
+            }
+            
+            if (_userGroupProvider != null) {
+              _userGroupProvider!.handleOperationResult(
+                success: true,
+                message: msg.isNotEmpty ? msg : 'Kamera başarıyla eklendi',
+              );
+            }
+          } else {
+            // Failed
+            print('❌ Add camera failed: $msg');
+            if (_userGroupProvider != null) {
+              _userGroupProvider!.handleOperationResult(
+                success: false,
+                message: msg.isNotEmpty ? msg : 'Kamera ekleme işlemi başarısız',
+              );
+            }
+          }
+          _batchNotifyListeners();
+          break;
+
         default:
           // Handle any command with result/msg pattern (generic command response handler)
           // Format: {"c":"command_name", "result":1, "msg":"..."}

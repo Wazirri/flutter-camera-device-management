@@ -74,6 +74,7 @@ class _UserGroupManagementScreenState extends State<UserGroupManagementScreen>
     return Scaffold(
       backgroundColor: AppTheme.darkBackground,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: AppTheme.darkSurface,
         title: const Text('Kullanıcı ve Grup Yönetimi'),
         bottom: TabBar(

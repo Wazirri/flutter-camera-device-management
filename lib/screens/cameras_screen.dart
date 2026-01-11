@@ -60,8 +60,8 @@ class _CamerasScreenState extends State<CamerasScreen>
       selectedCamera = camera;
     });
 
-    // Doğrudan canlı izlemeye git
-    _openLiveView(camera);
+    // Kamera detaylarını göster
+    _showCameraDetails(camera);
   }
 
   void _showCameraDetails(Camera camera) {
@@ -93,7 +93,7 @@ class _CamerasScreenState extends State<CamerasScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => LiveViewScreen(camera: camera),
+        builder: (context) => LiveViewScreen(camera: camera, showBackButton: true),
       ),
     );
   }
@@ -102,7 +102,7 @@ class _CamerasScreenState extends State<CamerasScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const MultiRecordingsScreen(),
+        builder: (context) => const MultiRecordingsScreen(showBackButton: true),
       ),
     );
   }
@@ -182,6 +182,7 @@ class _CamerasScreenState extends State<CamerasScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Cameras'),
         bottom: TabBar(
           controller: _tabController,
@@ -790,10 +791,140 @@ class _CamerasScreenState extends State<CamerasScreen>
       ),
     );
 
+    // Calculate device-based stats from all cameras in all groups
+    final allCameras = groupedCameras.values.expand((list) => list).toList();
+    
+    // Online: cameras connected on at least one device / cameras with connected info on at least one device
+    int totalConnectedOnDevices = 0;
+    int totalDevicesWithConnectedInfo = 0;
+    
+    // Offline: cameras disconnected on at least one device / cameras with disconnected info
+    int totalDisconnectedOnDevices = 0;
+    int totalDevicesWithDisconnectedInfo = 0;
+    
+    // Recording: cameras recording on at least one device / cameras with recording info
+    int totalRecordingOnDevices = 0;
+    int totalDevicesWithRecordingInfo = 0;
+    
+    for (final camera in allCameras) {
+      // Connected - count based on camReportsConnectedDevices tracker
+      if (camera.camReportsConnectedDevices.isNotEmpty) {
+        totalDevicesWithConnectedInfo += camera.camReportsConnectedDevices.length;
+        // Count how many devices report this camera as connected
+        for (final deviceMac in camera.camReportsConnectedDevices) {
+          if (camera.isConnectedOnDevice(deviceMac)) {
+            totalConnectedOnDevices++;
+          }
+        }
+      }
+      
+      // Disconnected - count based on camReportsDisconnectedDevices tracker
+      if (camera.camReportsDisconnectedDevices.isNotEmpty) {
+        totalDevicesWithDisconnectedInfo += camera.camReportsDisconnectedDevices.length;
+        // Count how many devices report this camera as disconnected
+        for (final deviceMac in camera.camReportsDisconnectedDevices) {
+          if (camera.getDisconnectedOnDevice(deviceMac) == true) {
+            totalDisconnectedOnDevices++;
+          }
+        }
+      }
+      
+      // Recording - count based on camReportsRecordingDevices tracker
+      if (camera.camReportsRecordingDevices.isNotEmpty) {
+        totalDevicesWithRecordingInfo += camera.camReportsRecordingDevices.length;
+        // Count how many devices report this camera as recording
+        for (final deviceMac in camera.camReportsRecordingDevices) {
+          if (camera.isRecordingOnDevice(deviceMac)) {
+            totalRecordingOnDevices++;
+          }
+        }
+      }
+    }
+    
+    // Format labels as "connected/total" (e.g., "2/3")
+    final onlineLabel = totalDevicesWithConnectedInfo > 0
+        ? '$totalConnectedOnDevices/$totalDevicesWithConnectedInfo'
+        : '0';
+    final offlineLabel = totalDevicesWithDisconnectedInfo > 0
+        ? '$totalDisconnectedOnDevices/$totalDevicesWithDisconnectedInfo'
+        : '0';
+    final recordingLabel = totalDevicesWithRecordingInfo > 0
+        ? '$totalRecordingOnDevices/$totalDevicesWithRecordingInfo'
+        : '0';
+    
+    // Build stats bar widget
+    final statsBar = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // Total cameras count
+          Row(
+            children: [
+              const Icon(Icons.videocam, size: 16, color: Colors.white70),
+              const SizedBox(width: 4),
+              Text(
+                '${allCameras.length}',
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+            ],
+          ),
+          // Online count (device-based)
+          Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                onlineLabel,
+                style: const TextStyle(color: Colors.green, fontSize: 12),
+              ),
+            ],
+          ),
+          // Offline count (device-based)
+          Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                offlineLabel,
+                style: const TextStyle(color: Colors.red, fontSize: 12),
+              ),
+            ],
+          ),
+          // Recording count (device-based)
+          Row(
+            children: [
+              const Icon(Icons.fiber_manual_record, size: 12, color: Colors.orange),
+              const SizedBox(width: 4),
+              Text(
+                recordingLabel,
+                style: const TextStyle(color: Colors.orange, fontSize: 12),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+
     return Column(
       children: [
         if (searchBar != null) searchBar,
         if (filterChips != null) filterChips,
+        statsBar,
         cameraContent,
       ],
     );

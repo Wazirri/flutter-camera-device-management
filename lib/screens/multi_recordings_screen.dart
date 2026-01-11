@@ -27,7 +27,9 @@ class RecordingTime {
 }
 
 class MultiRecordingsScreen extends StatefulWidget {
-  const MultiRecordingsScreen({Key? key}) : super(key: key);
+  final bool showBackButton; // Show back button when opened via Navigator.push
+  
+  const MultiRecordingsScreen({Key? key, this.showBackButton = false}) : super(key: key);
 
   @override
   State<MultiRecordingsScreen> createState() => _MultiRecordingsScreenState();
@@ -2148,7 +2150,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Multi Recordings'),
-        automaticallyImplyLeading: false, // Geri butonunu devre dışı bırak
+        automaticallyImplyLeading: widget.showBackButton, // Geri butonunu parametreye göre göster
         actions: [
           // Çoklu seçim modu butonu
           IconButton(

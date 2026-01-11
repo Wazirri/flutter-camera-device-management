@@ -10,8 +10,9 @@ import '../utils/responsive_helper.dart';
 class LiveViewScreen extends StatefulWidget {
   final Camera?
       camera; // Make camera optional so the route can work without a parameter
+  final bool showBackButton; // Show back button when opened via Navigator.push
 
-  const LiveViewScreen({Key? key, this.camera}) : super(key: key);
+  const LiveViewScreen({Key? key, this.camera, this.showBackButton = false}) : super(key: key);
 
   @override
   State<LiveViewScreen> createState() => _LiveViewScreenState();
@@ -295,6 +296,7 @@ class _LiveViewScreenState extends State<LiveViewScreen>
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: widget.showBackButton,
         title:
             Text(_camera != null ? 'Live View: ${_camera!.name}' : 'Live View'),
         actions: [

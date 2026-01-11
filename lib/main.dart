@@ -361,12 +361,26 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
     final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
     
     // Set callback for WebSocket result messages
-    webSocketProvider.onResultMessage = (command, result, message) {
+    webSocketProvider.onResultMessage = (commandType, result, message, {String? mac, String? commandText}) {
       if (mounted && message.isNotEmpty) {
         final isSuccess = result == 1;
         final icon = isSuccess ? Icons.check_circle : Icons.error_outline;
         final color = isSuccess ? Colors.green.shade600 : Colors.red.shade600;
         final emoji = isSuccess ? '✅' : '❌';
+        
+        // Build display text with MAC and command info if available
+        String displayTitle = '$emoji $commandType';
+        String displaySubtitle = message;
+        if (mac != null && mac.isNotEmpty) {
+          displaySubtitle = '[$mac] $message';
+        }
+        if (commandText != null && commandText.isNotEmpty) {
+          // Show shortened command text
+          final shortCommand = commandText.length > 50 
+              ? '${commandText.substring(0, 50)}...' 
+              : commandText;
+          displaySubtitle = '$displaySubtitle\n→ $shortCommand';
+        }
         
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -380,13 +394,13 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '$emoji $command',
+                        displayTitle,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                       ),
                       Text(
-                        message,
+                        displaySubtitle,
                         style: const TextStyle(fontSize: 13),
-                        maxLines: 2,
+                        maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
@@ -396,6 +410,50 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
             ),
             backgroundColor: color,
             duration: Duration(seconds: isSuccess ? 3 : 5),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    };
+    
+    // Set callback for two-phase notifications (e.g., CLEARCAMS)
+    webSocketProvider.onTwoPhaseNotification = (phase, mac, message) {
+      if (mounted) {
+        final isPhase1 = phase == 1;
+        final icon = isPhase1 ? Icons.send : Icons.check_circle;
+        final color = isPhase1 ? Colors.blue.shade600 : Colors.green.shade600;
+        final phaseText = isPhase1 ? '1/2' : '2/2';
+        final checkMark = isPhase1 ? '📤' : '✅';
+        
+        // Get short MAC for display
+        final shortMac = mac.length > 8 ? '...${mac.substring(mac.length - 8)}' : mac;
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(icon, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$checkMark CLEARCAMS [$phaseText]',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
+                      Text(
+                        '[$shortMac] $message',
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: color,
+            duration: Duration(seconds: isPhase1 ? 2 : 4),
             behavior: SnackBarBehavior.floating,
           ),
         );

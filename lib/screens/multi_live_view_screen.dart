@@ -332,6 +332,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen>
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text('Çoklu Canlı İzleme', style: theme.textTheme.headlineSmall),
         backgroundColor: theme.appBarTheme.backgroundColor,
         actions: [
