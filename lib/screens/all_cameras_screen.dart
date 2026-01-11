@@ -965,7 +965,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
     final hasDeviceConnectedInfo = totalDevicesWithConnectedInfo > 0;
     final isOnline = hasDeviceConnectedInfo ? connectedCount > 0 : camera.connected;
     final onlineLabel = hasDeviceConnectedInfo 
-        ? '$connectedCount/$totalDevicesWithConnectedInfo'
+        ? '$connectedCount/$totalDevicesWithConnectedInfo ${isOnline ? "Online" : "Offline"}'
         : (isOnline ? 'Online' : 'Offline');
     
     // Calculate recording count from camReports data

@@ -1214,7 +1214,7 @@ class _CamerasScreenState extends State<CamerasScreen>
     final hasDeviceConnectedInfo = totalDevicesWithConnectedInfo > 0;
     final isOnline = hasDeviceConnectedInfo ? connectedCount > 0 : camera.connected;
     final onlineLabel = hasDeviceConnectedInfo 
-        ? '$connectedCount/$totalDevicesWithConnectedInfo'
+        ? '$connectedCount/$totalDevicesWithConnectedInfo ${isOnline ? "Online" : "Offline"}'
         : (isOnline ? 'Online' : 'Offline');
 
     // Calculate recording count
@@ -1443,86 +1443,10 @@ class _CamerasScreenState extends State<CamerasScreen>
                     ),
                   ],
                 ),
-                // Row 2: Device assignments (if any)
+                // Row 2: Device assignments (if any) - detailed like all_cameras
                 if (camera.currentDevices.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.devices, size: 12, color: Colors.blue),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Assigned to ${camera.currentDevices.length} device(s)',
-                              style: const TextStyle(fontSize: 10, color: Colors.blue),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
-                          children: camera.currentDevices.entries.take(3).map((entry) {
-                            final deviceMac = entry.key;
-                            final isConnectedOnDevice = camera.isConnectedOnDevice(deviceMac);
-                            final isRecordingOnDevice = camera.isRecordingOnDevice(deviceMac);
-                            return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: isConnectedOnDevice 
-                                    ? Colors.green.withOpacity(0.2)
-                                    : Colors.red.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(
-                                  color: isConnectedOnDevice ? Colors.green : Colors.red,
-                                  width: 0.5,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isConnectedOnDevice ? Icons.check_circle : Icons.cancel,
-                                    size: 10,
-                                    color: isConnectedOnDevice ? Colors.green : Colors.red,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    deviceMac.length > 12 
-                                        ? '${deviceMac.substring(0, 12)}...'
-                                        : deviceMac,
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      color: Colors.grey.shade300,
-                                    ),
-                                  ),
-                                  if (isRecordingOnDevice) ...[
-                                    const SizedBox(width: 4),
-                                    const Icon(Icons.fiber_manual_record, size: 8, color: Colors.orange),
-                                  ],
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                        if (camera.currentDevices.length > 3)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              '+${camera.currentDevices.length - 3} more devices',
-                              style: TextStyle(fontSize: 9, color: Colors.grey.shade500),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
+                  _buildDeviceInfoSection(camera),
                 ],
                 
                 // Row 3: Details grid (Resolution, Codec, Brand)
@@ -2073,5 +1997,343 @@ extension _CamerasScreenRename on _CamerasScreenState {
       default:
         return Colors.grey;
     }
+  }
+
+  // Build device info section (like all_cameras_screen)
+  Widget _buildDeviceInfoSection(Camera camera) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.blue.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Device header
+          Row(
+            children: [
+              const Icon(Icons.devices, size: 14, color: Colors.blue),
+              const SizedBox(width: 6),
+              Text(
+                camera.currentDevices.length > 1
+                    ? 'Assigned Devices (${camera.currentDevices.length})'
+                    : 'Assigned Device',
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Device details for each assigned device
+          ...camera.currentDevices.entries.map((entry) {
+            final deviceMac = entry.key;
+            final deviceInfo = entry.value;
+            // Check if this device is recording this camera
+            final isDeviceRecording = camera.recordingDevices[deviceMac] ?? false;
+            // Get device-specific camreports data
+            final isDeviceConnected = camera.isConnectedOnDevice(deviceMac);
+            final deviceRecordPath = camera.getRecordPathOnDevice(deviceMac);
+            final deviceLastSeenAt = camera.getLastSeenAtOnDevice(deviceMac);
+            final deviceDisconnected = camera.getDisconnectedOnDevice(deviceMac);
+            final deviceLastRestartTime = camera.getLastRestartTimeOnDevice(deviceMac);
+            final deviceReported = camera.getReportedOnDevice(deviceMac);
+            
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: camera.currentDevices.entries.last.key != deviceMac
+                    ? 12.0
+                    : 0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // First row: Device MAC, IP, Recording status
+                  Row(
+                    children: [
+                      // Connection indicator for this device
+                      Container(
+                        width: 24,
+                        height: 24,
+                        margin: const EdgeInsets.only(right: 8),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isDeviceConnected 
+                              ? Colors.green.withOpacity(0.2)
+                              : Colors.orange.withOpacity(0.2),
+                          border: Border.all(
+                            color: isDeviceConnected ? Colors.green : Colors.orange,
+                            width: 1,
+                          ),
+                        ),
+                        child: Icon(
+                          isDeviceConnected ? Icons.link : Icons.link_off,
+                          size: 12,
+                          color: isDeviceConnected ? Colors.green : Colors.orange,
+                        ),
+                      ),
+                      // Device MAC
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Device MAC',
+                              style: TextStyle(
+                                fontSize: 9,
+                                color: Colors.grey.shade500,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              deviceMac.isNotEmpty
+                                  ? deviceMac.toUpperCase()
+                                  : '-',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Device IP
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Device IP',
+                              style: TextStyle(
+                                fontSize: 9,
+                                color: Colors.grey.shade500,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              deviceInfo.deviceIp.isNotEmpty
+                                  ? deviceInfo.deviceIp
+                                  : '-',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Recording status badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: isDeviceRecording 
+                              ? Colors.red.withOpacity(0.2)
+                              : Colors.grey.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: isDeviceRecording ? Colors.red : Colors.grey.shade600,
+                            width: 0.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isDeviceRecording ? Icons.fiber_manual_record : Icons.stop,
+                              size: 8,
+                              color: isDeviceRecording ? Colors.red : Colors.grey,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isDeviceRecording ? 'REC' : 'OFF',
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: isDeviceRecording ? Colors.red : Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Second row: CamReports data (Connected status, Last Seen, etc.)
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: Colors.grey.shade800,
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Row 1: Connected status and Last Seen
+                        Row(
+                          children: [
+                            // Connected status
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    isDeviceConnected ? Icons.check_circle : Icons.cancel,
+                                    size: 12,
+                                    color: isDeviceConnected ? Colors.green : Colors.orange,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    isDeviceConnected ? 'Connected' : 'Disconnected',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: isDeviceConnected ? Colors.green : Colors.orange,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Last Seen
+                            if (deviceLastSeenAt.isNotEmpty) ...[
+                              Icon(
+                                Icons.visibility,
+                                size: 10,
+                                color: Colors.grey.shade500,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                deviceLastSeenAt,
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  color: Colors.grey.shade400,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        // Row 2: Disconnected and Last Restart Time
+                        if (deviceDisconnected.isNotEmpty && deviceDisconnected != '-' ||
+                            deviceLastRestartTime.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              // Disconnected timestamp
+                              if (deviceDisconnected.isNotEmpty && deviceDisconnected != '-') ...[
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.link_off,
+                                        size: 10,
+                                        color: Colors.orange.shade300,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Flexible(
+                                        child: Text(
+                                          'Disc: $deviceDisconnected',
+                                          style: TextStyle(
+                                            fontSize: 9,
+                                            color: Colors.orange.shade300,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              // Last Restart Time
+                              if (deviceLastRestartTime.isNotEmpty) ...[
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.restart_alt,
+                                        size: 10,
+                                        color: Colors.blue.shade300,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Flexible(
+                                        child: Text(
+                                          deviceLastRestartTime,
+                                          style: TextStyle(
+                                            fontSize: 9,
+                                            color: Colors.blue.shade300,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                        // Row 3: Recording Path
+                        if (deviceRecordPath.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.folder,
+                                size: 10,
+                                color: Colors.purple.shade300,
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  deviceRecordPath,
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    color: Colors.purple.shade300,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                        // Row 4: Reported timestamp
+                        if (deviceReported.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.schedule,
+                                size: 10,
+                                color: Colors.cyan.shade300,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Reported: $deviceReported',
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  color: Colors.cyan.shade300,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
   }
 }
