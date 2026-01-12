@@ -83,8 +83,23 @@ class WebSocketProviderOptimized with ChangeNotifier {
   // Parameters: phase (1 or 2), mac, message
   void Function(int phase, String mac, String message)? onTwoPhaseNotification;
   
+  // Combined result notification callback - shows command send status AND device result together
+  // Parameters: commandType, sendResult (1=sent successfully), deviceResult (-1=pending, 0=error, 1=success), 
+  //             sendMessage, deviceMessage, mac, commandText
+  void Function(String commandType, int sendResult, int deviceResult, 
+                String sendMessage, String deviceMessage, 
+                {String? mac, String? commandText})? onCombinedResultMessage;
+  
   // Pending CLEARCAMS commands waiting for 'deleted' confirmation
   final Set<String> _pendingClearCams = {};
+  
+  // Pending COMMAND messages waiting for device response
+  // Key: "${mac}_${commandText}", Value: {sendResult, sendMessage, timestamp}
+  final Map<String, Map<String, dynamic>> _pendingCommands = {};
+  
+  // Pending SHMC (slave_cmd) commands waiting for server response
+  // Key: "${mac}_${command}", Value: {timestamp, commandText}
+  final Map<String, Map<String, dynamic>> _pendingShmcCommands = {};
   
   // Connection settings
   String _serverIp = '85.104.114.145';
@@ -168,8 +183,8 @@ class WebSocketProviderOptimized with ChangeNotifier {
     
     _messageLog.add(logEntry);
     
-    // Keep log size manageable (max 100000 messages)
-    if (_messageLog.length > 10000000) {
+    // Keep log size manageable (max 50000000 messages)
+    if (_messageLog.length > 50000000) {
       _messageLog.removeAt(0);
     }
     
@@ -413,6 +428,72 @@ class WebSocketProviderOptimized with ChangeNotifier {
       _socket!.add(command);
       print('[${DateTime.now().toString().split('.').first}] Command sent: $command');
       _logMessage('SENT: $command');
+      
+      // Track CLEARCAMS commands - response comes as slave_cmd, not COMMAND
+      // Format: <MAC> CLEARCAMS
+      // NOTE: Phase notifications are handled by the progress dialog, not here
+      if (command.contains(' CLEARCAMS')) {
+        final parts = command.split(' ');
+        if (parts.isNotEmpty) {
+          final mac = parts[0];
+          _pendingClearCams.add(mac);
+          print('[CLEARCAMS] Stored pending command for device: $mac');
+          
+          // Timeout to auto-clear if no response in 15 seconds
+          Future.delayed(const Duration(seconds: 15), () {
+            if (_pendingClearCams.contains(mac)) {
+              _pendingClearCams.remove(mac);
+              print('[CLEARCAMS] Timeout - no response for: $mac');
+              // Show timeout notification
+              if (onTwoPhaseNotification != null) {
+                onTwoPhaseNotification!(2, mac, 'Cihazdan yanıt alınamadı (zaman aşımı)');
+              }
+            }
+          });
+        }
+      }
+      
+      // Track SHMC commands for combined notification with slave_cmd response
+      // Format: <MAC> SHMC <path> <value>
+      if (command.contains(' SHMC ')) {
+        final parts = command.split(' ');
+        if (parts.length >= 3) {
+          final mac = parts[0];
+          // Full command after MAC (e.g., "SHMC configuration.service.recorder.on 1")
+          final shmcCommand = parts.sublist(1).join(' ');
+          final pendingKey = '${mac}_$shmcCommand';
+          
+          _pendingShmcCommands[pendingKey] = {
+            'timestamp': DateTime.now().millisecondsSinceEpoch,
+            'commandText': shmcCommand,
+            'mac': mac,
+          };
+          
+          print('[SHMC] Stored pending command: $pendingKey');
+          
+          // Timeout to auto-clear if no response in 10 seconds
+          Future.delayed(const Duration(seconds: 10), () {
+            if (_pendingShmcCommands.containsKey(pendingKey)) {
+              final pendingData = _pendingShmcCommands.remove(pendingKey);
+              print('[SHMC] Timeout - no response for: $pendingKey');
+              
+              // Show timeout notification
+              if (onCombinedResultMessage != null && pendingData != null) {
+                onCombinedResultMessage!(
+                  'SHMC',
+                  1, // sent successfully
+                  -1, // no response (timeout)
+                  'Komut gönderildi',
+                  'Cihazdan yanıt alınamadı (zaman aşımı)',
+                  mac: mac,
+                  commandText: shmcCommand,
+                );
+              }
+            }
+          });
+        }
+      }
+      
       return true;
     } catch (e) {
       _errorMessage = 'Error sending command: $e';
@@ -596,7 +677,7 @@ class WebSocketProviderOptimized with ChangeNotifier {
         print('[$now] WebSocket raw message: $message');
         
         // Log raw message to UI (truncate if too long for display)
-        final displayMsg = message.length > 500 ? '${message.substring(0, 500)}...' : message;
+        final displayMsg = message.length > 200000 ? '${message.substring(0, 200000)}...' : message;
         _logMessage(displayMsg);
         
         // Try to parse JSON message
@@ -637,15 +718,142 @@ class WebSocketProviderOptimized with ChangeNotifier {
         // Convert result to int (could be int or string)
         final resultInt = result is int ? result : int.tryParse(result.toString()) ?? -1;
         
-        // Handle CLEARCAMS command - mark as pending and notify phase 1
-        if (command == 'COMMAND' && commandText == 'CLEARCAMS' && resultInt == 1 && mac != null && mac.isNotEmpty) {
-          print('[CLEARCAMS] Phase 1: Command sent successfully to device $mac');
-          _pendingClearCams.add(mac);
-          // Notify phase 1: Message sent
-          if (onTwoPhaseNotification != null) {
-            onTwoPhaseNotification!(1, mac, 'Mesaj başarılı şekilde iletildi');
+        print('[DEBUG] command=$command, commandText=$commandText, mac=$mac, result=$resultInt');
+        
+        // Handle CLEARCAMS command specially - skip COMMAND type, handled via slave_cmd
+        // Response comes as slave_cmd, not COMMAND, so we just skip here to avoid double notification
+        if (command == 'COMMAND' && commandText == 'CLEARCAMS' && mac != null && mac.isNotEmpty) {
+          print('[CLEARCAMS] Skipping COMMAND type message for $mac, waiting for slave_cmd response');
+          // Skip all notification systems for CLEARCAMS COMMAND type
+          return;
+        }
+        
+        // Handle all COMMAND type messages with pending tracking (except CLEARCAMS and SHMC)
+        // CLEARCAMS and SHMC are handled via slave_cmd response, not COMMAND
+        if (command == 'COMMAND' && commandText != null && mac != null && mac.isNotEmpty) {
+          // Skip SHMC commands - they are handled via slave_cmd response only
+          if (commandText.contains('SHMC')) {
+            print('[SHMC] Skipping COMMAND type message for $mac: $commandText');
+            return;
           }
-          // Skip regular notification for CLEARCAMS - we handle it specially
+          
+          final pendingKey = '${mac}_$commandText';
+          
+          // Check if this is a device response (result could be 0 or 1 from device)
+          // Device responses typically come after the send confirmation
+          if (_pendingCommands.containsKey(pendingKey)) {
+            // This is the device response - combine with send result
+            final pendingData = _pendingCommands.remove(pendingKey)!;
+            final sendResult = pendingData['sendResult'] as int;
+            final sendMessage = pendingData['sendMessage'] as String;
+            
+            print('[COMMAND] Combined notification: Send=$sendResult, Device=$resultInt, MAC=$mac, Command=$commandText');
+            
+            // Use combined notification if available
+            if (onCombinedResultMessage != null) {
+              onCombinedResultMessage!(
+                'COMMAND',
+                sendResult,
+                resultInt,
+                sendMessage,
+                msg.toString(),
+                mac: mac,
+                commandText: commandText,
+              );
+            }
+            // Skip regular notification - we used combined
+            return;
+          } else {
+            // This is the first message (send confirmation)
+            // Store it and wait for device response
+            _pendingCommands[pendingKey] = {
+              'sendResult': resultInt,
+              'sendMessage': msg.toString(),
+              'timestamp': DateTime.now().millisecondsSinceEpoch,
+            };
+            
+            print('[COMMAND] Stored pending command: $pendingKey, waiting for device response');
+            
+            // Set timeout to auto-notify if no device response in 5 seconds
+            Future.delayed(const Duration(seconds: 5), () {
+              if (_pendingCommands.containsKey(pendingKey)) {
+                final pendingData = _pendingCommands.remove(pendingKey)!;
+                final sendResult = pendingData['sendResult'] as int;
+                final sendMessage = pendingData['sendMessage'] as String;
+                
+                print('[COMMAND] Timeout - no device response for: $pendingKey');
+                
+                // Show combined notification with pending device result
+                if (onCombinedResultMessage != null) {
+                  onCombinedResultMessage!(
+                    'COMMAND',
+                    sendResult,
+                    -1, // -1 = no device response yet
+                    sendMessage,
+                    'Cihazdan yanıt bekleniyor...',
+                    mac: mac,
+                    commandText: commandText,
+                  );
+                }
+              }
+            });
+            
+            // Skip regular notification for now - we'll combine later
+            return;
+          }
+        }
+        
+        // Handle slave_cmd response - combine with pending SHMC command or handle CLEARCAMS
+        if (command == 'slave_cmd') {
+          final device = jsonData['device']?.toString();
+          final shmcCommand = jsonData['command']?.toString();
+          
+          print('[slave_cmd] device=$device, command=$shmcCommand');
+          print('[slave_cmd] Pending SHMC keys: ${_pendingShmcCommands.keys.toList()}');
+          
+          if (device != null && shmcCommand != null) {
+            // Check if this is a CLEARCAMS response - show Phase 1 complete, wait for 'deleted' message
+            if (shmcCommand == 'CLEARCAMS') {
+              print('[CLEARCAMS] slave_cmd response received for device: $device, Phase 1 complete');
+              print('[CLEARCAMS] Pending CLEARCAMS set: $_pendingClearCams');
+              
+              // Phase 1 complete - command was delivered to device
+              // Always send Phase 1 notification for CLEARCAMS (dialog is listening)
+              if (onTwoPhaseNotification != null) {
+                onTwoPhaseNotification!(1, device, 'Komut cihaza iletildi');
+              }
+              // Don't remove from pending - wait for 'deleted' message for Phase 2
+              return;
+            }
+            
+            final pendingKey = '${device}_$shmcCommand';
+            
+            if (_pendingShmcCommands.containsKey(pendingKey)) {
+              // Found pending command - show combined notification
+              _pendingShmcCommands.remove(pendingKey);
+              
+              print('[SHMC] Combined notification: Device=$device, Command=$shmcCommand, Result=$resultInt, Msg=$msg');
+              
+              // Use combined notification - shows both send and result in one popup
+              if (onCombinedResultMessage != null) {
+                onCombinedResultMessage!(
+                  'SHMC',
+                  1, // sent successfully (we wouldn't get here otherwise)
+                  resultInt, // device response (0=error, 1=success)
+                  'Komut gönderildi',
+                  msg.toString(),
+                  mac: device,
+                  commandText: shmcCommand,
+                );
+              }
+              
+              // Skip regular notification - we handled it
+              return;
+            }
+          }
+          
+          // If not a pending command, still skip regular notification for slave_cmd
+          // as it's a response type message
           return;
         }
         
@@ -964,38 +1172,170 @@ class WebSocketProviderOptimized with ChangeNotifier {
           break;
 
         case 'deleted':
-          // Handle deleted keys (e.g., cameras cleared from device)
-          // Format: {"c":"deleted", "keys":["ecs_slaves.36:56:F0:A5:36:30.cam"]}
+          // Handle deleted keys (e.g., cameras cleared from device, system data, etc.)
+          // Format: {"c":"deleted", "keys":["ecs_slaves.36:56:F0:A5:36:30.cam", "cameras_mac.MAC.current.CAM_MAC", ...]}
           final keys = jsonData['keys'] as List<dynamic>?;
-          if (keys != null) {
+          if (keys != null && keys.isNotEmpty) {
+            // Group keys by device MAC for better notification
+            final Map<String, List<String>> deletedByDevice = {};
+            final Map<String, Set<String>> deletedCamerasByDevice = {}; // Track camera MACs per device
+            final List<String> otherDeletedKeys = [];
+            
             for (var key in keys) {
               final keyStr = key.toString();
-              // Check if this is a camera deletion: ecs_slaves.DEVICE_MAC.cam
-              if (keyStr.startsWith('ecs_slaves.') && keyStr.endsWith('.cam')) {
-                // Extract device MAC from key
+              
+              // Check if this is an ecs_slaves key
+              if (keyStr.startsWith('ecs_slaves.')) {
                 final parts = keyStr.split('.');
                 if (parts.length >= 2) {
                   final deviceMac = parts[1];
-                  print('[DELETED] Device $deviceMac cameras deleted (key: $keyStr)');
-                  
-                  // Clear cameras locally
-                  _cameraDevicesProvider?.clearDeviceCamerasLocally(deviceMac);
-                  
-                  // Check if this was a pending CLEARCAMS command
-                  if (_pendingClearCams.contains(deviceMac)) {
-                    _pendingClearCams.remove(deviceMac);
-                    // Notify phase 2: Device confirmed deletion
-                    if (onTwoPhaseNotification != null) {
-                      onTwoPhaseNotification!(2, deviceMac, 'Cihaz kameraları sildi');
-                    }
-                  } else {
-                    // Not a pending CLEARCAMS, just notify normally
-                    if (onResultMessage != null) {
-                      onResultMessage!('deleted', 1, 'Cihaz $deviceMac kameraları silindi');
-                    }
+                  deletedByDevice.putIfAbsent(deviceMac, () => []);
+                  deletedByDevice[deviceMac]!.add(keyStr);
+                }
+              } 
+              // Check if this is a cameras_mac key (camera data per device)
+              // Format: cameras_mac.<DEVICE_MAC>.current.<CAMERA_MAC>[.property]
+              // Only process if the key contains '.current.' - this indicates actual camera deletion
+              else if (keyStr.startsWith('cameras_mac.') && keyStr.contains('.current.')) {
+                final parts = keyStr.split('.');
+                if (parts.length >= 4) {
+                  final deviceMac = parts[1]; // Device MAC
+                  // Find the camera MAC (after 'current')
+                  final currentIndex = parts.indexOf('current');
+                  if (currentIndex >= 0 && currentIndex + 1 < parts.length) {
+                    final cameraMac = parts[currentIndex + 1]; // Camera MAC
+                    
+                    deletedByDevice.putIfAbsent(deviceMac, () => []);
+                    deletedByDevice[deviceMac]!.add(keyStr);
+                    
+                    // Track unique camera MACs being deleted
+                    deletedCamerasByDevice.putIfAbsent(deviceMac, () => {});
+                    deletedCamerasByDevice[deviceMac]!.add(cameraMac);
+                    
+                    print('[DELETED] cameras_mac.current key: device=$deviceMac, camera=$cameraMac, key=$keyStr');
                   }
                 }
               }
+              else if (keyStr.startsWith('all_cameras.')) {
+                // all_cameras.<CAMERA_MAC>[.property] - camera data deleted from global list
+                final parts = keyStr.split('.');
+                if (parts.length >= 2) {
+                  final cameraMac = parts[1];
+                  // Track for deletion from global camera list
+                  otherDeletedKeys.add(keyStr);
+                  // Also add to a special set for global camera deletion
+                  deletedCamerasByDevice.putIfAbsent('__global__', () => {});
+                  deletedCamerasByDevice['__global__']!.add(cameraMac);
+                  print('[DELETED] all_cameras key: camera=$cameraMac, key=$keyStr');
+                }
+              } else {
+                otherDeletedKeys.add(keyStr);
+              }
+            }
+            
+            // Handle global camera deletions (from all_cameras.* keys)
+            if (deletedCamerasByDevice.containsKey('__global__')) {
+              final globalCameras = deletedCamerasByDevice['__global__']!;
+              print('[DELETED] Global cameras to remove: ${globalCameras.length}');
+              for (final cameraMac in globalCameras) {
+                _cameraDevicesProvider?.removeCameraFromGlobalList(cameraMac);
+              }
+            }
+            
+            // Process each device's deleted keys
+            for (var entry in deletedByDevice.entries) {
+              final deviceMac = entry.key;
+              final deviceKeys = entry.value;
+              
+              // Check what type of data was deleted
+              // ecs_slaves.MAC.cam or ecs_slaves.MAC.cam.[0].property indicates all cameras deleted
+              final hasCamDeleted = deviceKeys.any((k) => 
+                  k.endsWith('.cam') || k.contains('.cam.['));
+              final hasSystemDeleted = deviceKeys.any((k) => k.contains('.system'));
+              final hasCamerasMacDeleted = deviceKeys.any((k) => k.startsWith('cameras_mac.'));
+              
+              // Handle ecs_slaves.*.cam deletion - all device cameras cleared
+              if (hasCamDeleted) {
+                print('[DELETED] Device $deviceMac cameras deleted (ecs_slaves.*.cam)');
+                
+                // Clear cameras locally - this removes from both device and global list
+                _cameraDevicesProvider?.clearDeviceCamerasLocally(deviceMac);
+                
+                // Check if this was a pending CLEARCAMS command
+                if (_pendingClearCams.contains(deviceMac)) {
+                  _pendingClearCams.remove(deviceMac);
+                  // Notify phase 2: Device confirmed deletion
+                  if (onTwoPhaseNotification != null) {
+                    onTwoPhaseNotification!(2, deviceMac, 'Cihaz kameraları sildi');
+                  }
+                } else {
+                  // Not a pending CLEARCAMS, just notify normally
+                  if (onResultMessage != null) {
+                    onResultMessage!('deleted', 1, 'Cihaz $deviceMac kameraları silindi', mac: deviceMac);
+                  }
+                }
+              }
+              
+              // Handle cameras_mac deletion - specific cameras removed
+              if (hasCamerasMacDeleted && !hasCamDeleted) {
+                final camerasDeleted = deletedCamerasByDevice[deviceMac] ?? {};
+                print('[DELETED] Device $deviceMac specific cameras deleted: ${camerasDeleted.length} cameras');
+                
+                // Remove specific cameras locally
+                for (final cameraMac in camerasDeleted) {
+                  _cameraDevicesProvider?.removeCameraLocally(deviceMac, cameraMac);
+                }
+                
+                // Check if this was a pending CLEARCAMS command
+                if (_pendingClearCams.contains(deviceMac)) {
+                  _pendingClearCams.remove(deviceMac);
+                  // Notify phase 2: Device confirmed deletion
+                  if (onTwoPhaseNotification != null) {
+                    onTwoPhaseNotification!(2, deviceMac, 'Cihaz kameraları sildi (${camerasDeleted.length} kamera)');
+                  }
+                } else {
+                  // Not a pending CLEARCAMS, just notify normally
+                  if (onResultMessage != null) {
+                    final shortMac = deviceMac.length > 8 
+                        ? '...${deviceMac.substring(deviceMac.length - 8)}' 
+                        : deviceMac;
+                    onResultMessage!('deleted', 1, 
+                        '[$shortMac] ${camerasDeleted.length} kamera silindi', 
+                        mac: deviceMac);
+                  }
+                }
+              }
+              
+              if (hasSystemDeleted) {
+                // System data deleted - device is disconnecting or being removed
+                print('[DELETED] Device $deviceMac system data deleted (${deviceKeys.length} keys)');
+                
+                // Check if the main system key is deleted (indicates full device removal)
+                final mainSystemDeleted = deviceKeys.any((k) => 
+                    k == 'ecs_slaves.$deviceMac.system' || 
+                    k.endsWith('.system.shmc_ready') ||
+                    k.endsWith('.system.progstate'));
+                
+                if (mainSystemDeleted) {
+                  // Full system data deletion - remove or mark device as disconnected
+                  _cameraDevicesProvider?.markDeviceDisconnected(deviceMac);
+                }
+                
+                // Notify about system data deletion
+                if (onResultMessage != null) {
+                  final shortMac = deviceMac.length > 8 
+                      ? '...${deviceMac.substring(deviceMac.length - 8)}' 
+                      : deviceMac;
+                  onResultMessage!('deleted', 1, 
+                      'Cihaz [$shortMac] bağlantısı kesildi (${deviceKeys.length} veri silindi)', 
+                      mac: deviceMac);
+                }
+              }
+            }
+            
+            // Log other deleted keys if any
+            if (otherDeletedKeys.isNotEmpty) {
+              print('[DELETED] Other keys deleted: $otherDeletedKeys');
             }
           }
           _batchNotifyListeners();

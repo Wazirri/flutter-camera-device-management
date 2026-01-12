@@ -4,6 +4,7 @@ import '../models/camera_device.dart';
 import '../providers/camera_devices_provider.dart';
 import '../providers/websocket_provider.dart';
 import '../providers/user_group_provider.dart';
+import '../providers/notification_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/camera_details_bottom_sheet.dart';
 import '../widgets/camera_snapshot_widget.dart';
@@ -87,6 +88,46 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
             ),
             onPressed: () => _showFilterBottomSheet(context),
           ),
+          // Notifications
+          Consumer<NotificationProvider>(
+            builder: (context, notificationProvider, child) {
+              return Stack(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    onPressed: () => _showNotificationsPanel(context),
+                  ),
+                  if (notificationProvider.hasUnread)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          notificationProvider.unreadCount > 99
+                              ? '99+'
+                              : notificationProvider.unreadCount.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
         ],
       ),
       body: Consumer3<CameraDevicesProviderOptimized,
@@ -139,6 +180,10 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                           cam.parentDeviceMacKey!.isEmpty);
                 case 'distributing':
                   return cam.distribute;
+                case 'verified':
+                  return cam.verified;
+                case 'unverified':
+                  return !cam.verified;
                 default:
                   return true;
               }
@@ -196,6 +241,9 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
 
           return Column(
             children: [
+              // Quick filter chips (horizontal scrollable)
+              _buildQuickFilterChips(),
+
               // Search bar
               _buildSearchBar(),
 
@@ -221,6 +269,91 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                 _buildPaginationBar(cameras.length, totalPages),
             ],
           );
+        },
+      ),
+    );
+  }
+
+  Widget _buildQuickFilterChips() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+      color: AppTheme.darkSurface,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            // Status filters
+            _buildQuickChip('Online', 'online', Icons.wifi, Colors.green),
+            _buildQuickChip('Offline', 'offline', Icons.wifi_off, Colors.red),
+            _buildQuickChip('Recording', 'recording', Icons.fiber_manual_record, Colors.orange),
+            _buildQuickChip('Assigned', 'assigned', Icons.link, Colors.cyan),
+            _buildQuickChip('Unassigned', 'unassigned', Icons.link_off, Colors.grey),
+            _buildQuickChip('Distributing', 'distributing', Icons.share, Colors.purple),
+            _buildQuickChip('Verified', 'verified', Icons.verified, Colors.green.shade700),
+            _buildQuickChip('Unverified', 'unverified', Icons.warning_amber, Colors.orange),
+            
+            // Divider
+            Container(
+              height: 24,
+              width: 1,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              color: Colors.grey.shade700,
+            ),
+            
+            // Clear all button if any filter is active
+            if (_hasActiveFilters())
+              ActionChip(
+                avatar: const Icon(Icons.clear_all, size: 16, color: Colors.white),
+                label: const Text('Temizle', style: TextStyle(color: Colors.white, fontSize: 12)),
+                backgroundColor: Colors.red.shade700,
+                onPressed: () {
+                  setState(() {
+                    _filterStatus = null;
+                    _filterBrand = null;
+                    _filterResolution = null;
+                    _filterCodec = null;
+                    _filterSubnet = null;
+                    _currentPage = 0;
+                  });
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickChip(String label, String value, IconData icon, Color color) {
+    final isSelected = _filterStatus == value;
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: FilterChip(
+        avatar: Icon(
+          icon,
+          size: 14,
+          color: isSelected ? Colors.white : color,
+        ),
+        label: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: isSelected ? Colors.white : Colors.grey.shade300,
+          ),
+        ),
+        selected: isSelected,
+        selectedColor: color,
+        backgroundColor: AppTheme.darkBackground,
+        checkmarkColor: Colors.white,
+        showCheckmark: false,
+        side: BorderSide(
+          color: isSelected ? color : Colors.grey.shade700,
+          width: 1,
+        ),
+        onSelected: (selected) {
+          setState(() {
+            _filterStatus = selected ? value : null;
+            _currentPage = 0;
+          });
         },
       ),
     );
@@ -1085,25 +1218,63 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                                 ),
                               ),
                             ),
+                            // Unverified warning icon
+                            if (!camera.verified)
+                              Padding(
+                                padding: const EdgeInsets.only(right: 4),
+                                child: Tooltip(
+                                  message: 'Doğrulanmamış kamera - Dağıtıma dahil edilemez',
+                                  child: Icon(
+                                    Icons.warning_amber_rounded,
+                                    size: 16,
+                                    color: Colors.orange,
+                                  ),
+                                ),
+                              ),
                             Expanded(
                               child: Text(
                                 camera.displayName,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: camera.verified ? Colors.white : Colors.orange.shade300,
                                 ),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 2),
-                        Text(
-                          camera.ip.isNotEmpty ? camera.ip : camera.mac,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey.shade400,
-                          ),
+                        Row(
+                          children: [
+                            if (!camera.verified && camera.name.isEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(right: 4),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    'İsim Yok',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      color: Colors.orange.shade400,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            Expanded(
+                              child: Text(
+                                camera.ip.isNotEmpty ? camera.ip : camera.mac,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey.shade400,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -1342,12 +1513,11 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                             activeColor: Colors.green,
                             onChanged: (value) async {
                               if (camera.mac.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        '${camera.displayName}: MAC adresi eksik!'),
-                                    backgroundColor: Colors.orange,
-                                  ),
+                                AppSnackBar.warning(
+                                  context,
+                                  '${camera.displayName}: MAC adresi eksik!',
+                                  cameraName: camera.displayName,
+                                  cameraMac: camera.mac,
                                 );
                                 return;
                               }
@@ -1361,24 +1531,22 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                                 cameraProvider.updateCamera(updatedCamera);
 
                                 if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        value
-                                            ? '${camera.displayName} dağıtıma dahil edildi'
-                                            : '${camera.displayName} dağıtımdan çıkarıldı',
-                                      ),
-                                      backgroundColor: Colors.green,
-                                    ),
+                                  AppSnackBar.success(
+                                    context,
+                                    value
+                                        ? '${camera.displayName} dağıtıma dahil edildi'
+                                        : '${camera.displayName} dağıtımdan çıkarıldı',
+                                    cameraName: camera.displayName,
+                                    cameraMac: camera.mac,
                                   );
                                 }
                               } else {
                                 if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('İşlem başarısız oldu'),
-                                      backgroundColor: Colors.red,
-                                    ),
+                                  AppSnackBar.error(
+                                    context,
+                                    'İşlem başarısız oldu',
+                                    cameraName: camera.displayName,
+                                    cameraMac: camera.mac,
                                   );
                                 }
                               }
@@ -1402,12 +1570,12 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                           if (context.mounted) {
                             final isSuccess = paramResult['success'] == true;
                             final message = paramResult['message'] ?? '';
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(message),
-                                backgroundColor: isSuccess ? Colors.green : Colors.red,
-                                duration: const Duration(seconds: 2),
-                              ),
+                            AppSnackBar.show(
+                              context,
+                              message,
+                              type: isSuccess ? NotificationType.success : NotificationType.error,
+                              cameraName: camera.displayName,
+                              cameraMac: camera.mac,
                             );
                           }
                         });
@@ -2384,6 +2552,16 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                             setState(() => _filterStatus = val);
                             setModalState(() {});
                           }),
+                          _buildFilterOption('Verified', 'verified',
+                              _filterStatus, Colors.green.shade700, (val) {
+                            setState(() => _filterStatus = val);
+                            setModalState(() {});
+                          }),
+                          _buildFilterOption('Unverified', 'unverified',
+                              _filterStatus, Colors.orange, (val) {
+                            setState(() => _filterStatus = val);
+                            setModalState(() {});
+                          }),
                         ],
                       ),
 
@@ -2729,12 +2907,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
   Future<void> _submitRename(Camera camera, String newName) async {
     final trimmedName = newName.trim();
     if (trimmedName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Kamera adı boş olamaz'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      AppSnackBar.error(context, 'Kamera adı boş olamaz', cameraName: camera.displayName, cameraMac: camera.mac);
       return;
     }
     
@@ -2749,16 +2922,194 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
     final success = await webSocketProvider.changeCameraName(camera.mac, trimmedName);
     
     if (success) {
+      AppSnackBar.success(context, 'Kamera adı değiştirildi: $trimmedName', cameraName: trimmedName, cameraMac: camera.mac);
       print('[AllCameras] Camera rename command sent: ${camera.mac} -> $trimmedName');
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Kamera adı değiştirme komutu gönderilemedi'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppSnackBar.error(context, 'Kamera adı değiştirme komutu gönderilemedi', cameraName: camera.displayName, cameraMac: camera.mac);
       }
     }
+  }
+
+  /// Show notifications panel
+  void _showNotificationsPanel(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.darkSurface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.3,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => Consumer<NotificationProvider>(
+          builder: (context, notificationProvider, child) {
+            final notifications = notificationProvider.notifications;
+            
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Row(
+                    children: [
+                      const Icon(Icons.notifications, color: AppTheme.primaryOrange),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Bildirimler',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Spacer(),
+                      if (notificationProvider.hasUnread)
+                        TextButton(
+                          onPressed: () {
+                            notificationProvider.markAllAsRead();
+                          },
+                          child: const Text('Tümünü Okundu İşaretle'),
+                        ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.grey),
+                        onPressed: notifications.isEmpty
+                            ? null
+                            : () {
+                                showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    backgroundColor: AppTheme.darkSurface,
+                                    title: const Text('Tüm Bildirimleri Sil',
+                                        style: TextStyle(color: Colors.white)),
+                                    content: const Text(
+                                        'Tüm bildirimler silinecek. Emin misiniz?',
+                                        style: TextStyle(color: Colors.grey)),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(ctx),
+                                        child: const Text('İptal'),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          notificationProvider.clearAll();
+                                          Navigator.pop(ctx);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red),
+                                        child: const Text('Sil'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${notifications.length} bildirim',
+                    style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+                  ),
+                  const SizedBox(height: 8),
+                  const Divider(color: Colors.grey),
+                  
+                  // Notifications list
+                  Expanded(
+                    child: notifications.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.notifications_none,
+                                    size: 64, color: Colors.grey.shade700),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Henüz bildirim yok',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade500,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: scrollController,
+                            itemCount: notifications.length,
+                            itemBuilder: (context, index) {
+                              final notification = notifications[index];
+                              return Dismissible(
+                                key: Key(notification.id),
+                                direction: DismissDirection.endToStart,
+                                onDismissed: (_) {
+                                  notificationProvider.removeNotification(notification.id);
+                                },
+                                background: Container(
+                                  alignment: Alignment.centerRight,
+                                  padding: const EdgeInsets.only(right: 20),
+                                  color: Colors.red,
+                                  child: const Icon(Icons.delete, color: Colors.white),
+                                ),
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: notification.color.withOpacity(0.2),
+                                    child: Icon(notification.icon, color: notification.color, size: 20),
+                                  ),
+                                  title: Text(
+                                    notification.message,
+                                    style: TextStyle(
+                                      color: notification.isRead ? Colors.grey : Colors.white,
+                                      fontWeight: notification.isRead ? FontWeight.normal : FontWeight.w500,
+                                    ),
+                                  ),
+                                  subtitle: Row(
+                                    children: [
+                                      if (notification.cameraName != null) ...[
+                                        Icon(Icons.videocam, size: 12, color: Colors.grey.shade600),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          notification.cameraName!,
+                                          style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
+                                        ),
+                                        const SizedBox(width: 8),
+                                      ],
+                                      Text(
+                                        notification.formattedTime,
+                                        style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: !notification.isRead
+                                      ? Container(
+                                          width: 8,
+                                          height: 8,
+                                          decoration: const BoxDecoration(
+                                            color: AppTheme.primaryOrange,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        )
+                                      : null,
+                                  onTap: () {
+                                    if (!notification.isRead) {
+                                      notificationProvider.markAsRead(notification.id);
+                                    }
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 }

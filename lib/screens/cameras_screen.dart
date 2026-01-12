@@ -5,6 +5,7 @@ import '../widgets/camera_snapshot_widget.dart';
 import '../providers/camera_devices_provider.dart';
 import '../providers/websocket_provider.dart';
 import '../providers/user_group_provider.dart';
+import '../providers/notification_provider.dart';
 import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import 'live_view_screen.dart';
@@ -1853,12 +1854,7 @@ extension _CamerasScreenRename on _CamerasScreenState {
   Future<void> _submitRename(Camera camera, String newName) async {
     final trimmedName = newName.trim();
     if (trimmedName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Kamera adı boş olamaz'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      AppSnackBar.error(context, 'Kamera adı boş olamaz', cameraName: camera.displayName, cameraMac: camera.mac);
       return;
     }
     
@@ -1870,15 +1866,11 @@ extension _CamerasScreenRename on _CamerasScreenState {
     final success = await webSocketProvider.changeCameraName(camera.mac, trimmedName);
     
     if (success) {
+      AppSnackBar.success(context, 'Kamera adı değiştirildi: $trimmedName', cameraName: trimmedName, cameraMac: camera.mac);
       print('[CamerasScreen] Camera rename command sent: ${camera.mac} -> $trimmedName');
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Kamera adı değiştirme komutu gönderilemedi'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppSnackBar.error(context, 'Kamera adı değiştirme komutu gönderilemedi', cameraName: camera.displayName, cameraMac: camera.mac);
       }
     }
   }

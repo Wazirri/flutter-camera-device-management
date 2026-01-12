@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../models/camera_device.dart';
 import '../providers/camera_devices_provider.dart';
-import '../providers/user_group_provider.dart';
 import '../providers/websocket_provider.dart';
+import '../providers/notification_provider.dart';
 import '../theme/app_theme.dart'; // Fixed import for AppTheme
 // Removed app_localizations import to fix build error
 
@@ -19,53 +19,10 @@ class CameraDevicesScreen extends StatefulWidget {
 class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserGroupProvider>(
-      builder: (context, userGroupProvider, _) {
-        // Show dialog when there's an operation result
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (userGroupProvider.lastOperationMessage != null && mounted) {
-            final message = userGroupProvider.lastOperationMessage!;
-            final isSuccess = userGroupProvider.lastOperationSuccess ?? false;
-            
-            // Clear immediately to prevent showing again
-            userGroupProvider.clearOperationResult();
-            
-            // Show popup dialog
-            showDialog(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                backgroundColor: AppTheme.darkSurface,
-                title: Row(
-                  children: [
-                    Icon(
-                      isSuccess ? Icons.check_circle : Icons.error,
-                      color: isSuccess ? Colors.green : Colors.red,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      isSuccess ? 'Başarılı' : 'Hata',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ],
-                ),
-                content: Text(
-                  message,
-                  style: const TextStyle(color: Colors.white70),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(ctx).pop(),
-                    child: const Text('Tamam'),
-                  ),
-                ],
-              ),
-            );
-          }
-        });
-        
-        return _buildMainScaffold(context);
-      },
-    );
+    // Removed Consumer<UserGroupProvider> that was showing dialog for every operation result
+    // CLEARCAMS and SHMC have their own dedicated UI feedback (dialogs, snackbars)
+    // Other operations are handled via SnackBar in main.dart
+    return _buildMainScaffold(context);
   }
   
   Widget _buildMainScaffold(BuildContext context) {
@@ -145,8 +102,60 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
     final newValue = !device.smartPlayerServiceOn;
     print('[Toggle] Current smartPlayerServiceOn: ${device.smartPlayerServiceOn}, newValue: $newValue');
     
-    // WebSocket komutu gönder - popup otomatik olarak gösterilecek
-    await cameraDevicesProvider.setSmartPlayerService(device.macAddress, newValue);
+    final actionText = newValue ? 'açmak' : 'kapatmak';
+    final actionTitle = newValue ? 'Smart Player Aç' : 'Smart Player Kapat';
+    final buttonText = newValue ? 'Aç' : 'Kapat';
+    final iconData = newValue ? Icons.play_circle : Icons.stop_circle;
+    final iconColor = newValue ? Colors.green : Colors.red;
+    
+    // Onay dialog'u göster
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppTheme.darkSurface,
+        title: Row(
+          children: [
+            Icon(iconData, color: iconColor, size: 28),
+            const SizedBox(width: 8),
+            Text(
+              actionTitle,
+              style: const TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        content: Text(
+          '${device.deviceName ?? device.macAddress} cihazında Smart Player servisini $actionText istiyor musunuz?',
+          style: TextStyle(color: Colors.grey.shade300),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('İptal'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: iconColor,
+            ),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(buttonText),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirmed != true) {
+      print('[Toggle] User cancelled smart player toggle');
+      return;
+    }
+    
+    // Progress dialog göster
+    await _showServiceProgressDialog(
+      context: context,
+      device: device,
+      serviceName: 'Smart Player',
+      isEnabling: newValue,
+      onSendCommand: () => cameraDevicesProvider.setSmartPlayerService(device.macAddress, newValue),
+    );
   }
   
   void _toggleRecorderService(CameraDevice device, CameraDevicesProviderOptimized cameraDevicesProvider) async {
@@ -154,6 +163,8 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
     
     final newValue = !device.recorderServiceOn;
     print('[Toggle] Current recorderServiceOn: ${device.recorderServiceOn}, newValue: $newValue');
+    
+    bool clearCameras = false;
     
     // Recorder açılırken onay iste
     if (newValue) {
@@ -163,7 +174,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
           backgroundColor: AppTheme.darkSurface,
           title: Row(
             children: [
-              const Icon(Icons.play_circle, color: Colors.orange, size: 28),
+              const Icon(Icons.fiber_manual_record, color: Colors.orange, size: 28),
               const SizedBox(width: 8),
               const Text(
                 'Recorder Başlat',
@@ -171,39 +182,9 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
               ),
             ],
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${device.deviceName ?? device.macAddress} cihazında Recorder servisini başlatmak istiyor musunuz?',
-                style: TextStyle(color: Colors.grey.shade300),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: Colors.orange.shade300, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Bu işlem cihazın kamera dağıtımını başlatacak ve kayıt yapmaya başlayacaktır.',
-                        style: TextStyle(
-                          color: Colors.orange.shade300,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          content: Text(
+            '${device.deviceName ?? device.macAddress} cihazında Recorder servisini başlatmak istiyor musunuz?\n\nBu işlem cihazın kayıt yapmasını başlatacaktır.',
+            style: TextStyle(color: Colors.grey.shade300),
           ),
           actions: [
             TextButton(
@@ -214,9 +195,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
               ),
-              onPressed: () {
-                Navigator.pop(dialogContext, true);
-              },
+              onPressed: () => Navigator.pop(dialogContext, true),
               child: const Text('Başlat'),
             ),
           ],
@@ -227,12 +206,8 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
         print('[Toggle] User cancelled recorder start');
         return;
       }
-    }
-    
-    // Recorder kapatılırken onay iste
-    if (!newValue) {
-      bool clearCameras = false;
-      
+    } else {
+      // Recorder kapatılırken onay iste
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => StatefulBuilder(
@@ -240,7 +215,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
             backgroundColor: AppTheme.darkSurface,
             title: Row(
               children: [
-                const Icon(Icons.warning_amber, color: Colors.orange, size: 28),
+                const Icon(Icons.stop_circle, color: Colors.red, size: 28),
                 const SizedBox(width: 8),
                 const Text(
                   'Recorder Durdur',
@@ -253,7 +228,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${device.deviceName ?? device.macAddress} cihazında Recorder servisini durdurmak istiyor musunuz?\n\nDikkat: Bu işlem cihazın kayıt yapmasını durduracak!',
+                  '${device.deviceName ?? device.macAddress} cihazında Recorder servisini durdurmak istiyor musunuz?',
                   style: TextStyle(color: Colors.grey.shade300),
                 ),
                 const SizedBox(height: 16),
@@ -298,9 +273,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                 ),
-                onPressed: () {
-                  Navigator.pop(dialogContext, true);
-                },
+                onPressed: () => Navigator.pop(dialogContext, true),
                 child: const Text('Durdur'),
               ),
             ],
@@ -312,17 +285,180 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
         print('[Toggle] User cancelled recorder stop');
         return;
       }
-      
-      // Eğer kameraları silme seçeneği seçildiyse CLEARCAMS komutunu gönder
-      if (clearCameras) {
-        print('[Toggle] User requested to clear cameras');
-        // Popup dialog göster ve CLEARCAMS komutunu gönder
-        await _showClearCamsProgressDialog(context, device, cameraDevicesProvider);
-      }
     }
     
-    // WebSocket komutu gönder - popup otomatik olarak gösterilecek
-    await cameraDevicesProvider.setRecorderService(device.macAddress, newValue);
+    // Progress dialog göster
+    await _showServiceProgressDialog(
+      context: context,
+      device: device,
+      serviceName: 'Recorder',
+      isEnabling: newValue,
+      onSendCommand: () => cameraDevicesProvider.setRecorderService(device.macAddress, newValue),
+    );
+    
+    // Eğer kameraları silme seçeneği seçildiyse CLEARCAMS komutunu gönder
+    if (!newValue && clearCameras) {
+      print('[Toggle] User requested to clear cameras after recorder stop');
+      await _showClearCamsProgressDialog(context, device, cameraDevicesProvider);
+    }
+  }
+  
+  /// Generic service progress dialog for Recorder/Smart Player operations
+  /// Shows 2-phase notification: 1) Command sent 2) Device confirmed
+  Future<void> _showServiceProgressDialog({
+    required BuildContext context,
+    required CameraDevice device,
+    required String serviceName,
+    required bool isEnabling,
+    required Future<void> Function() onSendCommand,
+  }) async {
+    final websocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
+    final shortMac = device.macAddress.length > 8 
+        ? '...${device.macAddress.substring(device.macAddress.length - 8)}' 
+        : device.macAddress;
+    
+    final actionText = isEnabling ? 'Açılıyor' : 'Kapatılıyor';
+    final completeText = isEnabling ? 'açıldı' : 'kapandı';
+    final iconData = isEnabling ? Icons.play_circle : Icons.stop_circle;
+    final iconColor = isEnabling ? Colors.green : Colors.red;
+    
+    bool phase1Complete = false;
+    bool phase2Complete = false;
+    String? phase2Message;
+    
+    // Store original callback
+    final originalCallback = websocketProvider.onCombinedResultMessage;
+    
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            // Set up callback to update dialog state
+            websocketProvider.onCombinedResultMessage = (commandType, sendResult, deviceResult, sendMsg, deviceMsg, {String? mac, String? commandText}) {
+              // Normalize MAC addresses for comparison
+              final normalizedMac = (mac ?? '').toUpperCase().replaceAll('-', ':');
+              final normalizedDeviceMac = device.macAddress.toUpperCase().replaceAll('-', ':');
+              
+              print('[$serviceName Dialog] commandType=$commandType, mac=$mac, deviceMac=${device.macAddress}, match=${normalizedMac == normalizedDeviceMac}');
+              
+              if (normalizedMac == normalizedDeviceMac && commandType == 'SHMC') {
+                setDialogState(() {
+                  phase1Complete = true;
+                  if (deviceResult >= 0) {
+                    phase2Complete = true;
+                    phase2Message = deviceMsg;
+                  }
+                });
+              }
+            };
+            
+            return AlertDialog(
+              backgroundColor: AppTheme.darkSurface,
+              title: Row(
+                children: [
+                  Icon(iconData, color: iconColor, size: 28),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '$serviceName $actionText',
+                          style: const TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                        Text(
+                          '[$shortMac]',
+                          style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Phase 1: Command sent
+                  _buildProgressStep(
+                    stepNumber: 1,
+                    title: 'Komut Gönderiliyor',
+                    subtitle: 'Mesaj cihaza iletiliyor',
+                    isComplete: phase1Complete,
+                    isActive: !phase1Complete,
+                  ),
+                  const SizedBox(height: 12),
+                  // Phase 2: Device confirmed
+                  _buildProgressStep(
+                    stepNumber: 2,
+                    title: 'Cihaz Yanıtı',
+                    subtitle: phase2Message ?? 'Cihaz yanıtı bekleniyor',
+                    isComplete: phase2Complete,
+                    isActive: phase1Complete && !phase2Complete,
+                  ),
+                  if (phase2Complete) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              '$serviceName servisi başarıyla $completeText!',
+                              style: TextStyle(color: Colors.green.shade300),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              actions: [
+                if (phase2Complete)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                    ),
+                    onPressed: () {
+                      // Restore original callback
+                      websocketProvider.onCombinedResultMessage = originalCallback;
+                      Navigator.pop(dialogContext);
+                    },
+                    child: const Text('Tamam'),
+                  )
+                else
+                  TextButton(
+                    onPressed: () {
+                      // Restore original callback
+                      websocketProvider.onCombinedResultMessage = originalCallback;
+                      Navigator.pop(dialogContext);
+                    },
+                    child: const Text('İptal'),
+                  ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    
+    // Wait a moment for dialog to render, then send command
+    await Future.delayed(const Duration(milliseconds: 100));
+    
+    // Send the command
+    await onSendCommand();
+    
+    // Restore original callback after dialog is closed
+    websocketProvider.onCombinedResultMessage = originalCallback;
   }
   
   Future<void> _showClearCamsProgressDialog(
@@ -347,9 +483,15 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
-            // Set up callback to update dialog state
+            // Set up callback to update dialog state ONLY - no snackbar popup
             websocketProvider.onTwoPhaseNotification = (phase, mac, message) {
-              if (mac == device.macAddress) {
+              // Normalize MAC addresses for comparison
+              final normalizedMac = mac.toUpperCase().replaceAll('-', ':');
+              final normalizedDeviceMac = device.macAddress.toUpperCase().replaceAll('-', ':');
+              
+              print('[CLEARCAMS Dialog] Phase=$phase, mac=$mac, deviceMac=${device.macAddress}, match=${normalizedMac == normalizedDeviceMac}');
+              
+              if (normalizedMac == normalizedDeviceMac) {
                 setDialogState(() {
                   if (phase == 1) {
                     phase1Complete = true;
@@ -358,8 +500,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
                   }
                 });
               }
-              // Also call original callback for SnackBar (optional)
-              originalCallback?.call(phase, mac, message);
+              // Don't call original callback - dialog is showing progress instead
             };
             
             return AlertDialog(
@@ -2420,16 +2561,12 @@ class _NetworkSettingsDialogState extends State<_NetworkSettingsDialog> {
   void _applyNetworkSettings() async {
     // Validate IP and Gateway (always required)
     if (_ipController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter an IP address')),
-      );
+      AppSnackBar.warning(context, 'Please enter an IP address');
       return;
     }
     
     if (_gatewayController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a gateway address')),
-      );
+      AppSnackBar.warning(context, 'Please enter a gateway address');
       return;
     }
 
@@ -2455,23 +2592,13 @@ class _NetworkSettingsDialogState extends State<_NetworkSettingsDialog> {
 
       Navigator.pop(context);
       
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Network settings updated for ${widget.device.deviceType}\n'
-            'IP: $ip, Gateway: $gw${_useDHCP ? ', DHCP Server: Enabled' : ''}',
-          ),
-          backgroundColor: Colors.green,
-          duration: const Duration(seconds: 4),
-        ),
+      AppSnackBar.success(
+        context,
+        'Network settings updated for ${widget.device.deviceType}\n'
+        'IP: $ip, Gateway: $gw${_useDHCP ? ', DHCP Server: Enabled' : ''}',
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      AppSnackBar.error(context, 'Error: $e');
     }
   }
 }

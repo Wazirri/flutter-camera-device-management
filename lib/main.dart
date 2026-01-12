@@ -38,6 +38,7 @@ import 'providers/multi_view_layout_provider.dart';
 import 'providers/multi_camera_view_provider.dart'; // Multi camera view provider
 import 'providers/user_group_provider.dart'; // User group provider
 import 'providers/conversion_tracking_provider.dart'; // Conversion tracking provider
+import 'providers/notification_provider.dart'; // Notification provider for session messages
 
 Future<void> main() async {
   // This captures errors that happen during initialization
@@ -83,6 +84,7 @@ Future<void> main() async {
     final multiCameraViewProvider = MultiCameraViewProvider();
     final userGroupProvider = UserGroupProvider();
     final conversionTrackingProvider = ConversionTrackingProvider();
+    final notificationProvider = NotificationProvider();
     
     // Initialize conversion tracking with websocket provider
     conversionTrackingProvider.initialize(webSocketProvider);
@@ -104,6 +106,7 @@ Future<void> main() async {
           ChangeNotifierProvider<MultiCameraViewProvider>.value(value: multiCameraViewProvider),
           ChangeNotifierProvider<UserGroupProvider>.value(value: userGroupProvider),
           ChangeNotifierProvider<ConversionTrackingProvider>.value(value: conversionTrackingProvider),
+          ChangeNotifierProvider<NotificationProvider>.value(value: notificationProvider),
         ],
         child: const MyApp(),
       ),
@@ -359,14 +362,174 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   void _setupConversionCallbacks() {
     final trackingProvider = Provider.of<ConversionTrackingProvider>(context, listen: false);
     final webSocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
+    final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
     
-    // Set callback for WebSocket result messages
+    // Set callback for combined result messages (send + device response in one popup)
+    webSocketProvider.onCombinedResultMessage = (commandType, sendResult, deviceResult, 
+        sendMessage, deviceMessage, {String? mac, String? commandText}) {
+      if (mounted) {
+        // Determine overall status
+        final sendSuccess = sendResult == 1;
+        final deviceSuccess = deviceResult == 1;
+        final devicePending = deviceResult == -1;
+        final deviceError = deviceResult == 0;
+        
+        // Choose icon and color based on combined status
+        IconData icon;
+        Color color;
+        String statusEmoji;
+        
+        if (sendSuccess && deviceSuccess) {
+          // Both successful
+          icon = Icons.check_circle;
+          color = Colors.green.shade600;
+          statusEmoji = '✅';
+        } else if (sendSuccess && devicePending) {
+          // Sent but waiting for device
+          icon = Icons.hourglass_empty;
+          color = Colors.orange.shade600;
+          statusEmoji = '⏳';
+        } else if (sendSuccess && deviceError) {
+          // Sent successfully but device reported error
+          icon = Icons.warning_amber;
+          color = Colors.orange.shade700;
+          statusEmoji = '⚠️';
+        } else {
+          // Send failed
+          icon = Icons.error_outline;
+          color = Colors.red.shade600;
+          statusEmoji = '❌';
+        }
+        
+        // Build display text
+        final shortMac = mac != null && mac.length > 8 
+            ? '...${mac.substring(mac.length - 8)}' 
+            : (mac ?? '');
+        
+        // Shorten command text
+        String shortCommand = commandText ?? '';
+        if (shortCommand.length > 30) {
+          shortCommand = '${shortCommand.substring(0, 30)}...';
+        }
+        
+        // Build status lines
+        final sendStatusIcon = sendSuccess ? '✓' : '✗';
+        String deviceStatusIcon;
+        String deviceStatusText;
+        if (devicePending) {
+          deviceStatusIcon = '⏳';
+          deviceStatusText = 'Bekleniyor...';
+        } else if (deviceSuccess) {
+          deviceStatusIcon = '✓';
+          deviceStatusText = deviceMessage.isNotEmpty ? deviceMessage : 'Başarılı';
+        } else {
+          deviceStatusIcon = '✗';
+          deviceStatusText = deviceMessage.isNotEmpty ? deviceMessage : 'Hata';
+        }
+        
+        // Log to NotificationProvider
+        final logMessage = '[$shortMac] $shortCommand\n'
+            'Gönderim: ${sendSuccess ? "Başarılı" : "Hata"}\n'
+            'Sonuç: $deviceStatusText';
+        notificationProvider.addNotification(
+          message: logMessage,
+          type: deviceSuccess ? NotificationType.success 
+              : (devicePending ? NotificationType.warning : NotificationType.error),
+          cameraMac: mac,
+        );
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(icon, color: Colors.white, size: 28),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title with MAC
+                      Text(
+                        '$statusEmoji [$shortMac] $shortCommand',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      // Two-line status
+                      Row(
+                        children: [
+                          Text(
+                            '$sendStatusIcon Gönderim: ',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: sendSuccess ? Colors.green.shade100 : Colors.red.shade100,
+                            ),
+                          ),
+                          Text(
+                            sendSuccess ? 'Başarılı' : 'Hata',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: sendSuccess ? Colors.green.shade100 : Colors.red.shade100,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            '$deviceStatusIcon Sonuç: ',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: deviceSuccess 
+                                  ? Colors.green.shade100 
+                                  : (devicePending ? Colors.orange.shade100 : Colors.red.shade100),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              deviceStatusText,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: deviceSuccess 
+                                    ? Colors.green.shade100 
+                                    : (devicePending ? Colors.orange.shade100 : Colors.red.shade100),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: color,
+            duration: Duration(seconds: deviceSuccess ? 3 : 5),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    };
+    
+    // Set callback for WebSocket result messages (non-COMMAND types)
     webSocketProvider.onResultMessage = (commandType, result, message, {String? mac, String? commandText}) {
       if (mounted && message.isNotEmpty) {
         final isSuccess = result == 1;
         final icon = isSuccess ? Icons.check_circle : Icons.error_outline;
         final color = isSuccess ? Colors.green.shade600 : Colors.red.shade600;
         final emoji = isSuccess ? '✅' : '❌';
+        
+        // Log to NotificationProvider
+        notificationProvider.addNotification(
+          message: '$commandType: $message',
+          type: isSuccess ? NotificationType.success : NotificationType.error,
+        );
         
         // Build display text with MAC and command info if available
         String displayTitle = '$emoji $commandType';
@@ -425,6 +588,12 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
         final phaseText = isPhase1 ? '1/2' : '2/2';
         final checkMark = isPhase1 ? '📤' : '✅';
         
+        // Log to NotificationProvider
+        notificationProvider.addNotification(
+          message: 'CLEARCAMS [$phaseText]: $message',
+          type: isPhase1 ? NotificationType.info : NotificationType.success,
+        );
+        
         // Get short MAC for display
         final shortMac = mac.length > 8 ? '...${mac.substring(mac.length - 8)}' : mac;
         
@@ -463,6 +632,12 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
     // Set callback for when conversion completes
     trackingProvider.onConversionComplete = (conversion) {
       if (mounted) {
+        // Log to NotificationProvider
+        notificationProvider.addSuccess(
+          'Dönüştürme Tamamlandı: ${conversion.cameraName} (${conversion.startTime} - ${conversion.endTime})',
+          cameraName: conversion.cameraName,
+        );
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -505,6 +680,12 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
     // Set callback for conversion errors
     trackingProvider.onConversionError = (conversion, error) {
       if (mounted) {
+        // Log to NotificationProvider
+        notificationProvider.addError(
+          'Dönüştürme Hatası: ${conversion.cameraName}: $error',
+          cameraName: conversion.cameraName,
+        );
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -617,6 +798,9 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
             ),
           ],
         ),
+        // Global floating notification button
+        floatingActionButton: _buildNotificationFab(context),
+        floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
       );
     } else {
       // Mobile layout with bottom navigation
@@ -641,8 +825,265 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
             Navigator.pushReplacementNamed(context, route);
           },
         ),
+        // Global floating notification button
+        floatingActionButton: _buildNotificationFab(context),
+        floatingActionButtonLocation: FloatingActionButtonLocation.miniEndTop,
       );
     }
+  }
+
+  /// Build floating action button for notifications
+  Widget _buildNotificationFab(BuildContext context) {
+    return Consumer<NotificationProvider>(
+      builder: (context, notificationProvider, child) {
+        return Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Stack(
+            children: [
+              FloatingActionButton.small(
+                heroTag: 'notification_fab',
+                onPressed: () => _showNotificationsPanel(context),
+                backgroundColor: AppTheme.darkSurface,
+                child: Icon(
+                  notificationProvider.hasUnread
+                      ? Icons.notifications_active
+                      : Icons.notifications_outlined,
+                  color: notificationProvider.hasUnread
+                      ? AppTheme.primaryOrange
+                      : Colors.grey,
+                ),
+              ),
+              if (notificationProvider.hasUnread)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 18,
+                      minHeight: 18,
+                    ),
+                    child: Text(
+                      notificationProvider.unreadCount > 99
+                          ? '99+'
+                          : notificationProvider.unreadCount.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// Show notifications panel
+  void _showNotificationsPanel(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppTheme.darkSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.3,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => Consumer<NotificationProvider>(
+          builder: (context, notificationProvider, child) {
+            final notifications = notificationProvider.notifications;
+            
+            return Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handle bar
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade600,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Header
+                  Row(
+                    children: [
+                      const Icon(Icons.notifications, color: AppTheme.primaryOrange),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Bildirimler',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Spacer(),
+                      if (notificationProvider.hasUnread)
+                        TextButton(
+                          onPressed: () {
+                            notificationProvider.markAllAsRead();
+                          },
+                          child: const Text('Tümünü Okundu İşaretle'),
+                        ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, color: Colors.grey),
+                        onPressed: notifications.isEmpty
+                            ? null
+                            : () {
+                                showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    backgroundColor: AppTheme.darkSurface,
+                                    title: const Text('Tüm Bildirimleri Sil',
+                                        style: TextStyle(color: Colors.white)),
+                                    content: const Text(
+                                        'Tüm bildirimler silinecek. Emin misiniz?',
+                                        style: TextStyle(color: Colors.grey)),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(ctx),
+                                        child: const Text('İptal'),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          notificationProvider.clearAll();
+                                          Navigator.pop(ctx);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red),
+                                        child: const Text('Sil'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${notifications.length} bildirim',
+                    style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+                  ),
+                  const SizedBox(height: 8),
+                  const Divider(color: Colors.grey),
+                  
+                  // Notifications list
+                  Expanded(
+                    child: notifications.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.notifications_none,
+                                    size: 64, color: Colors.grey.shade700),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Henüz bildirim yok',
+                                  style: TextStyle(
+                                    color: Colors.grey.shade500,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: scrollController,
+                            itemCount: notifications.length,
+                            itemBuilder: (context, index) {
+                              final notification = notifications[index];
+                              return Dismissible(
+                                key: Key(notification.id),
+                                direction: DismissDirection.endToStart,
+                                onDismissed: (_) {
+                                  notificationProvider.removeNotification(notification.id);
+                                },
+                                background: Container(
+                                  alignment: Alignment.centerRight,
+                                  padding: const EdgeInsets.only(right: 20),
+                                  color: Colors.red,
+                                  child: const Icon(Icons.delete, color: Colors.white),
+                                ),
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: notification.color.withValues(alpha: 0.2),
+                                    child: Icon(notification.icon, color: notification.color, size: 20),
+                                  ),
+                                  title: Text(
+                                    notification.message,
+                                    style: TextStyle(
+                                      color: notification.isRead ? Colors.grey : Colors.white,
+                                      fontWeight: notification.isRead ? FontWeight.normal : FontWeight.w500,
+                                      fontSize: 13,
+                                    ),
+                                    maxLines: 4,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  subtitle: Row(
+                                    children: [
+                                      if (notification.cameraMac != null) ...[
+                                        Icon(Icons.videocam, size: 12, color: Colors.grey.shade600),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          notification.cameraMac!.length > 8
+                                              ? '...${notification.cameraMac!.substring(notification.cameraMac!.length - 8)}'
+                                              : notification.cameraMac!,
+                                          style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
+                                        ),
+                                        const SizedBox(width: 8),
+                                      ],
+                                      Text(
+                                        notification.formattedTime,
+                                        style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: !notification.isRead
+                                      ? Container(
+                                          width: 8,
+                                          height: 8,
+                                          decoration: const BoxDecoration(
+                                            color: AppTheme.primaryOrange,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        )
+                                      : null,
+                                  onTap: () {
+                                    if (!notification.isRead) {
+                                      notificationProvider.markAsRead(notification.id);
+                                    }
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 
   Widget _buildConversionBanner(BuildContext context) {

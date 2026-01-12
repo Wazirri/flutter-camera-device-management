@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/websocket_provider.dart';
+import '../providers/notification_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_text_field.dart';
@@ -107,12 +108,7 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
       if (_serverAddressController.text.isEmpty ||
           _serverPortController.text.isEmpty ||
           _emailController.text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please fill all required fields'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppSnackBar.warning(context, 'Please fill all required fields');
         return;
       }
 
@@ -142,12 +138,7 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
           Navigator.pop(context);
         }
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Connection failed: ${webSocketProvider.errorMessage.isNotEmpty ? webSocketProvider.errorMessage : "Please check server address and port."}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          AppSnackBar.error(context, 'Connection failed: ${webSocketProvider.errorMessage.isNotEmpty ? webSocketProvider.errorMessage : "Please check server address and port."}');
         }
         return;
       }
@@ -216,12 +207,7 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
         // Disconnect on login failure to reset state
         await webSocketProvider.disconnect();
         
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(errorMessage ?? 'Login failed'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppSnackBar.error(context, errorMessage ?? 'Login failed');
       }
     } catch (e, stack) {
       print('LOGIN ERROR: $e\n$stack');
@@ -230,12 +216,7 @@ class _LoginScreenOptimizedState extends State<LoginScreenOptimized> {
         Navigator.pop(context);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppSnackBar.error(context, 'Error: ${e.toString()}');
       }
     } finally {
       if (mounted) {

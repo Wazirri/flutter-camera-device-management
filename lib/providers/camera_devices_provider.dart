@@ -669,6 +669,11 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
             value is int ? value : int.tryParse(value.toString()) ?? 1;
         print('CDP_OPT: Updated distribute_count for camera ${camera.mac} = ${camera.distributeCount}');
         break; // Distribute count - how many devices camera should be on
+      case 'verified':
+        camera.verified =
+            value == 1 || value == true || value.toString() == '1';
+        print('CDP_OPT: Updated verified for camera ${camera.mac} = ${camera.verified}');
+        break; // Verified flag - camera is authorized and data accessible
       case 'onvif_connected':
         camera.onvifConnected =
             value == 1 || value == true || value.toString() == '1';
@@ -2828,27 +2833,46 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
   }
   
   /// Clear cameras locally when server confirms the operation
-  /// Called by WebSocketProvider when clearcams response is received
+  /// Called by WebSocketProvider when 'deleted' message with ecs_slaves.*.cam is received
+  /// This removes cameras from both the device AND the global camera list
   void clearDeviceCamerasLocally(String deviceMac) {
     print('CDP: 🗑️ Clearing cameras locally for device: $deviceMac');
     
-    final device = _devices[deviceMac];
+    // Normalize MAC
+    final canonicalDeviceMac = deviceMac.toUpperCase().replaceAll('-', ':');
+    
+    // Try both normalized and original MAC
+    final device = _devices[canonicalDeviceMac] ?? _devices[deviceMac];
+    
     if (device != null) {
       final cameraCount = device.cameras.length;
       
-      // Only clear device.cameras - DO NOT remove from _macDefinedCameras!
-      // _macDefinedCameras is the global camera list for all_cameras screen
-      // A camera should stay in the global list even if removed from a device
-      // because it might be on other devices or just not assigned yet
+      // Collect camera MACs before clearing
+      final cameraMacsToRemove = device.cameras.map((c) => c.mac.toUpperCase().replaceAll('-', ':')).toList();
       
       // Clear device cameras
       device.cameras.clear();
+      
+      // Also remove from global _macDefinedCameras list
+      int globalRemoved = 0;
+      for (final cameraMac in cameraMacsToRemove) {
+        if (_macDefinedCameras.containsKey(cameraMac)) {
+          _macDefinedCameras.remove(cameraMac);
+          globalRemoved++;
+        }
+        // Also try original case
+        final lowerMac = cameraMac.toLowerCase();
+        if (_macDefinedCameras.containsKey(lowerMac)) {
+          _macDefinedCameras.remove(lowerMac);
+          globalRemoved++;
+        }
+      }
       
       // Clear caches
       _cachedDevicesList = null;
       _cachedFlatCameraList = null;
       
-      print('CDP: ✅ Cameras cleared for device $deviceMac (removed $cameraCount cameras from device, global list unchanged)');
+      print('CDP: ✅ Cameras cleared for device $deviceMac (removed $cameraCount cameras from device, $globalRemoved from global list)');
       
       triggerUpdate();
     } else {
@@ -2856,6 +2880,156 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
     }
   }
   
+  /// Remove a specific camera from a device locally AND from global camera list
+  /// Called by WebSocketProvider when cameras_mac.*.current.* deletion is received
+  void removeCameraLocally(String deviceMac, String cameraMac) {
+    print('CDP: 🗑️ Removing camera locally: $cameraMac from device: $deviceMac');
+    
+    // Normalize MAC addresses
+    final canonicalDeviceMac = deviceMac.toUpperCase().replaceAll('-', ':');
+    final canonicalCameraMac = cameraMac.toUpperCase().replaceAll('-', ':');
+    
+    bool anyRemoved = false;
+    
+    // 1. Remove from device's camera list
+    final device = _devices[canonicalDeviceMac];
+    if (device != null) {
+      final beforeCount = device.cameras.length;
+      
+      // Remove camera by MAC
+      device.cameras.removeWhere((camera) => 
+          camera.mac.toUpperCase().replaceAll('-', ':') == canonicalCameraMac);
+      
+      final afterCount = device.cameras.length;
+      
+      if (beforeCount != afterCount) {
+        print('CDP: ✅ Camera $canonicalCameraMac removed from device $canonicalDeviceMac');
+        anyRemoved = true;
+      }
+    }
+    
+    // 2. Remove from global _macDefinedCameras (all_cameras / active_cameras list)
+    if (_macDefinedCameras.containsKey(canonicalCameraMac)) {
+      _macDefinedCameras.remove(canonicalCameraMac);
+      print('CDP: ✅ Camera $canonicalCameraMac removed from global camera list');
+      anyRemoved = true;
+    }
+    
+    // Also try lowercase version just in case
+    if (_macDefinedCameras.containsKey(cameraMac)) {
+      _macDefinedCameras.remove(cameraMac);
+      print('CDP: ✅ Camera $cameraMac removed from global camera list (lowercase)');
+      anyRemoved = true;
+    }
+    
+    // 3. Remove from all devices (camera might be on multiple devices)
+    for (final dev in _devices.values) {
+      final beforeCount = dev.cameras.length;
+      dev.cameras.removeWhere((camera) => 
+          camera.mac.toUpperCase().replaceAll('-', ':') == canonicalCameraMac);
+      if (beforeCount != dev.cameras.length) {
+        print('CDP: ✅ Camera $canonicalCameraMac also removed from device ${dev.macAddress}');
+        anyRemoved = true;
+      }
+    }
+    
+    if (anyRemoved) {
+      // Clear caches
+      _cachedDevicesList = null;
+      _cachedFlatCameraList = null;
+      triggerUpdate();
+    } else {
+      print('CDP: ⚠️ Camera $canonicalCameraMac not found anywhere');
+    }
+  }
+  
+  /// Remove a camera from global list only (not from devices)
+  /// Called when all_cameras.* deletion is received
+  void removeCameraFromGlobalList(String cameraMac) {
+    print('CDP: 🗑️ Removing camera from global list only: $cameraMac');
+    
+    final canonicalCameraMac = cameraMac.toUpperCase().replaceAll('-', ':');
+    bool removed = false;
+    
+    if (_macDefinedCameras.containsKey(canonicalCameraMac)) {
+      _macDefinedCameras.remove(canonicalCameraMac);
+      removed = true;
+    }
+    
+    // Also try original case
+    if (_macDefinedCameras.containsKey(cameraMac)) {
+      _macDefinedCameras.remove(cameraMac);
+      removed = true;
+    }
+    
+    if (removed) {
+      _cachedDevicesList = null;
+      _cachedFlatCameraList = null;
+      print('CDP: ✅ Camera $cameraMac removed from global list');
+      triggerUpdate();
+    } else {
+      print('CDP: ⚠️ Camera $cameraMac not found in global list');
+    }
+  }
+  
+  /// Remove device completely when server confirms deletion
+  /// Called by WebSocketProvider when device system data is deleted
+  void removeDeviceLocally(String deviceMac) {
+    print('CDP: 🗑️ Removing device locally: $deviceMac');
+    
+    // Normalize MAC address for lookup
+    final canonicalMac = deviceMac.toUpperCase().replaceAll('-', ':');
+    
+    if (_devices.containsKey(canonicalMac)) {
+      final device = _devices[canonicalMac]!;
+      final cameraCount = device.cameras.length;
+      
+      // Remove device from devices map
+      _devices.remove(canonicalMac);
+      
+      // Clear caches
+      _cachedDevicesList = null;
+      _cachedFlatCameraList = null;
+      
+      // If this was the selected device, clear selection
+      if (_selectedDevice?.macAddress == canonicalMac || _selectedDevice?.macKey == canonicalMac) {
+        _selectedDevice = null;
+      }
+      
+      print('CDP: ✅ Device removed: $canonicalMac (had $cameraCount cameras)');
+      
+      triggerUpdate();
+    } else {
+      print('CDP: ⚠️ Device not found for removal: $deviceMac (tried: $canonicalMac)');
+    }
+  }
+  
+  /// Mark device as disconnected (offline) when system data is partially deleted
+  /// This keeps the device in the list but marks it as inactive
+  void markDeviceDisconnected(String deviceMac) {
+    print('CDP: 📴 Marking device as disconnected: $deviceMac');
+    
+    // Normalize MAC address for lookup
+    final canonicalMac = deviceMac.toUpperCase().replaceAll('-', ':');
+    
+    final device = _devices[canonicalMac];
+    if (device != null) {
+      // Mark device as disconnected/offline
+      device.lastSeenAt = 'Bağlantı Kesildi';
+      device.connected = false;
+      device.online = false;
+      
+      // Clear caches
+      _cachedDevicesList = null;
+      
+      print('CDP: ✅ Device marked as disconnected: $canonicalMac');
+      
+      triggerUpdate();
+    } else {
+      print('CDP: ⚠️ Device not found for disconnect marking: $deviceMac');
+    }
+  }
+
   /// Add a camera to a device manually
   /// Format: ADD_CAM <CAM_MAC> <SLAVE_MAC>
   Future<bool> addCameraToDevice(String cameraMac, String deviceMac) async {

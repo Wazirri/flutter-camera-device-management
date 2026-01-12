@@ -5,6 +5,7 @@ import '../models/camera_device.dart';
 import '../theme/app_theme.dart';
 import '../providers/websocket_provider.dart';
 import '../providers/camera_devices_provider.dart';
+import '../providers/notification_provider.dart';
 import '../screens/live_view_screen.dart';
 import '../screens/multi_recordings_screen.dart';
 
@@ -362,24 +363,22 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                               cameraProvider.updateCamera(updatedCamera);
 
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      value
-                                          ? 'Kamera dağıtıma dahil edildi'
-                                          : 'Kamera dağıtımdan çıkarıldı',
-                                    ),
-                                    backgroundColor: Colors.green,
-                                  ),
+                                AppSnackBar.success(
+                                  context,
+                                  value
+                                      ? 'Kamera dağıtıma dahil edildi'
+                                      : 'Kamera dağıtımdan çıkarıldı',
+                                  cameraName: camera.displayName,
+                                  cameraMac: camera.mac,
                                 );
                               }
                             } else {
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('İşlem başarısız oldu'),
-                                    backgroundColor: Colors.red,
-                                  ),
+                                AppSnackBar.error(
+                                  context,
+                                  'İşlem başarısız oldu',
+                                  cameraName: camera.displayName,
+                                  cameraMac: camera.mac,
                                 );
                               }
                             }
@@ -493,13 +492,7 @@ class CameraDetailsBottomSheet extends StatelessWidget {
                           tooltip: 'Kopyala',
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: detail.value));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${detail.name} kopyalandı'),
-                                duration: const Duration(seconds: 1),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
+                            AppSnackBar.success(context, '${detail.name} kopyalandı');
                           },
                         ),
                     ],

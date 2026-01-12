@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/camera_device.dart';
 import '../providers/camera_devices_provider.dart';
 import '../providers/websocket_provider.dart';
+import '../providers/notification_provider.dart';
 import 'camera_snapshot_widget.dart';
 
 class CameraGridItem extends StatelessWidget {
@@ -394,26 +395,47 @@ class CameraGridItem extends StatelessWidget {
               child: Consumer2<CameraDevicesProviderOptimized,
                   WebSocketProviderOptimized>(
                 builder: (context, cameraProvider, websocketProvider, child) {
+                  // Determine if camera can be distributed (verified=true required)
+                  final bool canDistribute = camera.verified;
+                  
                   return Row(
                     children: [
                       Icon(
-                        Icons.share,
+                        canDistribute ? Icons.share : Icons.block,
                         size: 16.0,
-                        color: camera.distribute
-                            ? Colors.green
-                            : Colors.grey,
+                        color: !canDistribute
+                            ? Colors.orange
+                            : camera.distribute
+                                ? Colors.green
+                                : Colors.grey,
                       ),
                       const SizedBox(width: 6),
                       Expanded(
-                        child: Text(
-                          'Dağıtıma Dahil',
-                          style: TextStyle(
-                            fontSize: 11.0,
-                            color: camera.distribute
-                                ? Colors.green
-                                : Colors.grey,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Dağıtıma Dahil',
+                              style: TextStyle(
+                                fontSize: 11.0,
+                                color: !canDistribute
+                                    ? Colors.orange
+                                    : camera.distribute
+                                        ? Colors.green
+                                        : Colors.grey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            if (!canDistribute)
+                              Text(
+                                'Yetkisiz/Doğrulanmamış',
+                                style: TextStyle(
+                                  fontSize: 9.0,
+                                  color: Colors.orange.shade700,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                       Transform.scale(
@@ -421,10 +443,19 @@ class CameraGridItem extends StatelessWidget {
                         child: Switch(
                           value: camera.distribute,
                           activeColor: Colors.green,
-                          onChanged: (value) async {
+                          // Disable switch if camera is not verified
+                          onChanged: !canDistribute
+                              ? null
+                              : (value) async {
                             // Check if camera has MAC address
                             if (!_hasMacAddress(camera)) {
                               // Show error for missing MAC
+                              final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+                              notificationProvider.addWarning(
+                                '${camera.name}: MAC adresi eksik!',
+                                cameraName: camera.name,
+                                cameraMac: camera.mac,
+                              );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
@@ -439,6 +470,7 @@ class CameraGridItem extends StatelessWidget {
 
                             // Send SETINT command to toggle distributing
                             try {
+                              final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
                               final success = await websocketProvider
                                   .toggleCameraDistribute(
                                 camera.mac,
@@ -451,19 +483,30 @@ class CameraGridItem extends StatelessWidget {
                                     camera.copyWith(distribute: value);
                                 cameraProvider.updateCamera(updatedCamera);
 
+                                // Add notification
+                                final message = value
+                                    ? '${camera.name} dağıtıma dahil edildi'
+                                    : '${camera.name} dağıtımdan çıkarıldı';
+                                notificationProvider.addSuccess(
+                                  message,
+                                  cameraName: camera.name,
+                                  cameraMac: camera.mac,
+                                );
+
                                 // Show feedback
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text(
-                                      value
-                                          ? '${camera.name} dağıtıma dahil edildi'
-                                          : '${camera.name} dağıtımdan çıkarıldı',
-                                    ),
+                                    content: Text(message),
                                     backgroundColor: Colors.green,
                                     duration: const Duration(seconds: 2),
                                   ),
                                 );
                               } else {
+                                notificationProvider.addError(
+                                  'İşlem başarısız oldu',
+                                  cameraName: camera.name,
+                                  cameraMac: camera.mac,
+                                );
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text('İşlem başarısız oldu'),
@@ -473,6 +516,12 @@ class CameraGridItem extends StatelessWidget {
                                 );
                               }
                             } catch (e) {
+                              final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+                              notificationProvider.addError(
+                                'Hata: $e',
+                                cameraName: camera.name,
+                                cameraMac: camera.mac,
+                              );
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text('Hata: $e'),

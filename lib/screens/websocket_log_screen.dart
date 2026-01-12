@@ -120,9 +120,15 @@ class _WebSocketLogScreenState extends State<WebSocketLogScreen> {
         final allLogs = _isPaused ? _pausedLogs : provider.messageLog;
         
         // Filter logs by search query
+        // Space-separated words are treated as AND (all words must match)
         final logs = _searchQuery.isEmpty
             ? allLogs
-            : allLogs.where((log) => log.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+            : allLogs.where((log) {
+                final logLower = log.toLowerCase();
+                final searchTerms = _searchQuery.toLowerCase().split(RegExp(r'\s+')).where((s) => s.isNotEmpty).toList();
+                // All search terms must be present in the log line
+                return searchTerms.every((term) => logLower.contains(term));
+              }).toList();
         
         return Scaffold(
           appBar: AppBar(

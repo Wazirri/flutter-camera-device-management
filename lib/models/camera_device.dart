@@ -1070,6 +1070,11 @@ class Camera {
   // Distribute count - how many devices this camera should be distributed to
   int distributeCount;
 
+  // Verified flag - indicates if the camera is verified (authorized and data accessible)
+  // verified=1: Camera can be distributed (distribute can be set to 1 or 0)
+  // verified=0: Camera is unauthorized or data is not accessible
+  bool verified;
+
   // ONVIF connection status
   bool onvifConnected;
 
@@ -1153,6 +1158,7 @@ class Camera {
     this.isPlaceholder = false,
     this.distribute = false,
     this.distributeCount = 1,
+    this.verified = false,
     this.onvifConnected = false,
     this.lastOnvifSeen = '',
     CameraCurrentDevice? currentDevice,
@@ -1239,6 +1245,7 @@ class Camera {
     bool? isPlaceholder,
     bool? distribute,
     int? distributeCount,
+    bool? verified,
     bool? onvifConnected,
     String? lastOnvifSeen,
     Map<String, CameraCurrentDevice>? currentDevices,
@@ -1311,6 +1318,7 @@ class Camera {
       isPlaceholder: isPlaceholder ?? this.isPlaceholder,
       distribute: distribute ?? this.distribute,
       distributeCount: distributeCount ?? this.distributeCount,
+      verified: verified ?? this.verified,
       onvifConnected: onvifConnected ?? this.onvifConnected,
       lastOnvifSeen: lastOnvifSeen ?? this.lastOnvifSeen,
       currentDevices: currentDevices ??
@@ -1417,6 +1425,9 @@ class Camera {
       macReportedError: json['macReportedError'] as String?,
       macStatus: json['macStatus'] as String?,
       parentDeviceMacKey: json['parentDeviceMacKey'] as String?,
+      distribute: json['distribute'] == true || json['distribute'] == 1,
+      distributeCount: json['distributeCount'] as int? ?? 1,
+      verified: json['verified'] == true || json['verified'] == 1,
       currentDevices: (json['currentDevices'] as Map<String, dynamic>?)?.map(
             (key, value) => MapEntry(key,
                 CameraCurrentDevice.fromJson(value as Map<String, dynamic>)),
@@ -1493,6 +1504,9 @@ class Camera {
       'macReportedError': macReportedError,
       'macStatus': macStatus,
       'parentDeviceMacKey': parentDeviceMacKey,
+      'distribute': distribute,
+      'distributeCount': distributeCount,
+      'verified': verified,
       'currentDevices':
           currentDevices.map((key, value) => MapEntry(key, value.toJson())),
       'deviceHistory': deviceHistory.map((e) => e.toJson()).toList(),
