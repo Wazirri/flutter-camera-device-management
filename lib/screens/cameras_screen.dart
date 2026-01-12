@@ -28,6 +28,7 @@ class _CamerasScreenState extends State<CamerasScreen>
   bool isGridView = false; // Default to list view
   bool _showDetailedView = false; // Detaylı gösterim modu
   String? selectedMacAddress;
+  String? _filterStatus; // 'online', 'offline', 'recording', 'assigned', 'unassigned', 'distributing', 'verified', 'unverified'
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
   
@@ -153,6 +154,90 @@ class _CamerasScreenState extends State<CamerasScreen>
         ),
         style: const TextStyle(color: Colors.white, fontSize: 14),
         onChanged: (value) => setState(() => searchQuery = value),
+      ),
+    );
+  }
+
+  Widget _buildStatsBar(List<Camera> allCameras) {
+    final online = allCameras.where((c) => c.connected).length;
+    final offline = allCameras.where((c) => !c.connected).length;
+    final recording = allCameras.where((c) => c.recording).length;
+    final assigned = allCameras.where((c) => c.currentDevices.isNotEmpty && c.currentDevices.keys.any((k) => k.isNotEmpty)).length;
+    final unassigned = allCameras.length - assigned;
+    final distributing = allCameras.where((c) => c.distribute).length;
+    final verified = allCameras.where((c) => c.verified).length;
+    final unverified = allCameras.where((c) => !c.verified).length;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.darkSurface,
+        border: Border(bottom: BorderSide(color: Colors.grey.shade800, width: 1)),
+      ),
+      child: Column(
+        children: [
+          // First row - Total, Online, Offline, Recording
+          Row(
+            children: [
+              Expanded(child: _buildStatChip(Icons.videocam, '${allCameras.length}', 'Total', Colors.blue, null)),
+              const SizedBox(width: 6),
+              Expanded(child: _buildStatChip(Icons.check_circle, '$online', 'Online', Colors.green, 'online')),
+              const SizedBox(width: 6),
+              Expanded(child: _buildStatChip(Icons.cancel, '$offline', 'Offline', Colors.red, 'offline')),
+              const SizedBox(width: 6),
+              Expanded(child: _buildStatChip(Icons.fiber_manual_record, '$recording', 'Recording', Colors.orange, 'recording')),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Second row - Assigned, Unassigned, Distributing, Verified, Unverified
+          Row(
+            children: [
+              Expanded(child: _buildStatChip(Icons.link, '$assigned', 'Assigned', Colors.cyan, 'assigned')),
+              const SizedBox(width: 6),
+              Expanded(child: _buildStatChip(Icons.link_off, '$unassigned', 'Unassigned', Colors.grey, 'unassigned')),
+              const SizedBox(width: 6),
+              Expanded(child: _buildStatChip(Icons.share, '$distributing', 'Distributing', Colors.purple, 'distributing')),
+              const SizedBox(width: 6),
+              Expanded(child: _buildStatChip(Icons.verified, '$verified', 'Verified', Colors.green.shade700, 'verified')),
+              const SizedBox(width: 6),
+              Expanded(child: _buildStatChip(Icons.warning_amber, '$unverified', 'Unverified', Colors.orange, 'unverified')),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatChip(IconData icon, String label, String subtitle, Color color, String? filterValue) {
+    final isSelected = _filterStatus == filterValue;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _filterStatus = _filterStatus == filterValue ? null : filterValue;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.2) : AppTheme.darkBackground,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: isSelected ? color : Colors.grey.shade700, width: 1),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 12, color: isSelected ? color : Colors.grey.shade400),
+                const SizedBox(width: 3),
+                Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isSelected ? color : Colors.white)),
+              ],
+            ),
+            Text(subtitle, style: TextStyle(fontSize: 9, color: isSelected ? color : Colors.grey.shade500)),
+          ],
+        ),
       ),
     );
   }
@@ -464,6 +549,32 @@ class _CamerasScreenState extends State<CamerasScreen>
               baseFilteredCameras.where((camera) => camera.connected).toList();
         }
 
+        // Apply status filter if set
+        if (_filterStatus != null) {
+          baseFilteredCameras = baseFilteredCameras.where((camera) {
+            switch (_filterStatus) {
+              case 'online':
+                return camera.connected;
+              case 'offline':
+                return !camera.connected;
+              case 'recording':
+                return camera.recording;
+              case 'assigned':
+                return camera.currentDevices.isNotEmpty && camera.currentDevices.keys.any((k) => k.isNotEmpty);
+              case 'unassigned':
+                return camera.currentDevices.isEmpty || !camera.currentDevices.keys.any((k) => k.isNotEmpty);
+              case 'distributing':
+                return camera.distribute;
+              case 'verified':
+                return camera.verified;
+              case 'unverified':
+                return !camera.verified;
+              default:
+                return true;
+            }
+          }).toList();
+        }
+
         // Remove duplicate cameras (same MAC address) - keep only one instance per MAC
         final Map<String, Camera> uniqueCamerasByMac = {};
         for (var camera in baseFilteredCameras) {
@@ -637,6 +748,32 @@ class _CamerasScreenState extends State<CamerasScreen>
             ? filteredBySearch.where((camera) => camera.connected).toList()
             : filteredBySearch;
 
+        // Apply status filter if set
+        if (_filterStatus != null) {
+          filteredAuthorizedCameras = filteredAuthorizedCameras.where((camera) {
+            switch (_filterStatus) {
+              case 'online':
+                return camera.connected;
+              case 'offline':
+                return !camera.connected;
+              case 'recording':
+                return camera.recording;
+              case 'assigned':
+                return camera.currentDevices.isNotEmpty && camera.currentDevices.keys.any((k) => k.isNotEmpty);
+              case 'unassigned':
+                return camera.currentDevices.isEmpty || !camera.currentDevices.keys.any((k) => k.isNotEmpty);
+              case 'distributing':
+                return camera.distribute;
+              case 'verified':
+                return camera.verified;
+              case 'unverified':
+                return !camera.verified;
+              default:
+                return true;
+            }
+          }).toList();
+        }
+
         // Track which cameras are assigned to groups
         Set<String> assignedCameraIds = {};
 
@@ -806,136 +943,14 @@ class _CamerasScreenState extends State<CamerasScreen>
       ),
     );
 
-    // Calculate device-based stats from all cameras in all groups
+    // Get all cameras for stats bar
     final allCameras = groupedCameras.values.expand((list) => list).toList();
-    
-    // Online: cameras connected on at least one device / cameras with connected info on at least one device
-    int totalConnectedOnDevices = 0;
-    int totalDevicesWithConnectedInfo = 0;
-    
-    // Offline: cameras disconnected on at least one device / cameras with disconnected info
-    int totalDisconnectedOnDevices = 0;
-    int totalDevicesWithDisconnectedInfo = 0;
-    
-    // Recording: cameras recording on at least one device / cameras with recording info
-    int totalRecordingOnDevices = 0;
-    int totalDevicesWithRecordingInfo = 0;
-    
-    for (final camera in allCameras) {
-      // Connected - count based on connectedDevices entries that have camReports data
-      for (final entry in camera.connectedDevices.entries) {
-        if (camera.camReportsConnectedDevices.contains(entry.key)) {
-          totalDevicesWithConnectedInfo++;
-          if (entry.value) totalConnectedOnDevices++;
-        }
-      }
-      
-      // Disconnected - count based on camReportsDisconnectedDevices tracker
-      if (camera.camReportsDisconnectedDevices.isNotEmpty) {
-        totalDevicesWithDisconnectedInfo += camera.camReportsDisconnectedDevices.length;
-        // Count how many devices report this camera as disconnected
-        for (final deviceMac in camera.camReportsDisconnectedDevices) {
-          final disconnectedValue = camera.getDisconnectedOnDevice(deviceMac);
-          // disconnected is a timestamp string, not empty means disconnected
-          if (disconnectedValue.isNotEmpty && disconnectedValue != '-') {
-            totalDisconnectedOnDevices++;
-          }
-        }
-      }
-      
-      // Recording - count based on recordingDevices entries that have camReports data
-      for (final entry in camera.recordingDevices.entries) {
-        if (camera.camReportsRecordingDevices.contains(entry.key)) {
-          totalDevicesWithRecordingInfo++;
-          if (entry.value) totalRecordingOnDevices++;
-        }
-      }
-    }
-    
-    // Format labels as "connected/total" (e.g., "2/3")
-    final onlineLabel = totalDevicesWithConnectedInfo > 0
-        ? '$totalConnectedOnDevices/$totalDevicesWithConnectedInfo'
-        : '0';
-    final offlineLabel = totalDevicesWithDisconnectedInfo > 0
-        ? '$totalDisconnectedOnDevices/$totalDevicesWithDisconnectedInfo'
-        : '0';
-    final recordingLabel = totalDevicesWithRecordingInfo > 0
-        ? '$totalRecordingOnDevices/$totalDevicesWithRecordingInfo'
-        : '0';
-    
-    // Build stats bar widget
-    final statsBar = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          // Total cameras count
-          Row(
-            children: [
-              const Icon(Icons.videocam, size: 16, color: Colors.white70),
-              const SizedBox(width: 4),
-              Text(
-                '${allCameras.length}',
-                style: const TextStyle(color: Colors.white70, fontSize: 12),
-              ),
-            ],
-          ),
-          // Online count (device-based)
-          Row(
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: Colors.green,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                onlineLabel,
-                style: const TextStyle(color: Colors.green, fontSize: 12),
-              ),
-            ],
-          ),
-          // Offline count (device-based)
-          Row(
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                offlineLabel,
-                style: const TextStyle(color: Colors.red, fontSize: 12),
-              ),
-            ],
-          ),
-          // Recording count (device-based)
-          Row(
-            children: [
-              const Icon(Icons.fiber_manual_record, size: 12, color: Colors.orange),
-              const SizedBox(width: 4),
-              Text(
-                recordingLabel,
-                style: const TextStyle(color: Colors.orange, fontSize: 12),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
 
     return Column(
       children: [
         if (searchBar != null) searchBar,
+        _buildStatsBar(allCameras),
         if (filterChips != null) filterChips,
-        statsBar,
         cameraContent,
       ],
     );

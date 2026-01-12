@@ -2285,9 +2285,9 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
       );
     }
 
-    // Tüm kameralar için kayıt yoksa
-    if (_cameraRecordings.isEmpty ||
-        _cameraRecordings.values.every((recordings) => recordings.isEmpty)) {
+    // Eğer hiç kamera seçilmemişse mesaj göster
+    // Kayıt 0 olsa bile seçili kamera varsa tab'lar gösterilecek
+    if (_selectedCameras.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -2296,8 +2296,8 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
             const SizedBox(height: 16),
             Text(
               _selectedDay != null
-                  ? 'No recordings available for ${DateFormat('yyyy_MM_dd').format(_selectedDay!)}'
-                  : 'No recordings available',
+                  ? 'No cameras selected for ${DateFormat('yyyy_MM_dd').format(_selectedDay!)}'
+                  : 'No cameras selected',
               style: const TextStyle(color: Colors.grey),
               textAlign: TextAlign.center,
             ),

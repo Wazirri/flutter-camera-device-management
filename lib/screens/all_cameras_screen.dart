@@ -241,9 +241,6 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
 
           return Column(
             children: [
-              // Quick filter chips (horizontal scrollable)
-              _buildQuickFilterChips(),
-
               // Search bar
               _buildSearchBar(),
 
@@ -269,91 +266,6 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                 _buildPaginationBar(cameras.length, totalPages),
             ],
           );
-        },
-      ),
-    );
-  }
-
-  Widget _buildQuickFilterChips() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-      color: AppTheme.darkSurface,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            // Status filters
-            _buildQuickChip('Online', 'online', Icons.wifi, Colors.green),
-            _buildQuickChip('Offline', 'offline', Icons.wifi_off, Colors.red),
-            _buildQuickChip('Recording', 'recording', Icons.fiber_manual_record, Colors.orange),
-            _buildQuickChip('Assigned', 'assigned', Icons.link, Colors.cyan),
-            _buildQuickChip('Unassigned', 'unassigned', Icons.link_off, Colors.grey),
-            _buildQuickChip('Distributing', 'distributing', Icons.share, Colors.purple),
-            _buildQuickChip('Verified', 'verified', Icons.verified, Colors.green.shade700),
-            _buildQuickChip('Unverified', 'unverified', Icons.warning_amber, Colors.orange),
-            
-            // Divider
-            Container(
-              height: 24,
-              width: 1,
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              color: Colors.grey.shade700,
-            ),
-            
-            // Clear all button if any filter is active
-            if (_hasActiveFilters())
-              ActionChip(
-                avatar: const Icon(Icons.clear_all, size: 16, color: Colors.white),
-                label: const Text('Temizle', style: TextStyle(color: Colors.white, fontSize: 12)),
-                backgroundColor: Colors.red.shade700,
-                onPressed: () {
-                  setState(() {
-                    _filterStatus = null;
-                    _filterBrand = null;
-                    _filterResolution = null;
-                    _filterCodec = null;
-                    _filterSubnet = null;
-                    _currentPage = 0;
-                  });
-                },
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickChip(String label, String value, IconData icon, Color color) {
-    final isSelected = _filterStatus == value;
-    return Padding(
-      padding: const EdgeInsets.only(right: 6),
-      child: FilterChip(
-        avatar: Icon(
-          icon,
-          size: 14,
-          color: isSelected ? Colors.white : color,
-        ),
-        label: Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            color: isSelected ? Colors.white : Colors.grey.shade300,
-          ),
-        ),
-        selected: isSelected,
-        selectedColor: color,
-        backgroundColor: AppTheme.darkBackground,
-        checkmarkColor: Colors.white,
-        showCheckmark: false,
-        side: BorderSide(
-          color: isSelected ? color : Colors.grey.shade700,
-          width: 1,
-        ),
-        onSelected: (selected) {
-          setState(() {
-            _filterStatus = selected ? value : null;
-            _currentPage = 0;
-          });
         },
       ),
     );
@@ -623,6 +535,8 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
         .length;
     final unassigned = allCameras.length - assigned;
     final distributing = allCameras.where((c) => c.distribute).length;
+    final verified = allCameras.where((c) => c.verified).length;
+    final unverified = allCameras.where((c) => !c.verified).length;
 
     // Calculate device-based stats (connected/total and recording/total)
     int totalConnectedOnDevices = 0;
@@ -738,7 +652,7 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
             ],
           ),
           const SizedBox(height: 10),
-          // Second row - Assigned/Unassigned
+          // Second row - Assigned/Unassigned/Distributing/Verified/Unverified
           Row(
             children: [
               Expanded(
@@ -789,9 +703,38 @@ class _AllCamerasScreenState extends State<AllCamerasScreen> {
                   },
                 ),
               ),
-              // Empty space to keep alignment
               const SizedBox(width: 8),
-              const Expanded(child: SizedBox()),
+              Expanded(
+                child: _buildClickableStatChip(
+                  icon: Icons.verified,
+                  label: '$verified',
+                  subtitle: 'Verified',
+                  color: Colors.green.shade700,
+                  isSelected: _filterStatus == 'verified',
+                  onTap: () {
+                    setState(() {
+                      _filterStatus =
+                          _filterStatus == 'verified' ? null : 'verified';
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildClickableStatChip(
+                  icon: Icons.warning_amber,
+                  label: '$unverified',
+                  subtitle: 'Unverified',
+                  color: Colors.orange,
+                  isSelected: _filterStatus == 'unverified',
+                  onTap: () {
+                    setState(() {
+                      _filterStatus =
+                          _filterStatus == 'unverified' ? null : 'unverified';
+                    });
+                  },
+                ),
+              ),
             ],
           ),
           // Subnet filter row
