@@ -241,8 +241,8 @@ class CameraDevice {
   int totalSessions;
 
   // Service status fields (from configuration.service.*)
-  bool smartPlayerServiceOn; // configuration.service.smart_player.on - default true (1)
-  bool recorderServiceOn; // configuration.service.recorder.on - default true (1)
+  bool smartPlayerServiceOn; // configuration.service.smart_player.on - default false (0)
+  bool recorderServiceOn; // configuration.service.recorder.on - default false (0)
 
   List<Camera> cameras;
 
@@ -347,8 +347,8 @@ class CameraDevice {
     this.networkInfo,
     this.totalConnections = 0,
     this.totalSessions = 0,
-    this.smartPlayerServiceOn = true, // Default: service is ON
-    this.recorderServiceOn = true, // Default: service is ON
+    this.smartPlayerServiceOn = false, // Default: service is OFF (until data received)
+    this.recorderServiceOn = false, // Default: service is OFF (until data received)
     List<Camera>? cameras,
   }) : cameras = cameras ?? [];
 
