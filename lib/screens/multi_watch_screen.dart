@@ -30,7 +30,8 @@ class MultiWatchScreen extends StatefulWidget {
   State<MultiWatchScreen> createState() => _MultiWatchScreenState();
 }
 
-class _MultiWatchScreenState extends State<MultiWatchScreen> {
+class _MultiWatchScreenState extends State<MultiWatchScreen>
+    with WidgetsBindingObserver {
   final Map<Camera, Player> _players = {};
   final Map<Camera, VideoController> _controllers = {};
   final Map<Camera, bool> _isBuffering = {};
@@ -39,6 +40,7 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   final Map<Camera, bool> _isPlaying = {};
   final Map<Camera, String> _recordingUrls = {}; // Store URLs for live check
   Map<Camera, Duration> _cameraOffsets = {}; // Start offset per camera for synchronized playback
+  bool _isAppInBackground = false; // Track app background state
   
   // Synchronized playback control
   bool _isSyncPlaying = false;
@@ -68,6 +70,7 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Initialize offsets from widget parameter
     _cameraOffsets = widget.cameraStartOffsets ?? {};
     if (_cameraOffsets.isNotEmpty) {
@@ -574,6 +577,7 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
   
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _liveCheckTimer?.cancel();
     _playlistRefreshTimer?.cancel();
     // Tüm player'ları temizle
@@ -581,6 +585,55 @@ class _MultiWatchScreenState extends State<MultiWatchScreen> {
       player.dispose();
     }
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        // App going to background - pause all players to prevent texture issues
+        if (!_isAppInBackground) {
+          _isAppInBackground = true;
+          print('[MultiWatch] App going to background - pausing all players');
+          for (final player in _players.values) {
+            try {
+              player.pause();
+            } catch (e) {
+              print('[MultiWatch] Error pausing player: $e');
+            }
+          }
+        }
+        break;
+      case AppLifecycleState.resumed:
+        // App coming back to foreground - resume playback
+        if (_isAppInBackground) {
+          _isAppInBackground = false;
+          print('[MultiWatch] App resumed - resuming players');
+          for (final player in _players.values) {
+            try {
+              player.play();
+            } catch (e) {
+              print('[MultiWatch] Error resuming player: $e');
+            }
+          }
+        }
+        break;
+      case AppLifecycleState.detached:
+        // App is being terminated
+        print('[MultiWatch] App detached - stopping all players');
+        for (final player in _players.values) {
+          try {
+            player.stop();
+          } catch (e) {
+            print('[MultiWatch] Error stopping player: $e');
+          }
+        }
+        break;
+    }
   }
 
   @override

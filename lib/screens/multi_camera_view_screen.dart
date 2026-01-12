@@ -783,17 +783,19 @@ class CameraGridView extends StatefulWidget {
   State<CameraGridView> createState() => _CameraGridViewState();
 }
 
-class _CameraGridViewState extends State<CameraGridView> {
+class _CameraGridViewState extends State<CameraGridView> with WidgetsBindingObserver {
   // Maps camera positions to Player instances
   final Map<int, Player> _players = {};
   final Map<int, VideoController> _controllers = {};
   final Map<int, bool> _loadingStates = {};
   final Map<int, bool> _errorStates = {};
   final Map<int, String> _errorMessages = {}; // Error messages per position
+  bool _isAppInBackground = false; // Track app background state
   
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initializePlayers();
   }
   
@@ -919,11 +921,68 @@ class _CameraGridViewState extends State<CameraGridView> {
   
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     // Dispose all players
     for (final player in _players.values) {
       player.dispose();
     }
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        // App going to background - pause all players to prevent texture issues
+        if (!_isAppInBackground) {
+          _isAppInBackground = true;
+          print('[MultiCameraView] App going to background - pausing all players');
+          _pauseAllPlayers();
+        }
+        break;
+      case AppLifecycleState.resumed:
+        // App coming back to foreground - resume streams
+        if (_isAppInBackground) {
+          _isAppInBackground = false;
+          print('[MultiCameraView] App resumed - resuming streams');
+          _resumeAllPlayers();
+        }
+        break;
+      case AppLifecycleState.detached:
+        // App is being terminated
+        print('[MultiCameraView] App detached - stopping all players');
+        _stopAllPlayers();
+        break;
+    }
+  }
+
+  void _pauseAllPlayers() {
+    for (final player in _players.values) {
+      try {
+        player.pause();
+      } catch (e) {
+        print('[MultiCameraView] Error pausing player: $e');
+      }
+    }
+  }
+
+  void _resumeAllPlayers() {
+    // Re-update streams to restart playback
+    _updateStreams();
+  }
+
+  void _stopAllPlayers() {
+    for (final player in _players.values) {
+      try {
+        player.stop();
+      } catch (e) {
+        print('[MultiCameraView] Error stopping player: $e');
+      }
+    }
   }
 
   @override

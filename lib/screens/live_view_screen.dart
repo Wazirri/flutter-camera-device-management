@@ -19,7 +19,7 @@ class LiveViewScreen extends StatefulWidget {
 }
 
 class _LiveViewScreenState extends State<LiveViewScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   int _selectedCameraIndex = 0;
   Camera? _camera;
   bool _isFullScreen = false;
@@ -30,6 +30,7 @@ class _LiveViewScreenState extends State<LiveViewScreen>
   bool _hasError = false;
   String _errorMessage = '';
   List<Camera> _availableCameras = [];
+  bool _isAppInBackground = false; // Track app background state
 
   // Search and filter state
   String _searchQuery = '';
@@ -45,6 +46,7 @@ class _LiveViewScreenState extends State<LiveViewScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initializeAnimations();
     _initializePlayer();
   }
@@ -207,10 +209,52 @@ class _LiveViewScreenState extends State<LiveViewScreen>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _pageAnimationController.dispose();
     _player.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        // App going to background - pause player to prevent texture issues
+        if (!_isAppInBackground) {
+          _isAppInBackground = true;
+          print('[LiveView] App going to background - pausing player');
+          try {
+            _player.pause();
+          } catch (e) {
+            print('[LiveView] Error pausing player: $e');
+          }
+        }
+        break;
+      case AppLifecycleState.resumed:
+        // App coming back to foreground - resume stream
+        if (_isAppInBackground) {
+          _isAppInBackground = false;
+          print('[LiveView] App resumed - resuming stream');
+          if (_camera != null) {
+            _loadCameraStream();
+          }
+        }
+        break;
+      case AppLifecycleState.detached:
+        // App is being terminated
+        print('[LiveView] App detached - stopping player');
+        try {
+          _player.stop();
+        } catch (e) {
+          print('[LiveView] Error stopping player: $e');
+        }
+        break;
+    }
   }
 
   // Get filtered cameras based on search and filter

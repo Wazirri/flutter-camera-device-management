@@ -21,7 +21,8 @@ class LiveRecordingScreen extends StatefulWidget {
   State<LiveRecordingScreen> createState() => _LiveRecordingScreenState();
 }
 
-class _LiveRecordingScreenState extends State<LiveRecordingScreen> {
+class _LiveRecordingScreenState extends State<LiveRecordingScreen>
+    with WidgetsBindingObserver {
   late Player _player;
   late VideoController _controller;
   
@@ -31,6 +32,7 @@ class _LiveRecordingScreenState extends State<LiveRecordingScreen> {
   bool _isPlaying = false;
   bool _isLive = true; // Whether we're at the live edge
   bool _isLiveRecording = true; // Whether the recording is still ongoing (no ENDLIST)
+  bool _isAppInBackground = false; // Track app background state
   
   Duration _position = Duration.zero;
   Duration _duration = Duration.zero;
@@ -49,6 +51,7 @@ class _LiveRecordingScreenState extends State<LiveRecordingScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _checkIfLiveRecording();
     _initializePlayer();
   }
@@ -311,10 +314,54 @@ class _LiveRecordingScreenState extends State<LiveRecordingScreen> {
   
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _liveCheckTimer?.cancel();
     _playlistRefreshTimer?.cancel();
     _player.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        // App going to background - pause player to prevent texture issues
+        if (!_isAppInBackground) {
+          _isAppInBackground = true;
+          print('[LiveRecording] App going to background - pausing player');
+          try {
+            _player.pause();
+          } catch (e) {
+            print('[LiveRecording] Error pausing player: $e');
+          }
+        }
+        break;
+      case AppLifecycleState.resumed:
+        // App coming back to foreground - resume stream
+        if (_isAppInBackground) {
+          _isAppInBackground = false;
+          print('[LiveRecording] App resumed - resuming stream');
+          try {
+            _player.play();
+          } catch (e) {
+            print('[LiveRecording] Error resuming player: $e');
+          }
+        }
+        break;
+      case AppLifecycleState.detached:
+        // App is being terminated
+        print('[LiveRecording] App detached - stopping player');
+        try {
+          _player.stop();
+        } catch (e) {
+          print('[LiveRecording] Error stopping player: $e');
+        }
+        break;
+    }
   }
 
   @override

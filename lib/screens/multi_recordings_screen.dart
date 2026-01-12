@@ -3934,7 +3934,8 @@ class _VideoPlayerPopup extends StatefulWidget {
   State<_VideoPlayerPopup> createState() => _VideoPlayerPopupState();
 }
 
-class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
+class _VideoPlayerPopupState extends State<_VideoPlayerPopup>
+    with WidgetsBindingObserver {
   late final Player _popupPlayer;
   late final VideoController _popupController;
   bool _isBuffering = false;
@@ -3945,10 +3946,12 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
   Duration _lastNSegmentsDuration = Duration.zero; // Duration of last N segments for live offset
   Timer? _playlistRefreshTimer; // Timer to refresh playlist duration
   bool _initialSeekDone = false; // Track if initial seek has been performed - prevents repeated seeks
+  bool _isAppInBackground = false; // Track app background state
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     print(
         '[VideoPlayerPopup] initState called with seekTime: ${widget.seekTime}');
@@ -4185,9 +4188,53 @@ class _VideoPlayerPopupState extends State<_VideoPlayerPopup> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _playlistRefreshTimer?.cancel();
     _popupPlayer.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        // App going to background - pause player to prevent texture issues
+        if (!_isAppInBackground) {
+          _isAppInBackground = true;
+          print('[VideoPlayerPopup] App going to background - pausing player');
+          try {
+            _popupPlayer.pause();
+          } catch (e) {
+            print('[VideoPlayerPopup] Error pausing player: $e');
+          }
+        }
+        break;
+      case AppLifecycleState.resumed:
+        // App coming back to foreground - resume playback
+        if (_isAppInBackground) {
+          _isAppInBackground = false;
+          print('[VideoPlayerPopup] App resumed - resuming player');
+          try {
+            _popupPlayer.play();
+          } catch (e) {
+            print('[VideoPlayerPopup] Error resuming player: $e');
+          }
+        }
+        break;
+      case AppLifecycleState.detached:
+        // App is being terminated
+        print('[VideoPlayerPopup] App detached - stopping player');
+        try {
+          _popupPlayer.stop();
+        } catch (e) {
+          print('[VideoPlayerPopup] Error stopping player: $e');
+        }
+        break;
+    }
   }
 
   @override

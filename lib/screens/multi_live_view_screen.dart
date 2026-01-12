@@ -17,7 +17,7 @@ class MultiLiveViewScreen extends StatefulWidget {
 }
 
 class _MultiLiveViewScreenState extends State<MultiLiveViewScreen>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   // Maximum number of cameras per page
   static const int maxCamerasPerPage = 20;
 
@@ -39,6 +39,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen>
       slots: 20,
       description: 'Default layout');
   bool _initialized = false;
+  bool _isAppInBackground = false; // Track app background state
 
   // Search and filter state
   String _searchQuery = '';
@@ -53,6 +54,7 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initializePlayers();
   }
 
@@ -221,12 +223,56 @@ class _MultiLiveViewScreenState extends State<MultiLiveViewScreen>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     // Dispose all players
     for (final player in _players) {
       player.dispose();
     }
 
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        // App going to background - pause all players to prevent texture issues
+        if (!_isAppInBackground) {
+          _isAppInBackground = true;
+          print('[MultiLiveView] App going to background - pausing all players');
+          for (final player in _players) {
+            try {
+              player.pause();
+            } catch (e) {
+              print('[MultiLiveView] Error pausing player: $e');
+            }
+          }
+        }
+        break;
+      case AppLifecycleState.resumed:
+        // App coming back to foreground - resume streams
+        if (_isAppInBackground) {
+          _isAppInBackground = false;
+          print('[MultiLiveView] App resumed - resuming streams');
+          _loadCamerasForCurrentPage();
+        }
+        break;
+      case AppLifecycleState.detached:
+        // App is being terminated
+        print('[MultiLiveView] App detached - stopping all players');
+        for (final player in _players) {
+          try {
+            player.stop();
+          } catch (e) {
+            print('[MultiLiveView] Error stopping player: $e');
+          }
+        }
+        break;
+    }
   }
 
   // Get filtered cameras based on search and filter

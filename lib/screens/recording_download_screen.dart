@@ -1227,13 +1227,16 @@ class _ConversionVideoPlayer extends StatefulWidget {
   State<_ConversionVideoPlayer> createState() => _ConversionVideoPlayerState();
 }
 
-class _ConversionVideoPlayerState extends State<_ConversionVideoPlayer> {
+class _ConversionVideoPlayerState extends State<_ConversionVideoPlayer>
+    with WidgetsBindingObserver {
   late final Player player;
   late final VideoController controller;
+  bool _isAppInBackground = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     player = Player();
     controller = VideoController(player);
     
@@ -1243,8 +1246,46 @@ class _ConversionVideoPlayerState extends State<_ConversionVideoPlayer> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     player.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+        if (!_isAppInBackground) {
+          _isAppInBackground = true;
+          try {
+            player.pause();
+          } catch (e) {
+            print('[ConversionVideoPlayer] Error pausing player: $e');
+          }
+        }
+        break;
+      case AppLifecycleState.resumed:
+        if (_isAppInBackground) {
+          _isAppInBackground = false;
+          try {
+            player.play();
+          } catch (e) {
+            print('[ConversionVideoPlayer] Error resuming player: $e');
+          }
+        }
+        break;
+      case AppLifecycleState.detached:
+        try {
+          player.stop();
+        } catch (e) {
+          print('[ConversionVideoPlayer] Error stopping player: $e');
+        }
+        break;
+    }
   }
 
   @override
