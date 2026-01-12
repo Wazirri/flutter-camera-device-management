@@ -1172,19 +1172,26 @@ class WebSocketProviderOptimized with ChangeNotifier {
           break;
 
         case 'deleted':
-          // Handle deleted keys (e.g., cameras cleared from device, system data, etc.)
-          // Format: {"c":"deleted", "keys":["ecs_slaves.36:56:F0:A5:36:30.cam", "cameras_mac.MAC.current.CAM_MAC", ...]}
+          // Handle deleted keys - comprehensive handler for ALL data types
+          // Format: {"c":"deleted", "keys":["ecs_slaves.MAC.property", "all_cameras.MAC.property", ...]}
           final keys = jsonData['keys'] as List<dynamic>?;
           if (keys != null && keys.isNotEmpty) {
-            // Group keys by device MAC for better notification
+            print('[DELETED] Processing ${keys.length} deleted keys');
+            
+            // Group keys by type and device for better processing
             final Map<String, List<String>> deletedByDevice = {};
-            final Map<String, Set<String>> deletedCamerasByDevice = {}; // Track camera MACs per device
+            final Map<String, Set<String>> deletedCamerasByDevice = {};
+            final Set<String> deletedGlobalCameras = {};
+            final Set<String> deletedUsers = {};
+            final Set<String> deletedGroups = {};
+            final List<String> deletedGlobalConfig = [];
+            final List<String> deletedNetworking = [];
             final List<String> otherDeletedKeys = [];
             
             for (var key in keys) {
               final keyStr = key.toString();
               
-              // Check if this is an ecs_slaves key
+              // =========== ecs_slaves.* ===========
               if (keyStr.startsWith('ecs_slaves.')) {
                 final parts = keyStr.split('.');
                 if (parts.length >= 2) {
@@ -1193,149 +1200,223 @@ class WebSocketProviderOptimized with ChangeNotifier {
                   deletedByDevice[deviceMac]!.add(keyStr);
                 }
               } 
-              // Check if this is a cameras_mac key (camera data per device)
+              // =========== cameras_mac.* ===========
               // Format: cameras_mac.<DEVICE_MAC>.current.<CAMERA_MAC>[.property]
-              // Only process if the key contains '.current.' - this indicates actual camera deletion
               else if (keyStr.startsWith('cameras_mac.') && keyStr.contains('.current.')) {
                 final parts = keyStr.split('.');
                 if (parts.length >= 4) {
-                  final deviceMac = parts[1]; // Device MAC
-                  // Find the camera MAC (after 'current')
+                  final deviceMac = parts[1];
                   final currentIndex = parts.indexOf('current');
                   if (currentIndex >= 0 && currentIndex + 1 < parts.length) {
-                    final cameraMac = parts[currentIndex + 1]; // Camera MAC
+                    final cameraMac = parts[currentIndex + 1];
                     
                     deletedByDevice.putIfAbsent(deviceMac, () => []);
                     deletedByDevice[deviceMac]!.add(keyStr);
                     
-                    // Track unique camera MACs being deleted
                     deletedCamerasByDevice.putIfAbsent(deviceMac, () => {});
                     deletedCamerasByDevice[deviceMac]!.add(cameraMac);
                     
-                    print('[DELETED] cameras_mac.current key: device=$deviceMac, camera=$cameraMac, key=$keyStr');
+                    print('[DELETED] cameras_mac.current: device=$deviceMac, camera=$cameraMac');
                   }
                 }
               }
+              // =========== all_cameras.* ===========
+              // Format: all_cameras.<CAMERA_MAC>[.property]
               else if (keyStr.startsWith('all_cameras.')) {
-                // all_cameras.<CAMERA_MAC>[.property] - camera data deleted from global list
                 final parts = keyStr.split('.');
                 if (parts.length >= 2) {
                   final cameraMac = parts[1];
-                  // Track for deletion from global camera list
-                  otherDeletedKeys.add(keyStr);
-                  // Also add to a special set for global camera deletion
-                  deletedCamerasByDevice.putIfAbsent('__global__', () => {});
-                  deletedCamerasByDevice['__global__']!.add(cameraMac);
-                  print('[DELETED] all_cameras key: camera=$cameraMac, key=$keyStr');
+                  deletedGlobalCameras.add(cameraMac);
+                  print('[DELETED] all_cameras: camera=$cameraMac');
                 }
-              } else {
+              }
+              // =========== users.* ===========
+              // Format: users.<USERNAME>[.property]
+              else if (keyStr.startsWith('users.')) {
+                final parts = keyStr.split('.');
+                if (parts.length >= 2) {
+                  final username = parts[1];
+                  deletedUsers.add(username);
+                  print('[DELETED] users: username=$username');
+                }
+              }
+              // =========== groups.* ===========
+              // Format: groups.<GROUPNAME>[.property]
+              else if (keyStr.startsWith('groups.')) {
+                final parts = keyStr.split('.');
+                if (parts.length >= 2) {
+                  final groupName = parts[1];
+                  deletedGroups.add(groupName);
+                  print('[DELETED] groups: groupName=$groupName');
+                }
+              }
+              // =========== configuration.* (global) ===========
+              else if (keyStr.startsWith('configuration.')) {
+                deletedGlobalConfig.add(keyStr);
+                print('[DELETED] global configuration: $keyStr');
+              }
+              // =========== networking.* ===========
+              else if (keyStr.startsWith('networking.')) {
+                deletedNetworking.add(keyStr);
+                print('[DELETED] networking: $keyStr');
+              }
+              // =========== ecs.* (global settings) ===========
+              else if (keyStr.startsWith('ecs.')) {
+                if (keyStr.contains('bridge_auto_cam_distributing')) {
+                  final parts = keyStr.split('.');
+                  if (parts.length >= 3) {
+                    _cameraDevicesProvider?.clearGlobalBridgeAutoSetting(parts.last);
+                  }
+                }
+                print('[DELETED] ecs global: $keyStr');
+              }
+              else {
                 otherDeletedKeys.add(keyStr);
               }
             }
             
-            // Handle global camera deletions (from all_cameras.* keys)
-            if (deletedCamerasByDevice.containsKey('__global__')) {
-              final globalCameras = deletedCamerasByDevice['__global__']!;
-              print('[DELETED] Global cameras to remove: ${globalCameras.length}');
-              for (final cameraMac in globalCameras) {
+            // =========== PROCESS: Global camera deletions ===========
+            if (deletedGlobalCameras.isNotEmpty) {
+              print('[DELETED] Removing ${deletedGlobalCameras.length} cameras from global list');
+              for (final cameraMac in deletedGlobalCameras) {
                 _cameraDevicesProvider?.removeCameraFromGlobalList(cameraMac);
               }
             }
             
-            // Process each device's deleted keys
+            // =========== PROCESS: User deletions ===========
+            if (deletedUsers.isNotEmpty) {
+              print('[DELETED] Removing ${deletedUsers.length} users');
+              for (final username in deletedUsers) {
+                _userGroupProvider?.removeUserLocally(username);
+              }
+            }
+            
+            // =========== PROCESS: Group deletions ===========
+            if (deletedGroups.isNotEmpty) {
+              print('[DELETED] Removing ${deletedGroups.length} groups');
+              for (final groupName in deletedGroups) {
+                _userGroupProvider?.removeGroupLocally(groupName);
+              }
+            }
+            
+            // =========== PROCESS: Networking settings ===========
+            if (deletedNetworking.isNotEmpty) {
+              print('[DELETED] Clearing ${deletedNetworking.length} networking settings');
+              for (final setting in deletedNetworking) {
+                _cameraDevicesProvider?.clearNetworkingSetting(setting);
+              }
+            }
+            
+            // =========== PROCESS: Per-device deletions ===========
             for (var entry in deletedByDevice.entries) {
               final deviceMac = entry.key;
               final deviceKeys = entry.value;
               
-              // Check what type of data was deleted
-              // ecs_slaves.MAC.cam or ecs_slaves.MAC.cam.[0].property indicates all cameras deleted
+              // Categorize device keys
               final hasCamDeleted = deviceKeys.any((k) => 
-                  k.endsWith('.cam') || k.contains('.cam.['));
+                  k.endsWith('.cam') || k.contains('.cam.[') || k.contains('.cam['));
               final hasSystemDeleted = deviceKeys.any((k) => k.contains('.system'));
+              final hasConfigDeleted = deviceKeys.any((k) => k.contains('.configuration'));
+              final hasCamReportsDeleted = deviceKeys.any((k) => k.contains('.camreports'));
               final hasCamerasMacDeleted = deviceKeys.any((k) => k.startsWith('cameras_mac.'));
+              
+              // Basic property deletions (online, connected, name, ipv4, etc.)
+              final basicPropertyKeys = deviceKeys.where((k) {
+                final parts = k.split('.');
+                if (parts.length == 3 && parts[0] == 'ecs_slaves') {
+                  final prop = parts[2];
+                  return ['online', 'connected', 'name', 'ipv4', 'ipv6', 'version', 
+                          'cpuTemp', 'firsttime', 'current_time', 'last_seen_at',
+                          'isMaster', 'last_ts', 'cam_count', 'app_ready', 'system_ready',
+                          'programs_ready', 'cam_ready', 'configuration_ready',
+                          'camreports_ready', 'movita_ready', 'registered', 'app_version',
+                          'system_count', 'camreports_count', 'programs_count',
+                          'is_closed_by_master', 'last_heartbeat_ts', 'offline_since',
+                          'smartweb_version'].contains(prop);
+                }
+                return false;
+              }).toList();
+              
+              // Handle basic property deletions
+              for (final keyStr in basicPropertyKeys) {
+                final parts = keyStr.split('.');
+                if (parts.length == 3) {
+                  _cameraDevicesProvider?.clearDevicePropertyLocally(deviceMac, parts[2]);
+                }
+              }
               
               // Handle ecs_slaves.*.cam deletion - all device cameras cleared
               if (hasCamDeleted) {
-                print('[DELETED] Device $deviceMac cameras deleted (ecs_slaves.*.cam)');
-                
-                // Clear cameras locally - this removes from both device and global list
+                print('[DELETED] Device $deviceMac: ALL cameras deleted');
                 _cameraDevicesProvider?.clearDeviceCamerasLocally(deviceMac);
                 
-                // Check if this was a pending CLEARCAMS command
                 if (_pendingClearCams.contains(deviceMac)) {
                   _pendingClearCams.remove(deviceMac);
-                  // Notify phase 2: Device confirmed deletion
-                  if (onTwoPhaseNotification != null) {
-                    onTwoPhaseNotification!(2, deviceMac, 'Cihaz kameraları sildi');
-                  }
+                  onTwoPhaseNotification?.call(2, deviceMac, 'Cihaz kameraları sildi');
                 } else {
-                  // Not a pending CLEARCAMS, just notify normally
-                  if (onResultMessage != null) {
-                    onResultMessage!('deleted', 1, 'Cihaz $deviceMac kameraları silindi', mac: deviceMac);
-                  }
+                  final shortMac = deviceMac.length > 8 ? '...${deviceMac.substring(deviceMac.length - 8)}' : deviceMac;
+                  onResultMessage?.call('deleted', 1, '[$shortMac] Tüm kameralar silindi', mac: deviceMac);
                 }
               }
               
               // Handle cameras_mac deletion - specific cameras removed
               if (hasCamerasMacDeleted && !hasCamDeleted) {
                 final camerasDeleted = deletedCamerasByDevice[deviceMac] ?? {};
-                print('[DELETED] Device $deviceMac specific cameras deleted: ${camerasDeleted.length} cameras');
+                print('[DELETED] Device $deviceMac: ${camerasDeleted.length} specific cameras deleted');
                 
-                // Remove specific cameras locally
                 for (final cameraMac in camerasDeleted) {
                   _cameraDevicesProvider?.removeCameraLocally(deviceMac, cameraMac);
                 }
                 
-                // Check if this was a pending CLEARCAMS command
                 if (_pendingClearCams.contains(deviceMac)) {
                   _pendingClearCams.remove(deviceMac);
-                  // Notify phase 2: Device confirmed deletion
-                  if (onTwoPhaseNotification != null) {
-                    onTwoPhaseNotification!(2, deviceMac, 'Cihaz kameraları sildi (${camerasDeleted.length} kamera)');
-                  }
+                  onTwoPhaseNotification?.call(2, deviceMac, 'Cihaz kameraları sildi (${camerasDeleted.length} kamera)');
                 } else {
-                  // Not a pending CLEARCAMS, just notify normally
-                  if (onResultMessage != null) {
-                    final shortMac = deviceMac.length > 8 
-                        ? '...${deviceMac.substring(deviceMac.length - 8)}' 
-                        : deviceMac;
-                    onResultMessage!('deleted', 1, 
-                        '[$shortMac] ${camerasDeleted.length} kamera silindi', 
-                        mac: deviceMac);
-                  }
+                  final shortMac = deviceMac.length > 8 ? '...${deviceMac.substring(deviceMac.length - 8)}' : deviceMac;
+                  onResultMessage?.call('deleted', 1, '[$shortMac] ${camerasDeleted.length} kamera silindi', mac: deviceMac);
                 }
               }
               
-              if (hasSystemDeleted) {
-                // System data deleted - device is disconnecting or being removed
-                print('[DELETED] Device $deviceMac system data deleted (${deviceKeys.length} keys)');
+              // Handle configuration deletions
+              if (hasConfigDeleted) {
+                final configKeys = deviceKeys.where((k) => k.contains('.configuration')).toList();
+                print('[DELETED] Device $deviceMac: ${configKeys.length} configuration keys deleted');
                 
-                // Check if the main system key is deleted (indicates full device removal)
+                for (final configKey in configKeys) {
+                  _cameraDevicesProvider?.removeDeviceConfigurationLocally(deviceMac, configKey);
+                }
+              }
+              
+              // Handle camreports deletions
+              if (hasCamReportsDeleted) {
+                final reportKeys = deviceKeys.where((k) => k.contains('.camreports')).toList();
+                print('[DELETED] Device $deviceMac: ${reportKeys.length} camreport keys deleted');
+                
+                for (final reportKey in reportKeys) {
+                  _cameraDevicesProvider?.removeCameraReportsLocally(deviceMac, reportKey);
+                }
+              }
+              
+              // Handle system deletions
+              if (hasSystemDeleted) {
+                print('[DELETED] Device $deviceMac: system data deleted');
+                
                 final mainSystemDeleted = deviceKeys.any((k) => 
                     k == 'ecs_slaves.$deviceMac.system' || 
                     k.endsWith('.system.shmc_ready') ||
                     k.endsWith('.system.progstate'));
                 
                 if (mainSystemDeleted) {
-                  // Full system data deletion - remove or mark device as disconnected
                   _cameraDevicesProvider?.markDeviceDisconnected(deviceMac);
-                }
-                
-                // Notify about system data deletion
-                if (onResultMessage != null) {
-                  final shortMac = deviceMac.length > 8 
-                      ? '...${deviceMac.substring(deviceMac.length - 8)}' 
-                      : deviceMac;
-                  onResultMessage!('deleted', 1, 
-                      'Cihaz [$shortMac] bağlantısı kesildi (${deviceKeys.length} veri silindi)', 
-                      mac: deviceMac);
+                  final shortMac = deviceMac.length > 8 ? '...${deviceMac.substring(deviceMac.length - 8)}' : deviceMac;
+                  onResultMessage?.call('deleted', 1, 'Cihaz [$shortMac] bağlantısı kesildi', mac: deviceMac);
                 }
               }
             }
             
-            // Log other deleted keys if any
+            // Log unhandled keys
             if (otherDeletedKeys.isNotEmpty) {
-              print('[DELETED] Other keys deleted: $otherDeletedKeys');
+              print('[DELETED] Unhandled keys: $otherDeletedKeys');
             }
           }
           _batchNotifyListeners();

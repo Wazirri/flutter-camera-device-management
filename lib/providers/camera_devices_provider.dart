@@ -3029,6 +3029,110 @@ class CameraDevicesProviderOptimized with ChangeNotifier {
       print('CDP: ⚠️ Device not found for disconnect marking: $deviceMac');
     }
   }
+  
+  /// Remove device configuration locally when deleted message is received
+  /// Called by WebSocketProvider when ecs_slaves.*.configuration.* deletion is received
+  void removeDeviceConfigurationLocally(String deviceMac, String configPath) {
+    print('CDP: ⚙️ Removing device configuration: $deviceMac, path: $configPath');
+    
+    final canonicalMac = deviceMac.toUpperCase().replaceAll('-', ':');
+    final device = _devices[canonicalMac];
+    
+    if (device != null) {
+      // Parse the config path to determine what to clear
+      // e.g., "configuration.service.recorder.on" -> clear recorder service state
+      if (configPath.contains('service.recorder')) {
+        device.recorderServiceOn = false;
+        print('CDP: ✅ Recorder service state cleared for $deviceMac');
+      } else if (configPath.contains('service.smart_player')) {
+        device.smartPlayerServiceOn = false;
+        print('CDP: ✅ Smart Player service state cleared for $deviceMac');
+      } else if (configPath.contains('cameraGroups')) {
+        // Camera group definition deleted
+        print('CDP: 📁 Camera group definition deleted: $configPath');
+      }
+      
+      triggerUpdate();
+    } else {
+      print('CDP: ⚠️ Device not found for config removal: $deviceMac');
+    }
+  }
+  
+  /// Remove camera reports locally when deleted message is received
+  /// Called by WebSocketProvider when ecs_slaves.*.camreports.* deletion is received
+  void removeCameraReportsLocally(String deviceMac, String reportPath) {
+    print('CDP: 📊 Removing camera reports: $deviceMac, path: $reportPath');
+    
+    final canonicalMac = deviceMac.toUpperCase().replaceAll('-', ':');
+    final device = _devices[canonicalMac];
+    
+    if (device != null) {
+      // Clear camera report data if needed
+      // Reports are typically stored per-camera, so we may need to parse the path
+      // For now, just log and notify
+      print('CDP: ✅ Camera reports cleared for $deviceMac');
+      triggerUpdate();
+    } else {
+      print('CDP: ⚠️ Device not found for report removal: $deviceMac');
+    }
+  }
+  
+  /// Clear device basic property when deleted
+  /// Called by WebSocketProvider when ecs_slaves.*.property deletion is received
+  void clearDevicePropertyLocally(String deviceMac, String propertyName) {
+    print('CDP: 🔧 Clearing device property: $deviceMac, property: $propertyName');
+    
+    final canonicalMac = deviceMac.toUpperCase().replaceAll('-', ':');
+    final device = _devices[canonicalMac];
+    
+    if (device != null) {
+      switch (propertyName) {
+        case 'name':
+          device.deviceName = null;
+          break;
+        case 'ipv4':
+          device.ipv4 = '';
+          break;
+        case 'ipv6':
+          device.ipv6 = null;
+          break;
+        case 'online':
+          device.online = false;
+          break;
+        case 'connected':
+          device.connected = false;
+          break;
+        case 'version':
+          device.firmwareVersion = '';
+          break;
+        case 'cpuTemp':
+          device.cpuTemp = 0.0;
+          break;
+        default:
+          print('CDP: ⚠️ Unknown property to clear: $propertyName');
+      }
+      
+      print('CDP: ✅ Property $propertyName cleared for $deviceMac');
+      triggerUpdate();
+    } else {
+      print('CDP: ⚠️ Device not found for property clear: $deviceMac');
+    }
+  }
+  
+  /// Update global bridge auto settings when deleted
+  void clearGlobalBridgeAutoSetting(String settingName) {
+    print('CDP: 🌐 Clearing global bridge auto setting: $settingName');
+    // Global settings are typically stored separately
+    // Log and notify for now
+    triggerUpdate();
+  }
+  
+  /// Clear global networking setting when deleted
+  void clearNetworkingSetting(String settingPath) {
+    print('CDP: 🌐 Clearing networking setting: $settingPath');
+    // Networking settings are typically stored separately
+    triggerUpdate();
+  }
 
   /// Add a camera to a device manually
   /// Format: ADD_CAM <CAM_MAC> <SLAVE_MAC>

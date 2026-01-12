@@ -304,7 +304,7 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
   }
   
   /// Generic service progress dialog for Recorder/Smart Player operations
-  /// Shows 2-phase notification: 1) Command sent 2) Device confirmed
+  /// Shows single phase - command sent and immediately completes (no device response expected)
   Future<void> _showServiceProgressDialog({
     required BuildContext context,
     required CameraDevice device,
@@ -312,7 +312,6 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
     required bool isEnabling,
     required Future<void> Function() onSendCommand,
   }) async {
-    final websocketProvider = Provider.of<WebSocketProviderOptimized>(context, listen: false);
     final shortMac = device.macAddress.length > 8 
         ? '...${device.macAddress.substring(device.macAddress.length - 8)}' 
         : device.macAddress;
@@ -322,37 +321,42 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
     final iconData = isEnabling ? Icons.play_circle : Icons.stop_circle;
     final iconColor = isEnabling ? Colors.green : Colors.red;
     
-    bool phase1Complete = false;
-    bool phase2Complete = false;
-    String? phase2Message;
+    bool commandSent = false;
+    bool commandSuccess = false;
+    String? errorMessage;
     
-    // Store original callback
-    final originalCallback = websocketProvider.onCombinedResultMessage;
-    
-    await showDialog(
+    // Show dialog
+    showDialog(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (context, setDialogState) {
-            // Set up callback to update dialog state
-            websocketProvider.onCombinedResultMessage = (commandType, sendResult, deviceResult, sendMsg, deviceMsg, {String? mac, String? commandText}) {
-              // Normalize MAC addresses for comparison
-              final normalizedMac = (mac ?? '').toUpperCase().replaceAll('-', ':');
-              final normalizedDeviceMac = device.macAddress.toUpperCase().replaceAll('-', ':');
+            // Send command on first build
+            if (!commandSent) {
+              commandSent = true;
               
-              print('[$serviceName Dialog] commandType=$commandType, mac=$mac, deviceMac=${device.macAddress}, match=${normalizedMac == normalizedDeviceMac}');
-              
-              if (normalizedMac == normalizedDeviceMac && commandType == 'SHMC') {
-                setDialogState(() {
-                  phase1Complete = true;
-                  if (deviceResult >= 0) {
-                    phase2Complete = true;
-                    phase2Message = deviceMsg;
-                  }
-                });
-              }
-            };
+              // Send command after dialog renders
+              Future.delayed(const Duration(milliseconds: 100), () async {
+                try {
+                  await onSendCommand();
+                  setDialogState(() {
+                    commandSuccess = true;
+                  });
+                  
+                  // Auto close after 1.5 seconds
+                  Future.delayed(const Duration(milliseconds: 1500), () {
+                    if (dialogContext.mounted) {
+                      Navigator.pop(dialogContext);
+                    }
+                  });
+                } catch (e) {
+                  setDialogState(() {
+                    errorMessage = e.toString();
+                  });
+                }
+              });
+            }
             
             return AlertDialog(
               backgroundColor: AppTheme.darkSurface,
@@ -380,25 +384,27 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Phase 1: Command sent
-                  _buildProgressStep(
-                    stepNumber: 1,
-                    title: 'Komut Gönderiliyor',
-                    subtitle: 'Mesaj cihaza iletiliyor',
-                    isComplete: phase1Complete,
-                    isActive: !phase1Complete,
-                  ),
-                  const SizedBox(height: 12),
-                  // Phase 2: Device confirmed
-                  _buildProgressStep(
-                    stepNumber: 2,
-                    title: 'Cihaz Yanıtı',
-                    subtitle: phase2Message ?? 'Cihaz yanıtı bekleniyor',
-                    isComplete: phase2Complete,
-                    isActive: phase1Complete && !phase2Complete,
-                  ),
-                  if (phase2Complete) ...[
-                    const SizedBox(height: 16),
+                  if (!commandSuccess && errorMessage == null) ...[
+                    // Sending state
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: iconColor,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Komut gönderiliyor...',
+                          style: TextStyle(color: Colors.grey.shade300),
+                        ),
+                      ],
+                    ),
+                  ] else if (commandSuccess) ...[
+                    // Success state
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -408,12 +414,34 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                          const Icon(Icons.check_circle, color: Colors.green, size: 24),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              '$serviceName servisi başarıyla $completeText!',
+                              '$serviceName servisi $completeText!',
                               style: TextStyle(color: Colors.green.shade300),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ] else if (errorMessage != null) ...[
+                    // Error state
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red.withOpacity(0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.error, color: Colors.red, size: 24),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Hata: $errorMessage',
+                              style: TextStyle(color: Colors.red.shade300),
                             ),
                           ),
                         ],
@@ -423,25 +451,25 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
                 ],
               ),
               actions: [
-                if (phase2Complete)
+                if (commandSuccess)
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                     ),
-                    onPressed: () {
-                      // Restore original callback
-                      websocketProvider.onCombinedResultMessage = originalCallback;
-                      Navigator.pop(dialogContext);
-                    },
+                    onPressed: () => Navigator.pop(dialogContext),
                     child: const Text('Tamam'),
+                  )
+                else if (errorMessage != null)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
+                    onPressed: () => Navigator.pop(dialogContext),
+                    child: const Text('Kapat'),
                   )
                 else
                   TextButton(
-                    onPressed: () {
-                      // Restore original callback
-                      websocketProvider.onCombinedResultMessage = originalCallback;
-                      Navigator.pop(dialogContext);
-                    },
+                    onPressed: () => Navigator.pop(dialogContext),
                     child: const Text('İptal'),
                   ),
               ],
@@ -450,15 +478,6 @@ class _CameraDevicesScreenState extends State<CameraDevicesScreen> {
         );
       },
     );
-    
-    // Wait a moment for dialog to render, then send command
-    await Future.delayed(const Duration(milliseconds: 100));
-    
-    // Send the command
-    await onSendCommand();
-    
-    // Restore original callback after dialog is closed
-    websocketProvider.onCombinedResultMessage = originalCallback;
   }
   
   Future<void> _showClearCamsProgressDialog(

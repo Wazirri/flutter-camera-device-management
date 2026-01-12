@@ -410,6 +410,17 @@ class UserGroupProvider with ChangeNotifier {
     return userType;
   }
 
+  /// Remove a user from local state (called when user is deleted)
+  void removeUserLocally(String username) {
+    if (_users.containsKey(username)) {
+      _users.remove(username);
+      print('🗑️ UGP: Removed user "$username" from local state');
+      notifyListeners();
+    } else {
+      print('⚠️ UGP: User "$username" not found in local state');
+    }
+  }
+
   /// Remove a group from local state (called when group is deleted)
   void removeGroupLocally(String groupName) {
     if (_groups.containsKey(groupName)) {
