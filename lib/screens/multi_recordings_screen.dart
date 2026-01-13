@@ -1790,20 +1790,24 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
     }
   }
 
-  // Kayıtları ±5dk toleransla grupla
+  // Kayıtları çoğunluk bazlı gruplama ile grupla
+  // Bu algoritma, bölük pörçük kayıtları olan tek bir kameranın 
+  // tüm gruplamanın yanlış olmasını önler
   List<List<RecordingTime>> _groupRecordingsByTime() {
     // Check if we have any recordings at all
     if (_cameraRecordings.isEmpty && _cameraDeviceRecordings.isEmpty) return [];
 
-    print('[MultiRecordings] Grouping recordings by time...');
+    print('[MultiRecordings] Grouping recordings by time (MAJORITY-BASED)...');
 
     // Tüm kayıtlardan zaman damgalarını çıkar
     final List<RecordingTime> allRecordings = [];
+    final Set<Camera> uniqueCameras = {};
 
     // Add recordings from single-device cameras
     for (final entry in _cameraRecordings.entries) {
       final camera = entry.key;
       final recordings = entry.value;
+      uniqueCameras.add(camera);
 
       print(
           '[MultiRecordings] Camera ${camera.name} has ${recordings.length} recordings');
@@ -1827,6 +1831,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
     for (final entry in _cameraDeviceRecordings.entries) {
       final camera = entry.key;
       final deviceRecordings = entry.value;
+      uniqueCameras.add(camera);
 
       for (final deviceEntry in deviceRecordings.entries) {
         final deviceMac = deviceEntry.key;
@@ -1855,131 +1860,104 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
 
     print(
         '[MultiRecordings] Total recordings with valid timestamps: ${allRecordings.length}');
-
-    // Debug: Count file types in valid recordings
-    final mkvCount = allRecordings
-        .where((r) => r.recording.toLowerCase().contains('.mkv'))
-        .length;
-    final m3u8Count = allRecordings
-        .where((r) => r.recording.toLowerCase().contains('.m3u8'))
-        .length;
-    print(
-        '[MultiRecordings] Valid recordings breakdown: $mkvCount MKV, $m3u8Count M3U8');
+    print('[MultiRecordings] Total unique cameras: ${uniqueCameras.length}');
 
     if (allRecordings.isEmpty) return [];
 
-    // Zaman damgalarına göre sırala
-    allRecordings.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-
-    print('[MultiRecordings] Sorted recordings:');
-    for (final rec in allRecordings) {
-      final fileType = rec.recording.toLowerCase().contains('.mkv')
-          ? 'MKV'
-          : rec.recording.toLowerCase().contains('.m3u8')
-              ? 'M3U8'
-              : 'UNKNOWN';
-      print(
-          '[MultiRecordings]   ${rec.camera.name}: ${rec.recording} ($fileType) -> ${rec.timestamp}');
+    // === MAJORITY-BASED GROUPING ALGORITHM ===
+    // Step 1: Find majority time slots (5-minute buckets with most cameras)
+    const int bucketMinutes = 5;
+    final Map<int, Set<Camera>> timeBucketCameras = {}; // bucket -> cameras that have recording in that bucket
+    final Map<int, List<RecordingTime>> timeBucketRecordings = {}; // bucket -> recordings in that bucket
+    
+    for (final recording in allRecordings) {
+      // Calculate bucket key (minutes since midnight, rounded to 5-min intervals)
+      final minutesSinceMidnight = recording.timestamp.hour * 60 + recording.timestamp.minute;
+      final bucketKey = (minutesSinceMidnight ~/ bucketMinutes) * bucketMinutes;
+      
+      timeBucketCameras.putIfAbsent(bucketKey, () => {});
+      timeBucketCameras[bucketKey]!.add(recording.camera);
+      
+      timeBucketRecordings.putIfAbsent(bucketKey, () => []);
+      timeBucketRecordings[bucketKey]!.add(recording);
     }
-
-    // ±5dk toleransla grupla - İKİ GEÇİŞLİ ALGORİTMA
-    // 1. Geçiş: Grupları oluştur
-    // 2. Geçiş: Kayıtları optimize et (daha yakın gruba taşı)
+    
+    print('[MultiRecordings] Found ${timeBucketCameras.length} time buckets');
+    
+    // Step 2: Determine minimum camera threshold for a valid group
+    // A valid group should have at least 50% of cameras, minimum 2
+    final int minCamerasForGroup = (uniqueCameras.length * 0.5).ceil().clamp(2, uniqueCameras.length);
+    print('[MultiRecordings] Minimum cameras for valid group: $minCamerasForGroup');
+    
+    // Step 3: Filter buckets that meet the threshold (these are "majority" time slots)
+    final List<int> majorityBuckets = timeBucketCameras.entries
+        .where((entry) => entry.value.length >= minCamerasForGroup)
+        .map((entry) => entry.key)
+        .toList()
+      ..sort();
+    
+    print('[MultiRecordings] Found ${majorityBuckets.length} majority time buckets: ${majorityBuckets.map((b) => "${b ~/ 60}:${(b % 60).toString().padLeft(2, '0')}").join(", ")}');
+    
+    if (majorityBuckets.isEmpty) {
+      print('[MultiRecordings] No majority buckets found, falling back to basic grouping');
+      return _fallbackGrouping(allRecordings, uniqueCameras.length);
+    }
+    
+    // Step 4: For each majority bucket, create a group with the best recording from each camera
     final List<List<RecordingTime>> groups = [];
     const Duration tolerance = Duration(minutes: 5);
-
-    print(
-        '[MultiRecordings] Starting TWO-PASS grouping with ${tolerance.inMinutes}min tolerance...');
-
-    // === PASS 1: Initial grouping ===
-    print('[MultiRecordings] === PASS 1: Initial grouping ===');
-    for (final recording in allRecordings) {
-      int bestGroupIndex = -1;
-      Duration bestTimeDiff = const Duration(days: 999);
-
-      for (int i = 0; i < groups.length; i++) {
-        final group = groups[i];
-        if (group.isNotEmpty) {
-          final hasThisCamera = group.any((r) => r.camera == recording.camera);
-          if (hasThisCamera) continue;
-
-          // Use group's CENTER time (average) instead of first timestamp
-          final groupCenterTime = _calculateGroupCenterTime(group);
-          final timeDiff = recording.timestamp.difference(groupCenterTime).abs();
-
-          if (timeDiff <= tolerance && timeDiff < bestTimeDiff) {
-            bestGroupIndex = i;
-            bestTimeDiff = timeDiff;
-          }
-        }
-      }
-
-      if (bestGroupIndex >= 0) {
-        print(
-            '[MultiRecordings] Pass1: Adding ${recording.camera.name}:${recording.recording} to group $bestGroupIndex (diff: ${bestTimeDiff.inSeconds}sec)');
-        groups[bestGroupIndex].add(recording);
-      } else {
-        print(
-            '[MultiRecordings] Pass1: Creating new group for ${recording.camera.name}:${recording.recording}');
-        groups.add([recording]);
-      }
-    }
-
-    // === PASS 2: Optimize - Move recordings to closer groups if possible ===
-    print('[MultiRecordings] === PASS 2: Optimizing groups ===');
-    bool changed = true;
-    int iterations = 0;
-    const maxIterations = 10; // Prevent infinite loops
     
-    while (changed && iterations < maxIterations) {
-      changed = false;
-      iterations++;
+    for (final bucketKey in majorityBuckets) {
+      final bucketTime = Duration(minutes: bucketKey);
+      final targetHour = bucketTime.inHours;
+      final targetMinute = bucketTime.inMinutes % 60;
       
-      for (int groupIdx = 0; groupIdx < groups.length; groupIdx++) {
-        final group = groups[groupIdx];
-        final recordingsToMove = <RecordingTime>[];
+      print('[MultiRecordings] Creating group for time slot $targetHour:${targetMinute.toString().padLeft(2, '0')}');
+      
+      final List<RecordingTime> group = [];
+      final Set<Camera> camerasInGroup = {};
+      
+      // For each camera, find the best recording for this time slot
+      for (final camera in uniqueCameras) {
+        // Get all recordings for this camera
+        final cameraRecordingsList = allRecordings
+            .where((r) => r.camera == camera)
+            .toList();
         
-        for (final recording in group) {
-          final currentGroupCenter = _calculateGroupCenterTime(group);
-          final currentDiff = recording.timestamp.difference(currentGroupCenter).abs();
+        if (cameraRecordingsList.isEmpty) continue;
+        
+        // Find the recording closest to this bucket's time
+        RecordingTime? bestRecording;
+        Duration bestDiff = const Duration(days: 999);
+        
+        for (final recording in cameraRecordingsList) {
+          final recordingMinutes = recording.timestamp.hour * 60 + recording.timestamp.minute;
+          final diff = Duration(minutes: (recordingMinutes - bucketKey).abs());
           
-          // Check if this recording would be closer to another group
-          for (int otherIdx = 0; otherIdx < groups.length; otherIdx++) {
-            if (otherIdx == groupIdx) continue;
-            
-            final otherGroup = groups[otherIdx];
-            // Check if this camera is already in the other group
-            if (otherGroup.any((r) => r.camera == recording.camera)) continue;
-            
-            final otherGroupCenter = _calculateGroupCenterTime(otherGroup);
-            final otherDiff = recording.timestamp.difference(otherGroupCenter).abs();
-            
-            // Move if other group is significantly closer (at least 30 seconds closer)
-            if (otherDiff < currentDiff && (currentDiff - otherDiff).inSeconds >= 30 && otherDiff <= tolerance) {
-              print('[MultiRecordings] Pass2: Moving ${recording.camera.name}:${recording.recording} from group $groupIdx to group $otherIdx (${currentDiff.inSeconds}s -> ${otherDiff.inSeconds}s)');
-              recordingsToMove.add(recording);
-              otherGroup.add(recording);
-              changed = true;
-              break;
-            }
+          if (diff <= tolerance && diff < bestDiff) {
+            bestDiff = diff;
+            bestRecording = recording;
           }
         }
         
-        // Remove moved recordings from current group
-        for (final rec in recordingsToMove) {
-          group.remove(rec);
+        if (bestRecording != null && !camerasInGroup.contains(camera)) {
+          group.add(bestRecording);
+          camerasInGroup.add(camera);
+          print('[MultiRecordings]   Added ${camera.name}: ${bestRecording.recording} (diff: ${bestDiff.inMinutes}min)');
         }
       }
+      
+      if (group.length >= 2) {
+        groups.add(group);
+        print('[MultiRecordings] Created group with ${group.length} cameras');
+      }
     }
-    
-    // Remove empty groups
-    groups.removeWhere((group) => group.isEmpty);
 
-    print('[MultiRecordings] Created ${groups.length} groups after optimization:');
+    print('[MultiRecordings] Created ${groups.length} groups using majority-based algorithm:');
     for (int i = 0; i < groups.length; i++) {
       final group = groups[i];
       final centerTime = _calculateGroupCenterTime(group);
-      print('[MultiRecordings] Group $i (${group.length} cameras, center: ${centerTime.hour}:${centerTime.minute}:${centerTime.second}):');
+      print('[MultiRecordings] Group $i (${group.length} cameras, center: ${centerTime.hour}:${centerTime.minute.toString().padLeft(2, '0')}):');
       for (final rec in group) {
         final fileType = rec.recording.toLowerCase().contains('.mkv')
             ? 'MKV'
@@ -1991,10 +1969,49 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
       }
     }
 
-    // Sadece birden fazla kamerası olan grupları döndür
-    final result = groups.where((group) => group.length > 1).toList();
-    print('[MultiRecordings] Returning ${result.length} multi-camera groups');
-    return result;
+    print('[MultiRecordings] Returning ${groups.length} multi-camera groups');
+    return groups;
+  }
+
+  // Fallback grouping when no majority buckets found (original algorithm)
+  List<List<RecordingTime>> _fallbackGrouping(List<RecordingTime> allRecordings, int totalCameras) {
+    print('[MultiRecordings] Using fallback grouping algorithm...');
+    
+    // Sort by timestamp
+    allRecordings.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    
+    final List<List<RecordingTime>> groups = [];
+    const Duration tolerance = Duration(minutes: 5);
+
+    for (final recording in allRecordings) {
+      int bestGroupIndex = -1;
+      Duration bestTimeDiff = const Duration(days: 999);
+
+      for (int i = 0; i < groups.length; i++) {
+        final group = groups[i];
+        if (group.isNotEmpty) {
+          final hasThisCamera = group.any((r) => r.camera == recording.camera);
+          if (hasThisCamera) continue;
+
+          final groupCenterTime = _calculateGroupCenterTime(group);
+          final timeDiff = recording.timestamp.difference(groupCenterTime).abs();
+
+          if (timeDiff <= tolerance && timeDiff < bestTimeDiff) {
+            bestGroupIndex = i;
+            bestTimeDiff = timeDiff;
+          }
+        }
+      }
+
+      if (bestGroupIndex >= 0) {
+        groups[bestGroupIndex].add(recording);
+      } else {
+        groups.add([recording]);
+      }
+    }
+    
+    // Remove groups with less than 2 cameras
+    return groups.where((group) => group.length > 1).toList();
   }
 
   /// Calculate the center (average) time of a group
