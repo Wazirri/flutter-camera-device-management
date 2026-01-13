@@ -535,6 +535,774 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
     _updateRecordingsForSelectedDay();
   }
 
+  // Show camera selection dialog with filters
+  Future<void> _showCameraSelectionDialog() async {
+    final provider = Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    final cameraGroups = provider.cameraGroupsList;
+    
+    // Create temporary selection state
+    Set<Camera> tempSelectedCameras = Set.from(_selectedCameras);
+    String searchQuery = '';
+    String? selectedGroupFilter; // null = all groups
+    bool showOnlyWithMultiDevices = false;
+    // New filters
+    bool? filterOnline; // null = all, true = online, false = offline
+    bool? filterRecording; // null = all, true = recording, false = not recording
+    bool? filterVerified; // null = all, true = verified, false = unverified
+    
+    await showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            // Get all available cameras
+            List<Camera> filteredCameras = List.from(_availableCameras);
+            
+            // Apply group filter
+            if (selectedGroupFilter != null) {
+              if (selectedGroupFilter == '__ungrouped__') {
+                // Get ungrouped cameras
+                final groupedCameraNames = <String>{};
+                for (final group in cameraGroups) {
+                  final camerasInGroup = provider.getCamerasInGroup(group.name);
+                  for (final camera in camerasInGroup) {
+                    groupedCameraNames.add(camera.name);
+                  }
+                }
+                filteredCameras = filteredCameras
+                    .where((camera) => !groupedCameraNames.contains(camera.name))
+                    .toList();
+              } else {
+                // Get cameras in specific group
+                final camerasInGroup = provider.getCamerasInGroup(selectedGroupFilter!);
+                final groupCameraNames = camerasInGroup.map((c) => c.name).toSet();
+                filteredCameras = filteredCameras
+                    .where((camera) => groupCameraNames.contains(camera.name))
+                    .toList();
+              }
+            }
+            
+            // Apply multi-device filter
+            if (showOnlyWithMultiDevices) {
+              filteredCameras = filteredCameras
+                  .where((camera) => camera.currentDevices.length > 1)
+                  .toList();
+            }
+            
+            // Apply online/offline filter
+            if (filterOnline != null) {
+              filteredCameras = filteredCameras
+                  .where((camera) => camera.connected == filterOnline)
+                  .toList();
+            }
+            
+            // Apply recording filter
+            if (filterRecording != null) {
+              filteredCameras = filteredCameras
+                  .where((camera) => camera.recording == filterRecording)
+                  .toList();
+            }
+            
+            // Apply verified filter
+            if (filterVerified != null) {
+              filteredCameras = filteredCameras
+                  .where((camera) => camera.verified == filterVerified)
+                  .toList();
+            }
+            
+            // Apply search filter
+            if (searchQuery.isNotEmpty) {
+              filteredCameras = filteredCameras.where((camera) {
+                final name = camera.name.toLowerCase();
+                final ip = camera.ip.toLowerCase();
+                final mac = camera.mac.toLowerCase();
+                return name.contains(searchQuery) ||
+                    ip.contains(searchQuery) ||
+                    mac.contains(searchQuery);
+              }).toList();
+            }
+            
+            // Sort cameras alphabetically
+            filteredCameras.sort((a, b) => a.name.compareTo(b.name));
+            
+            // Count selected in current filter
+            final selectedInFilter = filteredCameras
+                .where((c) => tempSelectedCameras.contains(c))
+                .length;
+            
+            // Calculate stats for filter chips
+            final onlineCount = _availableCameras.where((c) => c.connected).length;
+            final offlineCount = _availableCameras.length - onlineCount;
+            final recordingCount = _availableCameras.where((c) => c.recording).length;
+            final verifiedCount = _availableCameras.where((c) => c.verified).length;
+            
+            // Helper to build filter chip
+            Widget buildFilterChip({
+              required String label,
+              required IconData icon,
+              required Color activeColor,
+              required bool? currentValue,
+              required bool targetValue,
+              required Function(bool?) onChanged,
+              int? count,
+            }) {
+              final isActive = currentValue == targetValue;
+              return InkWell(
+                onTap: () {
+                  onChanged(isActive ? null : targetValue);
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: isActive ? activeColor.withOpacity(0.15) : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isActive ? activeColor : Colors.grey.shade300,
+                      width: isActive ? 1.5 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(icon, size: 14, color: isActive ? activeColor : Colors.grey.shade600),
+                      const SizedBox(width: 4),
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isActive ? activeColor : Colors.grey.shade700,
+                          fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                        ),
+                      ),
+                      if (count != null) ...[
+                        const SizedBox(width: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: isActive ? activeColor.withOpacity(0.3) : Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            count.toString(),
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: isActive ? activeColor : Colors.grey.shade600,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            }
+            
+            return Dialog(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: MediaQuery.of(context).size.height * 0.85,
+                constraints: const BoxConstraints(maxWidth: 900, maxHeight: 750),
+                child: Column(
+                  children: [
+                    // Header
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryBlue,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(4),
+                          topRight: Radius.circular(4),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.videocam, color: Colors.white),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Text(
+                              'Kamera Seçimi',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '${tempSelectedCameras.length} seçili',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.white),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Filters
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Search field
+                          TextField(
+                            style: const TextStyle(color: Colors.black87),
+                            decoration: InputDecoration(
+                              hintText: 'Kamera ismi, IP adresi veya MAC adresi ile ara...',
+                              hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                              prefixIcon: Icon(Icons.search, color: Colors.grey.shade600),
+                              isDense: true,
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(color: Colors.grey.shade300),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                            ),
+                            onChanged: (value) {
+                              setDialogState(() {
+                                searchQuery = value.toLowerCase();
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          
+                          // Group filter dropdown row
+                          Row(
+                            children: [
+                              // Group filter dropdown
+                              Expanded(
+                                flex: 2,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: Colors.grey.shade300),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String?>(
+                                      value: selectedGroupFilter,
+                                      isExpanded: true,
+                                      hint: Row(
+                                        children: [
+                                          Icon(Icons.folder_open, size: 18, color: Colors.grey.shade500),
+                                          const SizedBox(width: 8),
+                                          Text('Grup seçin...', style: TextStyle(color: Colors.grey.shade500)),
+                                        ],
+                                      ),
+                                      items: [
+                                        const DropdownMenuItem<String?>(
+                                          value: null,
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.all_inclusive, size: 18, color: Colors.blue),
+                                              SizedBox(width: 8),
+                                              Text('Tüm Gruplar'),
+                                            ],
+                                          ),
+                                        ),
+                                        ...cameraGroups.map((group) => DropdownMenuItem<String?>(
+                                          value: group.name,
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.folder, size: 18, color: Colors.orange),
+                                              const SizedBox(width: 8),
+                                              Expanded(child: Text(group.name, overflow: TextOverflow.ellipsis)),
+                                              Text(
+                                                '(${provider.getCamerasInGroup(group.name).length})',
+                                                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                              ),
+                                            ],
+                                          ),
+                                        )),
+                                        const DropdownMenuItem<String?>(
+                                          value: '__ungrouped__',
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.folder_off, size: 18, color: Colors.grey),
+                                              SizedBox(width: 8),
+                                              Text('Grupsuz Kameralar'),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                      onChanged: (value) {
+                                        setDialogState(() {
+                                          selectedGroupFilter = value;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              
+                              // Multi-device filter chip
+                              buildFilterChip(
+                                label: 'Multi-Device',
+                                icon: Icons.devices,
+                                activeColor: Colors.orange,
+                                currentValue: showOnlyWithMultiDevices ? true : null,
+                                targetValue: true,
+                                onChanged: (val) {
+                                  setDialogState(() {
+                                    showOnlyWithMultiDevices = val == true;
+                                  });
+                                },
+                                count: _availableCameras.where((c) => c.currentDevices.length > 1).length,
+                              ),
+                            ],
+                          ),
+                          
+                          const SizedBox(height: 10),
+                          
+                          // Status filter chips row
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                // Online filter
+                                buildFilterChip(
+                                  label: 'Online',
+                                  icon: Icons.wifi,
+                                  activeColor: Colors.green,
+                                  currentValue: filterOnline,
+                                  targetValue: true,
+                                  onChanged: (val) {
+                                    setDialogState(() {
+                                      filterOnline = val;
+                                    });
+                                  },
+                                  count: onlineCount,
+                                ),
+                                const SizedBox(width: 8),
+                                
+                                // Offline filter
+                                buildFilterChip(
+                                  label: 'Offline',
+                                  icon: Icons.wifi_off,
+                                  activeColor: Colors.red,
+                                  currentValue: filterOnline,
+                                  targetValue: false,
+                                  onChanged: (val) {
+                                    setDialogState(() {
+                                      filterOnline = val;
+                                    });
+                                  },
+                                  count: offlineCount,
+                                ),
+                                const SizedBox(width: 8),
+                                
+                                // Recording filter
+                                buildFilterChip(
+                                  label: 'Kayıt Yapan',
+                                  icon: Icons.fiber_manual_record,
+                                  activeColor: Colors.red.shade700,
+                                  currentValue: filterRecording,
+                                  targetValue: true,
+                                  onChanged: (val) {
+                                    setDialogState(() {
+                                      filterRecording = val;
+                                    });
+                                  },
+                                  count: recordingCount,
+                                ),
+                                const SizedBox(width: 8),
+                                
+                                // Not Recording filter
+                                buildFilterChip(
+                                  label: 'Kayıt Yok',
+                                  icon: Icons.stop_circle_outlined,
+                                  activeColor: Colors.grey.shade700,
+                                  currentValue: filterRecording,
+                                  targetValue: false,
+                                  onChanged: (val) {
+                                    setDialogState(() {
+                                      filterRecording = val;
+                                    });
+                                  },
+                                  count: _availableCameras.length - recordingCount,
+                                ),
+                                const SizedBox(width: 8),
+                                
+                                // Verified filter
+                                buildFilterChip(
+                                  label: 'Doğrulanmış',
+                                  icon: Icons.verified,
+                                  activeColor: Colors.blue,
+                                  currentValue: filterVerified,
+                                  targetValue: true,
+                                  onChanged: (val) {
+                                    setDialogState(() {
+                                      filterVerified = val;
+                                    });
+                                  },
+                                  count: verifiedCount,
+                                ),
+                                const SizedBox(width: 8),
+                                
+                                // Unverified filter
+                                buildFilterChip(
+                                  label: 'Doğrulanmamış',
+                                  icon: Icons.warning_amber_rounded,
+                                  activeColor: Colors.amber.shade700,
+                                  currentValue: filterVerified,
+                                  targetValue: false,
+                                  onChanged: (val) {
+                                    setDialogState(() {
+                                      filterVerified = val;
+                                    });
+                                  },
+                                  count: _availableCameras.length - verifiedCount,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Quick actions bar
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.filter_list, size: 16, color: Colors.grey.shade600),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${filteredCameras.length} kamera',
+                            style: TextStyle(color: Colors.grey.shade700, fontSize: 13, fontWeight: FontWeight.w500),
+                          ),
+                          if (selectedInFilter > 0) ...[
+                            Text(
+                              ' • $selectedInFilter seçili',
+                              style: TextStyle(color: Colors.blue.shade600, fontSize: 13, fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                          const Spacer(),
+                          TextButton.icon(
+                            icon: const Icon(Icons.check_box, size: 18),
+                            label: const Text('Tümünü Seç'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.green.shade700,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                            ),
+                            onPressed: () {
+                              setDialogState(() {
+                                tempSelectedCameras.addAll(filteredCameras);
+                              });
+                            },
+                          ),
+                          TextButton.icon(
+                            icon: const Icon(Icons.check_box_outline_blank, size: 18),
+                            label: const Text('Tümünü Kaldır'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.red.shade700,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                            ),
+                            onPressed: () {
+                              setDialogState(() {
+                                for (final camera in filteredCameras) {
+                                  tempSelectedCameras.remove(camera);
+                                }
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Camera list
+                    Expanded(
+                      child: filteredCameras.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.search_off, size: 56, color: Colors.grey.shade400),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'Kamera bulunamadı',
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Filtrelerinizi değiştirmeyi deneyin',
+                                    style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ListView.builder(
+                              itemCount: filteredCameras.length,
+                              itemBuilder: (context, index) {
+                                final camera = filteredCameras[index];
+                                final isSelected = tempSelectedCameras.contains(camera);
+                                final hasMultiDevices = camera.currentDevices.length > 1;
+                                
+                                // Find which group this camera belongs to
+                                String? cameraGroup;
+                                for (final group in cameraGroups) {
+                                  final camerasInGroup = provider.getCamerasInGroup(group.name);
+                                  if (camerasInGroup.any((c) => c.name == camera.name)) {
+                                    cameraGroup = group.name;
+                                    break;
+                                  }
+                                }
+                                
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? Colors.blue.shade50 : null,
+                                    border: Border(
+                                      bottom: BorderSide(color: Colors.grey.shade200),
+                                    ),
+                                  ),
+                                  child: CheckboxListTile(
+                                    value: isSelected,
+                                    onChanged: (value) {
+                                      setDialogState(() {
+                                        if (value == true) {
+                                          tempSelectedCameras.add(camera);
+                                        } else {
+                                          tempSelectedCameras.remove(camera);
+                                        }
+                                      });
+                                    },
+                                    title: Row(
+                                      children: [
+                                        // Status indicators
+                                        Container(
+                                          margin: const EdgeInsets.only(right: 8),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              // Online/Offline indicator
+                                              Container(
+                                                width: 8,
+                                                height: 8,
+                                                decoration: BoxDecoration(
+                                                  color: camera.connected ? Colors.green : Colors.red.shade400,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                              // Recording indicator
+                                              if (camera.recording) ...[
+                                                const SizedBox(width: 4),
+                                                Container(
+                                                  width: 8,
+                                                  height: 8,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.red.shade700,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: const Center(
+                                                    child: Icon(Icons.fiber_manual_record, size: 6, color: Colors.white),
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            camera.name,
+                                            style: TextStyle(
+                                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                              color: isSelected ? Colors.black87 : Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                        // Verified badge
+                                        if (camera.verified)
+                                          Padding(
+                                            padding: const EdgeInsets.only(right: 4),
+                                            child: Icon(Icons.verified, size: 16, color: Colors.blue.shade600),
+                                          ),
+                                        if (hasMultiDevices)
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.orange.shade100,
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(Icons.devices, size: 12, color: Colors.orange),
+                                                const SizedBox(width: 2),
+                                                Text(
+                                                  '${camera.currentDevices.length}',
+                                                  style: const TextStyle(fontSize: 11, color: Colors.orange),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    subtitle: Row(
+                                      children: [
+                                        Text(
+                                          camera.ip,
+                                          style: TextStyle(
+                                            fontSize: 12, 
+                                            color: isSelected ? Colors.grey.shade600 : Colors.grey.shade400,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        // Status text
+                                        Text(
+                                          camera.connected ? 'Online' : 'Offline',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: camera.connected ? Colors.green : Colors.red,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        if (camera.recording) ...[
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                            decoration: BoxDecoration(
+                                              color: Colors.red.withOpacity(0.2),
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: const Text(
+                                              'REC',
+                                              style: TextStyle(
+                                                fontSize: 9,
+                                                color: Colors.red,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                        if (cameraGroup != null) ...[
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                            decoration: BoxDecoration(
+                                              color: isSelected ? Colors.grey.shade200 : Colors.grey.shade700,
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              cameraGroup,
+                                              style: TextStyle(
+                                                fontSize: 10, 
+                                                color: isSelected ? Colors.grey.shade700 : Colors.grey.shade300,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                    controlAffinity: ListTileControlAffinity.leading,
+                                    activeColor: AppTheme.primaryBlue,
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                    
+                    // Footer with action buttons
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(4),
+                          bottomRight: Radius.circular(4),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          // Clear all button
+                          OutlinedButton.icon(
+                            icon: const Icon(Icons.clear_all),
+                            label: const Text('Tümünü Temizle'),
+                            onPressed: () {
+                              setDialogState(() {
+                                tempSelectedCameras.clear();
+                              });
+                            },
+                          ),
+                          const Spacer(),
+                          // Cancel button
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('İptal'),
+                          ),
+                          const SizedBox(width: 12),
+                          // Apply button
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.check),
+                            label: Text('Uygula (${tempSelectedCameras.length})'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.primaryBlue,
+                              foregroundColor: Colors.white,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context, tempSelectedCameras);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ).then((result) {
+      if (result != null && result is Set<Camera>) {
+        setState(() {
+          _selectedCameras = result.toList();
+          // Clear old recordings for removed cameras
+          final camerasToRemove = _cameraRecordings.keys
+              .where((c) => !result.contains(c))
+              .toList();
+          for (final camera in camerasToRemove) {
+            _cameraRecordings.remove(camera);
+            _cameraErrors.remove(camera);
+            _cameraDeviceRecordings.remove(camera);
+            _cameraDeviceErrors.remove(camera);
+          }
+        });
+        _updateRecordingsForSelectedDay();
+      }
+    });
+  }
+
   // Show device selection dialog for cameras on multiple devices
   Future<String?> _showDeviceSelectionDialog(Camera camera) async {
     final cameraDevicesProvider =
@@ -1886,7 +2654,10 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
     
     // Step 2: Determine minimum camera threshold for a valid group
     // A valid group should have at least 50% of cameras, minimum 2
-    final int minCamerasForGroup = (uniqueCameras.length * 0.5).ceil().clamp(2, uniqueCameras.length);
+    // Handle edge case where only 1 camera is selected
+    final int minCamerasForGroup = uniqueCameras.length <= 1 
+        ? 1 
+        : (uniqueCameras.length * 0.5).ceil().clamp(2, uniqueCameras.length);
     print('[MultiRecordings] Minimum cameras for valid group: $minCamerasForGroup');
     
     // Step 3: Filter buckets that meet the threshold (these are "majority" time slots)
@@ -3443,378 +4214,85 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
     print(
         '[MultiRecordings] Selected cameras count: ${_selectedCameras.length}');
 
-    // Get ungrouped cameras
-    final groupedCameraNames = <String>{};
-    for (final group in cameraGroups) {
-      final camerasInGroup = provider.getCamerasInGroup(group.name);
-      for (final camera in camerasInGroup) {
-        groupedCameraNames.add(camera.name);
-      }
-    }
-
-    final ungroupedCameras = _availableCameras
-        .where((camera) => !groupedCameraNames.contains(camera.name))
-        .toList();
-
-    print(
-        '[MultiRecordings] Ungrouped cameras count: ${ungroupedCameras.length}');
-
-    // If no groups exist, show ungrouped cameras only
-    if (cameraGroups.isEmpty) {
-      print(
-          '[MultiRecordings] No camera groups found, using ungrouped cameras');
-      return _buildUngroupedCameraSelection();
-    }
-
     return Card(
       margin: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Camera Groups',
+                  'Kamera Seçimi',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
-                Text(
-                  '${_selectedCameras.length} selected',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ),
-          // Select All / Clear All buttons
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.select_all, size: 16),
-                    label: const Text('Select All'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _selectedCameras.isNotEmpty 
+                        ? AppTheme.primaryBlue.withOpacity(0.1)
+                        : Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _selectedCameras.isNotEmpty 
+                          ? AppTheme.primaryBlue
+                          : Colors.grey.shade400,
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _selectedCameras.clear();
-                        // Add all grouped cameras
-                        for (final group in cameraGroups) {
-                          final camerasInGroup =
-                              provider.getCamerasInGroup(group.name);
-                          _selectedCameras.addAll(camerasInGroup);
-                        }
-                        // Add all ungrouped cameras
-                        _selectedCameras.addAll(ungroupedCameras);
-                      });
-                      _updateRecordingsForSelectedDay();
-                    },
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.clear, size: 16),
-                    label: const Text('Clear All'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    '${_selectedCameras.length} / ${_availableCameras.length}',
+                    style: TextStyle(
+                      color: _selectedCameras.isNotEmpty 
+                          ? AppTheme.primaryBlue
+                          : Colors.grey.shade600,
+                      fontWeight: FontWeight.bold,
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _selectedCameras.clear();
-                        _cameraRecordings.clear();
-                        _cameraErrors.clear();
-                      });
-                    },
                   ),
                 ),
               ],
             ),
           ),
-
-          const SizedBox(height: 8),
-
-          // Toplu İzle button
+          
+          // Main camera selection button
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                icon: const Icon(Icons.play_circle_fill, size: 18),
-                label: const Text('Toplu İzle (Closest Times)'),
+                icon: const Icon(Icons.videocam, size: 20),
+                label: Text(_selectedCameras.isEmpty 
+                    ? 'Kamera Seç' 
+                    : 'Kameraları Düzenle (${_selectedCameras.length})'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryOrange,
+                  backgroundColor: AppTheme.primaryBlue,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-                onPressed: _selectedCameras.isEmpty
-                    ? null
-                    : () {
-                        _watchClosestRecordings();
-                      },
+                onPressed: _showCameraSelectionDialog,
               ),
             ),
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
-          // Camera groups and ungrouped cameras list
-          Expanded(
-            child: ListView(
-              children: [
-                // Camera groups
-                ...cameraGroups.map((group) {
-                  final camerasInGroup = provider.getCamerasInGroup(group.name);
-                  final selectedInGroup = camerasInGroup
-                      .where((c) => _selectedCameras.contains(c))
-                      .length;
-
-                  return ExpansionTile(
-                    leading: Icon(
-                      Icons.videocam_outlined,
-                      color: selectedInGroup > 0 ? AppTheme.primaryBlue : null,
-                    ),
-                    title: Text(
-                      group.name,
-                      style: TextStyle(
-                        fontWeight: selectedInGroup > 0
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                      ),
-                    ),
-                    subtitle: Text(
-                        '$selectedInGroup/${camerasInGroup.length} cameras selected'),
-                    children: [
-                      ...camerasInGroup.map((camera) {
-                        final isSelected = _selectedCameras.contains(camera);
-                        final hasMultipleDevices =
-                            camera.currentDevices.length > 1;
-                        final selectedDeviceMac = _cameraSelectedDevice[camera];
-
-                        return CheckboxListTile(
-                          dense: true,
-                          contentPadding:
-                              const EdgeInsets.only(left: 50, right: 16),
-                          title: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  camera.name,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              ),
-                              if (hasMultipleDevices)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.orange.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                        color: Colors.orange.withOpacity(0.5)),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(Icons.devices,
-                                          size: 12, color: Colors.orange),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '${camera.currentDevices.length}',
-                                        style: const TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.orange,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                            ],
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'IP: ${camera.ip}',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              if (isSelected && selectedDeviceMac != null)
-                                Text(
-                                  'Cihaz: ${selectedDeviceMac.toUpperCase().substring(selectedDeviceMac.length > 8 ? selectedDeviceMac.length - 8 : 0)}',
-                                  style: TextStyle(
-                                      fontSize: 10, color: Colors.blue[700]),
-                                ),
-                            ],
-                          ),
-                          value: isSelected,
-                          onChanged: (bool? value) {
-                            _selectCamera(camera, value ?? false);
-                          },
-                        );
-                      }).toList(),
-                    ],
-                  );
-                }).toList(),
-
-                // Ungrouped cameras section (if any)
-                if (ungroupedCameras.isNotEmpty) ...[
-                  const Divider(),
-                  ExpansionTile(
-                    leading: Icon(
-                      Icons.videocam_off_outlined,
-                      color: ungroupedCameras
-                              .any((c) => _selectedCameras.contains(c))
-                          ? AppTheme.primaryOrange
-                          : null,
-                    ),
-                    title: Text(
-                      'Ungrouped Cameras',
-                      style: TextStyle(
-                        fontWeight: ungroupedCameras
-                                .any((c) => _selectedCameras.contains(c))
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                        color: Colors.orange.shade700,
-                      ),
-                    ),
-                    subtitle: Text(
-                        '${ungroupedCameras.where((c) => _selectedCameras.contains(c)).length}/${ungroupedCameras.length} cameras selected'),
-                    children: [
-                      ...ungroupedCameras.map((camera) {
-                        final isSelected = _selectedCameras.contains(camera);
-                        final hasMultipleDevices =
-                            camera.currentDevices.length > 1;
-                        final selectedDeviceMac = _cameraSelectedDevice[camera];
-
-                        return CheckboxListTile(
-                          dense: true,
-                          contentPadding:
-                              const EdgeInsets.only(left: 50, right: 16),
-                          title: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  camera.name,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              ),
-                              if (hasMultipleDevices)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.orange.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                        color: Colors.orange.withOpacity(0.5)),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(Icons.devices,
-                                          size: 12, color: Colors.orange),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '${camera.currentDevices.length}',
-                                        style: const TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.orange,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                            ],
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'IP: ${camera.ip}',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              if (isSelected && selectedDeviceMac != null)
-                                Text(
-                                  'Cihaz: ${selectedDeviceMac.toUpperCase().substring(selectedDeviceMac.length > 8 ? selectedDeviceMac.length - 8 : 0)}',
-                                  style: TextStyle(
-                                      fontSize: 10, color: Colors.blue[700]),
-                                ),
-                            ],
-                          ),
-                          value: isSelected,
-                          onChanged: (bool? value) {
-                            _selectCamera(camera, value ?? false);
-                          },
-                        );
-                      }).toList(),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUngroupedCameraSelection() {
-    print(
-        '[MultiRecordings] Building ungrouped camera selection with ${_availableCameras.length} cameras');
-
-    if (_availableCameras.isEmpty) {
-      print('[MultiRecordings] No cameras available, showing empty state');
-      return const Card(
-        margin: EdgeInsets.all(8.0),
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Center(
-            child: Text('No cameras available'),
-          ),
-        ),
-      );
-    }
-
-    return Card(
-      margin: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Available Cameras',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                Text(
-                  '${_selectedCameras.length}/${_availableCameras.length} selected',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ),
-
-          // Select All / Clear All buttons
+          // Quick action buttons
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
               children: [
                 Expanded(
-                  child: ElevatedButton.icon(
+                  child: OutlinedButton.icon(
                     icon: const Icon(Icons.select_all, size: 16),
-                    label: const Text('Select All'),
-                    style: ElevatedButton.styleFrom(
+                    label: const Text('Tümü', style: TextStyle(fontSize: 12)),
+                    style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                     ),
                     onPressed: () {
@@ -3827,17 +4305,19 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: ElevatedButton.icon(
+                  child: OutlinedButton.icon(
                     icon: const Icon(Icons.clear, size: 16),
-                    label: const Text('Clear All'),
-                    style: ElevatedButton.styleFrom(
+                    label: const Text('Temizle', style: TextStyle(fontSize: 12)),
+                    style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                     ),
-                    onPressed: () {
+                    onPressed: _selectedCameras.isEmpty ? null : () {
                       setState(() {
                         _selectedCameras.clear();
                         _cameraRecordings.clear();
                         _cameraErrors.clear();
+                        _cameraDeviceRecordings.clear();
+                        _cameraDeviceErrors.clear();
                       });
                     },
                   ),
@@ -3846,7 +4326,7 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
             ),
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
           // Toplu İzle button
           Padding(
@@ -3855,11 +4335,14 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
               width: double.infinity,
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.play_circle_fill, size: 18),
-                label: const Text('Toplu İzle (Closest Times)'),
+                label: const Text('Toplu İzle'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryOrange,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onPressed: _selectedCameras.isEmpty
                     ? null
@@ -3870,116 +4353,180 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
             ),
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
+          const Divider(height: 1),
 
-          // Camera search field
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: TextField(
-              controller: _cameraSearchController,
-              decoration: InputDecoration(
-                hintText: 'Search cameras...',
-                prefixIcon: const Icon(Icons.search, size: 20),
-                suffixIcon: _cameraSearchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear, size: 20),
-                        onPressed: () {
-                          setState(() {
-                            _cameraSearchController.clear();
-                            _cameraSearchQuery = '';
-                          });
-                        },
-                      )
-                    : null,
-                isDense: true,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  _cameraSearchQuery = value.toLowerCase();
-                });
-              },
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // Camera list
+          // Selected cameras list
           Expanded(
-            child: Builder(
-              builder: (context) {
-                // Filter cameras based on search query
-                final filteredCameras = _cameraSearchQuery.isEmpty
-                    ? _availableCameras
-                    : _availableCameras.where((camera) {
-                        final name = camera.name.toLowerCase();
-                        final ip = camera.ip.toLowerCase();
-                        final mac = camera.mac.toLowerCase();
-                        return name.contains(_cameraSearchQuery) ||
-                            ip.contains(_cameraSearchQuery) ||
-                            mac.contains(_cameraSearchQuery);
-                      }).toList();
-
-                if (filteredCameras.isEmpty) {
-                  return Center(
+            child: _selectedCameras.isEmpty
+                ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.search_off,
-                            size: 48, color: Colors.grey[400]),
-                        const SizedBox(height: 8),
+                        Icon(Icons.videocam_off, size: 48, color: Colors.grey.shade400),
+                        const SizedBox(height: 12),
                         Text(
-                          'No cameras found for "$_cameraSearchQuery"',
-                          style: TextStyle(color: Colors.grey[600]),
+                          'Kamera seçilmedi',
+                          style: TextStyle(color: Colors.grey.shade600),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          icon: const Icon(Icons.add),
+                          label: const Text('Kamera Seç'),
+                          onPressed: _showCameraSelectionDialog,
                         ),
                       ],
                     ),
-                  );
-                }
-
-                return ListView.builder(
-                  itemCount: filteredCameras.length,
-                  itemBuilder: (context, index) {
-                    final camera = filteredCameras[index];
-                    final isSelected = _selectedCameras.contains(camera);
-                    return CheckboxListTile(
-                      dense: true,
-                      title: Text(
-                        camera.name,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      subtitle: Text(
-                        'IP: ${camera.ip}',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                      value: isSelected,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          if (value == true) {
-                            if (!_selectedCameras.contains(camera)) {
-                              _selectedCameras.add(camera);
-                            }
-                          } else {
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: _selectedCameras.length,
+                    itemBuilder: (context, index) {
+                      final camera = _selectedCameras[index];
+                      final hasMultiDevices = camera.currentDevices.length > 1;
+                      
+                      // Get recording count for this camera
+                      int recordingCount = 0;
+                      if (hasMultiDevices && camera.currentDevices.length > 1) {
+                        final deviceRecordings = _cameraDeviceRecordings[camera] ?? {};
+                        for (var recordings in deviceRecordings.values) {
+                          recordingCount += recordings.length;
+                        }
+                      } else {
+                        recordingCount = (_cameraRecordings[camera] ?? []).length;
+                      }
+                      
+                      // Find camera group
+                      String? cameraGroup;
+                      for (final group in cameraGroups) {
+                        final camerasInGroup = provider.getCamerasInGroup(group.name);
+                        if (camerasInGroup.any((c) => c.name == camera.name)) {
+                          cameraGroup = group.name;
+                          break;
+                        }
+                      }
+                      
+                      return Dismissible(
+                        key: Key(camera.mac),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 16),
+                          color: Colors.red,
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        onDismissed: (_) {
+                          setState(() {
                             _selectedCameras.remove(camera);
                             _cameraRecordings.remove(camera);
                             _cameraErrors.remove(camera);
-                          }
-                        });
-                        _updateRecordingsForSelectedDay();
-                      },
-                    );
-                  },
-                );
-              },
-            ),
+                            _cameraDeviceRecordings.remove(camera);
+                            _cameraDeviceErrors.remove(camera);
+                          });
+                        },
+                        child: ListTile(
+                          dense: true,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                          leading: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: recordingCount > 0 
+                                  ? AppTheme.primaryBlue.withOpacity(0.1)
+                                  : Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                                recordingCount.toString(),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: recordingCount > 0 
+                                      ? AppTheme.primaryBlue
+                                      : Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ),
+                          title: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  camera.name,
+                                  style: const TextStyle(fontSize: 13),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (hasMultiDevices)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orange.shade100,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.devices, size: 10, color: Colors.orange),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        '${camera.currentDevices.length}',
+                                        style: const TextStyle(fontSize: 9, color: Colors.orange),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
+                          subtitle: Row(
+                            children: [
+                              Text(
+                                camera.ip,
+                                style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                              ),
+                              if (cameraGroup != null) ...[
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    cameraGroup,
+                                    style: TextStyle(fontSize: 9, color: Colors.grey.shade600),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.close, size: 18, color: Colors.grey.shade500),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                            onPressed: () {
+                              setState(() {
+                                _selectedCameras.remove(camera);
+                                _cameraRecordings.remove(camera);
+                                _cameraErrors.remove(camera);
+                                _cameraDeviceRecordings.remove(camera);
+                                _cameraDeviceErrors.remove(camera);
+                              });
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildUngroupedCameraSelection() {
+    // Redirect to new dialog-based selection
+    return _buildGroupedCameraSelection();
   }
 }
 
