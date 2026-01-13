@@ -571,11 +571,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             final user = parts.isNotEmpty ? parts[0] : '';
             final pass = parts.length > 1 ? parts[1] : '';
             
+            // Mask username and password
+            final maskedUser = user.length > 2 
+                ? '${user[0]}${'*' * (user.length - 2)}${user[user.length - 1]}'
+                : '*' * user.length;
+            final maskedPass = '*' * pass.length;
+            
             return ListTile(
               dense: true,
               leading: const Icon(Icons.person, color: AppTheme.primaryBlue, size: 20),
-              title: Text(user, style: const TextStyle(color: AppTheme.darkTextPrimary)),
-              subtitle: Text(pass, style: TextStyle(color: Colors.grey[400])),
+              title: Text(maskedUser, style: const TextStyle(color: AppTheme.darkTextPrimary)),
+              subtitle: Text(maskedPass, style: TextStyle(color: Colors.grey[400])),
               trailing: IconButton(
                 icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                 onPressed: () async {
