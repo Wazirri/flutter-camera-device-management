@@ -59,6 +59,50 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
   final Map<Camera, Map<String, String>> _cameraDeviceDateFormats =
       {}; // Camera -> DeviceMAC -> date format
 
+  // Helper method to get total recording count for a camera (considers multi-device)
+  int _getTotalRecordingCount(Camera camera) {
+    if (camera.currentDevices.length > 1) {
+      // Multi-device camera: sum recordings from all devices
+      final deviceRecordings = _cameraDeviceRecordings[camera] ?? {};
+      int total = 0;
+      for (var recordings in deviceRecordings.values) {
+        total += recordings.length;
+      }
+      return total;
+    } else {
+      // Single-device camera
+      return (_cameraRecordings[camera] ?? []).length;
+    }
+  }
+
+  // Helper method to get sorted cameras (cameras with recordings first, 0 recordings last)
+  List<Camera> _getSortedSelectedCameras() {
+    // Create a copy to avoid modifying the original list
+    final sortedCameras = List<Camera>.from(_selectedCameras);
+    
+    sortedCameras.sort((a, b) {
+      final countA = _getTotalRecordingCount(a);
+      final countB = _getTotalRecordingCount(b);
+      
+      // Cameras with recordings (>0) come first
+      // Among cameras with recordings, sort by count descending
+      // Cameras with 0 recordings go to the end
+      if (countA == 0 && countB == 0) {
+        return 0; // Both have no recordings, keep original order
+      } else if (countA == 0) {
+        return 1; // a has no recordings, move to end
+      } else if (countB == 0) {
+        return -1; // b has no recordings, a comes first
+      } else {
+        return countB.compareTo(countA); // Both have recordings, sort descending
+      }
+    });
+    
+    print('[MultiRecordings] Sorted cameras by recording count: ${sortedCameras.map((c) => "${c.name}(${_getTotalRecordingCount(c)})").join(", ")}');
+    
+    return sortedCameras;
+  }
+
   // Aktif oynatılan kayıt bilgileri (sadece selection tracking için)
   Camera? _activeCamera;
   String? _activeRecording;
@@ -2395,8 +2439,11 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
     final tabs = <Widget>[];
     final cameraDevicesProvider =
         Provider.of<CameraDevicesProviderOptimized>(context, listen: false);
+    
+    // Use sorted cameras (cameras with recordings first, 0 recordings last)
+    final sortedCameras = _getSortedSelectedCameras();
 
-    for (var camera in _selectedCameras) {
+    for (var camera in sortedCameras) {
       // Check if camera is on multiple devices
       if (camera.currentDevices.length > 1) {
         // Multi-device camera: create a tab for each device
@@ -2505,8 +2552,11 @@ class _MultiRecordingsScreenState extends State<MultiRecordingsScreen>
   // Build tab contents for cameras
   List<Widget> _buildCameraTabContents() {
     final contents = <Widget>[];
+    
+    // Use sorted cameras (cameras with recordings first, 0 recordings last)
+    final sortedCameras = _getSortedSelectedCameras();
 
-    for (var camera in _selectedCameras) {
+    for (var camera in sortedCameras) {
       // Check if camera is on multiple devices
       if (camera.currentDevices.length > 1) {
         // Multi-device camera: create content for each device
